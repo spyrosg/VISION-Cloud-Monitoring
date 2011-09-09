@@ -138,8 +138,8 @@ public class RuleParser
 					@Override
 					public FieldCheck map(Tuple3<String[], Boolean, String> arg0)
 					{
-						return arg0.a.length == 1 ? new FieldCheck( arg0.a[0], arg0.b, arg0.c ) : new FieldCheck( arg0.a[0],
-								new FieldCheck( arg0.a[1], arg0.b, arg0.c ) );
+						return arg0.a.length == 1 ? new FieldCheck( arg0.a[0], arg0.b, arg0.c, false ) : new FieldCheck(
+								arg0.a[0], new FieldCheck( arg0.a[1], arg0.b, arg0.c, true ) );
 					}
 				} );
 	}
