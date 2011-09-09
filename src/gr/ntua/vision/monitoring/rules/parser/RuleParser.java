@@ -1,6 +1,5 @@
 package gr.ntua.vision.monitoring.rules.parser;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.codehaus.jparsec.Parser;
@@ -234,18 +233,28 @@ public class RuleParser
 	 */
 	public static void main(String[] args)
 	{
-		String[] tests = { "a = \"adfadsf\"", "a like \"adfa\\\"dsf\"", "a.b like \"adfa\\\"dsf\"", };
+		// String[] tests = { "a = \"adfadsf\"", "a like \"adfa\\\"dsf\"", "a.b like \"adfa\\\"dsf\"", };
+		//
+		// for( String t : tests )
+		// System.out.println( instance.fieldCheck().from( instance.tokenizer(), instance.ignored() ).parse( t ) );
+		//
+		// System.out.println( "--" );
+		// String event = "Event(a = \"adfadsf\", a like \"adfa\\\"dsf\" , a.b like \"adfa\\\"dsf\" )";
+		// System.out
+		// .println( Arrays.toString( instance.eventSpec().from( instance.tokenizer(), instance.ignored() ).parse( event ) ) );
+		//
+		// System.out.println( "--" );
+		// String rule =
+		// "rule \"mitsos\"\nwhen\nEvent(a = \"adfadsf\", a like \"adfa\\\"dsf\" , a.b like \"adfa\\\"dsf\" );\nEvent(a = \"adfadsf\", a like \"adfa\\\"dsf\" , a.b like \"adfa\\\"dsf\" );\nEvent(a = \"adfadsf\", a like \"adfa\\\"dsf\" , a.b like \"adfa\\\"dsf\" );\nthen PushAsIs(\"foo@bar:4040/\");\n";
+		// System.out.println( instance.rule().from( instance.tokenizer(), instance.ignored() ).parse( rule ) );
 
-		for( String t : tests )
-			System.out.println( instance.fieldCheck().from( instance.tokenizer(), instance.ignored() ).parse( t ) );
+		String rule = "rule \"mitsos\"\n" + //
+				"when\n" + //
+				"Event( Tenant = \"foo\", User like \"admin?\", User = \"kostas\" );\n" + //
+				"Event( Source.Host like \".*\\.cluster10\\.cloud\\.net\" );\n" + //
+				"then\n" + //
+				"PushAsIs(\"foo@bar:4040/\");\n";
 
-		System.out.println( "--" );
-		String event = "Event(a = \"adfadsf\", a like \"adfa\\\"dsf\" , a.b like \"adfa\\\"dsf\" )";
-		System.out
-				.println( Arrays.toString( instance.eventSpec().from( instance.tokenizer(), instance.ignored() ).parse( event ) ) );
-
-		System.out.println( "--" );
-		String rule = "rule \"mitsos\"\nwhen\nEvent(a = \"adfadsf\", a like \"adfa\\\"dsf\" , a.b like \"adfa\\\"dsf\" );\nEvent(a = \"adfadsf\", a like \"adfa\\\"dsf\" , a.b like \"adfa\\\"dsf\" );\nEvent(a = \"adfadsf\", a like \"adfa\\\"dsf\" , a.b like \"adfa\\\"dsf\" );\nthen PushAsIs(\"foo@bar:4040/\");\n";
 		System.out.println( instance.rule().from( instance.tokenizer(), instance.ignored() ).parse( rule ) );
 	}
 }
