@@ -1,8 +1,10 @@
 package gr.ntua.vision.monitoring.rules.parser;
 
+import gr.ntua.vision.monitoring.model.Event;
+
 import java.util.regex.Pattern;
 
-import gr.ntua.vision.monitoring.model.Event;
+import com.google.common.base.Predicate;
 
 
 /**
@@ -85,5 +87,52 @@ public class FieldCheck
 		builder.append( inner );
 		builder.append( "]" );
 		return builder.toString();
+	}
+
+
+	/**
+	 * check if this and the given checks inspect the same field.
+	 * 
+	 * @param chk
+	 *            the check.
+	 * @return <code>true</code> if and only if this and the given checks inspect the same field.
+	 */
+	public boolean sameFieldWith(FieldCheck chk)
+	{
+		if( field != chk.field ) return false;
+		if( inner == null ^ chk.inner == null ) return false;
+		if( inner != null ) //
+			if( inner.field != chk.inner.field ) return false;
+		return true;
+	}
+
+
+	/**
+	 * create a predicate for this field check.
+	 * 
+	 * @return the predicate.
+	 */
+	public Predicate<Event> toPredicate()
+	{
+		return new Predicate<Event>() {
+			@Override
+			public boolean apply(Event event)
+			{
+				boolean exact = FieldCheck.this.exact;
+				String value = FieldCheck.this.value;
+				Pattern pattern = FieldCheck.this.pattern;
+
+				Object fvalue = field.fieldValue( event );
+				if( inner != null )
+				{
+					fvalue = inner.field.fieldValue( fvalue );
+					exact = inner.exact;
+					value = inner.value;
+					pattern = inner.pattern;
+				}
+
+				return exact ? value.equals( fvalue.toString() ) : pattern.matcher( fvalue.toString() ).matches();
+			}
+		};
 	}
 }

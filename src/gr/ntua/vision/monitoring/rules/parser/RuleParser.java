@@ -1,5 +1,8 @@
 package gr.ntua.vision.monitoring.rules.parser;
 
+import gr.ntua.vision.monitoring.rules.Actions;
+
+import java.util.Arrays;
 import java.util.List;
 
 import org.codehaus.jparsec.Parser;
@@ -173,7 +176,7 @@ public class RuleParser
 
 		for( final Actions action : Actions.values() )
 			parsers.add( term( action.toString() )
-					.next( action.argumentParser( term( "," ) ).between( term( "(" ), term( ")" ) ) )
+					.next( argumentParser( action.getArgumentTypes() ).between( term( "(" ), term( ")" ) ) )
 					.map( new Map<Object[], ActionSpec>() {
 						@Override
 						public ActionSpec map(Object[] arg0)
@@ -183,6 +186,87 @@ public class RuleParser
 					} ) );
 
 		return Parsers.or( parsers );
+	}
+
+
+	/**
+	 * get the arguments parser for this.
+	 * 
+	 * @param arg_types
+	 *            the argument types.
+	 * @return the parser.
+	 */
+	public Parser<Object[]> argumentParser(Class< ? >[] arg_types)
+	{
+		Parser<List<Object>> next = null;
+
+		for( int i = arg_types.length - 1; i >= 0; --i )
+		{
+			Parser<List<Object>> argParser = mkParser( arg_types[i] ).map( new Map<Object, List<Object>>() {
+				@Override
+				public List<Object> map(Object arg0)
+				{
+					return Arrays.asList( arg0 );
+				}
+			} );
+
+			if( next != null )
+				next = Parsers.tuple( argParser, term( "," ), next )
+						.map( new Map<Tuple3<List<Object>, Object, List<Object>>, List<Object>>() {
+							@Override
+							public List<Object> map(Tuple3<List<Object>, Object, List<Object>> arg0)
+							{
+								List<Object> list = Lists.newArrayList( arg0.a );
+								list.addAll( arg0.c );
+								return list;
+							}
+						} );
+			else next = argParser;
+		}
+
+		if( next == null ) return Parsers.always();
+
+		return next.map( new Map<List<Object>, Object[]>() {
+			@Override
+			public Object[] map(List<Object> arg0)
+			{
+				return arg0.toArray( new Object[arg0.size()] );
+			}
+		} );
+	}
+
+
+	/**
+	 * create a parser for the given type.
+	 * 
+	 * @param type
+	 *            the type to parse.
+	 * @return the parser.
+	 */
+	private Parser< ? > mkParser(Class< ? > type)
+	{
+		if( type == String.class ) //
+			return Terminals.StringLiteral.PARSER;
+
+		if( type == Integer.class ) //
+			return Terminals.DecimalLiteral.PARSER.map( new Map<String, Integer>() {
+				@Override
+				public Integer map(String arg0)
+				{
+					return Integer.parseInt( arg0 );
+				}
+			} );
+
+		if( type == Long.class ) //
+			return Terminals.DecimalLiteral.PARSER.map( new Map<String, Long>() {
+				@Override
+				public Long map(String arg0)
+				{
+					return Long.parseLong( arg0 );
+				}
+			} );
+
+		throw new AssertionError( "unreachable" );
 	}
 
 
