@@ -4,6 +4,8 @@ import gr.ntua.vision.monitoring.model.Event;
 
 import java.util.UUID;
 
+import com.google.common.base.Function;
+
 
 /**
  * The possible rule actions.
@@ -54,23 +56,20 @@ public enum Actions
 	 *            action arguments.
 	 * @param id
 	 *            id of rule, used to identify its aggregation pool - if any.
+	 * @param actionFunctor
+	 *            the action functor.
 	 */
-	public void apply(ActionHandler handler, Event event, Object[] arguments, UUID id)
+	public void apply(ActionHandler handler, Event event, Object[] arguments, UUID id, Function<Event, Void> actionFunctor)
 	{
 		switch( this )
 		{
 		case PushAggregated:
-			handler.ensurePool( id, (Integer) arguments[1], (Integer) arguments[2], (Long) arguments[3] );
-			handler.aggregateNPush( event, id, (String) arguments[0] );
+		case Store:
+			handler.pool( id, actionFunctor, (Integer) arguments[1], (Integer) arguments[2], (Long) arguments[3] ).push( event );
 			return;
 
 		case PushAsIs:
-			handler.pushEvent( event, (String) arguments[0] );
-			return;
-
-		case Store:
-			handler.ensurePool( id, (Integer) arguments[1], (Integer) arguments[2], (Long) arguments[3] );
-			handler.aggregateNStore( event, id, (String) arguments[0] );
+			handler.transmit( event, (String) arguments[0] );
 			return;
 		}
 	}

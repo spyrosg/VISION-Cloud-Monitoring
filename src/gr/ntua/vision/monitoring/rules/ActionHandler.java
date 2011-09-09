@@ -4,6 +4,8 @@ import gr.ntua.vision.monitoring.model.Event;
 
 import java.util.UUID;
 
+import com.google.common.base.Function;
+
 
 /**
  * This specifies a class able to handle rule actions.
@@ -19,50 +21,37 @@ public interface ActionHandler
 	 * 
 	 * @param pool
 	 *            the pool ID.
+	 * @param action
+	 *            event handling action.
 	 * @param minCount
 	 *            the minimum count of events in a group.
 	 * @param maxCount
 	 *            the maximum count of events in a group.
 	 * @param timeWindow
 	 *            the maximum time difference between the most recent and the oldest event in the group.
+	 * @return the pool.
 	 */
-	public void ensurePool(UUID pool, int minCount, int maxCount, long timeWindow);
+	public AggregationPool pool(UUID pool, Function<Event, Void> action, int minCount, int maxCount, long timeWindow);
 
 
 	/**
-	 * request the aggregation of the events, matching the given prototype (as specified in DRL).
+	 * store the given event under the specified key.
 	 * 
-	 * @param prototype
-	 *            event prototype, obtained from the DRL.
-	 * @param pool
-	 *            aggregation pool.
+	 * @param event
+	 *            event to store.
 	 * @param key
-	 *            the key to store the event groups under.
+	 *            the key to store the event under.
 	 */
-	public void aggregateNStore(Event prototype, UUID pool, String key);
+	public void store(Event event, String key);
 
 
 	/**
-	 * request the push of the events, matching the given prototype (as specified in DRL). Events are pushed at the time they
-	 * arrive. No aggregation takes place.
+	 * transmit the given event.
 	 * 
-	 * @param prototype
-	 *            event prototype, obtained from the DRL.
+	 * @param event
+	 *            event to transmit.
 	 * @param pushURL
 	 *            the URL of the push REST service.
 	 */
-	public void pushEvent(Event prototype, String pushURL);
-
-
-	/**
-	 * request the push of the events, matching the given prototype (as specified in DRL).
-	 * 
-	 * @param prototype
-	 *            event prototype, obtained from the DRL.
-	 * @param pool
-	 *            aggregation pool.
-	 * @param pushURL
-	 *            the URL of the push REST service.
-	 */
-	public void aggregateNPush(Event prototype, UUID pool, String pushURL);
+	public void transmit(Event event, String pushURL);
 }

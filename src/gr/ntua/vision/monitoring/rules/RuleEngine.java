@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 
 
@@ -17,11 +18,13 @@ import com.google.common.collect.Maps;
 public class RuleEngine implements Runnable, ActionHandler
 {
 	/** the rules registered. */
-	private final Map<UUID, EventMatcher>	rules		= Maps.newHashMap();
+	private final Map<UUID, EventMatcher>		rules		= Maps.newHashMap();
+	/** the pools registered. */
+	private final Map<UUID, AggregationPool>	pools		= Maps.newHashMap();
 	/** internal rule cache. */
-	private EventMatcher[]					matchers	= null;
+	private EventMatcher[]						matchers	= null;
 	/** the event queue. */
-	private final ArrayBlockingQueue<Event>	eventQueue	= new ArrayBlockingQueue<Event>( 10000 );
+	private final ArrayBlockingQueue<Event>		eventQueue	= new ArrayBlockingQueue<Event>( 10000 );
 
 
 	/**
@@ -118,7 +121,7 @@ public class RuleEngine implements Runnable, ActionHandler
 				for( EventMatcher em : cache )
 					if( em.matches( event ) ) //
 						for( ActionSpec action : em.rule.actions )
-							action.action.apply( this, event, action.arguments, em.rule.id );
+							action.action.apply( this, event, action.arguments, em.rule.id, action.actionFunctor( this ) );
 			}
 		}
 		catch( InterruptedException x )
@@ -129,10 +132,22 @@ public class RuleEngine implements Runnable, ActionHandler
 
 
 	/**
-	 * @see gr.ntua.vision.monitoring.rules.ActionHandler#ensurePool(java.util.UUID, int, int, long)
+	 * @see gr.ntua.vision.monitoring.rules.ActionHandler#pool(java.util.UUID, com.google.common.base.Function, int, int, long)
 	 */
 	@Override
-	public void ensurePool(UUID pool, int minCount, int maxCount, long timeWindow)
+	public AggregationPool pool(UUID pool, Function<Event, Void> action, int minCount, int maxCount, long timeWindow)
+	{
+		if( !pools.containsKey( pool ) ) //
+			pools.put( pool, new AggregationPool( pool, action, minCount, maxCount, timeWindow ) );
+		return pools.get( pool );
+	}
+
+
+	/**
+	 * @see gr.ntua.vision.monitoring.rules.ActionHandler#store(gr.ntua.vision.monitoring.model.Event, java.lang.String)
+	 */
+	@Override
+	public void store(Event event, String key)
 	{
 		// TODO Auto-generated method stub
 
@@ -140,34 +155,10 @@ public class RuleEngine implements Runnable, ActionHandler
 
 
 	/**
-	 * @see gr.ntua.vision.monitoring.rules.ActionHandler#aggregateNStore(gr.ntua.vision.monitoring.model.Event, java.util.UUID,
-	 *      java.lang.String)
+	 * @see gr.ntua.vision.monitoring.rules.ActionHandler#transmit(gr.ntua.vision.monitoring.model.Event, java.lang.String)
 	 */
 	@Override
-	public void aggregateNStore(Event prototype, UUID pool, String key)
-	{
-		// TODO Auto-generated method stub
-
-	}
-
-
-	/**
-	 * @see gr.ntua.vision.monitoring.rules.ActionHandler#pushEvent(gr.ntua.vision.monitoring.model.Event, java.lang.String)
-	 */
-	@Override
-	public void pushEvent(Event prototype, String pushURL)
-	{
-		// TODO Auto-generated method stub
-
-	}
-
-
-	/**
-	 * @see gr.ntua.vision.monitoring.rules.ActionHandler#aggregateNPush(gr.ntua.vision.monitoring.model.Event, java.util.UUID,
-	 *      java.lang.String)
-	 */
-	@Override
-	public void aggregateNPush(Event prototype, UUID pool, String pushURL)
+	public void transmit(Event event, String pushURL)
 	{
 		// TODO Auto-generated method stub
 
