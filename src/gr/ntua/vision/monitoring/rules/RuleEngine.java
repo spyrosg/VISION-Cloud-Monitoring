@@ -1,12 +1,22 @@
 package gr.ntua.vision.monitoring.rules;
 
+import gr.ntua.vision.monitoring.ext.local.Catalog;
+import gr.ntua.vision.monitoring.ext.local.CloudCatalogFactory;
 import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.rules.parser.ActionSpec;
 import gr.ntua.vision.monitoring.rules.parser.RuleSpec;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
+
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
@@ -18,7 +28,7 @@ import com.google.common.collect.Maps;
 public class RuleEngine implements Runnable, ActionHandler
 {
 	/** rules & pools lock. */
-	private final Object						rulesLock = new Object();
+	private final Object						rulesLock	= new Object();
 	/** the rules registered. */
 	private final Map<UUID, EventMatcher>		rules		= Maps.newHashMap();
 	/** the pools registered. */
@@ -156,8 +166,9 @@ public class RuleEngine implements Runnable, ActionHandler
 	@Override
 	public void store(Event event, String key)
 	{
-		// TODO Auto-generated method stub
+		Catalog catalog = CloudCatalogFactory.cloudCatalogInstance();
 
+		catalog.put( key, event.serialize() );
 	}
 
 
@@ -167,7 +178,34 @@ public class RuleEngine implements Runnable, ActionHandler
 	@Override
 	public void transmit(Event event, String pushURL)
 	{
-		// TODO Auto-generated method stub
+		HttpClient httpclient = new DefaultHttpClient();
+		try
+		{
+			HttpPost post = new HttpPost( pushURL );
 
+			post.getParams().setParameter( "event", event.toJSON().toString() );
+
+			httpclient.execute( post );
+		}
+		catch( JSONException x )
+		{
+			x.printStackTrace();
+		}
+		catch( UnsupportedEncodingException x )
+		{
+			x.printStackTrace();
+		}
+		catch( ClientProtocolException x )
+		{
+			x.printStackTrace();
+		}
+		catch( IOException x )
+		{
+			x.printStackTrace();
+		}
+		finally
+		{
+			httpclient.getConnectionManager().shutdown();
+		}
 	}
 }

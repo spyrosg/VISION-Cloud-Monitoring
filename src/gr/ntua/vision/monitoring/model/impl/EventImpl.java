@@ -3,11 +3,15 @@ package gr.ntua.vision.monitoring.model.impl;
 import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.model.Location;
 import gr.ntua.vision.monitoring.model.Resource;
+import gr.ntua.vision.monitoring.util.Pair;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.google.common.collect.Lists;
 
 
 /**
@@ -344,5 +348,41 @@ public class EventImpl implements Event
 	public void setAggregationCount(int aggregation_count)
 	{
 		this.aggregation_count = aggregation_count;
+	}
+
+
+	/**
+	 * @see gr.ntua.vision.monitoring.model.Event#serialize()
+	 */
+	@Override
+	public List<Pair<String, Object>> serialize()
+	{
+		List<Pair<String, Object>> pairs = Lists.newArrayList();
+
+		pairs.add( new Pair<String, Object>( "id", id ) );
+		pairs.add( new Pair<String, Object>( "probe", probe ) );
+		pairs.add( new Pair<String, Object>( "tenant", tenant ) );
+		pairs.add( new Pair<String, Object>( "user", user ) );
+		pairs.add( new Pair<String, Object>( "description", description ) );
+		pairs.add( new Pair<String, Object>( "type", type.toString() ) );
+		pairs.add( new Pair<String, Object>( "startTm", start ) );
+		pairs.add( new Pair<String, Object>( "endTm", end ) );
+		pairs.add( new Pair<String, Object>( "resource", resource.toString() ) );
+		pairs.add( new Pair<String, Object>( "value", value.toString() ) );
+		pairs.add( new Pair<String, Object>( "aggregationCount", aggregation_count ) );
+		pairs.add( new Pair<String, Object>( "source.hostname", source.hostname() ) );
+		pairs.add( new Pair<String, Object>( "source.service", source.service() ) );
+		pairs.add( new Pair<String, Object>( "source.userID", source.userID() ) );
+		pairs.add( new Pair<String, Object>( "source.netAddress", source.netAddress() ) );
+		pairs.add( new Pair<String, Object>( "target.hostname", target.hostname() ) );
+		pairs.add( new Pair<String, Object>( "target.service", target.service() ) );
+		pairs.add( new Pair<String, Object>( "target.userID", target.userID() ) );
+		pairs.add( new Pair<String, Object>( "target.netAddress", target.netAddress() ) );
+		pairs.add( new Pair<String, Object>( "observer.hostname", observer.hostname() ) );
+		pairs.add( new Pair<String, Object>( "observer.service", observer.service() ) );
+		pairs.add( new Pair<String, Object>( "observer.userID", observer.userID() ) );
+		pairs.add( new Pair<String, Object>( "observer.netAddress", observer.netAddress() ) );
+
+		return pairs;
 	}
 }

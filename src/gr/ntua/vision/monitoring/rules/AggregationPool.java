@@ -104,6 +104,7 @@ public class AggregationPool extends Thread
 		this.keys = keys;
 		this.action = action;
 
+		setName( "AggregationPool[" + id + "]:Scheduler" );
 		start();
 	}
 
@@ -147,7 +148,7 @@ public class AggregationPool extends Thread
 			try
 			{
 				Thread.sleep( 500 );
-				
+
 				long now = timeWindow > 0 ? new Date().getTime() : 0;
 
 				Iterator<Map.Entry<Key, EventImpl>> events = aggregated.entrySet().iterator();

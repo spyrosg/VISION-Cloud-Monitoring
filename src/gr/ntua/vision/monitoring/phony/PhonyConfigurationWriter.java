@@ -2,7 +2,7 @@ package gr.ntua.vision.monitoring.phony;
 
 import gr.ntua.vision.monitoring.core.Configuration;
 import gr.ntua.vision.monitoring.ext.local.InMemoryLocalCatalog;
-import gr.ntua.vision.monitoring.ext.local.LocalCatalog;
+import gr.ntua.vision.monitoring.ext.local.Catalog;
 import gr.ntua.vision.monitoring.ext.local.LocalCatalogFactory;
 import gr.ntua.vision.monitoring.util.Pair;
 
@@ -22,7 +22,7 @@ public abstract class PhonyConfigurationWriter
 	 */
 	public static void registerPhonyConfig()
 	{
-		LocalCatalog catalog = LocalCatalogFactory.localCatalogInstance();
+		Catalog catalog = LocalCatalogFactory.localCatalogInstance();
 		if( !( catalog instanceof InMemoryLocalCatalog ) ) throw new AssertionError();
 
 		final List<Pair<String, Object>> items = Lists.newArrayList();

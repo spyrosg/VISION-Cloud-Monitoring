@@ -1,12 +1,12 @@
 package gr.ntua.vision.monitoring.ext.local;
 
 /**
- * This is the {@link LocalCatalog} provider.
+ * This is the {@link Catalog} provider.
  */
 public abstract class LocalCatalogFactory
 {
 	/** the local catalog used. */
-	private static LocalCatalog	local_catalog	= new InMemoryLocalCatalog();
+	private static Catalog	local_catalog	= new InMemoryLocalCatalog();
 
 
 	/**
@@ -14,7 +14,7 @@ public abstract class LocalCatalogFactory
 	 * 
 	 * @return the instance.
 	 */
-	public static LocalCatalog localCatalogInstance()
+	public static Catalog localCatalogInstance()
 	{
 		return local_catalog;
 	}

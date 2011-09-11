@@ -1,5 +1,8 @@
 package gr.ntua.vision.monitoring.model;
 
+import gr.ntua.vision.monitoring.util.Pair;
+
+import java.util.List;
 import java.util.UUID;
 
 
@@ -147,4 +150,12 @@ public interface Event extends JSONExchanged
 	 * @return the event count.
 	 */
 	public int aggregationCount();
+
+
+	/**
+	 * serialize the event.
+	 * 
+	 * @return the event serial form.
+	 */
+	public List<Pair<String, Object>> serialize();
 }

@@ -4,7 +4,7 @@
 <%@page import="java.util.Date"%>
 <%@page import="gr.ntua.vision.monitoring.core.Configuration"%>
 <%@page import="gr.ntua.vision.monitoring.ext.local.LocalCatalogFactory"%>
-<%@page import="gr.ntua.vision.monitoring.ext.local.LocalCatalog"%>
+<%@page import="gr.ntua.vision.monitoring.ext.local.Catalog"%>
 <%@page
 	import="gr.ntua.vision.monitoring.ext.local.InMemoryLocalCatalog"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -21,7 +21,7 @@
 	<div style="border: 2px; border-color: black;">
 		<pre>
 		<%
-			LocalCatalog ctg = (LocalCatalog) getServletContext().getAttribute( "lcl-store" );
+			Catalog ctg = (Catalog) getServletContext().getAttribute( "lcl-store" );
 
 			out.println( "--------------------------------" );
 			out.println( "\tMEMORY" );

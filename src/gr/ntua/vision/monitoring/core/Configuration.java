@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.core;
 
-import gr.ntua.vision.monitoring.ext.local.LocalCatalog;
+import gr.ntua.vision.monitoring.ext.local.Catalog;
 import gr.ntua.vision.monitoring.ext.local.LocalCatalogFactory;
 import gr.ntua.vision.monitoring.probe.Probe;
 import gr.ntua.vision.monitoring.probe.ProbeFactory;
@@ -69,7 +69,7 @@ public class Configuration
 	 */
 	void reload(Set<Probe> newProbes, Set<String> delete)
 	{
-		LocalCatalog ctg = LocalCatalogFactory.localCatalogInstance();
+		Catalog ctg = LocalCatalogFactory.localCatalogInstance();
 
 		String dir = ctg.as( GlobalCfgKey, ScriptsDir, String.class );
 		if( dir == null )

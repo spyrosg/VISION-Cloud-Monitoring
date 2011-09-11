@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * The local catalog interface.
  */
-public interface LocalCatalog
+public interface Catalog
 {
 	/**
 	 * <b>LCAT_PutVariables</b>
