@@ -41,6 +41,8 @@ public class EventImpl implements Event
 	private final Location		target;
 	/** event's observer. */
 	private final Location		observer;
+	/** the aggregation count. */
+	private int					aggregation_count;
 
 
 	/**
@@ -80,6 +82,29 @@ public class EventImpl implements Event
 
 
 	/**
+	 * copy c/tor.
+	 * 
+	 * @param event
+	 */
+	public EventImpl(Event event)
+	{
+		this.id = event.id();
+		this.probe = event.probeID();
+		this.tenant = event.tenantID();
+		this.user = event.userID();
+		this.description = event.getDescription();
+		this.value = event.getValue();
+		this.type = event.eventType();
+		this.resource = (ResourceType) event.resourceType();
+		this.start = event.startTime();
+		this.end = event.endTime();
+		this.source = event.source();
+		this.target = event.target();
+		this.observer = event.observer();
+	}
+
+
+	/**
 	 * c/tor.
 	 * 
 	 * @param json
@@ -93,8 +118,9 @@ public class EventImpl implements Event
 		user = json.getString( "user" );
 		description = json.getString( "description" );
 		type = EventType.valueOf( json.getString( "type" ) );
-		start = Long.parseLong( json.getString( "start" ) );
-		end = Long.parseLong( json.getString( "end" ) );
+		start = json.getLong( "start" );
+		end = json.getLong( "end" );
+		aggregation_count = json.getInt( "aggr_count" );
 
 		String rsc_str = json.getString( "resource" );
 		resource = rsc_str == null ? null : ResourceType.valueOf( rsc_str );
@@ -130,11 +156,44 @@ public class EventImpl implements Event
 		obj.put( "end", end );
 		obj.put( "resource", resource.toString() );
 		obj.put( "value", value );
+		obj.put( "aggr_count", aggregation_count );
 		obj.put( "source", source.toJSON() );
 		obj.put( "target", target == null ? null : target.toJSON() );
 		obj.put( "observer", observer == null ? null : observer.toJSON() );
 
 		return obj;
+	}
+
+
+	/**
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ( ( id == null ) ? 0 : id.hashCode() );
+		return result;
+	}
+
+
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj)
+	{
+		if( this == obj ) return true;
+		if( obj == null ) return false;
+		if( getClass() != obj.getClass() ) return false;
+		EventImpl other = (EventImpl) obj;
+		if( id == null )
+		{
+			if( other.id != null ) return false;
+		}
+		else if( !id.equals( other.id ) ) return false;
+		return true;
 	}
 
 
@@ -265,5 +324,25 @@ public class EventImpl implements Event
 	public Location observer()
 	{
 		return observer;
+	}
+
+
+	/**
+	 * @see gr.ntua.vision.monitoring.model.Event#aggregationCount()
+	 */
+	@Override
+	public int aggregationCount()
+	{
+		return aggregation_count;
+	}
+
+
+	/**
+	 * @param aggregation_count
+	 *            the aggregation count to set
+	 */
+	public void setAggregationCount(int aggregation_count)
+	{
+		this.aggregation_count = aggregation_count;
 	}
 }

@@ -12,12 +12,12 @@ import com.google.common.base.Function;
  */
 public enum Actions
 {
-	/***/
-	Store(String.class, Integer.class, Integer.class, Long.class),
-	/***/
+	/** store(url, minCount, timeWindow, field) */
+	Store(String.class, Integer.class, Long.class, String.class),
+	/** push(url, minCount, timeWindow, field) */
+	PushAggregated(String.class, Integer.class, Long.class, String.class),
+	/** push(url) */
 	PushAsIs(String.class),
-	/***/
-	PushAggregated(String.class, Integer.class, Integer.class, Long.class),
 	/***/
 	;
 
@@ -65,7 +65,8 @@ public enum Actions
 		{
 		case PushAggregated:
 		case Store:
-			handler.pool( id, actionFunctor, (Integer) arguments[1], (Integer) arguments[2], (Long) arguments[3] ).push( event );
+			handler.pool( id, actionFunctor, (Integer) arguments[1], (Long) arguments[2],
+							EventField.valueOf( (String) arguments[3] ) ).push( event );
 			return;
 
 		case PushAsIs:

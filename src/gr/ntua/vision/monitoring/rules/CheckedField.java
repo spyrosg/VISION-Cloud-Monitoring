@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring.rules.parser;
+package gr.ntua.vision.monitoring.rules;
 
 /**
  * this specifies the structure of fields which can be checked against constants or regular expressions.

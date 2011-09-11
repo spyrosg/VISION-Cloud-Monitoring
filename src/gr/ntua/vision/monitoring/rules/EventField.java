@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring.rules.parser;
+package gr.ntua.vision.monitoring.rules;
 
 import gr.ntua.vision.monitoring.model.Event;
 
@@ -37,7 +37,7 @@ public enum EventField implements CheckedField
 
 
 	/**
-	 * @see gr.ntua.vision.monitoring.rules.parser.CheckedField#fieldValue(java.lang.Object)
+	 * @see gr.ntua.vision.monitoring.rules.CheckedField#fieldValue(java.lang.Object)
 	 */
 	@Override
 	public Object fieldValue(Object source)
@@ -64,7 +64,7 @@ public enum EventField implements CheckedField
 
 
 	/**
-	 * @see gr.ntua.vision.monitoring.rules.parser.CheckedField#hasInner()
+	 * @see gr.ntua.vision.monitoring.rules.CheckedField#hasInner()
 	 */
 	@Override
 	public boolean hasInner()

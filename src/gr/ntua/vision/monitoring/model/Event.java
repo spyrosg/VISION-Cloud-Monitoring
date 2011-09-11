@@ -139,4 +139,12 @@ public interface Event extends JSONExchanged
 	 * @return the end time.
 	 */
 	public long endTime();
+
+
+	/**
+	 * number of events this one represents.
+	 * 
+	 * @return the event count.
+	 */
+	public int aggregationCount();
 }

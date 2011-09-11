@@ -17,6 +17,8 @@ import com.google.common.collect.Maps;
  */
 public class RuleEngine implements Runnable, ActionHandler
 {
+	/** rules & pools lock. */
+	private final Object						rulesLock = new Object();
 	/** the rules registered. */
 	private final Map<UUID, EventMatcher>		rules		= Maps.newHashMap();
 	/** the pools registered. */
@@ -68,8 +70,9 @@ public class RuleEngine implements Runnable, ActionHandler
 	public boolean remove(UUID id)
 	{
 		boolean ret = null != rules.remove( id );
-		synchronized( rules )
+		synchronized( rulesLock )
 		{
+			pools.remove( id );
 			matchers = rules.values().toArray( new EventMatcher[rules.size()] );
 		}
 		return ret;
@@ -114,7 +117,7 @@ public class RuleEngine implements Runnable, ActionHandler
 				Event event = eventQueue.take();
 
 				EventMatcher[] cache = null;
-				synchronized( rules )
+				synchronized( rulesLock )
 				{
 					cache = matchers;
 				}
@@ -132,14 +135,18 @@ public class RuleEngine implements Runnable, ActionHandler
 
 
 	/**
-	 * @see gr.ntua.vision.monitoring.rules.ActionHandler#pool(java.util.UUID, com.google.common.base.Function, int, int, long)
+	 * @see gr.ntua.vision.monitoring.rules.ActionHandler#pool(java.util.UUID, com.google.common.base.Function, int, long,
+	 *      gr.ntua.vision.monitoring.rules.CheckedField[])
 	 */
 	@Override
-	public AggregationPool pool(UUID pool, Function<Event, Void> action, int minCount, int maxCount, long timeWindow)
+	public AggregationPool pool(UUID pool, Function<Event, Void> action, int maxCount, long timeWindow, CheckedField... fields)
 	{
-		if( !pools.containsKey( pool ) ) //
-			pools.put( pool, new AggregationPool( pool, action, minCount, maxCount, timeWindow ) );
-		return pools.get( pool );
+		synchronized( rulesLock )
+		{
+			if( !pools.containsKey( pool ) ) //
+				pools.put( pool, new AggregationPool( pool, maxCount, timeWindow, fields, action ) );
+			return pools.get( pool );
+		}
 	}
 
 

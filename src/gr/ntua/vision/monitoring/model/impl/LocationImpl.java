@@ -71,6 +71,56 @@ public class LocationImpl implements Location
 
 
 	/**
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ( ( address == null ) ? 0 : address.hashCode() );
+		result = prime * result + ( ( host == null ) ? 0 : host.hashCode() );
+		result = prime * result + ( ( service == null ) ? 0 : service.hashCode() );
+		result = prime * result + ( ( user == null ) ? 0 : user.hashCode() );
+		return result;
+	}
+
+
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj)
+	{
+		if( this == obj ) return true;
+		if( obj == null ) return false;
+		if( getClass() != obj.getClass() ) return false;
+		LocationImpl other = (LocationImpl) obj;
+		if( address == null )
+		{
+			if( other.address != null ) return false;
+		}
+		else if( !address.equals( other.address ) ) return false;
+		if( host == null )
+		{
+			if( other.host != null ) return false;
+		}
+		else if( !host.equals( other.host ) ) return false;
+		if( service == null )
+		{
+			if( other.service != null ) return false;
+		}
+		else if( !service.equals( other.service ) ) return false;
+		if( user == null )
+		{
+			if( other.user != null ) return false;
+		}
+		else if( !user.equals( other.user ) ) return false;
+		return true;
+	}
+
+
+	/**
 	 * @see gr.ntua.vision.monitoring.model.Location#hostname()
 	 */
 	@Override

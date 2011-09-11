@@ -1,6 +1,9 @@
 package gr.ntua.vision.monitoring.rules.parser;
 
 import gr.ntua.vision.monitoring.model.Event;
+import gr.ntua.vision.monitoring.rules.CheckedField;
+import gr.ntua.vision.monitoring.rules.EventField;
+import gr.ntua.vision.monitoring.rules.LocationField;
 
 import java.util.regex.Pattern;
 
