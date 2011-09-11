@@ -5,9 +5,12 @@ import gr.ntua.vision.monitoring.ext.local.CloudCatalogFactory;
 import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.rules.parser.ActionSpec;
 import gr.ntua.vision.monitoring.rules.parser.RuleSpec;
+import gr.ntua.vision.monitoring.util.Pair;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -19,6 +22,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 
@@ -97,6 +101,7 @@ public class RuleEngine implements Runnable, ActionHandler
 	 */
 	public void push(Event e)
 	{
+		if( e == null ) return;
 		eventQueue.offer( e );
 	}
 
@@ -166,9 +171,19 @@ public class RuleEngine implements Runnable, ActionHandler
 	@Override
 	public void store(Event event, String key)
 	{
-		Catalog catalog = CloudCatalogFactory.cloudCatalogInstance();
+		try
+		{
+			Catalog catalog = CloudCatalogFactory.cloudCatalogInstance();
 
-		catalog.put( key, event.serialize() );
+			List<Pair<String, Object>> pairs = Lists.newArrayList();
+			pairs.add( new Pair<String, Object>( event.id().toString(), event.toJSON().toString() ) );
+
+			catalog.put( key, new Date().getTime(), pairs );
+		}
+		catch( JSONException x )
+		{
+			x.printStackTrace();
+		}
 	}
 
 
