@@ -1,10 +1,13 @@
-package gr.ntua.vision.monitoring.core;
+package gr.ntua.vision.monitoring.cluster;
 
+import gr.ntua.vision.monitoring.Monitoring;
 import gr.ntua.vision.monitoring.phony.PhonyConfigurationWriter;
 import gr.ntua.vision.monitoring.probe.Probe;
 
 import java.io.File;
 import java.util.Set;
+
+import javax.servlet.ServletContext;
 
 import org.apache.log4j.Logger;
 
@@ -16,21 +19,21 @@ import com.google.common.collect.Sets;
 /**
  * This is the application singleton object.
  */
-public class Monitoring extends Scheduler
+public class ClusterMonitoring extends Scheduler implements Monitoring
 {
 	/** single instance. */
-	public static final Monitoring	instance	= new Monitoring();
+	public static final ClusterMonitoring	instance	= new ClusterMonitoring();
 	/** the logger. */
 	@SuppressWarnings("all")
-	private static final Logger		log			= Logger.getLogger( Monitoring.class );
+	private static final Logger				log			= Logger.getLogger( ClusterMonitoring.class );
 	/** the real application path */
-	private String					realPath	= "/";
+	private String							realPath	= "/";
 
 
 	/**
 	 * c/tor.
 	 */
-	private Monitoring()
+	private ClusterMonitoring()
 	{
 		// TODO: remove this!
 		PhonyConfigurationWriter.registerPhonyConfig();
@@ -49,17 +52,14 @@ public class Monitoring extends Scheduler
 
 
 	/**
-	 * launch the application. It is illegal to call this more than once, even if {@link #shutdown()} has been called in the
-	 * between two successive invocations.
-	 * 
-	 * @param realPath
-	 *            the path where the application is installed in.
+	 * @see gr.ntua.vision.monitoring.Monitoring#launch(javax.servlet.ServletContext)
 	 */
-	public void launch(String realPath)
+	@Override
+	public void launch(ServletContext ctx)
 	{
 		log.info( "Application begins" );
 
-		this.realPath = realPath;
+		this.realPath = ctx.getRealPath( "/" );
 
 		reConfigure();
 		start();
@@ -110,8 +110,9 @@ public class Monitoring extends Scheduler
 
 
 	/**
-	 * shutdown the application. It is illegal to call this more than once.
+	 * @see gr.ntua.vision.monitoring.Monitoring#shutdown()
 	 */
+	@Override
 	public void shutdown()
 	{
 		log.info( "Application stops" );

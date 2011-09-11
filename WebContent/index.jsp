@@ -2,7 +2,7 @@
 <%@page import="java.util.List"%>
 <%@page import="com.google.common.collect.Lists"%>
 <%@page import="java.util.Date"%>
-<%@page import="gr.ntua.vision.monitoring.core.Configuration"%>
+<%@page import="gr.ntua.vision.monitoring.cluster.Configuration"%>
 <%@page import="gr.ntua.vision.monitoring.ext.local.LocalCatalogFactory"%>
 <%@page import="gr.ntua.vision.monitoring.ext.local.Catalog"%>
 <%@page

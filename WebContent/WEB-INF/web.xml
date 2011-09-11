@@ -15,6 +15,10 @@
 	<listener>
 		<listener-class>gr.ntua.vision.monitoring.VismoCtxListener</listener-class>
 	</listener>
+	<context-param>
+		<param-name>instance.type</param-name>
+		<param-value>gr.ntua.vision.monitoring.cloud.CloudMonitoring</param-value>
+	</context-param>
 	<servlet>
 		<servlet-name>Monitoring</servlet-name>
 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>

@@ -44,6 +44,29 @@ public class RuleEngine implements Runnable, ActionHandler
 
 
 	/**
+	 * shutdown the engine.
+	 */
+	public void shutdown()
+	{
+		synchronized( rulesLock )
+		{
+			for( AggregationPool pool : pools.values() )
+				try
+				{
+					pool.shutdown();
+				}
+				catch( InterruptedException x )
+				{
+					x.printStackTrace();
+				}
+
+			rules.clear();
+			pools.clear();
+		}
+	}
+
+
+	/**
 	 * register a rule.
 	 * 
 	 * @param rule

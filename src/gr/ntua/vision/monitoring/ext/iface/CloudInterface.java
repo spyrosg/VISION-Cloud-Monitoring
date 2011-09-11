@@ -1,5 +1,6 @@
 package gr.ntua.vision.monitoring.ext.iface;
 
+import gr.ntua.vision.monitoring.cloud.CloudMonitoring;
 import gr.ntua.vision.monitoring.rules.parser.RuleParser;
 import gr.ntua.vision.monitoring.rules.parser.RuleSpec;
 
@@ -57,9 +58,7 @@ public class CloudInterface
 	{
 		RuleSpec compiled = RuleParser.instance.ruleParser.parse( rule );
 
-		// FIXME: obtain the rule engine instance.
-		// RuleEngine e;
-		// e.register( compiled );
+		CloudMonitoring.instance.ruleEngine.register( compiled );
 
 		JSONWriter wr = new JSONStringer().object();
 		wr.key( "status" ).value( compiled == null ? "failed" : "ok" );

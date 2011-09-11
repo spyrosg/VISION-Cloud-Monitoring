@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring.core;
+package gr.ntua.vision.monitoring.cluster;
 
 import gr.ntua.vision.monitoring.ext.local.Catalog;
 import gr.ntua.vision.monitoring.ext.local.LocalCatalogFactory;
@@ -15,7 +15,7 @@ import com.google.common.collect.Sets;
 
 /**
  * This manages the monitoring application configuration. It is a singleton object, with its instance accessible only inside the
- * package. {@link Monitoring} singleton should be responsible for distributing it outside.
+ * package. {@link ClusterMonitoring} singleton should be responsible for distributing it outside.
  */
 public class Configuration
 {
@@ -115,7 +115,7 @@ public class Configuration
 					if( inScripts == null ) throw new Exception( "in scripts" );
 
 					if( inScripts )
-						cmdparts[0] = Monitoring.instance.scriptsDirectory().getAbsolutePath() + File.separatorChar + cmdparts[0];
+						cmdparts[0] = ClusterMonitoring.instance.scriptsDirectory().getAbsolutePath() + File.separatorChar + cmdparts[0];
 
 					newProbes.add( ProbeFactory.create( name, cmdparts, attrSep, kvSep, execPeriod, execTimeout, storeKey, fail,
 														retries ) );

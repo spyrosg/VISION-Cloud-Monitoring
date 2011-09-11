@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring.core;
+package gr.ntua.vision.monitoring.cluster;
 
 import java.util.Set;
 
