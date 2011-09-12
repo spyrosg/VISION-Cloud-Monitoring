@@ -44,7 +44,7 @@ public class EventImpl implements Event
 	/** event's target. */
 	private final Location	target;
 	/** event's observer. */
-	private final Location	observer;
+	private Location		observer;
 	/** the aggregation count. */
 	private int				aggregation_count;
 
@@ -107,13 +107,15 @@ public class EventImpl implements Event
 	 */
 	public EventImpl(JSONObject json) throws JSONException
 	{
-		id = UUID.fromString( json.getString( "id" ) );
+		String json_id = json.optString( "id" );
+		id = json_id == null ? UUID.randomUUID() : UUID.fromString( json_id );
 		probe = UUID.fromString( json.getString( "probe" ) );
-		description = json.getString( "description" );
+		String desc = json.optString( "description" );
+		description = desc == null ? "" : desc;
 		type = EventType.valueOf( json.getString( "type" ) );
 		start = json.getLong( "start" );
 		end = json.getLong( "end" );
-		aggregation_count = json.getInt( "aggr_count" );
+		aggregation_count = json.optInt( "aggr_count" );
 
 		JSONArray rsc = json.getJSONArray( "resources" );
 		resources = Lists.newArrayList();
@@ -319,6 +321,17 @@ public class EventImpl implements Event
 
 
 	/**
+	 * @see gr.ntua.vision.monitoring.model.Event#setObserver(gr.ntua.vision.monitoring.model.Location)
+	 */
+	@Override
+	public Event setObserver(Location observer)
+	{
+		this.observer = observer;
+		return this;
+	}
+
+
+	/**
 	 * @see gr.ntua.vision.monitoring.model.Event#aggregationCount()
 	 */
 	@Override
@@ -331,10 +344,12 @@ public class EventImpl implements Event
 	/**
 	 * @param description
 	 *            the description to set
+	 * @return <code>this</code>
 	 */
-	public void setDescription(String description)
+	public EventImpl setDescription(String description)
 	{
 		this.description = description;
+		return this;
 	}
 
 

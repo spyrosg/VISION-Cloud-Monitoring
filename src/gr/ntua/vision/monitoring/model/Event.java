@@ -102,6 +102,16 @@ public interface Event extends JSONExchanged
 
 
 	/**
+	 * set the event's observer.
+	 * 
+	 * @param observer
+	 *            the event's observer to set.
+	 * @return <code>this</code>
+	 */
+	public Event setObserver(Location observer);
+
+
+	/**
 	 * starting time of the event. The time is in UNIX format (milliseconds since midnight, 1/1/1971).
 	 * 
 	 * @return the start time.

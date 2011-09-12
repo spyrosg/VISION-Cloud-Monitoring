@@ -1,12 +1,15 @@
 package gr.ntua.vision.monitoring.probe;
 
 import gr.ntua.vision.monitoring.model.Event;
+import gr.ntua.vision.monitoring.model.Location;
 import gr.ntua.vision.monitoring.model.impl.EventImpl;
+import gr.ntua.vision.monitoring.model.impl.LocationImpl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.util.Date;
 import java.util.List;
 
@@ -38,13 +41,14 @@ class DefaultProbe implements Probe
 	private final String		storeKey;
 	/** the number of retries before the execution is considered failed. */
 	private final int			retries;
-
 	/** last collected event. */
 	private List<Event>			last_events			= Lists.newArrayList();
 	/** error event. */
 	private Event				error				= null;
 	/** last event collection time. */
 	private long				last_collection_tm	= 0;
+	/** the location of this. */
+	private final Location		observer;
 
 
 	/**
@@ -69,7 +73,13 @@ class DefaultProbe implements Probe
 		this.execTimeout = execTimeout;
 		this.storeKey = storeKey;
 		this.retries = retries;
+
 		this.error = failResponse != null && failResponse.length() > 0 ? new EventImpl( new JSONObject( failResponse ) ) : null;
+
+		InetAddress localhost = InetAddress.getLocalHost();
+		byte[] ip = localhost.getAddress();
+		this.observer = new LocationImpl( localhost.getCanonicalHostName(), "Monitoring", null, null,
+				String.format( "%d,%d,%d,%d", ip[0], ip[1], ip[2], ip[3] ) );
 	}
 
 
@@ -109,14 +119,16 @@ class DefaultProbe implements Probe
 				last_collection_tm = new Date().getTime();
 				JSONArray events = new JSONArray( buf.toString() );
 				for( int i = 0; i < events.length(); ++i )
-					last_events.add( new EventImpl( events.getJSONObject( i ) ) );
+				{
+					last_events.add( new EventImpl( events.getJSONObject( i ) ).setObserver( observer ) );
+				}
 				break;
 			}
 			catch( IOException x )
 			{
 				log.debug( "failed (I/O error:" + x.getMessage() + ") @ attempt: " + ( tries + 1 ) + "/" + retries );
 				EventImpl err = new EventImpl( error );
-				err.setDescription( x.getClass().getCanonicalName() + " :: " + x.getMessage() );
+				err.setDescription( x.getClass().getCanonicalName() + " :: " + x.getMessage() ).setObserver( observer );
 				last_events.clear();
 				last_events.add( err );
 			}
@@ -124,7 +136,7 @@ class DefaultProbe implements Probe
 			{
 				log.warn( "failed (" + x.getMessage() + ") @ attempt: " + ( tries + 1 ) + "/" + retries );
 				EventImpl err = new EventImpl( error );
-				err.setDescription( x.getClass().getCanonicalName() + " :: " + x.getMessage() );
+				err.setDescription( x.getClass().getCanonicalName() + " :: " + x.getMessage() ).setObserver( observer );
 				last_events.clear();
 				last_events.add( err );
 			}
