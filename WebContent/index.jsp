@@ -1,3 +1,4 @@
+<%@page import="org.json.JSONObject"%>
 <%@page import="gr.ntua.vision.monitoring.util.Pair"%>
 <%@page import="java.util.List"%>
 <%@page import="com.google.common.collect.Lists"%>
@@ -23,29 +24,13 @@
 		<%
 			Catalog ctg = (Catalog) getServletContext().getAttribute( "lcl-store" );
 
-			out.println( "--------------------------------" );
-			out.println( "\tMEMORY" );
-			out.println( "--------------------------------" );
-
 			List<Pair<String, Object>> items = Lists.newArrayList();
-			ctg.timeRange( "vismo.memory", 0, new Date().getTime(), items );
+			ctg.timeRange( "vismo.measurements", new Date().getTime() - 10 * 60 * 1000, new Date().getTime(), items );
 
 			out.println( items.size() );
 
 			for( Pair<String, Object> pair : items )
-				out.println( pair.a + " :: " + pair.b );
-
-			out.println( "--------------------------------" );
-			out.println( "\tLOAD" );
-			out.println( "--------------------------------" );
-
-			items.clear();
-			ctg.timeRange( "vismo.load", 0, new Date().getTime(), items );
-
-			out.println( items.size() );
-
-			for( Pair<String, Object> pair : items )
-				out.println( pair.a + " :: " + pair.b );
+				out.println( pair.a + " :: \n" + new JSONObject( pair.b.toString() ).toString( 10 ) );
 		%>
 		</pre>
 	</div>
