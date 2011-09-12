@@ -119,29 +119,37 @@ class DefaultProbe implements Probe
 				last_collection_tm = new Date().getTime();
 				JSONArray events = new JSONArray( buf.toString() );
 				for( int i = 0; i < events.length(); ++i )
-				{
 					last_events.add( new EventImpl( events.getJSONObject( i ) ).setObserver( observer ) );
-				}
+
 				break;
 			}
 			catch( IOException x )
 			{
 				log.debug( "failed (I/O error:" + x.getMessage() + ") @ attempt: " + ( tries + 1 ) + "/" + retries );
-				EventImpl err = new EventImpl( error );
-				err.setDescription( x.getClass().getCanonicalName() + " :: " + x.getMessage() ).setObserver( observer );
-				last_events.clear();
-				last_events.add( err );
+				if( tries == retries - 1 ) pushErrorEvent( x );
 			}
 			catch( Exception x )
 			{
 				log.warn( "failed (" + x.getMessage() + ") @ attempt: " + ( tries + 1 ) + "/" + retries );
-				EventImpl err = new EventImpl( error );
-				err.setDescription( x.getClass().getCanonicalName() + " :: " + x.getMessage() ).setObserver( observer );
-				last_events.clear();
-				last_events.add( err );
+				if( tries == retries - 1 ) pushErrorEvent( x );
 			}
 
 		log.debug( "Done" );
+	}
+
+
+	/**
+	 * push an error event.
+	 * 
+	 * @param x
+	 */
+	private void pushErrorEvent(Exception x)
+	{
+		EventImpl err = new EventImpl( error );
+		err.setDescription( x.getClass().getCanonicalName() + " :: " + x.getMessage() ).setObserver( observer )
+				.setTime( new Date().getTime() );
+		last_events.clear();
+		last_events.add( err );
 	}
 
 

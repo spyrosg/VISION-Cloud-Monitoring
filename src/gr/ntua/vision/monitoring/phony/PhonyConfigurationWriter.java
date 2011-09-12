@@ -4,9 +4,15 @@ import gr.ntua.vision.monitoring.cluster.Configuration;
 import gr.ntua.vision.monitoring.ext.local.Catalog;
 import gr.ntua.vision.monitoring.ext.local.InMemoryLocalCatalog;
 import gr.ntua.vision.monitoring.ext.local.LocalCatalogFactory;
+import gr.ntua.vision.monitoring.model.Event;
+import gr.ntua.vision.monitoring.model.Event.EventType;
+import gr.ntua.vision.monitoring.model.Resource;
+import gr.ntua.vision.monitoring.model.impl.EventImpl;
 import gr.ntua.vision.monitoring.util.Pair;
 
 import java.util.List;
+
+import org.json.JSONException;
 
 import com.google.common.collect.Lists;
 
@@ -17,6 +23,16 @@ import com.google.common.collect.Lists;
  */
 public abstract class PhonyConfigurationWriter
 {
+	/** error event **/
+	private static final Event	error;
+
+	static
+	{
+		error = new EventImpl( null, null, "error", EventType.Measurement, Lists.<Resource> newArrayList(), 0, 0, null, null,
+				null );
+	}
+
+
 	/**
 	 * do the registration of false configuration data.
 	 */
@@ -29,38 +45,27 @@ public abstract class PhonyConfigurationWriter
 
 		items.add( new Pair<String, Object>( Configuration.ScriptsDir, "/home/matron/Work/workspace/vismo/WebContent/scripts" ) );
 
-		final String A = "probeA:mem:local";
-		final String B = "probeB:load:local";
-		final String C = "probeC:load:remote";
-		items.add( new Pair<String, Object>( Configuration.ProbeNames, new String[] { A, B, C } ) );
+		final String A = "probe:local";
+		items.add( new Pair<String, Object>( Configuration.ProbeNames, new String[] { A } ) );
+
+		String errJson = "";
+		try
+		{
+			errJson = error.toJSON().toString();
+		}
+		catch( JSONException e )
+		{
+			e.printStackTrace();
+		}
 
 		// probe A:
-		items.add( new Pair<String, Object>( A + Configuration.ProbeCommandParts, new String[] { "mem.sh" } ) );
+		items.add( new Pair<String, Object>( A + Configuration.ProbeCommandParts, new String[] { "probe.sh" } ) );
 		items.add( new Pair<String, Object>( A + Configuration.ProbeExecPeriod, 2 ) );
 		items.add( new Pair<String, Object>( A + Configuration.ProbeExecTimeout, 2 ) );
-		items.add( new Pair<String, Object>( A + Configuration.ProbeStoreKey, "vismo.memory" ) );
-		items.add( new Pair<String, Object>( A + Configuration.ProbeFail, "host=localhost\nfailed=true" ) );
+		items.add( new Pair<String, Object>( A + Configuration.ProbeStoreKey, "vismo.measurements" ) );
+		items.add( new Pair<String, Object>( A + Configuration.ProbeFail, errJson ) );
 		items.add( new Pair<String, Object>( A + Configuration.ProbeRetries, 4 ) );
 		items.add( new Pair<String, Object>( A + Configuration.ProbeInScripts, true ) );
-
-		// probe B:
-		items.add( new Pair<String, Object>( B + Configuration.ProbeCommandParts, new String[] { "load.sh" } ) );
-		items.add( new Pair<String, Object>( B + Configuration.ProbeExecPeriod, 2 ) );
-		items.add( new Pair<String, Object>( B + Configuration.ProbeExecTimeout, 2 ) );
-		items.add( new Pair<String, Object>( B + Configuration.ProbeStoreKey, "vismo.load" ) );
-		items.add( new Pair<String, Object>( B + Configuration.ProbeFail, "host=localhost\nfailed=true" ) );
-		items.add( new Pair<String, Object>( B + Configuration.ProbeRetries, 4 ) );
-		items.add( new Pair<String, Object>( B + Configuration.ProbeInScripts, true ) );
-
-		// probe C:
-		items.add( new Pair<String, Object>( C + Configuration.ProbeCommandParts, new String[] { "/usr/bin/ssh",
-				"orthanc@147.102.19.45", "/home/orthanc/bin/load.sh" } ) );
-		items.add( new Pair<String, Object>( C + Configuration.ProbeExecPeriod, 2 ) );
-		items.add( new Pair<String, Object>( C + Configuration.ProbeExecTimeout, 2 ) );
-		items.add( new Pair<String, Object>( C + Configuration.ProbeStoreKey, "vismo.load" ) );
-		items.add( new Pair<String, Object>( C + Configuration.ProbeFail, "host=147.102.19.45\nfailed=true" ) );
-		items.add( new Pair<String, Object>( C + Configuration.ProbeRetries, 4 ) );
-		items.add( new Pair<String, Object>( C + Configuration.ProbeInScripts, false ) );
 
 		catalog.put( Configuration.GlobalCfgKey, items );
 	}

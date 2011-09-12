@@ -36,9 +36,9 @@ public class EventImpl implements Event
 	/** event's resources. */
 	private List<Resource>	resources;
 	/** begin time of the event. */
-	private final long		start;
+	private long			start;
 	/** end time of the event. */
-	private final long		end;
+	private long			end;
 	/** event's source. */
 	private final Location	source;
 	/** event's target. */
@@ -287,6 +287,16 @@ public class EventImpl implements Event
 	public long endTime()
 	{
 		return end;
+	}
+
+
+	/**
+	 * @see gr.ntua.vision.monitoring.model.Event#setTime(long)
+	 */
+	@Override
+	public void setTime(long tm)
+	{
+		start = end = tm;
 	}
 
 

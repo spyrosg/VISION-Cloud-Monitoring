@@ -112,6 +112,15 @@ public interface Event extends JSONExchanged
 
 
 	/**
+	 * set both the start and end time.
+	 * 
+	 * @param tm
+	 *            the to set.
+	 */
+	public void setTime(long tm);
+
+
+	/**
 	 * starting time of the event. The time is in UNIX format (milliseconds since midnight, 1/1/1971).
 	 * 
 	 * @return the start time.
