@@ -1,18 +1,16 @@
 package gr.ntua.vision.monitoring.probe;
 
-import gr.ntua.vision.monitoring.util.Pair;
+import gr.ntua.vision.monitoring.model.Event;
+import gr.ntua.vision.monitoring.model.impl.EventImpl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
-import java.util.List;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-
-import com.google.common.collect.Lists;
+import org.json.JSONObject;
 
 
 /**
@@ -22,31 +20,27 @@ class DefaultProbe implements Probe
 {
 	/** the logger. */
 	@SuppressWarnings("all")
-	private static final Logger					log					= Logger.getLogger( DefaultProbe.class );
+	private static final Logger	log					= Logger.getLogger( DefaultProbe.class );
 
 	/** name of the probe */
-	final String								name;
+	final String				name;
 	/** probe's command parts. */
-	private final String[]						cmdparts;
-	/** attribute list elements separator. */
-	private final char							attrSep;
-	/** key value separator. */
-	private final char							kvSep;
+	private final String[]		cmdparts;
 	/** execution period. */
-	private final int							execPeriod;
+	private final int			execPeriod;
 	/** execution timeout. */
-	final int									execTimeout;
+	final int					execTimeout;
 	/** local catalog storage key. */
-	private final String						storeKey;
+	private final String		storeKey;
 	/** the number of retries before the execution is considered failed. */
-	private final int							retries;
+	private final int			retries;
 
 	/** last collected event. */
-	private final List<Pair<String, Object>>	last_event			= Lists.newArrayList();
+	private EventImpl			last_event			= null;
 	/** error event. */
-	private final List<Pair<String, Object>>	error				= Lists.newArrayList();
+	private Event				error				= null;
 	/** last event collection time. */
-	private long								last_collection_tm	= 0;
+	private long				last_collection_tm	= 0;
 
 
 	/**
@@ -54,8 +48,6 @@ class DefaultProbe implements Probe
 	 * 
 	 * @param name
 	 * @param cmdparts
-	 * @param attrSep
-	 * @param kvSep
 	 * @param execPeriod
 	 * @param execTimeout
 	 * @param storeKey
@@ -64,19 +56,16 @@ class DefaultProbe implements Probe
 	 * @throws Exception
 	 *             - on creation errors.
 	 */
-	DefaultProbe(String name, String[] cmdparts, char attrSep, char kvSep, int execPeriod, int execTimeout, String storeKey,
-			String failResponse, int retries) throws Exception
+	DefaultProbe(String name, String[] cmdparts, int execPeriod, int execTimeout, String storeKey, String failResponse,
+			int retries) throws Exception
 	{
 		this.name = name;
 		this.cmdparts = cmdparts;
-		this.attrSep = attrSep;
-		this.kvSep = kvSep;
 		this.execPeriod = execPeriod;
 		this.execTimeout = execTimeout;
 		this.storeKey = storeKey;
 		this.retries = retries;
-
-		appendItems( failResponse, attrSep, kvSep, error );
+		this.error = failResponse != null && failResponse.length() > 0 ? new EventImpl( new JSONObject( failResponse ) ) : null;
 	}
 
 
@@ -87,7 +76,7 @@ class DefaultProbe implements Probe
 	public void run()
 	{
 		log.debug( "Executing" );
-		last_event.clear();
+		last_event = null;
 		last_collection_tm = new Date().getTime();
 
 		for( int tries = 0; tries < retries; ++tries )
@@ -114,16 +103,20 @@ class DefaultProbe implements Probe
 				}
 
 				last_collection_tm = new Date().getTime();
-				appendItems( buf.toString(), attrSep, kvSep, last_event );
+				last_event = new EventImpl( new JSONObject( buf.toString() ) );
 				break;
 			}
 			catch( IOException x )
 			{
 				log.debug( "failed (I/O error:" + x.getMessage() + ") @ attempt: " + ( tries + 1 ) + "/" + retries );
+				last_event = new EventImpl( error );
+				last_event.setDescription( x.getClass().getCanonicalName() + " :: " + x.getMessage() );
 			}
 			catch( Exception x )
 			{
 				log.warn( "failed (" + x.getMessage() + ") @ attempt: " + ( tries + 1 ) + "/" + retries );
+				last_event = new EventImpl( error );
+				last_event.setDescription( x.getClass().getCanonicalName() + " :: " + x.getMessage() );
 			}
 
 		log.debug( "Done" );
@@ -174,33 +167,9 @@ class DefaultProbe implements Probe
 	 * @see gr.ntua.vision.monitoring.probe.Probe#lastCollected()
 	 */
 	@Override
-	public List<Pair<String, Object>> lastCollected()
+	public Event lastCollected()
 	{
 		return last_event;
-	}
-
-
-	/**
-	 * append the items parsed form the given text to the pool provided.
-	 * 
-	 * @param text
-	 * @param attrSep
-	 * @param kvSep
-	 * @param pool
-	 * @throws Exception
-	 *             - on parse errors, but not on <code>null</code> (not checked for).
-	 */
-	protected void appendItems(String text, char attrSep, char kvSep, List<Pair<String, Object>> pool) throws Exception
-	{
-		String[] items = text.split( Pattern.quote( Character.toString( attrSep ) ) );
-
-		String kvs = Pattern.quote( Character.toString( kvSep ) );
-		for( String attr : items )
-		{
-			String[] parts = attr.split( kvs );
-			if( parts.length != 2 ) throw new Exception( "bad attribute format: " + attr );
-			pool.add( new Pair<String, Object>( parts[0], parts[1] ) );
-		}
 	}
 
 

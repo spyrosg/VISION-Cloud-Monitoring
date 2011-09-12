@@ -1,10 +1,8 @@
 package gr.ntua.vision.monitoring.cluster;
 
 import gr.ntua.vision.monitoring.ext.local.LocalCatalogFactory;
+import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.probe.Probe;
-import gr.ntua.vision.monitoring.util.Pair;
-
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -98,15 +96,10 @@ public class ProbeExecutor
 
 						// save the stuff:
 						long tmstamp = probe.lastCollectionTime();
-						List<Pair<String, Object>> event = probe.lastCollected();
-						if( event.size() == 0 )
-						{
-							log.warn( "Probe exited with an empty result set." );
-							return;
-						}
+						Event event = probe.lastCollected();
 
-						LocalCatalogFactory.localCatalogInstance().put( probe.storeKey(), tmstamp, event );
-						log.debug( "Event saved, size:" + event.size() );
+						LocalCatalogFactory.localCatalogInstance().put( probe.storeKey(), tmstamp, event.serialize() );
+						log.debug( "Event saved" );
 					}
 					finally
 					{

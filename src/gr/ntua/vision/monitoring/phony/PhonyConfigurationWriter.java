@@ -1,8 +1,8 @@
 package gr.ntua.vision.monitoring.phony;
 
 import gr.ntua.vision.monitoring.cluster.Configuration;
-import gr.ntua.vision.monitoring.ext.local.InMemoryLocalCatalog;
 import gr.ntua.vision.monitoring.ext.local.Catalog;
+import gr.ntua.vision.monitoring.ext.local.InMemoryLocalCatalog;
 import gr.ntua.vision.monitoring.ext.local.LocalCatalogFactory;
 import gr.ntua.vision.monitoring.util.Pair;
 
@@ -36,8 +36,6 @@ public abstract class PhonyConfigurationWriter
 
 		// probe A:
 		items.add( new Pair<String, Object>( A + Configuration.ProbeCommandParts, new String[] { "mem.sh" } ) );
-		items.add( new Pair<String, Object>( A + Configuration.ProbeAttributeListSeparator, '\n' ) );
-		items.add( new Pair<String, Object>( A + Configuration.ProbeKeyValueSeparator, '=' ) );
 		items.add( new Pair<String, Object>( A + Configuration.ProbeExecPeriod, 2 ) );
 		items.add( new Pair<String, Object>( A + Configuration.ProbeExecTimeout, 2 ) );
 		items.add( new Pair<String, Object>( A + Configuration.ProbeStoreKey, "vismo.memory" ) );
@@ -47,8 +45,6 @@ public abstract class PhonyConfigurationWriter
 
 		// probe B:
 		items.add( new Pair<String, Object>( B + Configuration.ProbeCommandParts, new String[] { "load.sh" } ) );
-		items.add( new Pair<String, Object>( B + Configuration.ProbeAttributeListSeparator, '\n' ) );
-		items.add( new Pair<String, Object>( B + Configuration.ProbeKeyValueSeparator, '=' ) );
 		items.add( new Pair<String, Object>( B + Configuration.ProbeExecPeriod, 2 ) );
 		items.add( new Pair<String, Object>( B + Configuration.ProbeExecTimeout, 2 ) );
 		items.add( new Pair<String, Object>( B + Configuration.ProbeStoreKey, "vismo.load" ) );
@@ -57,9 +53,8 @@ public abstract class PhonyConfigurationWriter
 		items.add( new Pair<String, Object>( B + Configuration.ProbeInScripts, true ) );
 
 		// probe C:
-		items.add( new Pair<String, Object>( C + Configuration.ProbeCommandParts, new String[] { "/usr/bin/ssh", "orthanc@147.102.19.45", "/home/orthanc/bin/load.sh" } ) );
-		items.add( new Pair<String, Object>( C + Configuration.ProbeAttributeListSeparator, '\n' ) );
-		items.add( new Pair<String, Object>( C + Configuration.ProbeKeyValueSeparator, '=' ) );
+		items.add( new Pair<String, Object>( C + Configuration.ProbeCommandParts, new String[] { "/usr/bin/ssh",
+				"orthanc@147.102.19.45", "/home/orthanc/bin/load.sh" } ) );
 		items.add( new Pair<String, Object>( C + Configuration.ProbeExecPeriod, 2 ) );
 		items.add( new Pair<String, Object>( C + Configuration.ProbeExecTimeout, 2 ) );
 		items.add( new Pair<String, Object>( C + Configuration.ProbeStoreKey, "vismo.load" ) );

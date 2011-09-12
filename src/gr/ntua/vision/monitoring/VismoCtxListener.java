@@ -1,12 +1,15 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.cluster.ClusterMonitoring;
 import gr.ntua.vision.monitoring.ext.local.LocalCatalogFactory;
+
+import java.util.List;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
+
+import com.google.common.collect.Lists;
 
 
 /**
@@ -16,7 +19,9 @@ public class VismoCtxListener implements ServletContextListener
 {
 	/** the logger. */
 	@SuppressWarnings("all")
-	private static final Logger	log	= Logger.getLogger( VismoCtxListener.class );
+	private static final Logger		log			= Logger.getLogger( VismoCtxListener.class );
+	/** running instances. */
+	private final List<Monitoring>	instances	= Lists.newArrayList();
 
 
 	/**
@@ -37,15 +42,22 @@ public class VismoCtxListener implements ServletContextListener
 		try
 		{
 			log.debug( "ctx init" );
-			String instance_t = event.getServletContext().getInitParameter( "instance.type" );
+			String instances_t = event.getServletContext().getInitParameter( "instance.type" );
 
-			@SuppressWarnings("unchecked")
-			Class< ? extends Monitoring> mtr_t = (Class< ? extends Monitoring>) Class.forName( instance_t );
+			String[] types = instances_t.split( ";" );
 
-			Monitoring instance = (Monitoring) mtr_t.getField( "instance" ).get( null );
+			for( String instance_t : types )
+			{
+				@SuppressWarnings("unchecked")
+				Class< ? extends Monitoring> mtr_t = (Class< ? extends Monitoring>) Class.forName( instance_t );
 
-			instance.launch( event.getServletContext() );
-			event.getServletContext().setAttribute( "lcl-store", LocalCatalogFactory.localCatalogInstance() );
+				Monitoring instance = (Monitoring) mtr_t.getField( "instance" ).get( null );
+
+				instance.launch( event.getServletContext() );
+				event.getServletContext().setAttribute( "lcl-store", LocalCatalogFactory.localCatalogInstance() );
+
+				instances.add( instance );
+			}
 		}
 		catch( Exception x )
 		{
@@ -61,6 +73,8 @@ public class VismoCtxListener implements ServletContextListener
 	public void contextDestroyed(ServletContextEvent event)
 	{
 		log.debug( "ctx destroy" );
-		ClusterMonitoring.instance.shutdown();
+
+		while( !instances.isEmpty() )
+			instances.remove( 0 ).shutdown();
 	}
 }

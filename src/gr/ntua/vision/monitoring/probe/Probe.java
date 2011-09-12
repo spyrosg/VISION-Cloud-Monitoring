@@ -1,8 +1,6 @@
 package gr.ntua.vision.monitoring.probe;
 
-import gr.ntua.vision.monitoring.util.Pair;
-
-import java.util.List;
+import gr.ntua.vision.monitoring.model.Event;
 
 
 /**
@@ -48,5 +46,5 @@ public interface Probe extends Runnable
 	 * 
 	 * @return the data.
 	 */
-	public List<Pair<String, Object>> lastCollected();
+	public Event lastCollected();
 }

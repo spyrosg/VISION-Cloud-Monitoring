@@ -5,25 +5,18 @@ import gr.ntua.vision.monitoring.ext.local.CloudCatalogFactory;
 import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.rules.parser.ActionSpec;
 import gr.ntua.vision.monitoring.rules.parser.RuleSpec;
-import gr.ntua.vision.monitoring.util.Pair;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
 
 
 /**
@@ -31,6 +24,8 @@ import com.google.common.collect.Maps;
  */
 public class RuleEngine implements Runnable, ActionHandler
 {
+	/** the client used to make HTTP requests. */
+	private static final Client					client		= Client.create();
 	/** rules & pools lock. */
 	private final Object						rulesLock	= new Object();
 	/** the rules registered. */
@@ -41,6 +36,11 @@ public class RuleEngine implements Runnable, ActionHandler
 	private EventMatcher[]						matchers	= null;
 	/** the event queue. */
 	private final ArrayBlockingQueue<Event>		eventQueue	= new ArrayBlockingQueue<Event>( 10000 );
+
+	static
+	{
+		client.setConnectTimeout( 1000 );
+	}
 
 
 	/**
@@ -194,19 +194,9 @@ public class RuleEngine implements Runnable, ActionHandler
 	@Override
 	public void store(Event event, String key)
 	{
-		try
-		{
-			Catalog catalog = CloudCatalogFactory.cloudCatalogInstance();
+		Catalog catalog = CloudCatalogFactory.cloudCatalogInstance();
 
-			List<Pair<String, Object>> pairs = Lists.newArrayList();
-			pairs.add( new Pair<String, Object>( event.id().toString(), event.toJSON().toString() ) );
-
-			catalog.put( key, new Date().getTime(), pairs );
-		}
-		catch( JSONException x )
-		{
-			x.printStackTrace();
-		}
+		catalog.put( key, new Date().getTime(), event.serialize() );
 	}
 
 
@@ -216,34 +206,13 @@ public class RuleEngine implements Runnable, ActionHandler
 	@Override
 	public void transmit(Event event, String pushURL)
 	{
-		HttpClient httpclient = new DefaultHttpClient();
 		try
 		{
-			HttpPost post = new HttpPost( pushURL );
-
-			post.getParams().setParameter( "event", event.toJSON().toString() );
-
-			httpclient.execute( post );
+			client.resource( pushURL ).queryParam( "event", event.toJSON().toString() ).put( ClientResponse.class );
 		}
 		catch( JSONException x )
 		{
 			x.printStackTrace();
-		}
-		catch( UnsupportedEncodingException x )
-		{
-			x.printStackTrace();
-		}
-		catch( ClientProtocolException x )
-		{
-			x.printStackTrace();
-		}
-		catch( IOException x )
-		{
-			x.printStackTrace();
-		}
-		finally
-		{
-			httpclient.getConnectionManager().shutdown();
 		}
 	}
 }
