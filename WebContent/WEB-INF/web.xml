@@ -17,7 +17,7 @@
 	</listener>
 	<context-param>
 		<param-name>instance.type</param-name>
-		<param-value>gr.ntua.vision.monitoring.cloud.CloudMonitoring</param-value>
+		<param-value>gr.ntua.vision.monitoring.cloud.CloudMonitoring;gr.ntua.vision.monitoring.cluster.ClusterMonitoring</param-value>
 	</context-param>
 	<servlet>
 		<servlet-name>Monitoring</servlet-name>

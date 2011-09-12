@@ -11,6 +11,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
+import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONStringer;
 import org.json.JSONWriter;
@@ -22,6 +23,11 @@ import org.json.JSONWriter;
 @Path("/cloud")
 public class CloudInterface
 {
+	/** the logger. */
+	@SuppressWarnings("all")
+	private static final Logger	log	= Logger.getLogger( CloudInterface.class );
+
+
 	/**
 	 * This operation is used to change the parameter of the cloud wide monitoring component.
 	 * 
@@ -38,6 +44,7 @@ public class CloudInterface
 	public String setCloudMonitoringParameter(@QueryParam("name") String name, @QueryParam("value") String value)
 			throws JSONException
 	{
+		log.debug( "REST: setCloudrMonitoringParameter('" + name + "')" );
 		return new JSONStringer().object().key( "status" ).value( "ok" ).endObject().toString();
 	}
 
@@ -56,7 +63,11 @@ public class CloudInterface
 	@Produces("application/json")
 	public String registerAggregationRule(@FormParam("rule") String rule) throws JSONException
 	{
+		log.debug( "REST: registerAggregationRule(code size: " + rule.length() + " chars)" );
+
 		RuleSpec compiled = RuleParser.instance.ruleParser.parse( rule );
+
+		log.debug( "REST: registerAggregationRule() compiled rule: " + compiled.name + " :: " + compiled.id );
 
 		CloudMonitoring.instance.ruleEngine.register( compiled );
 

@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
+
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 
@@ -71,6 +73,9 @@ public class AggregationPool extends Thread
 		}
 	}
 
+	/** the logger. */
+	@SuppressWarnings("all")
+	private static final Logger				log			= Logger.getLogger( AggregationPool.class );
 	/** the pool's id. */
 	public final UUID					id;
 	/** the maximum count of events in a group. */
@@ -103,6 +108,8 @@ public class AggregationPool extends Thread
 		this.timeWindow = timeWindow;
 		this.keys = keys;
 		this.action = action;
+		
+		log.info( "Created pool: " + id + " over: " + Arrays.toString( keys ) );
 
 		setName( "AggregationPool[" + id + "]:Scheduler" );
 		start();
@@ -133,6 +140,7 @@ public class AggregationPool extends Thread
 	 */
 	public void shutdown() throws InterruptedException
 	{
+		log.info( "shutdown" );
 		interrupt();
 		join();
 	}
@@ -144,6 +152,7 @@ public class AggregationPool extends Thread
 	@Override
 	public void run()
 	{
+		log.debug( id + " :: committer starts" );
 		while( true )
 			try
 			{
@@ -166,7 +175,7 @@ public class AggregationPool extends Thread
 			}
 			catch( InterruptedException x )
 			{
-				// ignore.
+				log.debug( id + " :: committer stops" );
 				return;
 			}
 	}

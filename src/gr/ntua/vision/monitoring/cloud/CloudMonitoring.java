@@ -42,6 +42,7 @@ public class CloudMonitoring implements Monitoring
 	{
 		log.info( "Application begins" );
 		eventReader = new EventReader( ruleEngine );
+		ruleEngine.start();
 	}
 
 
@@ -52,7 +53,14 @@ public class CloudMonitoring implements Monitoring
 	public void shutdown()
 	{
 		log.info( "Application stops" );
-		ruleEngine.shutdown();
+		try
+		{
+			ruleEngine.shutdown();
+		}
+		catch( InterruptedException x )
+		{
+			x.printStackTrace();
+		}
 		if( eventReader != null ) eventReader.interrupt();
 	}
 }

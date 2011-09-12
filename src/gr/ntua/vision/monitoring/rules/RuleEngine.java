@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import org.apache.log4j.Logger;
 import org.json.JSONException;
 
 import com.google.common.base.Function;
@@ -22,8 +23,11 @@ import com.sun.jersey.api.client.ClientResponse;
 /**
  * This is the rule engine implementation. This is a singleton object.
  */
-public class RuleEngine implements Runnable, ActionHandler
+public class RuleEngine extends Thread implements ActionHandler
 {
+	/** the logger. */
+	@SuppressWarnings("all")
+	private static final Logger					log			= Logger.getLogger( RuleEngine.class );
 	/** the client used to make HTTP requests. */
 	private static final Client					client		= Client.create();
 	/** rules & pools lock. */
@@ -44,10 +48,25 @@ public class RuleEngine implements Runnable, ActionHandler
 
 
 	/**
-	 * shutdown the engine.
+	 * c/tor.
 	 */
-	public void shutdown()
+	public RuleEngine()
 	{
+		setName( "RuleEngine" );
+	}
+
+
+	/**
+	 * shutdown the engine.
+	 * 
+	 * @throws InterruptedException
+	 */
+	public void shutdown() throws InterruptedException
+	{
+		log.info( "shutdown" );
+		interrupt();
+		join();
+
 		synchronized( rulesLock )
 		{
 			for( AggregationPool pool : pools.values() )
@@ -74,6 +93,7 @@ public class RuleEngine implements Runnable, ActionHandler
 	 */
 	public void register(RuleSpec rule)
 	{
+		log.debug( "registering rule: " + rule.id );
 		rules.put( rule.id, new EventMatcher( rule, rule.normalizeChecks() ) );
 		synchronized( rules )
 		{
@@ -106,6 +126,7 @@ public class RuleEngine implements Runnable, ActionHandler
 	 */
 	public boolean remove(UUID id)
 	{
+		log.debug( "removing rule w/ id: " + id );
 		boolean ret = null != rules.remove( id );
 		synchronized( rulesLock )
 		{
@@ -148,6 +169,7 @@ public class RuleEngine implements Runnable, ActionHandler
 	@Override
 	public void run()
 	{
+		log.debug( "rule engine starts" );
 		try
 		{
 			while( true )
@@ -169,6 +191,7 @@ public class RuleEngine implements Runnable, ActionHandler
 		{
 			// ignore.
 		}
+		log.debug( "rule engine stops" );
 	}
 
 
@@ -194,6 +217,8 @@ public class RuleEngine implements Runnable, ActionHandler
 	@Override
 	public void store(Event event, String key)
 	{
+		log.trace( "store "+ event.id() + " @ " + key );
+
 		Catalog catalog = CloudCatalogFactory.cloudCatalogInstance();
 
 		catalog.put( key, new Date().getTime(), event.serialize() );
@@ -206,6 +231,7 @@ public class RuleEngine implements Runnable, ActionHandler
 	@Override
 	public void transmit(Event event, String pushURL)
 	{
+		log.trace( "trasmit "+ event.id() + " @ " + pushURL );
 		try
 		{
 			client.resource( pushURL ).queryParam( "event", event.toJSON().toString() ).put( ClientResponse.class );

@@ -5,6 +5,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
+import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONStringer;
 
@@ -15,6 +16,11 @@ import org.json.JSONStringer;
 @Path("/cluster")
 public class ClusterInterface
 {
+	/** the logger. */
+	@SuppressWarnings("all")
+	private static final Logger	log	= Logger.getLogger( ClusterInterface.class );
+
+
 	/**
 	 * This operation is used to change the parameter of the cluster wide monitoring component.
 	 * 
@@ -31,6 +37,7 @@ public class ClusterInterface
 	public String setClusterMonitoringParameter(@QueryParam("name") String name, @QueryParam("value") String value)
 			throws JSONException
 	{
+		log.debug( "REST: setClusterMonitoringParameter('" + name + "')" );
 		return new JSONStringer().object().key( "status" ).value( "ok" ).endObject().toString();
 	}
 }
