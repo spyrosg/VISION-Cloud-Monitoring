@@ -32,6 +32,8 @@ public class Configuration
 	public static final String				GlobalCfgKey		= "vismo.config";
 	/** the variable name for the scripts' working directory. */
 	public static final String				ScriptsDir			= "vismo.scripts.dir";
+	/** the variable name for the default key used for storing events in the catalog. */
+	public static final String				CatalogKey			= "vismo.ctlg.key";
 	/** the variable name for the names of the probes. */
 	public static final String				ProbeNames			= "vismo.probes";
 	/** the variable name suffix for command parts. */
@@ -53,6 +55,8 @@ public class Configuration
 	private final Set<String>				liveProbes			= Sets.newHashSet();
 	/** the scripts' working directory. */
 	private String							scriptsWorkDir		= "/";
+	/** the default catalog. */
+	private String							catalogKey			= null;
 
 
 	/**
@@ -74,6 +78,13 @@ public class Configuration
 			return;
 		}
 		scriptsWorkDir = dir;
+		String key = ctg.as( GlobalCfgKey, CatalogKey, String.class );
+		if( key == null )
+		{
+			log.error( "Invalid configuration: null catalog key." );
+			return;
+		}
+		catalogKey = key;
 
 		String[] probeNames = ctg.as( GlobalCfgKey, ProbeNames, string_vec_t );
 		if( probeNames == null )
@@ -132,5 +143,14 @@ public class Configuration
 	public String getScriptsWorkDir()
 	{
 		return scriptsWorkDir;
+	}
+
+
+	/**
+	 * @return the catalogKey
+	 */
+	public String getCatalogKey()
+	{
+		return catalogKey;
 	}
 }

@@ -107,24 +107,7 @@ public class ProbeExecutor
 						long tmstamp = probe.lastCollectionTime();
 						List<Event> events = probe.lastCollected();
 
-						List<Pair<String, Object>> items = Lists.newArrayList();
-						Iterables.addAll( items, Iterables.transform( events, new Function<Event, Pair<String, Object>>() {
-							@Override
-							public Pair<String, Object> apply(Event event)
-							{
-								try
-								{
-									return new Pair<String, Object>( event.id().toString(), event.toJSON().toString() );
-								}
-								catch( JSONException e )
-								{
-									e.printStackTrace();
-									return null;
-								}
-							}
-						} ) );
-						Iterables.removeIf( items, Predicates.isNull() );
-						LocalCatalogFactory.localCatalogInstance().put( probe.storeKey(), tmstamp, items );
+						saveEvents( tmstamp, events, probe.storeKey() );
 						log.debug( "Event saved" );
 					}
 					finally
@@ -138,5 +121,36 @@ public class ProbeExecutor
 			current.setDaemon( true );
 			current.start();
 		}
+	}
+
+
+	/**
+	 * save the events given to the catalog service.
+	 * 
+	 * @param tmstamp
+	 * @param events
+	 */
+	public static void saveEvents(long tmstamp, List<Event> events, String key)
+	{
+		List<Pair<String, Object>> items = Lists.newArrayList();
+		Iterables.addAll( items, Iterables.transform( events, new Function<Event, Pair<String, Object>>() {
+			@Override
+			public Pair<String, Object> apply(Event event)
+			{
+				try
+				{
+					return new Pair<String, Object>( event.id().toString(), event.toJSON().toString() );
+				}
+				catch( JSONException e )
+				{
+					e.printStackTrace();
+					return null;
+				}
+			}
+		} ) );
+		Iterables.removeIf( items, Predicates.isNull() );
+		
+		LocalCatalogFactory.localCatalogInstance().put( key == null ? Configuration.instance.getCatalogKey() : key, tmstamp,
+														items );
 	}
 }

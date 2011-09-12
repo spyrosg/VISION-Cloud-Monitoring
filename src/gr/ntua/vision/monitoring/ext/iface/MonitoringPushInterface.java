@@ -1,8 +1,12 @@
 package gr.ntua.vision.monitoring.ext.iface;
 
-import gr.ntua.vision.monitoring.cloud.CloudMonitoring;
+import gr.ntua.vision.monitoring.cluster.ClusterMonitoring;
+import gr.ntua.vision.monitoring.cluster.ProbeExecutor;
 import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.model.impl.EventImpl;
+
+import java.util.Arrays;
+import java.util.Date;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -49,7 +53,7 @@ public class MonitoringPushInterface
 	 */
 	public void handleEvent(Event event)
 	{
-		if( CloudMonitoring.instance.isInstanceAlive() ) //
-			CloudMonitoring.instance.ruleEngine.push( event );
+		if( ClusterMonitoring.instance.isInstanceAlive() ) //
+			ProbeExecutor.saveEvents( new Date().getTime(), Arrays.asList( event ), null );
 	}
 }

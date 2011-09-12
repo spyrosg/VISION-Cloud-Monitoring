@@ -24,20 +24,6 @@ public interface Event extends JSONExchanged
 
 
 	/**
-	 * This is type of value for all events of type {@link EventType#Action}.
-	 */
-	public enum ActionStatus
-	{
-		/***/
-		InProgress,
-		/***/
-		Failed,
-		/***/
-		Succeded,
-	}
-
-
-	/**
 	 * get the event's ID.
 	 * 
 	 * @return the event's ID.
