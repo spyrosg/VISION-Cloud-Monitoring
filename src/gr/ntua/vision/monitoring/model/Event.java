@@ -54,37 +54,11 @@ public interface Event extends JSONExchanged
 
 
 	/**
-	 * get the ID of the tenant, in the context of which this event took place. Not all events happen in the context of a tenant
-	 * and for those that don't this method returns <code>null</code>.
-	 * 
-	 * @return the tenant ID.
-	 */
-	public String tenantID();
-
-
-	/**
-	 * get the ID of the user, in the context of which this event took place. Not all events happen in the context of a user and
-	 * for those that don't this method returns <code>null</code>.
-	 * 
-	 * @return the user ID.
-	 */
-	public String userID();
-
-
-	/**
 	 * get the description of the event (human readable format).
 	 * 
 	 * @return the description.
 	 */
 	public String getDescription();
-
-
-	/**
-	 * get the event's value. All events have a value. It's type depends on the event type.
-	 * 
-	 * @return the event's value.
-	 */
-	public Object getValue();
 
 
 	/**
@@ -96,12 +70,11 @@ public interface Event extends JSONExchanged
 
 
 	/**
-	 * get the resource type of the event. Only events of type {@link EventType#Measurement} are associated with resources. Other
-	 * events will return <code>null</code>.
+	 * get the resources associated with this event.
 	 * 
-	 * @return the associated resource specification, or <code>null</code> if there isn't any.
+	 * @return the resources associated with this event.
 	 */
-	public Resource resourceType();
+	public List<Resource> resources();
 
 
 	/**

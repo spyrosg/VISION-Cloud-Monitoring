@@ -32,6 +32,15 @@ public interface Location extends JSONExchanged
 
 
 	/**
+	 * get the ID of the tenant, in the context of which this event took place. Not all events happen in the context of a tenant
+	 * and for those that don't this method returns <code>null</code>.
+	 * 
+	 * @return the tenant ID.
+	 */
+	public String tenantID();
+
+
+	/**
 	 * get the network address.
 	 * 
 	 * @return the network address.

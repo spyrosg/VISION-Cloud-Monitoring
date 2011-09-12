@@ -3,20 +3,37 @@ package gr.ntua.vision.monitoring.model;
 /**
  * This specifies a monitored resource.
  */
-public interface Resource
+public interface Resource extends JSONExchanged, Comparable<Resource>
 {
 	/**
-	 * get the resource name.
+	 * get the resource type.
 	 * 
-	 * @return the resource name.
+	 * @return the resource type.
 	 */
-	public String resourceName();
+	public String type();
 
 
 	/**
-	 * get the type of the measurement objects. This method always returns the box type of a java builtin type.
+	 * get the resource unit.
 	 * 
-	 * @return the type of the measurement objects.
+	 * @return the resource unit.
 	 */
-	public Class< ? > measurementType();
+	public String unit();
+
+
+	/**
+	 * get the resource value.
+	 * 
+	 * @return the resource value.
+	 */
+	public double value();
+
+
+	/**
+	 * set the resource value.
+	 * 
+	 * @param value
+	 *            the resource value to set.
+	 */
+	public void setValue(double value);
 }

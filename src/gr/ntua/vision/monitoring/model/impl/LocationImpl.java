@@ -17,6 +17,8 @@ public class LocationImpl implements Location
 	private final String	service;
 	/** the user ID */
 	private final String	user;
+	/** the tenant ID */
+	private final String	tenant;
 	/** the network address */
 	private final String	address;
 
@@ -27,13 +29,15 @@ public class LocationImpl implements Location
 	 * @param host
 	 * @param service
 	 * @param user
+	 * @param tenant
 	 * @param address
 	 */
-	public LocationImpl(String host, String service, String user, String address)
+	public LocationImpl(String host, String service, String user, String tenant, String address)
 	{
 		this.host = host;
 		this.service = service;
 		this.user = user;
+		this.tenant = tenant;
 		this.address = address;
 	}
 
@@ -49,6 +53,7 @@ public class LocationImpl implements Location
 		host = json.getString( "host" );
 		service = json.optString( "service" );
 		user = json.optString( "user" );
+		tenant = json.optString( "tenant" );
 		address = json.getString( "address" );
 	}
 
@@ -64,6 +69,7 @@ public class LocationImpl implements Location
 		obj.put( "host", host );
 		obj.put( "service", service );
 		obj.put( "user", user );
+		obj.put( "tenant", tenant );
 		obj.put( "address", address );
 
 		return obj;
@@ -81,6 +87,7 @@ public class LocationImpl implements Location
 		result = prime * result + ( ( address == null ) ? 0 : address.hashCode() );
 		result = prime * result + ( ( host == null ) ? 0 : host.hashCode() );
 		result = prime * result + ( ( service == null ) ? 0 : service.hashCode() );
+		result = prime * result + ( ( tenant == null ) ? 0 : tenant.hashCode() );
 		result = prime * result + ( ( user == null ) ? 0 : user.hashCode() );
 		return result;
 	}
@@ -111,6 +118,11 @@ public class LocationImpl implements Location
 			if( other.service != null ) return false;
 		}
 		else if( !service.equals( other.service ) ) return false;
+		if( tenant == null )
+		{
+			if( other.tenant != null ) return false;
+		}
+		else if( !tenant.equals( other.tenant ) ) return false;
 		if( user == null )
 		{
 			if( other.user != null ) return false;
@@ -147,6 +159,16 @@ public class LocationImpl implements Location
 	public String userID()
 	{
 		return user;
+	}
+
+
+	/**
+	 * @see gr.ntua.vision.monitoring.model.Location#tenantID()
+	 */
+	@Override
+	public String tenantID()
+	{
+		return tenant;
 	}
 
 

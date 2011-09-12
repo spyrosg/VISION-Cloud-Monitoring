@@ -1,6 +1,7 @@
 package gr.ntua.vision.monitoring.rules;
 
 import gr.ntua.vision.monitoring.model.Event;
+import gr.ntua.vision.monitoring.model.impl.ResourceImpl;
 
 
 /** the event fields that may checked against. */
@@ -31,7 +32,7 @@ public enum EventField implements CheckedField
 	 * @param hasInner
 	 */
 	private EventField(boolean hasInner)
-	{	
+	{
 		this.hasInner = hasInner;
 	}
 
@@ -47,17 +48,13 @@ public enum EventField implements CheckedField
 		case Observer:
 			return ( (Event) source ).observer();
 		case Resource:
-			return ( (Event) source ).resourceType();
+			return ResourceImpl.typesIn( ( (Event) source ).resources(), ":" );
 		case Source:
 			return ( (Event) source ).source();
 		case Target:
 			return ( (Event) source ).target();
-		case Tenant:
-			return ( (Event) source ).tenantID();
 		case Type:
 			return ( (Event) source ).eventType();
-		case User:
-			return ( (Event) source ).userID();
 		}
 		throw new AssertionError( "unreachable" );
 	}

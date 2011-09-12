@@ -5,13 +5,18 @@ import gr.ntua.vision.monitoring.model.Location;
 import gr.ntua.vision.monitoring.model.Resource;
 import gr.ntua.vision.monitoring.util.Pair;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 
@@ -21,33 +26,27 @@ import com.google.common.collect.Lists;
 public class EventImpl implements Event
 {
 	/** event id. */
-	private final UUID			id;
+	private final UUID		id;
 	/** probe id. */
-	private final UUID			probe;
-	/** tenant id */
-	private final String		tenant;
-	/** user id */
-	private final String		user;
+	private final UUID		probe;
 	/** event description. */
-	private String				description;
-	/** event's value. */
-	private final Object		value;
+	private String			description;
 	/** event's type. */
-	private final EventType		type;
-	/** event's resource type. */
-	private final ResourceType	resource;
+	private final EventType	type;
+	/** event's resources. */
+	private List<Resource>	resources;
 	/** begin time of the event. */
-	private final long			start;
+	private final long		start;
 	/** end time of the event. */
-	private final long			end;
+	private final long		end;
 	/** event's source. */
-	private final Location		source;
+	private final Location	source;
 	/** event's target. */
-	private final Location		target;
+	private final Location	target;
 	/** event's observer. */
-	private final Location		observer;
+	private final Location	observer;
 	/** the aggregation count. */
-	private int					aggregation_count;
+	private int				aggregation_count;
 
 
 	/**
@@ -55,29 +54,23 @@ public class EventImpl implements Event
 	 * 
 	 * @param id
 	 * @param probe
-	 * @param tenant
-	 * @param user
 	 * @param description
-	 * @param value
 	 * @param type
-	 * @param resource
+	 * @param resources
 	 * @param start
 	 * @param end
 	 * @param source
 	 * @param target
 	 * @param observer
 	 */
-	public EventImpl(UUID id, UUID probe, String tenant, String user, String description, Object value, EventType type,
-			ResourceType resource, long start, long end, Location source, Location target, Location observer)
+	public EventImpl(UUID id, UUID probe, String description, EventType type, List<Resource> resources, long start, long end,
+			Location source, Location target, Location observer)
 	{
 		this.id = id;
 		this.probe = probe;
-		this.tenant = tenant;
-		this.user = user;
 		this.description = description;
-		this.value = value;
 		this.type = type;
-		this.resource = resource;
+		this.resources = resources;
 		this.start = start;
 		this.end = end;
 		this.source = source;
@@ -95,12 +88,9 @@ public class EventImpl implements Event
 	{
 		this.id = event.id();
 		this.probe = event.probeID();
-		this.tenant = event.tenantID();
-		this.user = event.userID();
 		this.description = event.getDescription();
-		this.value = event.getValue();
 		this.type = event.eventType();
-		this.resource = (ResourceType) event.resourceType();
+		this.resources = Lists.newArrayList( event.resources() );
 		this.start = event.startTime();
 		this.end = event.endTime();
 		this.source = event.source();
@@ -119,20 +109,16 @@ public class EventImpl implements Event
 	{
 		id = UUID.fromString( json.getString( "id" ) );
 		probe = UUID.fromString( json.getString( "probe" ) );
-		tenant = json.getString( "tenant" );
-		user = json.getString( "user" );
 		description = json.getString( "description" );
 		type = EventType.valueOf( json.getString( "type" ) );
 		start = json.getLong( "start" );
 		end = json.getLong( "end" );
 		aggregation_count = json.getInt( "aggr_count" );
 
-		String rsc_str = json.optString( "resource" );
-		resource = rsc_str == null ? null : ResourceType.valueOf( rsc_str );
-
-		if( resource != null )
-			value = resource.parseValue( json.optString( "value" ) );
-		else value = ActionStatus.valueOf( json.optString( "value" ) );
+		JSONArray rsc = json.getJSONArray( "resources" );
+		resources = Lists.newArrayList();
+		for( int i = 0; i < rsc.length(); ++i )
+			resources.add( new ResourceImpl( rsc.getJSONObject( i ) ) );
 
 		JSONObject tmp = json.getJSONObject( "source" );
 		source = new LocationImpl( tmp );
@@ -140,6 +126,21 @@ public class EventImpl implements Event
 		target = tmp == null ? null : new LocationImpl( tmp );
 		tmp = json.optJSONObject( "observer" );
 		observer = tmp == null ? null : new LocationImpl( tmp );
+	}
+
+
+	/**
+	 * merge this with the given event.
+	 * 
+	 * @param event
+	 *            the event to merge with.
+	 */
+	public void mergeWith(Event event)
+	{
+		List<Resource> all = ResourceImpl.merge( resources, event.resources() );
+		resources = all;
+
+		++aggregation_count;
 	}
 
 
@@ -153,14 +154,29 @@ public class EventImpl implements Event
 
 		obj.put( "id", id.toString() );
 		obj.put( "probe", probe.toString() );
-		obj.put( "tenant", tenant );
-		obj.put( "user", user );
 		obj.put( "description", description );
 		obj.put( "type", type.toString() );
 		obj.put( "start", start );
 		obj.put( "end", end );
-		obj.put( "resource", resource == null ? null : resource.toString() );
-		obj.put( "value", value );
+
+		Iterable<JSONObject> rscs = Iterables.transform( resources, new Function<Resource, JSONObject>() {
+			@Override
+			public JSONObject apply(Resource rsc)
+			{
+				try
+				{
+					return rsc.toJSON();
+				}
+				catch( JSONException e )
+				{
+					e.printStackTrace();
+					return null;
+				}
+			}
+		} );
+		Iterables.removeIf( rscs, Predicates.isNull() );
+		JSONArray rsc = new JSONArray( Lists.newArrayList( rscs ) );
+		obj.put( "resource", rsc );
 		obj.put( "aggr_count", aggregation_count );
 		obj.put( "source", source.toJSON() );
 		obj.put( "target", target == null ? null : target.toJSON() );
@@ -223,42 +239,12 @@ public class EventImpl implements Event
 
 
 	/**
-	 * @see gr.ntua.vision.monitoring.model.Event#tenantID()
-	 */
-	@Override
-	public String tenantID()
-	{
-		return tenant;
-	}
-
-
-	/**
-	 * @see gr.ntua.vision.monitoring.model.Event#userID()
-	 */
-	@Override
-	public String userID()
-	{
-		return user;
-	}
-
-
-	/**
 	 * @see gr.ntua.vision.monitoring.model.Event#getDescription()
 	 */
 	@Override
 	public String getDescription()
 	{
 		return description;
-	}
-
-
-	/**
-	 * @see gr.ntua.vision.monitoring.model.Event#getValue()
-	 */
-	@Override
-	public Object getValue()
-	{
-		return value;
 	}
 
 
@@ -273,12 +259,12 @@ public class EventImpl implements Event
 
 
 	/**
-	 * @see gr.ntua.vision.monitoring.model.Event#resourceType()
+	 * @see gr.ntua.vision.monitoring.model.Event#resources()
 	 */
 	@Override
-	public Resource resourceType()
+	public List<Resource> resources()
 	{
-		return resource;
+		return resources;
 	}
 
 
@@ -343,16 +329,6 @@ public class EventImpl implements Event
 
 
 	/**
-	 * @param aggregation_count
-	 *            the aggregation count to set
-	 */
-	public void setAggregationCount(int aggregation_count)
-	{
-		this.aggregation_count = aggregation_count;
-	}
-
-
-	/**
 	 * @param description
 	 *            the description to set
 	 */
@@ -390,19 +366,23 @@ public class EventImpl implements Event
 	 */
 	public static void main(String[] args) throws JSONException
 	{
-		LocationImpl source = new LocationImpl( "localhost", null, null, "127.0.0.1" );
-		LocationImpl observer = new LocationImpl( "localhost", null, null, "127.0.0.1" );
+		LocationImpl source = new LocationImpl( "localhost", null, null, null, "127.0.0.1" );
+		LocationImpl observer = new LocationImpl( "localhost", null, null, null, "127.0.0.1" );
 
-		EventImpl measurement = new EventImpl( UUID.randomUUID(), UUID.randomUUID(), null, null, "event description string",
-				new Float( 3.14f ), EventType.Measurement, ResourceType.SystemLoad, new Date().getTime(),
-				new Date().getTime() + 20, source, null, observer );
+		List<Resource> resources = Arrays.<Resource> asList(	new ResourceImpl( "execution-time", "seconds", 20.34 ),
+																new ResourceImpl( "memory", "GB", 2.34 ), new ResourceImpl(
+																		"storage", "GB", 200.34 ) );
 
-		LocationImpl act_source = new LocationImpl( "localhost", "some-component-name", "some-user-id", "127.0.0.1" );
-		LocationImpl act_target = new LocationImpl( "localhost", "some-component-name", "some-user-id", "127.0.0.1" );
+		EventImpl measurement = new EventImpl( UUID.randomUUID(), UUID.randomUUID(), "event description string",
+				EventType.Measurement, resources, new Date().getTime(), new Date().getTime() + 20, source, null, observer );
 
-		EventImpl action = new EventImpl( UUID.randomUUID(), UUID.randomUUID(), "some-tenant-id", "some-user-id",
-				"event action name", ActionStatus.Succeded, EventType.Action, null, new Date().getTime(),
-				new Date().getTime() + 20, act_source, act_target, observer );
+		LocationImpl act_source = new LocationImpl( "localhost", "some-component-name", "some-user-id", "some-tenant-id",
+				"127.0.0.1" );
+		LocationImpl act_target = new LocationImpl( "localhost", "some-component-name", "some-user-id", "some-tenant-id",
+				"127.0.0.1" );
+
+		EventImpl action = new EventImpl( UUID.randomUUID(), UUID.randomUUID(), "event action name", EventType.Action, resources,
+				new Date().getTime(), new Date().getTime() + 20, act_source, act_target, observer );
 
 		System.out.println( "measurement event:\n" );
 		System.out.println( measurement.toJSON().toString( 2 ) );

@@ -75,7 +75,7 @@ public class AggregationPool extends Thread
 
 	/** the logger. */
 	@SuppressWarnings("all")
-	private static final Logger				log			= Logger.getLogger( AggregationPool.class );
+	private static final Logger			log			= Logger.getLogger( AggregationPool.class );
 	/** the pool's id. */
 	public final UUID					id;
 	/** the maximum count of events in a group. */
@@ -108,7 +108,7 @@ public class AggregationPool extends Thread
 		this.timeWindow = timeWindow;
 		this.keys = keys;
 		this.action = action;
-		
+
 		log.info( "Created pool: " + id + " over: " + Arrays.toString( keys ) );
 
 		setName( "AggregationPool[" + id + "]:Scheduler" );
@@ -128,7 +128,7 @@ public class AggregationPool extends Thread
 		EventImpl master = aggregated.get( key );
 
 		if( master != null )
-			master.setAggregationCount( 1 + master.aggregationCount() );
+			master.mergeWith( event );
 		else aggregated.put( key, master = new EventImpl( event ) );
 	}
 
