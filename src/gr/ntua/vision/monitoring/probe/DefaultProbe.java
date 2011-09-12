@@ -8,9 +8,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.google.common.collect.Lists;
 
 
 /**
@@ -36,7 +40,7 @@ class DefaultProbe implements Probe
 	private final int			retries;
 
 	/** last collected event. */
-	private EventImpl			last_event			= null;
+	private List<Event>			last_events			= Lists.newArrayList();
 	/** error event. */
 	private Event				error				= null;
 	/** last event collection time. */
@@ -76,7 +80,7 @@ class DefaultProbe implements Probe
 	public void run()
 	{
 		log.debug( "Executing" );
-		last_event = null;
+		last_events.clear();
 		last_collection_tm = new Date().getTime();
 
 		for( int tries = 0; tries < retries; ++tries )
@@ -103,20 +107,26 @@ class DefaultProbe implements Probe
 				}
 
 				last_collection_tm = new Date().getTime();
-				last_event = new EventImpl( new JSONObject( buf.toString() ) );
+				JSONArray events = new JSONArray( buf.toString() );
+				for( int i = 0; i < events.length(); ++i )
+					last_events.add( new EventImpl( events.getJSONObject( i ) ) );
 				break;
 			}
 			catch( IOException x )
 			{
 				log.debug( "failed (I/O error:" + x.getMessage() + ") @ attempt: " + ( tries + 1 ) + "/" + retries );
-				last_event = new EventImpl( error );
-				last_event.setDescription( x.getClass().getCanonicalName() + " :: " + x.getMessage() );
+				EventImpl err = new EventImpl( error );
+				err.setDescription( x.getClass().getCanonicalName() + " :: " + x.getMessage() );
+				last_events.clear();
+				last_events.add( err );
 			}
 			catch( Exception x )
 			{
 				log.warn( "failed (" + x.getMessage() + ") @ attempt: " + ( tries + 1 ) + "/" + retries );
-				last_event = new EventImpl( error );
-				last_event.setDescription( x.getClass().getCanonicalName() + " :: " + x.getMessage() );
+				EventImpl err = new EventImpl( error );
+				err.setDescription( x.getClass().getCanonicalName() + " :: " + x.getMessage() );
+				last_events.clear();
+				last_events.add( err );
 			}
 
 		log.debug( "Done" );
@@ -167,9 +177,9 @@ class DefaultProbe implements Probe
 	 * @see gr.ntua.vision.monitoring.probe.Probe#lastCollected()
 	 */
 	@Override
-	public Event lastCollected()
+	public List<Event> lastCollected()
 	{
-		return last_event;
+		return last_events;
 	}
 
 

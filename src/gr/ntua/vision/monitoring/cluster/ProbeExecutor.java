@@ -3,8 +3,17 @@ package gr.ntua.vision.monitoring.cluster;
 import gr.ntua.vision.monitoring.ext.local.LocalCatalogFactory;
 import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.probe.Probe;
+import gr.ntua.vision.monitoring.util.Pair;
+
+import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.json.JSONException;
+
+import com.google.common.base.Function;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 
 /**
@@ -96,9 +105,26 @@ public class ProbeExecutor
 
 						// save the stuff:
 						long tmstamp = probe.lastCollectionTime();
-						Event event = probe.lastCollected();
+						List<Event> events = probe.lastCollected();
 
-						LocalCatalogFactory.localCatalogInstance().put( probe.storeKey(), tmstamp, event.serialize() );
+						List<Pair<String, Object>> items = Lists.newArrayList();
+						Iterables.addAll( items, Iterables.transform( events, new Function<Event, Pair<String, Object>>() {
+							@Override
+							public Pair<String, Object> apply(Event event)
+							{
+								try
+								{
+									return new Pair<String, Object>( event.id().toString(), event.toJSON().toString() );
+								}
+								catch( JSONException e )
+								{
+									e.printStackTrace();
+									return null;
+								}
+							}
+						} ) );
+						Iterables.removeIf( items, Predicates.isNull() );
+						LocalCatalogFactory.localCatalogInstance().put( probe.storeKey(), tmstamp, items );
 						log.debug( "Event saved" );
 					}
 					finally

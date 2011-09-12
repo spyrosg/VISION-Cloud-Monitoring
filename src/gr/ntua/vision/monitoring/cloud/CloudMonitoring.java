@@ -47,6 +47,16 @@ public class CloudMonitoring implements Monitoring
 
 
 	/**
+	 * @see gr.ntua.vision.monitoring.Monitoring#isInstanceAlive()
+	 */
+	@Override
+	public boolean isInstanceAlive()
+	{
+		return ruleEngine.isAlive();
+	}
+
+
+	/**
 	 * @see gr.ntua.vision.monitoring.Monitoring#shutdown()
 	 */
 	@Override

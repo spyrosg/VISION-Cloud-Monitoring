@@ -63,13 +63,17 @@ public class CloudInterface
 	@Produces("application/json")
 	public String registerAggregationRule(@FormParam("rule") String rule) throws JSONException
 	{
-		log.debug( "REST: registerAggregationRule(code size: " + rule.length() + " chars)" );
+		RuleSpec compiled = null;
+		if( CloudMonitoring.instance.isInstanceAlive() )
+		{
+			log.debug( "REST: registerAggregationRule(code size: " + rule.length() + " chars)" );
 
-		RuleSpec compiled = RuleParser.instance.ruleParser.parse( rule );
+			compiled = RuleParser.instance.ruleParser.parse( rule );
 
-		log.debug( "REST: registerAggregationRule() compiled rule: " + compiled.name + " :: " + compiled.id );
+			log.debug( "REST: registerAggregationRule() compiled rule: " + compiled.name + " :: " + compiled.id );
 
-		CloudMonitoring.instance.ruleEngine.register( compiled );
+			CloudMonitoring.instance.ruleEngine.register( compiled );
+		}
 
 		JSONWriter wr = new JSONStringer().object();
 		wr.key( "status" ).value( compiled == null ? "failed" : "ok" );

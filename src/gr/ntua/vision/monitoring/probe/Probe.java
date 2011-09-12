@@ -2,6 +2,8 @@ package gr.ntua.vision.monitoring.probe;
 
 import gr.ntua.vision.monitoring.model.Event;
 
+import java.util.List;
+
 
 /**
  * This defines a monitoring probe. Probes require to be invoked in regular intervals, to collect data and provide them to their
@@ -46,5 +48,5 @@ public interface Probe extends Runnable
 	 * 
 	 * @return the data.
 	 */
-	public Event lastCollected();
+	public List<Event> lastCollected();
 }

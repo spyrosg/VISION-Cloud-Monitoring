@@ -47,8 +47,8 @@ public class LocationImpl implements Location
 	public LocationImpl(JSONObject json) throws JSONException
 	{
 		host = json.getString( "host" );
-		service = json.getString( "service" );
-		user = json.getString( "user" );
+		service = json.optString( "service" );
+		user = json.optString( "user" );
 		address = json.getString( "address" );
 	}
 

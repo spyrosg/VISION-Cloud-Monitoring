@@ -1,5 +1,6 @@
 package gr.ntua.vision.monitoring.ext.iface;
 
+import gr.ntua.vision.monitoring.cloud.CloudMonitoring;
 import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.model.impl.EventImpl;
 
@@ -17,7 +18,7 @@ import org.json.JSONWriter;
 /**
  * Monitoring push example interface.
  */
-public abstract class MonitoringPushInterface
+public class MonitoringPushInterface
 {
 	/**
 	 * This is the service implementing method.
@@ -46,5 +47,9 @@ public abstract class MonitoringPushInterface
 	 * @param event
 	 *            event to handle.
 	 */
-	public abstract void handleEvent(Event event);
+	public void handleEvent(Event event)
+	{
+		if( CloudMonitoring.instance.isInstanceAlive() ) //
+			CloudMonitoring.instance.ruleEngine.push( event );
+	}
 }

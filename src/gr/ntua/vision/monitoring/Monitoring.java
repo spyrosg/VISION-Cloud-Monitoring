@@ -18,6 +18,14 @@ public interface Monitoring
 
 
 	/**
+	 * check if the instance is {@link #launch(ServletContext)}ed.
+	 * 
+	 * @return <code>true</code> if and only if the instance is {@link #launch(ServletContext)}ed.
+	 */
+	public boolean isInstanceAlive();
+
+
+	/**
 	 * shutdown the application. It is illegal to call this more than once.
 	 */
 	public void shutdown();

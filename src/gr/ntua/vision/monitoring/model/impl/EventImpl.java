@@ -5,6 +5,7 @@ import gr.ntua.vision.monitoring.model.Location;
 import gr.ntua.vision.monitoring.model.Resource;
 import gr.ntua.vision.monitoring.util.Pair;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -126,18 +127,18 @@ public class EventImpl implements Event
 		end = json.getLong( "end" );
 		aggregation_count = json.getInt( "aggr_count" );
 
-		String rsc_str = json.getString( "resource" );
+		String rsc_str = json.optString( "resource" );
 		resource = rsc_str == null ? null : ResourceType.valueOf( rsc_str );
 
 		if( resource != null )
-			value = resource.parseValue( json.getString( "value" ) );
-		else value = ActionStatus.valueOf( json.getString( "value" ) );
+			value = resource.parseValue( json.optString( "value" ) );
+		else value = ActionStatus.valueOf( json.optString( "value" ) );
 
 		JSONObject tmp = json.getJSONObject( "source" );
 		source = new LocationImpl( tmp );
-		tmp = json.getJSONObject( "target" );
+		tmp = json.optJSONObject( "target" );
 		target = tmp == null ? null : new LocationImpl( tmp );
-		tmp = json.getJSONObject( "observer" );
+		tmp = json.optJSONObject( "observer" );
 		observer = tmp == null ? null : new LocationImpl( tmp );
 	}
 
@@ -158,7 +159,7 @@ public class EventImpl implements Event
 		obj.put( "type", type.toString() );
 		obj.put( "start", start );
 		obj.put( "end", end );
-		obj.put( "resource", resource.toString() );
+		obj.put( "resource", resource == null ? null : resource.toString() );
 		obj.put( "value", value );
 		obj.put( "aggr_count", aggregation_count );
 		obj.put( "source", source.toJSON() );
@@ -377,5 +378,37 @@ public class EventImpl implements Event
 			x.printStackTrace();
 		}
 		return pairs;
+	}
+
+
+	/**
+	 * schema export app.
+	 * 
+	 * @param args
+	 *            ignored.
+	 * @throws JSONException
+	 */
+	public static void main(String[] args) throws JSONException
+	{
+		LocationImpl source = new LocationImpl( "localhost", null, null, "127.0.0.1" );
+		LocationImpl observer = new LocationImpl( "localhost", null, null, "127.0.0.1" );
+
+		EventImpl measurement = new EventImpl( UUID.randomUUID(), UUID.randomUUID(), null, null, "event description string",
+				new Float( 3.14f ), EventType.Measurement, ResourceType.SystemLoad, new Date().getTime(),
+				new Date().getTime() + 20, source, null, observer );
+
+		LocationImpl act_source = new LocationImpl( "localhost", "some-component-name", "some-user-id", "127.0.0.1" );
+		LocationImpl act_target = new LocationImpl( "localhost", "some-component-name", "some-user-id", "127.0.0.1" );
+
+		EventImpl action = new EventImpl( UUID.randomUUID(), UUID.randomUUID(), "some-tenant-id", "some-user-id",
+				"event action name", ActionStatus.Succeded, EventType.Action, null, new Date().getTime(),
+				new Date().getTime() + 20, act_source, act_target, observer );
+
+		System.out.println( "measurement event:\n" );
+		System.out.println( measurement.toJSON().toString( 2 ) );
+
+		System.out.println( "\n\n==================================================" );
+		System.out.println( "action event:\n" );
+		System.out.println( action.toJSON().toString( 2 ) );
 	}
 }

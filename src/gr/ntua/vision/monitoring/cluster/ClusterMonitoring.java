@@ -67,6 +67,16 @@ public class ClusterMonitoring extends Scheduler implements Monitoring
 
 
 	/**
+	 * @see gr.ntua.vision.monitoring.Monitoring#isInstanceAlive()
+	 */
+	@Override
+	public boolean isInstanceAlive()
+	{
+		return isAlive();
+	}
+
+
+	/**
 	 * get the scripts working directory.
 	 * 
 	 * @return the directory.
