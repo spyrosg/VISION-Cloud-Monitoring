@@ -6,10 +6,14 @@ import gr.ntua.vision.monitoring.ext.local.InMemoryLocalCatalog;
 import gr.ntua.vision.monitoring.ext.local.LocalCatalogFactory;
 import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.model.Event.EventType;
+import gr.ntua.vision.monitoring.model.Location;
 import gr.ntua.vision.monitoring.model.Resource;
 import gr.ntua.vision.monitoring.model.impl.EventImpl;
+import gr.ntua.vision.monitoring.model.impl.LocationImpl;
 import gr.ntua.vision.monitoring.util.Pair;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import org.json.JSONException;
@@ -28,8 +32,22 @@ public abstract class PhonyConfigurationWriter
 
 	static
 	{
-		error = new EventImpl( null, null, "error", EventType.Measurement, Lists.<Resource> newArrayList(), 0, 0, null, null,
-				null );
+		Location src = null;
+		try
+		{
+			InetAddress localhost = InetAddress.getLocalHost();
+			byte[] ip = localhost.getAddress();
+			src = new LocationImpl( localhost.getCanonicalHostName(), "Monitoring", null, null, String.format(	"%d,%d,%d,%d",
+																												ip[0], ip[1],
+																												ip[2], ip[3] ) );
+		}
+		catch( UnknownHostException e )
+		{
+			e.printStackTrace();
+		}
+		if( src == null ) src = new LocationImpl( "localhost", "Monitoring.", null, null, "127.0.0.1" );
+
+		error = new EventImpl( null, null, "error", EventType.Measurement, Lists.<Resource> newArrayList(), 0, 0, src, null, null );
 	}
 
 

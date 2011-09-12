@@ -89,6 +89,7 @@ class DefaultProbe implements Probe
 	@Override
 	public void run()
 	{
+		String jsonStr = null;
 		log.debug( "Executing" );
 		last_events.clear();
 		last_collection_tm = new Date().getTime();
@@ -116,8 +117,10 @@ class DefaultProbe implements Probe
 					continue;
 				}
 
+				jsonStr = buf.toString();
+
 				last_collection_tm = new Date().getTime();
-				JSONArray events = new JSONArray( buf.toString() );
+				JSONArray events = new JSONArray( jsonStr );
 				for( int i = 0; i < events.length(); ++i )
 					last_events.add( new EventImpl( events.getJSONObject( i ) ).setObserver( observer ) );
 

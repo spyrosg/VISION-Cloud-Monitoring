@@ -26,27 +26,27 @@ import com.google.common.collect.Lists;
 public class EventImpl implements Event
 {
 	/** event id. */
-	private final UUID		id;
+	private final UUID				id;
 	/** probe id. */
-	private final UUID		probe;
+	private final UUID				probe;
 	/** event description. */
-	private String			description;
+	private String					description;
 	/** event's type. */
-	private final EventType	type;
+	private final EventType			type;
 	/** event's resources. */
-	private List<Resource>	resources;
+	private final List<Resource>	resources	= Lists.newArrayList();
 	/** begin time of the event. */
-	private long			start;
+	private long					start;
 	/** end time of the event. */
-	private long			end;
+	private long					end;
 	/** event's source. */
-	private final Location	source;
+	private final Location			source;
 	/** event's target. */
-	private final Location	target;
+	private final Location			target;
 	/** event's observer. */
-	private Location		observer;
+	private Location				observer;
 	/** the aggregation count. */
-	private int				aggregation_count;
+	private int						aggregation_count;
 
 
 	/**
@@ -66,11 +66,11 @@ public class EventImpl implements Event
 	public EventImpl(UUID id, UUID probe, String description, EventType type, List<Resource> resources, long start, long end,
 			Location source, Location target, Location observer)
 	{
-		this.id = id;
-		this.probe = probe;
+		this.id = id == null ? UUID.randomUUID() : id;
+		this.probe = probe == null ? new UUID( 0, 0 ) : probe;
 		this.description = description;
 		this.type = type;
-		this.resources = resources;
+		this.resources.addAll( resources );
 		this.start = start;
 		this.end = end;
 		this.source = source;
@@ -90,7 +90,7 @@ public class EventImpl implements Event
 		this.probe = event.probeID();
 		this.description = event.getDescription();
 		this.type = event.eventType();
-		this.resources = Lists.newArrayList( event.resources() );
+		this.resources.addAll( event.resources() );
 		this.start = event.startTime();
 		this.end = event.endTime();
 		this.source = event.source();
@@ -108,19 +108,19 @@ public class EventImpl implements Event
 	public EventImpl(JSONObject json) throws JSONException
 	{
 		String json_id = json.optString( "id" );
-		id = json_id == null ? UUID.randomUUID() : UUID.fromString( json_id );
+		id = json_id.length() == 0 ? UUID.randomUUID() : UUID.fromString( json_id );
+		
 		probe = UUID.fromString( json.getString( "probe" ) );
-		String desc = json.optString( "description" );
-		description = desc == null ? "" : desc;
+		description = json.optString( "description" );
 		type = EventType.valueOf( json.getString( "type" ) );
 		start = json.getLong( "start" );
 		end = json.getLong( "end" );
 		aggregation_count = json.optInt( "aggr_count" );
 
-		JSONArray rsc = json.getJSONArray( "resources" );
-		resources = Lists.newArrayList();
-		for( int i = 0; i < rsc.length(); ++i )
-			resources.add( new ResourceImpl( rsc.getJSONObject( i ) ) );
+		JSONArray rsc = json.optJSONArray( "resources" );
+		if( rsc != null ) //
+			for( int i = 0; i < rsc.length(); ++i )
+				resources.add( new ResourceImpl( rsc.getJSONObject( i ) ) );
 
 		JSONObject tmp = json.getJSONObject( "source" );
 		source = new LocationImpl( tmp );
@@ -139,8 +139,8 @@ public class EventImpl implements Event
 	 */
 	public void mergeWith(Event event)
 	{
-		List<Resource> all = ResourceImpl.merge( resources, event.resources() );
-		resources = all;
+		resources.clear();
+		resources.addAll( ResourceImpl.merge( resources, event.resources() ) );
 
 		++aggregation_count;
 	}
