@@ -13,6 +13,8 @@ public enum LocationField implements CheckedField
 	/***/
 	User,
 	/***/
+	Tenant,
+	/***/
 	Service,
 	/***/
 	;
@@ -33,6 +35,8 @@ public enum LocationField implements CheckedField
 			return ( (Location) source ).service();
 		case User:
 			return ( (Location) source ).userID();
+		case Tenant:
+			return ( (Location) source ).tenantID();
 		}
 		throw new AssertionError( "unreachable" );
 	}
