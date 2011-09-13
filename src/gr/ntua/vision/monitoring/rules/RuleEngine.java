@@ -17,6 +17,7 @@ import org.json.JSONException;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.representation.Form;
 
 
 /**
@@ -180,10 +181,11 @@ public class RuleEngine extends Thread implements ActionHandler
 				{
 					cache = matchers;
 				}
-				for( EventMatcher em : cache )
-					if( em.matches( event ) ) //
-						for( ActionSpec action : em.rule.actions )
-							action.action.apply( this, event, action.arguments, em.rule.id, action.actionFunctor( this ) );
+				if( cache != null ) //
+					for( EventMatcher em : cache )
+						if( em.matches( event ) ) //
+							for( ActionSpec action : em.rule.actions )
+								action.action.apply( this, event, action.arguments, em.rule.id, action.actionFunctor( this ) );
 			}
 		}
 		catch( InterruptedException x )
@@ -216,7 +218,7 @@ public class RuleEngine extends Thread implements ActionHandler
 	@Override
 	public void store(Event event, String key)
 	{
-		log.trace( "store "+ event.id() + " @ " + key );
+		log.trace( "store " + event.id() + " @ " + key );
 
 		Catalog catalog = CloudCatalogFactory.cloudCatalogInstance();
 
@@ -230,10 +232,13 @@ public class RuleEngine extends Thread implements ActionHandler
 	@Override
 	public void transmit(Event event, String pushURL)
 	{
-		log.trace( "trasmit "+ event.id() + " @ " + pushURL );
+		log.trace( "trasmit " + event.id() + " @ " + pushURL );
 		try
 		{
-			client.resource( pushURL ).queryParam( "event", event.toJSON().toString() ).post();
+			Form form = new Form();
+			form.add( "event", event.toJSON().toString() );
+
+			client.resource( pushURL ).post( form );
 		}
 		catch( JSONException x )
 		{

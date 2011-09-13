@@ -9,6 +9,7 @@ import org.codehaus.jparsec.Parser;
 import org.codehaus.jparsec.Parsers;
 import org.codehaus.jparsec.Scanners;
 import org.codehaus.jparsec.Terminals;
+import org.codehaus.jparsec.Tokens.Fragment;
 import org.codehaus.jparsec.functors.Map;
 import org.codehaus.jparsec.functors.Tuple3;
 
@@ -55,8 +56,8 @@ public class RuleParser
 	 */
 	private RuleParser()
 	{
-		ruleParser = rule();
-		rulesParser = rules();
+		ruleParser = rule().from( tokenizer(), ignored() );
+		rulesParser = rules().from( tokenizer(), ignored() );
 	}
 
 
@@ -128,13 +129,13 @@ public class RuleParser
 				return true;
 			}
 		} ), //
-					term( "like" ).map( new Map<Object, Boolean>() {
-						@Override
-						public Boolean map(Object arg0)
-						{
-							return false;
-						}
-					} ) ), //
+		term( "like" ).map( new Map<Object, Boolean>() {
+			@Override
+			public Boolean map(Object arg0)
+			{
+				return false;
+			}
+		} ) ), //
 								Terminals.StringLiteral.PARSER )//
 				.map( new Map<Tuple3<String[], Boolean, String>, FieldCheck>() {
 					@Override
@@ -249,20 +250,20 @@ public class RuleParser
 			return Terminals.StringLiteral.PARSER;
 
 		if( type == Integer.class ) //
-			return Terminals.DecimalLiteral.PARSER.map( new Map<String, Integer>() {
+			return Terminals.DecimalLiteral.TOKENIZER.map( new Map<Fragment, Integer>() {
 				@Override
-				public Integer map(String arg0)
+				public Integer map(Fragment arg0)
 				{
-					return Integer.parseInt( arg0 );
+					return Integer.parseInt( arg0.text() );
 				}
 			} );
 
 		if( type == Long.class ) //
-			return Terminals.DecimalLiteral.PARSER.map( new Map<String, Long>() {
+			return Terminals.DecimalLiteral.TOKENIZER.map( new Map<Fragment, Long>() {
 				@Override
-				public Long map(String arg0)
+				public Long map(Fragment arg0)
 				{
-					return Long.parseLong( arg0 );
+					return Long.parseLong( arg0.text() );
 				}
 			} );
 
@@ -334,7 +335,6 @@ public class RuleParser
 
 		String rule = "rule \"mitsos\"\n" + //
 				"when\n" + //
-				"Event( Tenant = \"foo\", User like \"admin?\", User = \"kostas\" );\n" + //
 				"Event( Source.Host like \".*\\.cluster10\\.cloud\\.net\" );\n" + //
 				"then\n" + //
 				"PushAsIs(\"foo@bar:4040/\");\n";

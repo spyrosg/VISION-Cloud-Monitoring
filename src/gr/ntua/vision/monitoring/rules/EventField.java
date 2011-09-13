@@ -8,10 +8,6 @@ import gr.ntua.vision.monitoring.model.impl.ResourceImpl;
 public enum EventField implements CheckedField
 {
 	/***/
-	Tenant(false),
-	/***/
-	User(false),
-	/***/
 	Type(false),
 	/***/
 	Resource(false),

@@ -14,6 +14,7 @@ import org.json.JSONException;
 
 import com.google.common.collect.Lists;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.representation.Form;
 
 
 /**
@@ -105,7 +106,10 @@ public class VisionMonitoring
 	{
 		try
 		{
-			client.resource( url ).queryParam( "event", event.toJSON().toString() ).post();
+			Form form = new Form();
+			form.add( "event", event.toJSON().toString() );
+
+			client.resource( url ).post( form );
 		}
 		catch( JSONException x )
 		{

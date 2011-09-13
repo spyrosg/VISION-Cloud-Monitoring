@@ -42,6 +42,9 @@ public class CloudMonitoring implements Monitoring
 	{
 		log.info( "Application begins" );
 		eventReader = new EventReader( ruleEngine );
+		eventReader.register( "lcl-store", "vismo.measurements" );
+		eventReader.register( "lcl-store", "vismo.actions" );
+		eventReader.start();
 		ruleEngine.start();
 	}
 

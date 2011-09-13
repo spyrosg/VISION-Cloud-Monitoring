@@ -8,9 +8,10 @@ import gr.ntua.vision.monitoring.util.Pair;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
+import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -25,7 +26,7 @@ import com.google.common.collect.Lists;
 public class EventReader extends Thread
 {
 	/** data required to access a cluster. */
-	private class ClusterData
+	private class ClusterData implements Comparable<ClusterData>
 	{
 		/** the cluster's catalog */
 		final Catalog	catalog;
@@ -47,12 +48,25 @@ public class EventReader extends Thread
 			this.key = key;
 			this.lastInspection = 0;
 		}
+
+
+		@Override
+		public int compareTo(ClusterData arg0)
+		{
+			if( !key.equals( arg0.key ) ) //
+				return key.toString().compareTo( arg0.key );
+
+			return hashCode() - arg0.hashCode();
+		}
 	}
 
+	/** the logger. */
+	@SuppressWarnings("all")
+	private static final Logger		log			= Logger.getLogger( EventReader.class );
 	/** the rule engine. */
-	private final RuleEngine				ruleEngine;
+	private final RuleEngine		ruleEngine;
 	/** the clusters to fetch events from. */
-	private final Map<String, ClusterData>	clusters	= new ConcurrentSkipListMap<String, ClusterData>();
+	private final Set<ClusterData>	clusters	= new ConcurrentSkipListSet<ClusterData>();
 
 
 	/**
@@ -76,7 +90,7 @@ public class EventReader extends Thread
 	 */
 	public void register(String cluster, String key)
 	{
-		clusters.put( cluster, new ClusterData( cluster, key ) );
+		clusters.add( new ClusterData( cluster, key ) );
 	}
 
 
@@ -101,31 +115,36 @@ public class EventReader extends Thread
 		while( true )
 			try
 			{
-				Thread.sleep( 500 );
+				Thread.sleep( 5000 );
 
 				List<Pair<String, Object>> pairs = Lists.newArrayList();
 
 				long now = new Date().getTime();
-				for( ClusterData ctlg : clusters.values() )
+				for( ClusterData ctlg : clusters )
 				{
 					pairs.clear();
 					ctlg.catalog.timeRange( ctlg.key, ctlg.lastInspection, now, pairs );
+					ctlg.lastInspection = now;
 
-					ruleEngine.push( Iterables.transform( pairs, new Function<Pair<String, Object>, Event>() {
-						@Override
-						public Event apply(Pair<String, Object> arg0)
-						{
-							try
+					if( pairs.size() > 0 )
+					{
+						log.debug( ctlg.key + ": pushing " + pairs.size() + " events." );
+						ruleEngine.push( Iterables.transform( pairs, new Function<Pair<String, Object>, Event>() {
+							@Override
+							public Event apply(Pair<String, Object> arg0)
 							{
-								return new EventImpl( new JSONObject( arg0.b.toString() ) );
+								try
+								{
+									return new EventImpl( new JSONObject( arg0.b.toString() ) );
+								}
+								catch( JSONException x )
+								{
+									x.printStackTrace();
+									return null;
+								}
 							}
-							catch( JSONException x )
-							{
-								x.printStackTrace();
-								return null;
-							}
-						}
-					} ) );
+						} ) );
+					}
 				}
 			}
 			catch( InterruptedException x )
