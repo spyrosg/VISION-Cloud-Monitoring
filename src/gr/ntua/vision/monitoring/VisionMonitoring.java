@@ -14,7 +14,6 @@ import org.json.JSONException;
 
 import com.google.common.collect.Lists;
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
 
 
 /**
@@ -69,7 +68,7 @@ public class VisionMonitoring
 	 * 
 	 * @return the instance.
 	 */
-	public VisionMonitoring instance()
+	public static VisionMonitoring instance()
 	{
 		return instance;
 	}
@@ -106,7 +105,7 @@ public class VisionMonitoring
 	{
 		try
 		{
-			client.resource( url ).queryParam( "event", event.toJSON().toString() ).put( ClientResponse.class );
+			client.resource( url ).queryParam( "event", event.toJSON().toString() ).post();
 		}
 		catch( JSONException x )
 		{

@@ -17,7 +17,6 @@ import org.json.JSONException;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
 
 
 /**
@@ -234,7 +233,7 @@ public class RuleEngine extends Thread implements ActionHandler
 		log.trace( "trasmit "+ event.id() + " @ " + pushURL );
 		try
 		{
-			client.resource( pushURL ).queryParam( "event", event.toJSON().toString() ).put( ClientResponse.class );
+			client.resource( pushURL ).queryParam( "event", event.toJSON().toString() ).post();
 		}
 		catch( JSONException x )
 		{
