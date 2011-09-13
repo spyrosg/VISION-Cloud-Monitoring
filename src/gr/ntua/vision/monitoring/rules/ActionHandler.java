@@ -27,7 +27,7 @@ public interface ActionHandler
 	 *            the aggregation key fields. All events in a group have the same values in those.
 	 * @return the pool.
 	 */
-	public AggregationPool pool(UUID pool, Function<Event, Void> action, int maxCount, long timeWindow, CheckedField... fields);
+	public AggregationPool pool(UUID pool, Function<Event, Boolean> action, int maxCount, long timeWindow, CheckedField... fields);
 
 
 	/**
@@ -37,8 +37,9 @@ public interface ActionHandler
 	 *            event to store.
 	 * @param key
 	 *            the key to store the event under.
+	 * @return <code>true</code> if and only if the operation completed successfully.
 	 */
-	public void store(Event event, String key);
+	public boolean store(Event event, String key);
 
 
 	/**
@@ -48,6 +49,7 @@ public interface ActionHandler
 	 *            event to transmit.
 	 * @param pushURL
 	 *            the URL of the push REST service.
+	 * @return <code>true</code> if and only if the operation completed successfully.
 	 */
-	public void transmit(Event event, String pushURL);
+	public boolean transmit(Event event, String pushURL);
 }

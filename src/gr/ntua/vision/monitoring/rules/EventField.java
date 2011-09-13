@@ -10,6 +10,8 @@ public enum EventField implements CheckedField
 	/***/
 	Type(false),
 	/***/
+	Description(false),
+	/***/
 	Resource(false),
 	/***/
 	Source(true),
@@ -51,6 +53,8 @@ public enum EventField implements CheckedField
 			return ( (Event) source ).target();
 		case Type:
 			return ( (Event) source ).eventType();
+		case Description:
+			return ( (Event) source ).getDescription();
 		}
 		throw new AssertionError( "unreachable" );
 	}

@@ -12,7 +12,6 @@ import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.log4j.Logger;
-import org.json.JSONException;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
@@ -181,11 +180,22 @@ public class RuleEngine extends Thread implements ActionHandler
 				{
 					cache = matchers;
 				}
-				if( cache != null ) //
+				if( cache != null )
+				//
 					for( EventMatcher em : cache )
-						if( em.matches( event ) ) //
+						if( em.matches( event ) )
+						//
 							for( ActionSpec action : em.rule.actions )
-								action.action.apply( this, event, action.arguments, em.rule.id, action.actionFunctor( this ) );
+								try
+								{
+									if( !action.action.apply(	this, event, action.arguments, em.rule.id,
+																action.actionFunctor( this ) ) ) remove( em.rule.id );
+								}
+								catch( Throwable x )
+								{
+									x.printStackTrace();
+									remove( em.rule.id );
+								}
 			}
 		}
 		catch( InterruptedException x )
@@ -201,7 +211,7 @@ public class RuleEngine extends Thread implements ActionHandler
 	 *      gr.ntua.vision.monitoring.rules.CheckedField[])
 	 */
 	@Override
-	public AggregationPool pool(UUID pool, Function<Event, Void> action, int maxCount, long timeWindow, CheckedField... fields)
+	public AggregationPool pool(UUID pool, Function<Event, Boolean> action, int maxCount, long timeWindow, CheckedField... fields)
 	{
 		synchronized( rulesLock )
 		{
@@ -216,13 +226,15 @@ public class RuleEngine extends Thread implements ActionHandler
 	 * @see gr.ntua.vision.monitoring.rules.ActionHandler#store(gr.ntua.vision.monitoring.model.Event, java.lang.String)
 	 */
 	@Override
-	public void store(Event event, String key)
+	public boolean store(Event event, String key)
 	{
 		log.trace( "store " + event.id() + " @ " + key );
 
 		Catalog catalog = CloudCatalogFactory.cloudCatalogInstance();
 
 		catalog.put( key, new Date().getTime(), event.serialize() );
+
+		return true;
 	}
 
 
@@ -230,7 +242,7 @@ public class RuleEngine extends Thread implements ActionHandler
 	 * @see gr.ntua.vision.monitoring.rules.ActionHandler#transmit(gr.ntua.vision.monitoring.model.Event, java.lang.String)
 	 */
 	@Override
-	public void transmit(Event event, String pushURL)
+	public boolean transmit(Event event, String pushURL)
 	{
 		log.trace( "trasmit " + event.id() + " @ " + pushURL );
 		try
@@ -239,10 +251,12 @@ public class RuleEngine extends Thread implements ActionHandler
 			form.add( "event", event.toJSON().toString() );
 
 			client.resource( pushURL ).post( form );
+			return true;
 		}
-		catch( JSONException x )
+		catch( Throwable x )
 		{
 			x.printStackTrace();
+			return false;
 		}
 	}
 }

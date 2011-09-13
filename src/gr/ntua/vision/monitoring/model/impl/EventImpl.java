@@ -109,7 +109,7 @@ public class EventImpl implements Event
 	{
 		String json_id = json.optString( "id" );
 		id = json_id.length() == 0 ? UUID.randomUUID() : UUID.fromString( json_id );
-		
+
 		probe = UUID.fromString( json.getString( "probe" ) );
 		description = json.optString( "description" );
 		type = EventType.valueOf( json.getString( "type" ) );
@@ -117,10 +117,9 @@ public class EventImpl implements Event
 		end = json.getLong( "end" );
 		aggregation_count = json.optInt( "aggr_count" );
 
-		JSONArray rsc = json.optJSONArray( "resources" );
-		if( rsc != null ) //
-			for( int i = 0; i < rsc.length(); ++i )
-				resources.add( new ResourceImpl( rsc.getJSONObject( i ) ) );
+		JSONArray rsc = json.getJSONArray( "resources" );
+		for( int i = 0; i < rsc.length(); ++i )
+			resources.add( new ResourceImpl( rsc.getJSONObject( i ) ) );
 
 		JSONObject tmp = json.getJSONObject( "source" );
 		source = new LocationImpl( tmp );
@@ -178,7 +177,7 @@ public class EventImpl implements Event
 		} );
 		Iterables.removeIf( rscs, Predicates.isNull() );
 		JSONArray rsc = new JSONArray( Lists.newArrayList( rscs ) );
-		obj.put( "resource", rsc );
+		obj.put( "resources", rsc );
 		obj.put( "aggr_count", aggregation_count );
 		obj.put( "source", source.toJSON() );
 		obj.put( "target", target == null ? null : target.toJSON() );

@@ -9,7 +9,6 @@ import org.codehaus.jparsec.Parser;
 import org.codehaus.jparsec.Parsers;
 import org.codehaus.jparsec.Scanners;
 import org.codehaus.jparsec.Terminals;
-import org.codehaus.jparsec.Tokens.Fragment;
 import org.codehaus.jparsec.functors.Map;
 import org.codehaus.jparsec.functors.Tuple3;
 
@@ -250,20 +249,20 @@ public class RuleParser
 			return Terminals.StringLiteral.PARSER;
 
 		if( type == Integer.class ) //
-			return Terminals.DecimalLiteral.TOKENIZER.map( new Map<Fragment, Integer>() {
+			return Terminals.DecimalLiteral.PARSER.map( new Map<String, Integer>() {
 				@Override
-				public Integer map(Fragment arg0)
+				public Integer map(String arg0)
 				{
-					return Integer.parseInt( arg0.text() );
+					return Integer.parseInt( arg0 );
 				}
 			} );
 
 		if( type == Long.class ) //
-			return Terminals.DecimalLiteral.TOKENIZER.map( new Map<Fragment, Long>() {
+			return Terminals.DecimalLiteral.PARSER.map( new Map<String, Long>() {
 				@Override
-				public Long map(Fragment arg0)
+				public Long map(String arg0)
 				{
-					return Long.parseLong( arg0.text() );
+					return Long.parseLong( arg0 );
 				}
 			} );
 

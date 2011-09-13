@@ -1,5 +1,6 @@
 package gr.ntua.vision.monitoring.rules;
 
+import gr.ntua.vision.monitoring.cloud.CloudMonitoring;
 import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.model.impl.EventImpl;
 
@@ -75,19 +76,19 @@ public class AggregationPool extends Thread
 
 	/** the logger. */
 	@SuppressWarnings("all")
-	private static final Logger			log			= Logger.getLogger( AggregationPool.class );
+	private static final Logger				log			= Logger.getLogger( AggregationPool.class );
 	/** the pool's id. */
-	public final UUID					id;
+	public final UUID						id;
 	/** the maximum count of events in a group. */
-	private final int					maxCount;
+	private final int						maxCount;
 	/** the maximum time difference between the most recent and the oldest event in the group. */
-	final long							timeWindow;
+	final long								timeWindow;
 	/** the aggregation keys. */
-	final CheckedField[]				keys;
+	final CheckedField[]					keys;
 	/** the action to perform with aggregated events. */
-	private final Function<Event, Void>	action;
+	private final Function<Event, Boolean>	action;
 	/** the aggregated events. */
-	private final Map<Key, EventImpl>	aggregated	= Maps.newConcurrentMap();
+	private final Map<Key, EventImpl>		aggregated	= Maps.newConcurrentMap();
 
 
 	/**
@@ -99,7 +100,7 @@ public class AggregationPool extends Thread
 	 * @param keys
 	 * @param action
 	 */
-	public AggregationPool(UUID id, int maxCount, long timeWindow, CheckedField[] keys, Function<Event, Void> action)
+	public AggregationPool(UUID id, int maxCount, long timeWindow, CheckedField[] keys, Function<Event, Boolean> action)
 	{
 		if( keys.length == 0 ) throw new IllegalArgumentException( "at least one aggregation field is required." );
 
@@ -121,8 +122,9 @@ public class AggregationPool extends Thread
 	 * 
 	 * @param event
 	 *            the event to push.
+	 * @return <code>true</code> if and only if the operation completed successfully.
 	 */
-	public void push(Event event)
+	public boolean push(Event event)
 	{
 		Key key = new Key( event );
 		EventImpl master = aggregated.get( key );
@@ -130,6 +132,8 @@ public class AggregationPool extends Thread
 		if( master != null )
 			master.mergeWith( event );
 		else aggregated.put( key, master = new EventImpl( event ) );
+
+		return true;
 	}
 
 
@@ -168,7 +172,8 @@ public class AggregationPool extends Thread
 					if( ( maxCount > 0 && entry.getValue().aggregationCount() >= maxCount ) || //
 							( timeWindow > 0 && now - entry.getKey().timestamp >= timeWindow ) )
 					{
-						action.apply( entry.getValue() );
+						if( !action.apply( entry.getValue() ) ) //
+							CloudMonitoring.instance.ruleEngine.remove( id );
 						events.remove();
 					}
 				}

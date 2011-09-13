@@ -58,20 +58,21 @@ public enum Actions
 	 *            id of rule, used to identify its aggregation pool - if any.
 	 * @param actionFunctor
 	 *            the action functor.
+	 * @return <code>true</code> if and only if the appliation was successful.
 	 */
-	public void apply(ActionHandler handler, Event event, Object[] arguments, UUID id, Function<Event, Void> actionFunctor)
+	public boolean apply(ActionHandler handler, Event event, Object[] arguments, UUID id, Function<Event, Boolean> actionFunctor)
 	{
 		switch( this )
 		{
 		case PushAggregated:
 		case Store:
-			handler.pool( id, actionFunctor, (Integer) arguments[1], (Long) arguments[2],
+			return handler.pool( id, actionFunctor, (Integer) arguments[1], (Long) arguments[2],
 							EventField.valueOf( (String) arguments[3] ) ).push( event );
-			return;
 
 		case PushAsIs:
-			handler.transmit( event, (String) arguments[0] );
-			return;
+			return handler.transmit( event, (String) arguments[0] );
 		}
+		
+		return false;
 	}
 }

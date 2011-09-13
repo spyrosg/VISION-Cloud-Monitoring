@@ -8,10 +8,10 @@ import gr.ntua.vision.monitoring.model.impl.EventImpl;
 import java.util.Arrays;
 import java.util.Date;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +35,7 @@ public class MonitoringPushInterface
 	 */
 	@POST
 	@Produces("application/json")
-	public String receiveEvent(@QueryParam("event") String eventJSON) throws JSONException
+	public String receiveEvent(@FormParam("event") String eventJSON) throws JSONException
 	{
 		handleEvent( new EventImpl( new JSONObject( eventJSON ) ) );
 

@@ -54,25 +54,23 @@ public class ActionSpec
 	 *            the action handler.
 	 * @return the functor.
 	 */
-	public Function<Event, Void> actionFunctor(final ActionHandler handler)
+	public Function<Event, Boolean> actionFunctor(final ActionHandler handler)
 	{
-		return new Function<Event, Void>() {
+		return new Function<Event, Boolean>() {
 			@Override
-			public Void apply(Event event)
+			public Boolean apply(Event event)
 			{
 				switch( action )
 				{
 				case PushAggregated:
-					handler.transmit( event, (String) arguments[0] );
-					break;
+					return handler.transmit( event, (String) arguments[0] );
 
 				case Store:
-					handler.store( event, (String) arguments[0] );
-					break;
+					return handler.store( event, (String) arguments[0] );
 
 				default:
 				}
-				return null;
+				return false;
 			}
 		};
 	}
