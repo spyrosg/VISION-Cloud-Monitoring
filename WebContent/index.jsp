@@ -20,6 +20,8 @@
 	Logs so far:
 	<br />
 	<div style="border: 2px; border-color: black;">
+		<div style="float: left; height: 800px; width: 50%; overflow: auto;">
+		<strong>Measurements</strong>
 		<pre>
 		<%
 			Catalog ctg = (Catalog) getServletContext().getAttribute( "lcl-store" );
@@ -33,6 +35,21 @@
 				out.println( pair.a + " :: \n" + new JSONObject( pair.b.toString() ).toString( 10 ) );
 		%>
 		</pre>
+		</div>
+		<div style="float: left; height: 800px; width: 50%; overflow: auto;">
+		<strong>Actions</strong>
+		<pre>
+		<%
+			items.clear();
+			ctg.timeRange( "vismo.actions", new Date().getTime() - 10 * 60 * 1000, new Date().getTime(), items );
+
+			out.println( items.size() );
+
+			for( Pair<String, Object> pair : items )
+				out.println( pair.a + " :: \n" + new JSONObject( pair.b.toString() ).toString( 10 ) );
+		%>
+		</pre>
+		</div>
 	</div>
 </body>
 </html>

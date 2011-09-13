@@ -22,6 +22,7 @@ import org.json.JSONWriter;
 /**
  * Monitoring push example interface.
  */
+@Path("/push/event")
 public class MonitoringPushInterface
 {
 	/**
@@ -33,7 +34,6 @@ public class MonitoringPushInterface
 	 * @throws JSONException
 	 */
 	@POST
-	@Path("/push/event")
 	@Produces("application/json")
 	public String receiveEvent(@QueryParam("event") String eventJSON) throws JSONException
 	{
