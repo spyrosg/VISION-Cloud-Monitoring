@@ -78,7 +78,7 @@ public class CloudInterface
 		JSONWriter wr = new JSONStringer().object();
 		wr.key( "status" ).value( compiled == null ? "failed" : "ok" );
 		if( compiled != null ) //
-			wr.key( "id" ).value( compiled.id );
+			wr.key( "id" ).value( compiled.id.toString() );
 		return wr.endObject().toString();
 	}
 }
