@@ -1,6 +1,8 @@
 package gr.ntua.vision.monitoring.ext.iface;
 
+import gr.ntua.vision.monitoring.VismoCtxListener;
 import gr.ntua.vision.monitoring.cloud.CloudMonitoring;
+import gr.ntua.vision.monitoring.ext.catalog.GlobalCatalogFactory;
 import gr.ntua.vision.monitoring.rules.parser.RuleParser;
 import gr.ntua.vision.monitoring.rules.parser.RuleSpec;
 
@@ -16,6 +18,8 @@ import org.json.JSONException;
 import org.json.JSONStringer;
 import org.json.JSONWriter;
 
+import com.google.common.base.Function;
+
 
 /**
  * This contains the cloud REST interface entries.
@@ -23,6 +27,71 @@ import org.json.JSONWriter;
 @Path("/cloud")
 public class CloudInterface
 {
+	/** variables that may be handled. */
+	private enum Variables
+	{
+		/***/
+		Alive(new Function<String, Void>() {
+			@Override
+			public Void apply(String arg0)
+			{
+				if( Boolean.parseBoolean( arg0 ) )
+				{
+					if( !VismoCtxListener.instance().isAlive( CloudMonitoring.class ) ) //
+						try
+						{
+							VismoCtxListener.instance().launch( CloudMonitoring.class );
+						}
+						catch( Throwable x )
+						{
+							throw new RuntimeException( x );
+						}
+				}
+				else
+				{
+					if( VismoCtxListener.instance().isAlive( CloudMonitoring.class ) )
+						VismoCtxListener.instance().shutdown( CloudMonitoring.class );
+				}
+				return null;
+			}
+		}),
+		/***/
+		GlobalCatalog(new Function<String, Void>() {
+			@Override
+			public Void apply(String arg0)
+			{
+				GlobalCatalogFactory.setGlobalURL( arg0 );
+				return null;
+			}
+		}),
+		/***/
+		LocalCatalogs(new Function<String, Void>() {
+			@Override
+			public Void apply(String arg0)
+			{
+				String[] clusters = arg0.split( ";" );
+				CloudMonitoring.instance.setClusters( clusters );
+				return null;
+			}
+		}),
+		/***/
+		;
+
+		/** value handler */
+		final Function<String, Void>	handler;
+
+
+		/**
+		 * c/tor.
+		 * 
+		 * @param handler
+		 */
+		private Variables(Function<String, Void> handler)
+		{
+			this.handler = handler;
+		}
+	}
+
 	/** the logger. */
 	@SuppressWarnings("all")
 	private static final Logger	log	= Logger.getLogger( CloudInterface.class );
@@ -44,7 +113,11 @@ public class CloudInterface
 	public String setCloudMonitoringParameter(@QueryParam("name") String name, @QueryParam("value") String value)
 			throws JSONException
 	{
-		log.debug( "REST: setCloudrMonitoringParameter('" + name + "')" );
+		log.debug( "REST: setCloudrMonitoringParameter('" + name + "' -> '" + value + "')" );
+
+		Variables var = Variables.valueOf( name );
+		if( var != null ) var.handler.apply( value );
+
 		return new JSONStringer().object().key( "status" ).value( "ok" ).endObject().toString();
 	}
 

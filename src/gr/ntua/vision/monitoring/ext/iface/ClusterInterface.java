@@ -1,5 +1,9 @@
 package gr.ntua.vision.monitoring.ext.iface;
 
+import gr.ntua.vision.monitoring.VismoCtxListener;
+import gr.ntua.vision.monitoring.cluster.ClusterMonitoring;
+import gr.ntua.vision.monitoring.ext.catalog.LocalCatalogFactory;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -9,6 +13,8 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONStringer;
 
+import com.google.common.base.Function;
+
 
 /**
  * This contains the cluster REST interface entries.
@@ -16,6 +22,61 @@ import org.json.JSONStringer;
 @Path("/cluster")
 public class ClusterInterface
 {
+	/** variables that may be handled. */
+	private enum Variables
+	{
+		/***/
+		Alive(new Function<String, Void>() {
+			@Override
+			public Void apply(String arg0)
+			{
+				if( Boolean.parseBoolean( arg0 ) )
+				{
+					if( !VismoCtxListener.instance().isAlive( ClusterMonitoring.class ) ) //
+						try
+						{
+							VismoCtxListener.instance().launch( ClusterMonitoring.class );
+						}
+						catch( Throwable x )
+						{
+							throw new RuntimeException( x );
+						}
+				}
+				else
+				{
+					if( VismoCtxListener.instance().isAlive( ClusterMonitoring.class ) )
+						VismoCtxListener.instance().shutdown( ClusterMonitoring.class );
+				}
+				return null;
+			}
+		}),
+		/***/
+		LocalCatalog(new Function<String, Void>() {
+			@Override
+			public Void apply(String arg0)
+			{
+				LocalCatalogFactory.setLocalURL( arg0 );
+				return null;
+			}
+		}),
+		/***/
+		;
+
+		/** value handler */
+		final Function<String, Void>	handler;
+
+
+		/**
+		 * c/tor.
+		 * 
+		 * @param handler
+		 */
+		private Variables(Function<String, Void> handler)
+		{
+			this.handler = handler;
+		}
+	}
+
 	/** the logger. */
 	@SuppressWarnings("all")
 	private static final Logger	log	= Logger.getLogger( ClusterInterface.class );
@@ -37,7 +98,11 @@ public class ClusterInterface
 	public String setClusterMonitoringParameter(@QueryParam("name") String name, @QueryParam("value") String value)
 			throws JSONException
 	{
-		log.debug( "REST: setClusterMonitoringParameter('" + name + "')" );
+		log.debug( "REST: setClusterMonitoringParameter('" + name + "' -> '" + value + "')" );
+
+		Variables var = Variables.valueOf( name );
+		if( var != null ) var.handler.apply( value );
+
 		return new JSONStringer().object().key( "status" ).value( "ok" ).endObject().toString();
 	}
 }

@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -28,6 +29,8 @@ public class EventReader extends Thread
 	/** data required to access a cluster. */
 	private class ClusterData implements Comparable<ClusterData>
 	{
+		/** cluster url */
+		final String	cluster;
 		/** the cluster's catalog */
 		final Catalog	catalog;
 		/** the key under which events are stored. */
@@ -44,6 +47,7 @@ public class EventReader extends Thread
 		 */
 		ClusterData(String cluster, String key)
 		{
+			this.cluster = cluster;
 			this.catalog = LocalCatalogFactory.localCatalogInstance( cluster );
 			this.key = key;
 			this.lastInspection = 0;
@@ -95,14 +99,29 @@ public class EventReader extends Thread
 
 
 	/**
+	 * clear the clusters pool.
+	 */
+	public void clear()
+	{
+		clusters.clear();
+	}
+
+
+	/**
 	 * remove a cluster from this class.
 	 * 
 	 * @param cluster
 	 *            the cluster to remove.
 	 */
-	public void remove(String cluster)
+	public void remove(final String cluster)
 	{
-		clusters.remove( cluster );
+		Iterables.removeIf( clusters, new Predicate<ClusterData>() {
+			@Override
+			public boolean apply(ClusterData arg0)
+			{
+				return arg0.cluster.equals( cluster );
+			}
+		} );
 	}
 
 

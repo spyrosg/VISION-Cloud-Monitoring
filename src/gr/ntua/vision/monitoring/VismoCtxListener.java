@@ -122,4 +122,22 @@ public class VismoCtxListener implements ServletContextListener
 		while( !instances.isEmpty() )
 			instances.remove( 0 ).shutdown();
 	}
+
+
+	/**
+	 * shutdown any instance of the given monitoring type.
+	 * 
+	 * @param type
+	 *            the monitoring instance type.
+	 */
+	public void shutdown(Class< ? extends Monitoring> type)
+	{
+		for( Monitoring mtr : instances )
+			if( type.isInstance( mtr ) )
+			{
+				instances.remove( mtr );
+				mtr.shutdown();
+				return;
+			}
+	}
 }

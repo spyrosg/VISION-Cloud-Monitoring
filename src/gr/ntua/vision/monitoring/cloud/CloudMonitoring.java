@@ -42,10 +42,26 @@ public class CloudMonitoring implements Monitoring
 	{
 		log.info( "Application begins" );
 		eventReader = new EventReader( ruleEngine );
-		eventReader.register( "lcl-store", "vismo.measurements" );
-		eventReader.register( "lcl-store", "vismo.actions" );
+		setClusters( "lcl-store" );
 		eventReader.start();
 		ruleEngine.start();
+	}
+
+
+	/**
+	 * set the clusters to read from.
+	 * 
+	 * @param clusters
+	 *            the clusters.
+	 */
+	public void setClusters(String... clusters)
+	{
+		eventReader.clear();
+		for( String cluster : clusters )
+		{
+			eventReader.register( cluster, "vismo.measurements" );
+			eventReader.register( cluster, "vismo.actions" );
+		}
 	}
 
 
