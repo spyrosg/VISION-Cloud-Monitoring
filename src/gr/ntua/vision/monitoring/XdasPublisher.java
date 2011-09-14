@@ -30,15 +30,22 @@ public abstract class XdasPublisher
 	private String				topicname	= "vision.xdas";
 	/** The url. */
 	private String				url			= "tcp://127.0.0.1:61616";
+	/** disable activemq flag */
+	private final boolean		disable;
 
 
 	/**
 	 * c/tor.
 	 * 
+	 * @param disable
+	 *            ActiveMQ usage.
 	 * @throws JMSException
 	 */
-	public XdasPublisher() throws JMSException
+	public XdasPublisher(boolean disable) throws JMSException
 	{
+		this.disable = disable;
+		if( disable ) return;
+		
 		ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory( url );
 		connection = factory.createConnection();
 		session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
@@ -56,6 +63,8 @@ public abstract class XdasPublisher
 	 */
 	public void stop() throws JMSException
 	{
+		if( disable ) return;
+		
 		connection.stop();
 		connection.close();
 	}
@@ -71,6 +80,8 @@ public abstract class XdasPublisher
 	 */
 	protected void sendXdas(String xdasmessage) throws Exception
 	{
+		if( disable ) return;
+		
 		TextMessage msg = session.createTextMessage();
 
 		msg.setText( xdasmessage );

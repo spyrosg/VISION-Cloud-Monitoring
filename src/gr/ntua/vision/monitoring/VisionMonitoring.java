@@ -61,11 +61,13 @@ public class VisionMonitoring extends XdasPublisher
 	 * c/tor.
 	 * 
 	 * @param url
+	 * @param id
+	 * @param disableXDAS
 	 * @throws JMSException
 	 */
-	private VisionMonitoring(String url, UUID id) throws JMSException
+	private VisionMonitoring(String url, UUID id, boolean disableXDAS) throws JMSException
 	{
-		super();
+		super( disableXDAS );
 		this.url = url;
 		this.id = id;
 	}
@@ -78,12 +80,14 @@ public class VisionMonitoring extends XdasPublisher
 	 *            the cluster monitoring URL.
 	 * @param id
 	 *            the hot component's ID.
+	 * @param disableXDAS
+	 *            disable ActiveMQ transmission of XDAS events.
 	 * @return the instance created.
 	 * @throws JMSException
 	 */
-	public static VisionMonitoring initialize(String url, UUID id) throws JMSException
+	public static VisionMonitoring initialize(String url, UUID id, boolean disableXDAS) throws JMSException
 	{
-		return instance = new VisionMonitoring( url, id );
+		return instance = new VisionMonitoring( url, id, disableXDAS );
 	}
 
 
@@ -263,7 +267,6 @@ public class VisionMonitoring extends XdasPublisher
 		TimeZone cetTime = TimeZone.getTimeZone( "CET" );
 		DateFormat cetFormat = new SimpleDateFormat();
 		cetFormat.setTimeZone( cetTime );
-		System.out.println( cetFormat.format( date ) );
 		return date.getTime() / 1000L;
 	}
 
