@@ -62,12 +62,9 @@ public class VisionMonitoring extends XdasPublisher
 	 * 
 	 * @param url
 	 * @param id
-	 * @param disableXDAS
-	 * @throws JMSException
 	 */
-	private VisionMonitoring(String url, UUID id, boolean disableXDAS) throws JMSException
+	private VisionMonitoring(String url, UUID id)
 	{
-		super( disableXDAS );
 		this.url = url;
 		this.id = id;
 	}
@@ -80,14 +77,12 @@ public class VisionMonitoring extends XdasPublisher
 	 *            the cluster monitoring URL.
 	 * @param id
 	 *            the hot component's ID.
-	 * @param disableXDAS
-	 *            disable ActiveMQ transmission of XDAS events.
 	 * @return the instance created.
 	 * @throws JMSException
 	 */
-	public static VisionMonitoring initialize(String url, UUID id, boolean disableXDAS) throws JMSException
+	public static VisionMonitoring initialize(String url, UUID id) throws JMSException
 	{
-		return instance = new VisionMonitoring( url, id, disableXDAS );
+		return instance = new VisionMonitoring( url, id );
 	}
 
 

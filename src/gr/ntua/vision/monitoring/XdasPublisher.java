@@ -9,6 +9,7 @@ import javax.jms.TextMessage;
 import javax.jms.Topic;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -16,6 +17,9 @@ import org.apache.activemq.ActiveMQConnectionFactory;
  */
 public abstract class XdasPublisher
 {
+	/** the logger. */
+	@SuppressWarnings("all")
+	private static final Logger	log			= Logger.getLogger( XdasPublisher.class );
 	/** single instance. */
 	public static XdasPublisher	instance;
 	/** The connection. */
@@ -31,28 +35,31 @@ public abstract class XdasPublisher
 	/** The url. */
 	private String				url			= "tcp://127.0.0.1:61616";
 	/** disable activemq flag */
-	private final boolean		disable;
+	private boolean				disable;
 
 
 	/**
 	 * c/tor.
-	 * 
-	 * @param disable
-	 *            ActiveMQ usage.
-	 * @throws JMSException
 	 */
-	public XdasPublisher(boolean disable) throws JMSException
+	public XdasPublisher()
 	{
-		this.disable = disable;
-		if( disable ) return;
-		
-		ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory( url );
-		connection = factory.createConnection();
-		session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
-		topic = session.createTopic( topicname );
+		try
+		{
+			ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory( url );
+			connection = factory.createConnection();
+			session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
+			topic = session.createTopic( topicname );
 
-		publisher = session.createProducer( topic );
-		publisher.setDeliveryMode( DeliveryMode.NON_PERSISTENT );
+			publisher = session.createProducer( topic );
+			publisher.setDeliveryMode( DeliveryMode.NON_PERSISTENT );
+			disable = false;
+		}
+		catch( JMSException x )
+		{
+			log.error( "ActiveMQ can't be initialized", x );
+			log.warn( "XDAS event publishing disabled." );
+			disable = true;
+		}
 	}
 
 
@@ -64,7 +71,7 @@ public abstract class XdasPublisher
 	public void stop() throws JMSException
 	{
 		if( disable ) return;
-		
+
 		connection.stop();
 		connection.close();
 	}
@@ -81,7 +88,7 @@ public abstract class XdasPublisher
 	protected void sendXdas(String xdasmessage) throws Exception
 	{
 		if( disable ) return;
-		
+
 		TextMessage msg = session.createTextMessage();
 
 		msg.setText( xdasmessage );
