@@ -5,6 +5,7 @@ import gr.ntua.vision.monitoring.util.Pair;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.json.JSONArray;
@@ -23,12 +24,15 @@ import com.sun.jersey.api.client.WebResource;
  */
 public class RemoteRESTCatalog implements Catalog
 {
+	/** the logger. */
+	@SuppressWarnings("all")
+	private static final Logger	log		= Logger.getLogger( RemoteRESTCatalog.class );
 	/** the jersey client which does all the requests. */
-	private final Client	client	= new Client();
+	private final Client		client	= new Client();
 	/** the URL to get data from. */
-	private final String	url;
+	private final String		url;
 	/** the accept string. */
-	private final String	accept;
+	private final String		accept;
 
 
 	/**
@@ -59,7 +63,8 @@ public class RemoteRESTCatalog implements Catalog
 			WebResource resource = client.resource( url );
 			resource.accept( accept ).type( accept );
 
-			resource.put( rqst );
+			ClientResponse response = resource.put( ClientResponse.class, rqst );
+			log.debug( "PUT " + resource.toString() + " :: " + response.getStatus() );
 		}
 		catch( Throwable x )
 		{
@@ -81,8 +86,10 @@ public class RemoteRESTCatalog implements Catalog
 			WebResource resource = client.resource( url );
 			resource.accept( accept ).type( accept );
 
-			String _json = resource.entity( rqst ).get( ClientResponse.class ).getEntity( String.class );
+			ClientResponse response = resource.entity( rqst ).get( ClientResponse.class );
+			log.debug( "POST " + resource.toString() + " :: " + response.getStatus() );
 
+			String _json = response.getEntity( String.class );
 			JSONObject result = new JSONObject( _json );
 			return result.get( "response_data" );
 		}
@@ -123,7 +130,10 @@ public class RemoteRESTCatalog implements Catalog
 			WebResource resource = client.resource( url );
 			resource.accept( accept ).type( accept );
 
-			String _json = resource.entity( rqst ).get( ClientResponse.class ).getEntity( String.class );
+			ClientResponse response = resource.entity( rqst ).get( ClientResponse.class );
+			log.debug( "POST " + resource.toString() + " :: " + response.getStatus() );
+
+			String _json = response.getEntity( String.class );
 
 			JSONObject result = new JSONObject( _json );
 			JSONObject collection = result.getJSONObject( "response_data" );
@@ -159,7 +169,8 @@ public class RemoteRESTCatalog implements Catalog
 			WebResource resource = client.resource( url );
 			resource.accept( accept ).type( accept );
 
-			resource.entity( rqst ).delete();
+			ClientResponse response = resource.entity( rqst ).delete( ClientResponse.class );
+			log.debug( "DELETE " + resource.toString() + " :: " + response.getStatus() );
 		}
 		catch( Throwable x )
 		{
@@ -181,7 +192,10 @@ public class RemoteRESTCatalog implements Catalog
 			WebResource resource = client.resource( url );
 			resource.accept( accept ).type( accept );
 
-			String _json = resource.entity( rqst ).get( ClientResponse.class ).getEntity( String.class );
+			ClientResponse response = resource.entity( rqst ).get( ClientResponse.class );
+			log.debug( "POST " + resource.toString() + " :: " + response.getStatus() );
+
+			String _json = response.getEntity( String.class );
 
 			JSONObject result = new JSONObject( _json );
 			JSONObject collection = result.getJSONObject( "response_data" );
@@ -214,7 +228,8 @@ public class RemoteRESTCatalog implements Catalog
 			WebResource resource = client.resource( url );
 			resource.accept( accept ).type( accept );
 
-			resource.put( rqst );
+			ClientResponse response = resource.put( ClientResponse.class, rqst );
+			log.debug( "PUT " + resource.toString() + " :: " + response.getStatus() );
 		}
 		catch( Throwable x )
 		{
@@ -242,7 +257,10 @@ public class RemoteRESTCatalog implements Catalog
 			WebResource resource = client.resource( url );
 			resource.accept( accept ).type( accept );
 
-			String _json = resource.entity( rqst ).get( ClientResponse.class ).getEntity( String.class );
+			ClientResponse response = resource.entity( rqst ).get( ClientResponse.class );
+			log.debug( "POST " + resource.toString() + " :: " + response.getStatus() );
+
+			String _json = response.getEntity( String.class );
 
 			JSONObject result = new JSONObject( _json );
 			JSONObject collection = result.getJSONObject( "response_data" );
@@ -292,7 +310,8 @@ public class RemoteRESTCatalog implements Catalog
 			WebResource resource = client.resource( url );
 			resource.accept( accept ).type( accept );
 
-			resource.entity( rqst ).delete();
+			ClientResponse response = resource.entity( rqst ).delete( ClientResponse.class );
+			log.debug( "DELETE " + resource.toString() + " :: " + response.getStatus() );
 		}
 		catch( Throwable x )
 		{
