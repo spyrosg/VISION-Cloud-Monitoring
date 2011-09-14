@@ -30,6 +30,21 @@ public class Scheduler extends Thread
 
 
 	/**
+	 * remove the given executor.
+	 * 
+	 * @param pexc
+	 *            the executor to remove.
+	 */
+	public void remove(ProbeExecutor pexc)
+	{
+		synchronized( probes )
+		{
+			probes.remove( pexc );
+		}
+	}
+
+
+	/**
 	 * @see java.lang.Thread#run()
 	 */
 	@Override

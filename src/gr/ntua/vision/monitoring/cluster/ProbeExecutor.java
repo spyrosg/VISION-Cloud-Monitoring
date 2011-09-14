@@ -40,6 +40,7 @@ public class ProbeExecutor
 	ProbeExecutor(Probe probe)
 	{
 		this.probe = probe;
+		probe.setExecutor( this );
 
 		// ensure the probe will run on first tick.
 		this.timer = probe.period() - 1;

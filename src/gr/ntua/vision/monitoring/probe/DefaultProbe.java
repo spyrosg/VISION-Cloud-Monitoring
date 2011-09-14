@@ -1,5 +1,7 @@
 package gr.ntua.vision.monitoring.probe;
 
+import gr.ntua.vision.monitoring.cluster.ClusterMonitoring;
+import gr.ntua.vision.monitoring.cluster.ProbeExecutor;
 import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.model.Location;
 import gr.ntua.vision.monitoring.model.impl.EventImpl;
@@ -49,6 +51,8 @@ class DefaultProbe implements Probe
 	private long				last_collection_tm	= 0;
 	/** the location of this. */
 	private final Location		observer;
+	/** the executor. */
+	private ProbeExecutor		executor			= null;
 
 
 	/**
@@ -80,6 +84,16 @@ class DefaultProbe implements Probe
 		byte[] ip = localhost.getAddress();
 		this.observer = new LocationImpl( localhost.getCanonicalHostName(), "Monitoring", null, null,
 				String.format( "%d,%d,%d,%d", ip[0], ip[1], ip[2], ip[3] ) );
+	}
+
+
+	/**
+	 * @see gr.ntua.vision.monitoring.probe.Probe#setExecutor(gr.ntua.vision.monitoring.cluster.ProbeExecutor)
+	 */
+	@Override
+	public void setExecutor(ProbeExecutor executor)
+	{
+		this.executor = executor;
 	}
 
 
@@ -128,6 +142,12 @@ class DefaultProbe implements Probe
 			}
 			catch( IOException x )
 			{
+				if( x.getMessage().contains( "Permission denied" ) && executor != null )
+				{
+					log.info( "Permission denied in running probe: " + name + " :: removing probe" );
+					ClusterMonitoring.instance.remove( executor );
+					return;
+				}
 				log.debug( "failed (I/O error:" + x.getMessage() + ") @ attempt: " + ( tries + 1 ) + "/" + retries );
 				if( tries == retries - 1 ) pushErrorEvent( x );
 			}

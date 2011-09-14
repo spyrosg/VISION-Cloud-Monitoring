@@ -1,5 +1,6 @@
 package gr.ntua.vision.monitoring.probe;
 
+import gr.ntua.vision.monitoring.cluster.ProbeExecutor;
 import gr.ntua.vision.monitoring.model.Event;
 
 import java.util.List;
@@ -49,4 +50,13 @@ public interface Probe extends Runnable
 	 * @return the data.
 	 */
 	public List<Event> lastCollected();
+
+
+	/**
+	 * set te executor.
+	 * 
+	 * @param executor
+	 *            the executor to set.
+	 */
+	public void setExecutor(ProbeExecutor executor);
 }
