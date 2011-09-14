@@ -6,7 +6,6 @@ import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.model.impl.EventImpl;
 
 import java.util.Arrays;
-import java.util.Date;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -54,6 +53,6 @@ public class MonitoringPushInterface
 	public void handleEvent(Event event)
 	{
 		if( ClusterMonitoring.instance.isInstanceAlive() ) //
-			ProbeExecutor.saveEvents( new Date().getTime(), Arrays.asList( event ), null );
+			ProbeExecutor.saveEvents( event.startTime(), Arrays.asList( event ), null );
 	}
 }

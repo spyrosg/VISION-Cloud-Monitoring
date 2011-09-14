@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring.ext.local;
+package gr.ntua.vision.monitoring.ext.catalog;
 
 import gr.ntua.vision.monitoring.util.Pair;
 
@@ -190,8 +190,8 @@ public interface Catalog
 	 * @throws IllegalStateException
 	 *             - Errors returned from underlying database
 	 */
-	public void timeRange(String key, long min, long max, List<Pair<String, Object>> results) throws IllegalArgumentException,
-			IllegalStateException;
+	public void timeRange(String key, long min, long max, List<Pair<Long, List<Pair<String, Object>>>> results)
+			throws IllegalArgumentException, IllegalStateException;
 
 
 	/**

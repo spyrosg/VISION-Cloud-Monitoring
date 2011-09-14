@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring.ext.local;
+package gr.ntua.vision.monitoring.ext.catalog;
 
 import gr.ntua.vision.monitoring.util.Pair;
 
@@ -22,7 +22,7 @@ public class InMemoryLocalCatalog implements Catalog
 
 
 	/**
-	 * @see gr.ntua.vision.monitoring.ext.local.Catalog#put(java.lang.String, java.util.List)
+	 * @see gr.ntua.vision.monitoring.ext.catalog.Catalog#put(java.lang.String, java.util.List)
 	 */
 	@Override
 	public void put(String key, List<Pair<String, Object>> items) throws IllegalArgumentException, IllegalStateException
@@ -36,7 +36,7 @@ public class InMemoryLocalCatalog implements Catalog
 
 
 	/**
-	 * @see gr.ntua.vision.monitoring.ext.local.Catalog#get(java.lang.String, java.lang.Object)
+	 * @see gr.ntua.vision.monitoring.ext.catalog.Catalog#get(java.lang.String, java.lang.Object)
 	 */
 	@Override
 	public Object get(String key, String var) throws IllegalArgumentException, IllegalStateException
@@ -48,7 +48,7 @@ public class InMemoryLocalCatalog implements Catalog
 
 
 	/**
-	 * @see gr.ntua.vision.monitoring.ext.local.Catalog#as(java.lang.String, java.lang.String, java.lang.Class)
+	 * @see gr.ntua.vision.monitoring.ext.catalog.Catalog#as(java.lang.String, java.lang.String, java.lang.Class)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -59,7 +59,7 @@ public class InMemoryLocalCatalog implements Catalog
 
 
 	/**
-	 * @see gr.ntua.vision.monitoring.ext.local.Catalog#range(java.lang.String, java.lang.Object, java.lang.Object,
+	 * @see gr.ntua.vision.monitoring.ext.catalog.Catalog#range(java.lang.String, java.lang.Object, java.lang.Object,
 	 *      java.util.List)
 	 */
 	@Override
@@ -73,7 +73,7 @@ public class InMemoryLocalCatalog implements Catalog
 
 
 	/**
-	 * @see gr.ntua.vision.monitoring.ext.local.Catalog#deleteRange(java.lang.String, java.lang.Object, java.lang.Object)
+	 * @see gr.ntua.vision.monitoring.ext.catalog.Catalog#deleteRange(java.lang.String, java.lang.Object, java.lang.Object)
 	 */
 	@Override
 	public void deleteRange(String key, String min, String max) throws IllegalArgumentException, IllegalStateException
@@ -86,7 +86,7 @@ public class InMemoryLocalCatalog implements Catalog
 
 
 	/**
-	 * @see gr.ntua.vision.monitoring.ext.local.Catalog#get(java.lang.String, java.util.List)
+	 * @see gr.ntua.vision.monitoring.ext.catalog.Catalog#get(java.lang.String, java.util.List)
 	 */
 	@Override
 	public void get(String key, List<Pair<String, Object>> items) throws IllegalArgumentException, IllegalStateException
@@ -98,7 +98,7 @@ public class InMemoryLocalCatalog implements Catalog
 
 
 	/**
-	 * @see gr.ntua.vision.monitoring.ext.local.Catalog#put(java.lang.String, long, java.util.List)
+	 * @see gr.ntua.vision.monitoring.ext.catalog.Catalog#put(java.lang.String, long, java.util.List)
 	 */
 	@Override
 	public void put(String key, long timestamp, List<Pair<String, Object>> items) throws IllegalArgumentException,
@@ -123,22 +123,22 @@ public class InMemoryLocalCatalog implements Catalog
 
 
 	/**
-	 * @see gr.ntua.vision.monitoring.ext.local.Catalog#timeRange(java.lang.String, long, long, java.util.List)
+	 * @see gr.ntua.vision.monitoring.ext.catalog.Catalog#timeRange(java.lang.String, long, long, java.util.List)
 	 */
 	@Override
-	public void timeRange(String key, long min, long max, List<Pair<String, Object>> results) throws IllegalArgumentException,
-			IllegalStateException
+	public void timeRange(String key, long min, long max, List<Pair<Long, List<Pair<String, Object>>>> results)
+			throws IllegalArgumentException, IllegalStateException
 	{
 		SortedMap<Long, Map<String, Object>> tmp = timed.get( key );
 		if( tmp == null ) return;
 
-		for( Map<String, Object> m : tmp.subMap( min, max ).values() )
-			results.addAll( Pair.pairsOf( m ) );
+		for( Map.Entry<Long, Map<String, Object>> m : tmp.subMap( min, max ).entrySet() )
+			results.add( new Pair<Long, List<Pair<String, Object>>>( m.getKey(), Pair.pairsOf( m.getValue() ) ) );
 	}
 
 
 	/**
-	 * @see gr.ntua.vision.monitoring.ext.local.Catalog#deleteTimeRange(java.lang.String, long, long)
+	 * @see gr.ntua.vision.monitoring.ext.catalog.Catalog#deleteTimeRange(java.lang.String, long, long)
 	 */
 	@Override
 	public void deleteTimeRange(String key, long min, long max) throws IllegalArgumentException, IllegalStateException

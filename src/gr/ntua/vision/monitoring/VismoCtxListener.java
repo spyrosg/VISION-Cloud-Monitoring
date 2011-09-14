@@ -1,9 +1,10 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.ext.local.LocalCatalogFactory;
+import gr.ntua.vision.monitoring.ext.catalog.LocalCatalogFactory;
 
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -20,8 +21,12 @@ public class VismoCtxListener implements ServletContextListener
 	/** the logger. */
 	@SuppressWarnings("all")
 	private static final Logger		log			= Logger.getLogger( VismoCtxListener.class );
+	/** instance used by the web application. */
+	private static VismoCtxListener	instance	= null;
 	/** running instances. */
 	private final List<Monitoring>	instances	= Lists.newArrayList();
+	/** the servlet context */
+	private ServletContext			ctx;
 
 
 	/**
@@ -29,7 +34,34 @@ public class VismoCtxListener implements ServletContextListener
 	 */
 	public VismoCtxListener()
 	{
-		// NOP
+		instance = this;
+	}
+
+
+	/**
+	 * get the instance used by the web application.
+	 * 
+	 * @return the instance.
+	 */
+	public static VismoCtxListener instance()
+	{
+		return instance;
+	}
+
+
+	/**
+	 * check if an instance of the given monitoring type is alive.
+	 * 
+	 * @param type
+	 *            the monitoring instance type.
+	 * @return <code>true</code> if and only if an instance of the given monitoring type is alive.
+	 */
+	public boolean isAlive(Class< ? extends Monitoring> type)
+	{
+		for( Monitoring mtr : instances )
+			if( type.isInstance( mtr ) ) //
+				return true;
+		return false;
 	}
 
 
@@ -42,7 +74,9 @@ public class VismoCtxListener implements ServletContextListener
 		try
 		{
 			log.debug( "ctx init" );
-			String instances_t = event.getServletContext().getInitParameter( "instance.type" );
+			ctx = event.getServletContext();
+			String instances_t = ctx.getInitParameter( "instance.type" );
+			ctx.setAttribute( "lcl-store", LocalCatalogFactory.localCatalogInstance() );
 
 			String[] types = instances_t.split( ";" );
 
@@ -51,18 +85,29 @@ public class VismoCtxListener implements ServletContextListener
 				@SuppressWarnings("unchecked")
 				Class< ? extends Monitoring> mtr_t = (Class< ? extends Monitoring>) Class.forName( instance_t );
 
-				Monitoring instance = (Monitoring) mtr_t.getField( "instance" ).get( null );
-
-				instance.launch( event.getServletContext() );
-				event.getServletContext().setAttribute( "lcl-store", LocalCatalogFactory.localCatalogInstance() );
-
-				instances.add( instance );
+				launch( mtr_t );
 			}
 		}
 		catch( Exception x )
 		{
 			x.printStackTrace();
 		}
+	}
+
+
+	/**
+	 * launch an instance.
+	 * 
+	 * @param mtr_t
+	 *            the monitoring instance type.
+	 * @throws IllegalAccessException
+	 * @throws NoSuchFieldException
+	 */
+	public void launch(Class< ? extends Monitoring> mtr_t) throws IllegalAccessException, NoSuchFieldException
+	{
+		Monitoring instance = (Monitoring) mtr_t.getField( "instance" ).get( null );
+		instance.launch( ctx );
+		instances.add( instance );
 	}
 
 

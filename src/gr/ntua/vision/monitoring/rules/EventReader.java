@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.rules;
 
-import gr.ntua.vision.monitoring.ext.local.Catalog;
-import gr.ntua.vision.monitoring.ext.local.LocalCatalogFactory;
+import gr.ntua.vision.monitoring.ext.catalog.Catalog;
+import gr.ntua.vision.monitoring.ext.catalog.LocalCatalogFactory;
 import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.model.impl.EventImpl;
 import gr.ntua.vision.monitoring.util.Pair;
@@ -117,7 +117,7 @@ public class EventReader extends Thread
 			{
 				Thread.sleep( 5000 );
 
-				List<Pair<String, Object>> pairs = Lists.newArrayList();
+				List<Pair<Long, List<Pair<String, Object>>>> pairs = Lists.newArrayList();
 
 				long now = new Date().getTime();
 				for( ClusterData ctlg : clusters )
@@ -129,21 +129,29 @@ public class EventReader extends Thread
 					if( pairs.size() > 0 )
 					{
 						log.debug( ctlg.key + ": pushing " + pairs.size() + " events." );
-						ruleEngine.push( Iterables.transform( pairs, new Function<Pair<String, Object>, Event>() {
-							@Override
-							public Event apply(Pair<String, Object> arg0)
-							{
-								try
-								{
-									return new EventImpl( new JSONObject( arg0.b.toString() ) );
-								}
-								catch( JSONException x )
-								{
-									x.printStackTrace();
-									return null;
-								}
-							}
-						} ) );
+
+						ruleEngine.push( Iterables.concat( Iterables
+								.transform( pairs, new Function<Pair<Long, List<Pair<String, Object>>>, Iterable<Event>>() {
+									@Override
+									public Iterable<Event> apply(Pair<Long, List<Pair<String, Object>>> arg0)
+									{
+										return Iterables.transform( arg0.b, new Function<Pair<String, Object>, Event>() {
+											@Override
+											public Event apply(Pair<String, Object> arg0)
+											{
+												try
+												{
+													return new EventImpl( new JSONObject( arg0.b.toString() ) );
+												}
+												catch( JSONException x )
+												{
+													x.printStackTrace();
+													return null;
+												}
+											}
+										} );
+									}
+								} ) ) );
 					}
 				}
 			}

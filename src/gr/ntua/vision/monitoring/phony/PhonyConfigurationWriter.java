@@ -1,9 +1,9 @@
 package gr.ntua.vision.monitoring.phony;
 
 import gr.ntua.vision.monitoring.cluster.Configuration;
-import gr.ntua.vision.monitoring.ext.local.Catalog;
-import gr.ntua.vision.monitoring.ext.local.InMemoryLocalCatalog;
-import gr.ntua.vision.monitoring.ext.local.LocalCatalogFactory;
+import gr.ntua.vision.monitoring.ext.catalog.Catalog;
+import gr.ntua.vision.monitoring.ext.catalog.InMemoryLocalCatalog;
+import gr.ntua.vision.monitoring.ext.catalog.LocalCatalogFactory;
 import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.model.Event.EventType;
 import gr.ntua.vision.monitoring.model.Location;

@@ -1,12 +1,11 @@
 package gr.ntua.vision.monitoring.rules;
 
-import gr.ntua.vision.monitoring.ext.local.Catalog;
-import gr.ntua.vision.monitoring.ext.local.CloudCatalogFactory;
+import gr.ntua.vision.monitoring.ext.catalog.Catalog;
+import gr.ntua.vision.monitoring.ext.catalog.GlobalCatalogFactory;
 import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.rules.parser.ActionSpec;
 import gr.ntua.vision.monitoring.rules.parser.RuleSpec;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -230,9 +229,9 @@ public class RuleEngine extends Thread implements ActionHandler
 	{
 		log.trace( "store " + event.id() + " @ " + key );
 
-		Catalog catalog = CloudCatalogFactory.cloudCatalogInstance();
+		Catalog catalog = GlobalCatalogFactory.globalCatalogInstance();
 
-		catalog.put( key, new Date().getTime(), event.serialize() );
+		catalog.put( key, event.startTime(), event.serialize() );
 
 		return true;
 	}

@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.cluster;
 
-import gr.ntua.vision.monitoring.ext.local.LocalCatalogFactory;
+import gr.ntua.vision.monitoring.ext.catalog.LocalCatalogFactory;
 import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.probe.Probe;
 import gr.ntua.vision.monitoring.util.Pair;

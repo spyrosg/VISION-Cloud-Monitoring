@@ -4,10 +4,10 @@
 <%@page import="com.google.common.collect.Lists"%>
 <%@page import="java.util.Date"%>
 <%@page import="gr.ntua.vision.monitoring.cluster.Configuration"%>
-<%@page import="gr.ntua.vision.monitoring.ext.local.LocalCatalogFactory"%>
-<%@page import="gr.ntua.vision.monitoring.ext.local.Catalog"%>
+<%@page import="gr.ntua.vision.monitoring.ext.catalog.LocalCatalogFactory"%>
+<%@page import="gr.ntua.vision.monitoring.ext.catalog.Catalog"%>
 <%@page
-	import="gr.ntua.vision.monitoring.ext.local.InMemoryLocalCatalog"%>
+	import="gr.ntua.vision.monitoring.ext.catalog.InMemoryLocalCatalog"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
