@@ -86,7 +86,7 @@ public class RemoteRESTCatalog implements Catalog
 			WebResource resource = client.resource( url );
 			resource.accept( accept ).type( accept );
 
-			ClientResponse response = resource.entity( rqst ).get( ClientResponse.class );
+			ClientResponse response = resource.entity( rqst ).post( ClientResponse.class );
 			log.debug( "POST " + resource.toString() + " :: " + response.getStatus() );
 
 			String _json = response.getEntity( String.class );
@@ -130,7 +130,7 @@ public class RemoteRESTCatalog implements Catalog
 			WebResource resource = client.resource( url );
 			resource.accept( accept ).type( accept );
 
-			ClientResponse response = resource.entity( rqst ).get( ClientResponse.class );
+			ClientResponse response = resource.entity( rqst ).post( ClientResponse.class );
 			log.debug( "POST " + resource.toString() + " :: " + response.getStatus() );
 
 			String _json = response.getEntity( String.class );
@@ -192,7 +192,7 @@ public class RemoteRESTCatalog implements Catalog
 			WebResource resource = client.resource( url );
 			resource.accept( accept ).type( accept );
 
-			ClientResponse response = resource.entity( rqst ).get( ClientResponse.class );
+			ClientResponse response = resource.entity( rqst ).post( ClientResponse.class );
 			log.debug( "POST " + resource.toString() + " :: " + response.getStatus() );
 
 			String _json = response.getEntity( String.class );
@@ -257,7 +257,7 @@ public class RemoteRESTCatalog implements Catalog
 			WebResource resource = client.resource( url );
 			resource.accept( accept ).type( accept );
 
-			ClientResponse response = resource.entity( rqst ).get( ClientResponse.class );
+			ClientResponse response = resource.entity( rqst ).post( ClientResponse.class );
 			log.debug( "POST " + resource.toString() + " :: " + response.getStatus() );
 
 			String _json = response.getEntity( String.class );
