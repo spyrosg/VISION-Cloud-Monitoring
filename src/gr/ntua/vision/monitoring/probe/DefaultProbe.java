@@ -142,14 +142,9 @@ class DefaultProbe implements Probe
 			}
 			catch( IOException x )
 			{
-				if( x.getMessage().contains( "Permission denied" ) && executor != null )
-				{
-					log.info( "Permission denied in running probe: " + name + " :: removing probe" );
-					ClusterMonitoring.instance.remove( executor );
-					return;
-				}
-				log.debug( "failed (I/O error:" + x.getMessage() + ") @ attempt: " + ( tries + 1 ) + "/" + retries );
-				if( tries == retries - 1 ) pushErrorEvent( x );
+				log.info( "I/O error when attempting to run probe: " + name + " :: removing probe" );
+				ClusterMonitoring.instance.remove( executor );
+				return;
 			}
 			catch( Exception x )
 			{
