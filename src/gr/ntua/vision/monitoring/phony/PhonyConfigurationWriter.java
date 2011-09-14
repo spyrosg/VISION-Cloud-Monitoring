@@ -61,7 +61,6 @@ public abstract class PhonyConfigurationWriter
 
 		final List<Pair<String, Object>> items = Lists.newArrayList();
 
-		items.add( new Pair<String, Object>( Configuration.ScriptsDir, "/home/matron/Work/workspace/vismo/WebContent/scripts" ) );
 		items.add( new Pair<String, Object>( Configuration.CatalogKey, "vismo.actions" ) );
 
 		final String A = "probe:local";

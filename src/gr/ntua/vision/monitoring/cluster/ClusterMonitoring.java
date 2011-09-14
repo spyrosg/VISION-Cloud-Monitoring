@@ -83,10 +83,7 @@ public class ClusterMonitoring extends Scheduler implements Monitoring
 	 */
 	public File scriptsDirectory()
 	{
-		if( Configuration.instance.getScriptsWorkDir().startsWith( "/" ) )
-			return new File( Configuration.instance.getScriptsWorkDir() );
-
-		return new File( realPath + File.separatorChar + Configuration.instance.getScriptsWorkDir() );
+		return new File( realPath + File.separatorChar + "scripts" );
 	}
 
 
