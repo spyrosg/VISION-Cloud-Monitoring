@@ -55,6 +55,7 @@ public abstract class LocalCatalogFactory
 	 */
 	public static Catalog localCatalogInstance(String clusterID)
 	{
-		return new RemoteRESTCatalog( clusterID, "application/local-catalog" );
+		return clusterID.startsWith( "http://" ) ? new RemoteRESTCatalog( clusterID, "application/local-catalog" )
+												: new InMemoryLocalCatalog();
 	}
 }

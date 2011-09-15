@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource.Builder;
 
 
 /**
@@ -22,9 +23,11 @@ public class RemoteRESTCatalog implements Catalog
 {
 	/** the logger. */
 	@SuppressWarnings("all")
-	private static final Logger	log		= Logger.getLogger( RemoteRESTCatalog.class );
+	private static final Logger	log			= Logger.getLogger( RemoteRESTCatalog.class );
+	/** debug option of this. */
+	public static boolean		debugIface	= true;
 	/** the jersey client which does all the requests. */
-	private final Client		client	= new Client();
+	private final Client		client		= new Client();
 	/** the URL to get data from. */
 	private final String		url;
 	/** the accept string. */
@@ -57,10 +60,10 @@ public class RemoteRESTCatalog implements Catalog
 			JSONObject rqst = jsonObject( "keyname", key, "items", list2JsonObject( items ) );
 
 			WebResource resource = client.resource( url );
-			resource.accept( accept ).type( accept );
+			Builder builder = resource.accept( accept ).header( "Content-Type", accept );
 
-			ClientResponse response = resource.put( ClientResponse.class, rqst );
-			log.debug( "PUT " + resource.toString() + " :: " + response.getStatus() );
+			ClientResponse response = builder.put( ClientResponse.class, rqst.toString() );
+			log.debug( "PUT " + resource.toString() + " :: " + response.getStatus() + "\n<<<<\n" + rqst.toString() );
 		}
 		catch( Throwable x )
 		{
@@ -80,12 +83,16 @@ public class RemoteRESTCatalog implements Catalog
 			JSONObject rqst = jsonObject( "query_name", "get_value", "query", jsonObject( "keyname", key, "variable", var ) );
 
 			WebResource resource = client.resource( url );
-			resource.accept( accept ).type( accept );
+			Builder builder = resource.accept( accept ).header( "Content-Type", accept );
 
-			ClientResponse response = resource.entity( rqst ).post( ClientResponse.class );
-			log.debug( "POST " + resource.toString() + " :: " + response.getStatus() );
+			ClientResponse response = builder.entity( rqst.toString() ).post( ClientResponse.class );
+			String _json = response.getStatus() == 200 ? response.getEntity( String.class ) : "";
 
-			String _json = response.getEntity( String.class );
+			log.debug( "POST " + resource.toString() + " :: " + response.getStatus() + "\n<<<<\n" + rqst.toString() + "\n>>>>\n"
+					+ "Response: " + _json.length() + " chars." );
+
+			if( response.getStatus() != 200 ) return null;
+
 			JSONObject result = new JSONObject( _json );
 			return result.get( "response_data" );
 		}
@@ -124,12 +131,15 @@ public class RemoteRESTCatalog implements Catalog
 														"variable_range", jsonObject( "from_variable", min, "to_variable", max ) ) );
 
 			WebResource resource = client.resource( url );
-			resource.accept( accept ).type( accept );
+			Builder builder = resource.accept( accept ).header( "Content-Type", accept );
 
-			ClientResponse response = resource.entity( rqst ).post( ClientResponse.class );
-			log.debug( "POST " + resource.toString() + " :: " + response.getStatus() );
+			ClientResponse response = builder.entity( rqst.toString() ).post( ClientResponse.class );
+			String _json = response.getStatus() == 200 ? response.getEntity( String.class ) : "";
 
-			String _json = response.getEntity( String.class );
+			log.debug( "POST " + resource.toString() + " :: " + response.getStatus() + "\n<<<<\n" + rqst.toString() + "\n>>>>\n"
+					+ "Response: " + _json.length() + " chars." );
+
+			if( response.getStatus() != 200 ) return;
 
 			JSONObject result = new JSONObject( _json );
 			JSONObject collection = result.getJSONObject( "response_data" );
@@ -163,10 +173,10 @@ public class RemoteRESTCatalog implements Catalog
 														"variable_range", jsonObject( "from_variable", min, "to_variable", max ) ) );
 
 			WebResource resource = client.resource( url );
-			resource.accept( accept ).type( accept );
+			Builder builder = resource.accept( accept ).header( "Content-Type", accept );
 
-			ClientResponse response = resource.entity( rqst ).delete( ClientResponse.class );
-			log.debug( "DELETE " + resource.toString() + " :: " + response.getStatus() );
+			ClientResponse response = builder.entity( rqst.toString() ).delete( ClientResponse.class );
+			log.debug( "DELETE " + resource.toString() + " :: " + response.getStatus() + "\n<<<<\n" + rqst.toString() );
 		}
 		catch( Throwable x )
 		{
@@ -186,12 +196,15 @@ public class RemoteRESTCatalog implements Catalog
 			JSONObject rqst = jsonObject( "query_name", "get_all_items", "query", jsonObject( "keyname", key ) );
 
 			WebResource resource = client.resource( url );
-			resource.accept( accept ).type( accept );
+			Builder builder = resource.accept( accept ).header( "Content-Type", accept );
 
-			ClientResponse response = resource.entity( rqst ).post( ClientResponse.class );
-			log.debug( "POST " + resource.toString() + " :: " + response.getStatus() );
+			ClientResponse response = builder.entity( rqst.toString() ).post( ClientResponse.class );
+			String _json = response.getStatus() == 200 ? response.getEntity( String.class ) : "";
 
-			String _json = response.getEntity( String.class );
+			log.debug( "POST " + resource.toString() + " :: " + response.getStatus() + "\n<<<<\n" + rqst.toString() + "\n>>>>\n"
+					+ "Response: " + _json.length() + " chars." );
+
+			if( response.getStatus() != 200 ) return;
 
 			JSONObject result = new JSONObject( _json );
 			JSONObject collection = result.getJSONObject( "response_data" );
@@ -219,13 +232,14 @@ public class RemoteRESTCatalog implements Catalog
 	{
 		try
 		{
-			JSONObject rqst = jsonObject( "keyname", key, "timestamp", Long.toString( timestamp ), "items", list2JsonObject( items ) );
+			JSONObject rqst = jsonObject(	"keyname", key, "timestamp", Long.toString( timestamp ), "items",
+											list2JsonObject( items ) );
 
 			WebResource resource = client.resource( url );
-			resource.accept( accept ).type( accept );
+			Builder builder = resource.accept( accept ).header( "Content-Type", accept );
 
-			ClientResponse response = resource.put( ClientResponse.class, rqst );
-			log.debug( "PUT " + resource.toString() + " :: " + response.getStatus() );
+			ClientResponse response = builder.put( ClientResponse.class, rqst.toString() );
+			log.debug( "PUT " + resource.toString() + " :: " + response.getStatus() + "\n<<<<\n" + rqst.toString() );
 		}
 		catch( Throwable x )
 		{
@@ -251,23 +265,25 @@ public class RemoteRESTCatalog implements Catalog
 																						"to_timestamp", Long.toString( max ) ) ) );
 
 			WebResource resource = client.resource( url );
-			resource.accept( accept ).type( accept );
+			Builder builder = resource.accept( accept ).header( "Content-Type", accept );
 
-			ClientResponse response = resource.entity( rqst ).post( ClientResponse.class );
-			log.debug( "POST " + resource.toString() + " :: " + response.getStatus() );
+			ClientResponse response = builder.entity( rqst.toString() ).post( ClientResponse.class );
+			String _json = response.getStatus() == 200 ? response.getEntity( String.class ) : "";
 
-			String _json = response.getEntity( String.class );
+			log.debug( "POST " + resource.toString() + " :: " + response.getStatus() + "\n<<<<\n" + rqst.toString() + "\n>>>>\n"
+					+ "Response: " + _json.length() + " chars." );
+
+			if( response.getStatus() != 200 ) return;
 
 			JSONObject result = new JSONObject( _json );
-			JSONObject collection = result.getJSONObject( "response_data" );
 			@SuppressWarnings("unchecked")
-			Iterator<String> times = collection.keys();
+			Iterator<String> times = result.keys();
 			while( times.hasNext() )
 			{
 				String t = times.next();
 				long tm = Long.parseLong( t );
 
-				JSONObject values = collection.getJSONObject( t );
+				JSONObject values = result.getJSONObject( t );
 				List<Pair<String, Object>> items = Lists.newArrayList();
 
 				@SuppressWarnings("unchecked")
@@ -304,10 +320,10 @@ public class RemoteRESTCatalog implements Catalog
 																						"to_timestamp", Long.toString( max ) ) ) );
 
 			WebResource resource = client.resource( url );
-			resource.accept( accept ).type( accept );
+			Builder builder = resource.accept( accept ).header( "Content-Type", accept );
 
-			ClientResponse response = resource.entity( rqst ).delete( ClientResponse.class );
-			log.debug( "DELETE " + resource.toString() + " :: " + response.getStatus() );
+			ClientResponse response = builder.entity( rqst.toString() ).delete( ClientResponse.class );
+			log.debug( "DELETE " + resource.toString() + " :: " + response.getStatus() + "\n<<<<\n" + rqst.toString() );
 		}
 		catch( Throwable x )
 		{

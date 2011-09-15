@@ -21,7 +21,7 @@ import com.sun.jersey.api.representation.Form;
 /**
  * This is the rule engine implementation. This is a singleton object.
  */
-public class RuleEngine extends Thread implements ActionHandler
+public class RuleEngine implements ActionHandler, Runnable
 {
 	/** the logger. */
 	@SuppressWarnings("all")
@@ -38,6 +38,8 @@ public class RuleEngine extends Thread implements ActionHandler
 	private EventMatcher[]						matchers	= null;
 	/** the event queue. */
 	private final ArrayBlockingQueue<Event>		eventQueue	= new ArrayBlockingQueue<Event>( 10000 );
+	/** the host thread */
+	private Thread								hostTh		= null;
 
 	static
 	{
@@ -50,7 +52,29 @@ public class RuleEngine extends Thread implements ActionHandler
 	 */
 	public RuleEngine()
 	{
-		setName( "RuleEngine" );
+		// NOP
+	}
+
+
+	/**
+	 * start the thread.
+	 */
+	public void start()
+	{
+		hostTh = new Thread( this );
+		hostTh.setName( "RuleEngine" );
+		hostTh.setDaemon( true );
+	}
+
+
+	/**
+	 * check if the host thread is alive.
+	 * 
+	 * @return <code>true</code> if and only if the host thread is alive.
+	 */
+	public boolean isAlive()
+	{
+		return hostTh != null && hostTh.isAlive();
 	}
 
 
@@ -62,8 +86,9 @@ public class RuleEngine extends Thread implements ActionHandler
 	public void shutdown() throws InterruptedException
 	{
 		log.info( "shutdown" );
-		interrupt();
-		join();
+		hostTh.interrupt();
+		hostTh.join();
+		hostTh = null;
 
 		synchronized( rulesLock )
 		{

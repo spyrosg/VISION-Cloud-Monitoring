@@ -31,7 +31,7 @@ public abstract class GlobalCatalogFactory
 	public static void setGlobalURL(String global_url)
 	{
 		GlobalCatalogFactory.global_url = global_url;
-		global_catalog = new RemoteRESTCatalog( global_url, "application/local-catalog" );
+		global_catalog = new RemoteRESTCatalog( global_url, "application/global-catalog" );
 	}
 
 

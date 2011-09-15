@@ -28,6 +28,8 @@ public class ClusterMonitoring extends Scheduler implements Monitoring
 	private static final Logger				log			= Logger.getLogger( ClusterMonitoring.class );
 	/** the real application path */
 	private String							realPath	= "/";
+	/** scheduler thread */
+	private Thread							scheduler	= null;
 
 
 	/**
@@ -62,7 +64,10 @@ public class ClusterMonitoring extends Scheduler implements Monitoring
 		this.realPath = ctx.getRealPath( "/" );
 
 		reConfigure();
-		start();
+		scheduler = new Thread( this );
+		scheduler.setName( "Scheduler" );
+		scheduler.setDaemon( true );
+		scheduler.start();
 	}
 
 
@@ -72,7 +77,7 @@ public class ClusterMonitoring extends Scheduler implements Monitoring
 	@Override
 	public boolean isInstanceAlive()
 	{
-		return isAlive();
+		return scheduler != null && scheduler.isAlive();
 	}
 
 
@@ -123,6 +128,7 @@ public class ClusterMonitoring extends Scheduler implements Monitoring
 	public void shutdown()
 	{
 		log.info( "Application stops" );
-		interrupt();
+		scheduler.interrupt();
+		scheduler = null;
 	}
 }

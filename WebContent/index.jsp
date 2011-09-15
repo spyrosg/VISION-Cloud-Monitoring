@@ -40,12 +40,12 @@
 			} );
 		});
 		$("#clusterAliveButton").click(function(){
-			$.get('/vismo/Monitoring/cloud/setCloudMonitoringParameter', { name:'Alive', value:$('#clusterAlive').val() }, function(data){
+			$.get('/vismo/Monitoring/cluster/setClusterMonitoringParameter', { name:'Alive', value:$('#clusterAlive').val() }, function(data){
 				alert(JSON.stringify(data));
 			} );
 		});
 		$("#clusterCatalogButton").click(function(){
-			$.get('/vismo/Monitoring/cloud/setCloudMonitoringParameter', { name:'LocalCatalog', value:$('#clusterCatalog').val() }, function(data){
+			$.get('/vismo/Monitoring/cluster/setClusterMonitoringParameter', { name:'LocalCatalog', value:$('#clusterCatalog').val() }, function(data){
 				alert(JSON.stringify(data));
 			} );
 		});

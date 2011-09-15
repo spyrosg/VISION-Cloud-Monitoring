@@ -10,7 +10,7 @@ import com.google.common.collect.Sets;
 /**
  * This is responsible for scheduling all live probes and running them at the appropriate times.
  */
-public class Scheduler extends Thread
+public class Scheduler implements Runnable
 {
 	/** the logger. */
 	@SuppressWarnings("all")
@@ -24,8 +24,7 @@ public class Scheduler extends Thread
 	 */
 	Scheduler()
 	{
-		setName( "Scheduler" );
-		setDaemon( true );
+		// NOP
 	}
 
 
@@ -51,7 +50,7 @@ public class Scheduler extends Thread
 	public void run()
 	{
 		log.info( "Start" );
-		while( !interrupted() )
+		while( !Thread.interrupted() )
 		{
 			try
 			{
