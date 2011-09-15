@@ -8,11 +8,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.json.JSONArray;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -58,7 +54,7 @@ public class RemoteRESTCatalog implements Catalog
 	{
 		try
 		{
-			JSONObject rqst = jsonObject( "keyname", key, "items", jsonArray( items ) );
+			JSONObject rqst = jsonObject( "keyname", key, "items", list2JsonObject( items ) );
 
 			WebResource resource = client.resource( url );
 			resource.accept( accept ).type( accept );
@@ -122,7 +118,7 @@ public class RemoteRESTCatalog implements Catalog
 		try
 		{
 			JSONObject rqst = jsonObject(	"query_name",
-											"query_value_range", //
+											"get_value_range", //
 											"query",
 											jsonObject( "keyname", key, //
 														"variable_range", jsonObject( "from_variable", min, "to_variable", max ) ) );
@@ -223,7 +219,7 @@ public class RemoteRESTCatalog implements Catalog
 	{
 		try
 		{
-			JSONObject rqst = jsonObject( "keyname", key, "timestamp", timestamp, "items", jsonArray( items ) );
+			JSONObject rqst = jsonObject( "keyname", key, "timestamp", Long.toString( timestamp ), "items", list2JsonObject( items ) );
 
 			WebResource resource = client.resource( url );
 			resource.accept( accept ).type( accept );
@@ -326,30 +322,16 @@ public class RemoteRESTCatalog implements Catalog
 	 * @param items
 	 *            the items to convert.
 	 * @return the JSON array.
+	 * @throws JSONException
 	 */
-	private JSONArray jsonArray(List<Pair<String, Object>> items)
+	private JSONObject list2JsonObject(List<Pair<String, Object>> items) throws JSONException
 	{
-		List<JSONObject> objects = Lists.newArrayList( Iterables.transform( items,
-																			new Function<Pair<String, Object>, JSONObject>() {
-																				@Override
-																				public JSONObject apply(Pair<String, Object> arg0)
-																				{
-																					JSONObject obj = new JSONObject();
+		JSONObject objects = new JSONObject();
 
-																					try
-																					{
-																						obj.put( arg0.a, arg0.b.toString() );
-																					}
-																					catch( JSONException e )
-																					{
-																						return null;
-																					}
+		for( Pair<String, Object> pair : items )
+			objects.put( pair.a, pair.b.toString() );
 
-																					return obj;
-																				}
-																			} ) );
-		Iterables.removeIf( objects, Predicates.isNull() );
-		return new JSONArray( objects );
+		return objects;
 	}
 
 
