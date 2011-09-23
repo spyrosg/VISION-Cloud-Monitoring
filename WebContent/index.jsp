@@ -69,7 +69,7 @@
 			<tr>
 				<td>Catalog:</td>
 				<td><input size=35 id="cloudCatalog"
-					value="<%=LocalCatalogFactory.getLocalURL()%>"></td>
+					value="<%=GlobalCatalogFactory.getGlobalURL()%>"></td>
 				<td><button id="cloudCatalogButton">set</button>
 			</tr>
 			<tr>
@@ -92,7 +92,7 @@
 			<tr>
 				<td>Catalog:</td>
 				<td><input size=35 id="clusterCatalog"
-					value="<%=GlobalCatalogFactory.getGlobalURL()%>"></td>
+					value="<%=LocalCatalogFactory.getLocalURL()%>"></td>
 				<td><button id="clusterCatalogButton">set</button>
 			</tr>
 		</table>

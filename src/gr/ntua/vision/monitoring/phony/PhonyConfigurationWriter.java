@@ -78,7 +78,7 @@ public abstract class PhonyConfigurationWriter
 
 		// probe A:
 		items.add( new Pair<String, Object>( A + Configuration.ProbeCommandParts, new String[] { "/opt/vision/vismo/scripts/probe.sh" } ) );
-		items.add( new Pair<String, Object>( A + Configuration.ProbeExecPeriod, 15 ) );
+		items.add( new Pair<String, Object>( A + Configuration.ProbeExecPeriod, 30 ) );
 		items.add( new Pair<String, Object>( A + Configuration.ProbeExecTimeout, 2 ) );
 		items.add( new Pair<String, Object>( A + Configuration.ProbeStoreKey, "vismo.measurements" ) );
 		items.add( new Pair<String, Object>( A + Configuration.ProbeFail, errJson ) );

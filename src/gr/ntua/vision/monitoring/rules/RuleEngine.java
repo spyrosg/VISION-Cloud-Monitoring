@@ -23,6 +23,85 @@ import com.sun.jersey.api.representation.Form;
  */
 public class RuleEngine implements ActionHandler, Runnable
 {
+	/** identifier of pools. */
+	class PoolKey implements Comparable<PoolKey>
+	{
+		/** the rule id */
+		final UUID	id;
+		/** the referring action index. */
+		final int	order;
+
+
+		/**
+		 * c/tor.
+		 * 
+		 * @param id
+		 * @param order
+		 */
+		PoolKey(UUID id, int order)
+		{
+			super();
+			this.id = id;
+			this.order = order;
+		}
+
+
+		/**
+		 * @see java.lang.Object#hashCode()
+		 */
+		@Override
+		public int hashCode()
+		{
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ( ( id == null ) ? 0 : id.hashCode() );
+			result = prime * result + order;
+			return result;
+		}
+
+
+		/**
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		@Override
+		public boolean equals(Object obj)
+		{
+			if( this == obj ) return true;
+			if( obj == null ) return false;
+			if( getClass() != obj.getClass() ) return false;
+			PoolKey other = (PoolKey) obj;
+			if( id == null )
+			{
+				if( other.id != null ) return false;
+			}
+			else if( !id.equals( other.id ) ) return false;
+			if( order != other.order ) return false;
+			return true;
+		}
+
+
+		/**
+		 * @see java.lang.Comparable#compareTo(java.lang.Object)
+		 */
+		@Override
+		public int compareTo(PoolKey arg0)
+		{
+			int result = id.compareTo( arg0.id );
+			if( result != 0 ) return result;
+			return order - arg0.order;
+		}
+
+
+		/**
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString()
+		{
+			return "[" + id + " / " + order + "]";
+		}
+	}
+
 	/** the logger. */
 	@SuppressWarnings("all")
 	private static final Logger					log			= Logger.getLogger( RuleEngine.class );
@@ -33,7 +112,7 @@ public class RuleEngine implements ActionHandler, Runnable
 	/** the rules registered. */
 	private final Map<UUID, EventMatcher>		rules		= Maps.newHashMap();
 	/** the pools registered. */
-	private final Map<UUID, AggregationPool>	pools		= Maps.newHashMap();
+	private final Map<PoolKey, AggregationPool>	pools		= Maps.newHashMap();
 	/** internal rule cache. */
 	private EventMatcher[]						matchers	= null;
 	/** the event queue. */
@@ -64,6 +143,7 @@ public class RuleEngine implements ActionHandler, Runnable
 		hostTh = new Thread( this );
 		hostTh.setName( "RuleEngine" );
 		hostTh.setDaemon( true );
+		hostTh.start();
 	}
 
 
@@ -86,9 +166,12 @@ public class RuleEngine implements ActionHandler, Runnable
 	public void shutdown() throws InterruptedException
 	{
 		log.info( "shutdown" );
-		hostTh.interrupt();
-		hostTh.join();
-		hostTh = null;
+		if( hostTh != null )
+		{
+			hostTh.interrupt();
+			hostTh.join();
+			hostTh = null;
+		}
 
 		synchronized( rulesLock )
 		{
@@ -208,18 +291,22 @@ public class RuleEngine implements ActionHandler, Runnable
 				//
 					for( EventMatcher em : cache )
 						if( em.matches( event ) )
-						//
-							for( ActionSpec action : em.rule.actions )
+						{
+							log.trace( "Event match occurred, performing " + em.rule.actions.length + " actions." );
+							for( int i = 0; i < em.rule.actions.length; ++i )
 								try
 								{
-									if( !action.action.apply(	this, event, action.arguments, em.rule.id,
-																action.actionFunctor( this ) ) ) remove( em.rule.id );
+									ActionSpec action = em.rule.actions[i];
+									if( !action.action.apply(	this, event, action.arguments, em.rule.id, i,
+																action.actionFunctor( this ) ) ) //
+										remove( em.rule.id );
 								}
 								catch( Throwable x )
 								{
 									x.printStackTrace();
 									remove( em.rule.id );
 								}
+						}
 			}
 		}
 		catch( InterruptedException x )
@@ -231,18 +318,26 @@ public class RuleEngine implements ActionHandler, Runnable
 
 
 	/**
-	 * @see gr.ntua.vision.monitoring.rules.ActionHandler#pool(java.util.UUID, com.google.common.base.Function, int, long,
+	 * @see gr.ntua.vision.monitoring.rules.ActionHandler#pool(java.util.UUID, int, com.google.common.base.Function, int, long,
 	 *      gr.ntua.vision.monitoring.rules.CheckedField[])
 	 */
 	@Override
-	public AggregationPool pool(UUID pool, Function<Event, Boolean> action, int maxCount, long timeWindow, CheckedField... fields)
+	public AggregationPool pool(UUID pool, int order, Function<Event, Boolean> action, int maxCount, long timeWindow,
+			CheckedField... fields)
 	{
+		PoolKey key = new PoolKey( pool, order );
+		AggregationPool ret = null;
 		synchronized( rulesLock )
 		{
-			if( !pools.containsKey( pool ) ) //
-				pools.put( pool, new AggregationPool( pool, maxCount, timeWindow, fields, action ) );
-			return pools.get( pool );
+			ret = pools.get( key );
+			if( ret == null )
+			{
+				pools.put( key, new AggregationPool( pool, maxCount, timeWindow, fields, action ) );
+				ret = pools.get( key );
+			}
 		}
+		log.debug( key + " :: " + ( ret == null ? "null" : Integer.toString( ret.hashCode() ) ) );
+		return ret;
 	}
 
 

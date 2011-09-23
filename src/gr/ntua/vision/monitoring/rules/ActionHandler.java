@@ -17,6 +17,8 @@ public interface ActionHandler
 	 * 
 	 * @param pool
 	 *            the pool ID.
+	 * @param order
+	 *            the pool order in the rule.
 	 * @param action
 	 *            event handling action.
 	 * @param maxCount
@@ -27,7 +29,8 @@ public interface ActionHandler
 	 *            the aggregation key fields. All events in a group have the same values in those.
 	 * @return the pool.
 	 */
-	public AggregationPool pool(UUID pool, Function<Event, Boolean> action, int maxCount, long timeWindow, CheckedField... fields);
+	public AggregationPool pool(UUID pool, int order, Function<Event, Boolean> action, int maxCount, long timeWindow,
+			CheckedField... fields);
 
 
 	/**

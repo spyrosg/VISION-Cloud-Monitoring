@@ -20,8 +20,6 @@ public abstract class XdasPublisher
 	/** the logger. */
 	@SuppressWarnings("all")
 	private static final Logger	log			= Logger.getLogger( XdasPublisher.class );
-	/** single instance. */
-	public static XdasPublisher	instance;
 	/** The connection. */
 	private Connection			connection;
 	/** The session. */
@@ -78,10 +76,10 @@ public abstract class XdasPublisher
 
 
 	/**
-	 * Send xdas.
+	 * Send XDAS.
 	 * 
 	 * @param xdasmessage
-	 *            the xdasmessage
+	 *            the XDAS message
 	 * @throws Exception
 	 *             the exception
 	 */

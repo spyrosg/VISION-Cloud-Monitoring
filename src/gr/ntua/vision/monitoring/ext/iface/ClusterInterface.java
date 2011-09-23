@@ -100,6 +100,12 @@ public class ClusterInterface
 	{
 		log.debug( "REST: setClusterMonitoringParameter('" + name + "' -> '" + value + "')" );
 
+		if( !name.equals( Variables.Alive.toString() ) && !ClusterMonitoring.instance.isInstanceAlive() )
+		{
+			log.warn( "Cluster instance down, ignoring request" );
+			return new JSONStringer().object().key( "status" ).value( "service down" ).endObject().toString();
+		}
+
 		Variables var = Variables.valueOf( name );
 		if( var != null ) var.handler.apply( value );
 

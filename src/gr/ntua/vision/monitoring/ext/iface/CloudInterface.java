@@ -113,7 +113,13 @@ public class CloudInterface
 	public String setCloudMonitoringParameter(@QueryParam("name") String name, @QueryParam("value") String value)
 			throws JSONException
 	{
-		log.debug( "REST: setCloudrMonitoringParameter('" + name + "' -> '" + value + "')" );
+		log.debug( "REST: setCloudMonitoringParameter('" + name + "' -> '" + value + "')" );
+
+		if( !name.equals( Variables.Alive.toString() ) && !CloudMonitoring.instance.isInstanceAlive() )
+		{
+			log.warn( "Cloud instance down, ignoring request" );
+			return new JSONStringer().object().key( "status" ).value( "service down" ).endObject().toString();
+		}
 
 		Variables var = Variables.valueOf( name );
 		if( var != null ) var.handler.apply( value );
@@ -137,14 +143,17 @@ public class CloudInterface
 	public String registerAggregationRule(@FormParam("rule") String rule) throws JSONException
 	{
 		RuleSpec compiled = null;
+		String failure_reason = "service down";
 		if( CloudMonitoring.instance.isInstanceAlive() )
 		{
 			log.debug( "REST: registerAggregationRule(code size: " + rule.length() + " chars)" );
 
+			failure_reason = "compilation error";
 			compiled = RuleParser.instance.ruleParser.parse( rule );
 
 			log.debug( "REST: registerAggregationRule() compiled rule: " + compiled.name + " :: " + compiled.id );
 
+			failure_reason = "registration failed";
 			CloudMonitoring.instance.ruleEngine.register( compiled );
 		}
 
@@ -152,6 +161,7 @@ public class CloudInterface
 		wr.key( "status" ).value( compiled == null ? "failed" : "ok" );
 		if( compiled != null ) //
 			wr.key( "id" ).value( compiled.id.toString() );
+		else wr.key( "reason" ).value( failure_reason );
 		return wr.endObject().toString();
 	}
 }
