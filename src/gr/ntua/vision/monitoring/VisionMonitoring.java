@@ -6,6 +6,7 @@ import gr.ntua.vision.monitoring.model.Location;
 import gr.ntua.vision.monitoring.model.Resource;
 import gr.ntua.vision.monitoring.model.impl.EventImpl;
 import gr.ntua.vision.monitoring.model.impl.LocationImpl;
+import gr.ntua.vision.monitoring.model.impl.ResourceImpl;
 import it.eng.compliance.persistenceservice.model.XdasV1Model;
 import it.eng.compliance.xdas.parser.XDasEventType;
 import it.eng.compliance.xdas.parser.XdasOutcomes;
@@ -34,6 +35,34 @@ import com.sun.jersey.api.representation.Form;
 
 /**
  * The monitoring library singleton.
+ * <p>
+ * The singleton should be initialized prior to its use. Each component should choose a UUID and call
+ * {@link VisionMonitoring#initialize(String, UUID)} with it. The first argument should be the Monitoring Cluster instance event
+ * receiving interface. Assuming the cluster instance runs on the IP <code>X.Y.Z.W</code>, then the address is
+ * <code>http://X.Y.Z.W:8080/vismo/Monitoring/push/event</code>. Thus, the singleton can be initialized with the following:
+ * <blockquote><code><br>UUID appId = UUID.randomUUID();<br>
+ * VisionMonitoring.initialize( "http://10.0.2.111:8080/vismo/Monitoring/push/event", appId ); </code></blockquote> As soon as the
+ * singleton is initialized, then its {@link VisionMonitoring#log(URL, URL, String, String, int, int, Map, List)} method may be
+ * called to commit an event. For example:<blockquote><code> <br>
+ * List&lt;Resource&gt; resources = Lists.newArrayList();<br>
+ * resources.add( new ResourceImpl( "memory", "MB", Math.random() * 3096 ) );<br>
+ * resources.add( new ResourceImpl( "storage", "GB", Math.random() * 1024 ) );<br>
+ * <br>
+ * String[] action = Actions[Math.min( (int) Math.floor( Actions.length * Math.random() ), Actions.length - 1 )];<br>
+ * <br>
+ * URL src = new URL( "http://localhost:7070/some/component/" );<br>
+ * URL trg = new URL( "http://otherhost:9090/some/other/component/" );<br>
+ * <br>
+ * Map<String, String> params = new HashMap<String, String>();<br>
+ * params.put( "foo", "bar" );<br>
+ * params.put( "foo1", "bar1" );<br>
+ * params.put( "foo2", "bar2" );<br>
+ * <br>
+ * VisionMonitoring.instance().log( src, trg, "foo", "bar",<br>
+ * XDasEventType.XDAS_AE_MODIFY_DATA_ITEM_ASSOC_CONTEXT.getEventCode(),<br>
+ * XdasOutcomes.XDAS_OUT_SUCCESS.getOutcomeCode(), params, resources );<br>
+ * </code></blockquote>
+ * </p>
  */
 public class VisionMonitoring extends XdasPublisher
 {
@@ -105,17 +134,19 @@ public class VisionMonitoring extends XdasPublisher
 	 * @param target
 	 *            action target. It may be <code>null</code>.
 	 * @param user
-	 *            user performing the action
+	 *            user performing the action, if any, otherwise <code>null</code>.
 	 * @param tenant
-	 *            tenant performing the action
+	 *            tenant performing the action, if any, otherwise <code>null</code>.
 	 * @param xdasType
 	 *            type of action. Use the {@link XDasEventType}.*.{@link XDasEventType#getEventCode()} to fill this.
 	 * @param xdasStatus
 	 *            status of action. Use the {@link XdasOutcomes}.*.{@link XdasOutcomes#getOutcomeCode()} to fill this.
 	 * @param parameters
-	 *            parameters of action (action specific data).
+	 *            parameters of action (action specific data). This can be filled in with any values necessary to describe the
+	 *            action at the detail level required.
 	 * @param resources
-	 *            the list with all resources that are consumed by te logged action.
+	 *            the list with all resources that are consumed by the logged action. The default resource implementation is
+	 *            {@link ResourceImpl}.
 	 * @throws Exception
 	 */
 	public void log(URL source, URL target, String user, String tenant, int xdasType, int xdasStatus,
