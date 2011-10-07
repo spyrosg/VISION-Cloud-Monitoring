@@ -1,6 +1,7 @@
 package gr.ntua.vision.monitoring.cluster;
 
 import gr.ntua.vision.monitoring.Monitoring;
+import gr.ntua.vision.monitoring.ext.catalog.LocalCatalogFactory;
 import gr.ntua.vision.monitoring.phony.PhonyConfigurationWriter;
 import gr.ntua.vision.monitoring.probe.Probe;
 
@@ -64,6 +65,9 @@ public class ClusterMonitoring extends Scheduler implements Monitoring
 		this.realPath = ctx.getRealPath( "/" );
 
 		reConfigure();
+		// XXX: hack to force read config from in-memory catalog.
+		LocalCatalogFactory.setLocalURL( LocalCatalogFactory.getLocalURL() );
+
 		scheduler = new Thread( this );
 		scheduler.setName( "Scheduler" );
 		scheduler.setDaemon( true );

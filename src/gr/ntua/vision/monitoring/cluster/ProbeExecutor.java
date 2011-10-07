@@ -8,7 +8,7 @@ import gr.ntua.vision.monitoring.util.Pair;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.json.JSONException;
+import org.codehaus.jettison.json.JSONException;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;

@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.model;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 
 /**

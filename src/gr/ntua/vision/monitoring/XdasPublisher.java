@@ -31,7 +31,7 @@ public abstract class XdasPublisher
 	/** The topicname. */
 	private String				topicname	= "vision.xdas";
 	/** The url. */
-	private String				url			= "tcp://127.0.0.1:61616";
+	private String				url			= "tcp://10.0.2.71:61616";
 	/** disable activemq flag */
 	private boolean				disable;
 

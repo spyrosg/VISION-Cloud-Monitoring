@@ -16,7 +16,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 
-import org.json.JSONException;
+import org.codehaus.jettison.json.JSONException;
 
 import com.google.common.collect.Lists;
 
@@ -45,7 +45,7 @@ public abstract class PhonyConfigurationWriter
 		{
 			e.printStackTrace();
 		}
-		if( src == null ) src = new LocationImpl( "localhost", "Monitoring.", null, null, "127.0.0.1" );
+		if( src == null ) src = new LocationImpl( "localhost", "Monitoring", null, null, "127.0.0.1" );
 
 		error = new EventImpl( null, null, "error", EventType.Measurement, Lists.<Resource> newArrayList(), 0, 0, src, null, null );
 	}

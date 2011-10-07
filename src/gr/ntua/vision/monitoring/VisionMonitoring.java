@@ -24,7 +24,7 @@ import java.util.UUID;
 
 import javax.jms.JMSException;
 
-import org.json.JSONException;
+import org.codehaus.jettison.json.JSONException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

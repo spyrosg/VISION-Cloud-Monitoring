@@ -1,7 +1,12 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.ext.catalog.LocalCatalogFactory;
+import gr.ntua.vision.monitoring.cloud.CloudMonitoring;
+import gr.ntua.vision.monitoring.cluster.ClusterMonitoring;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -75,18 +80,38 @@ public class VismoCtxListener implements ServletContextListener
 		{
 			log.debug( "ctx init" );
 			ctx = event.getServletContext();
-			String instances_t = ctx.getInitParameter( "instance.type" );
-			ctx.setAttribute( "lcl-store", LocalCatalogFactory.localCatalogInstance() );
+			// String instances_t = ctx.getInitParameter( "instance.type" );
+			// ctx.setAttribute( "lcl-store", LocalCatalogFactory.localCatalogInstance() );
+			//
+			// String[] types = instances_t.split( ";" );
+			//
+			// for( String instance_t : types )
+			// {
+			// @SuppressWarnings("unchecked")
+			// Class< ? extends Monitoring> mtr_t = (Class< ? extends Monitoring>) Class.forName( instance_t );
+			//
+			// launch( mtr_t );
+			// }
 
-			String[] types = instances_t.split( ";" );
+			launch( ClusterMonitoring.class );
 
-			for( String instance_t : types )
+			boolean hasMagicAddress = false;
+			InetAddress magicAddress = InetAddress.getByAddress( new byte[] { 10, 0, 2, 111 } );
+			Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+			for( NetworkInterface netint : Collections.list( nets ) )
 			{
-				@SuppressWarnings("unchecked")
-				Class< ? extends Monitoring> mtr_t = (Class< ? extends Monitoring>) Class.forName( instance_t );
-
-				launch( mtr_t );
+				Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
+				for( InetAddress inetAddress : Collections.list( inetAddresses ) )
+					if( inetAddress.equals( magicAddress ) )
+					{
+						hasMagicAddress = true;
+						break;
+					}
+				if( hasMagicAddress ) break;
 			}
+
+			if( hasMagicAddress ) //
+				launch( CloudMonitoring.class );
 		}
 		catch( Exception x )
 		{

@@ -1,6 +1,7 @@
 package gr.ntua.vision.monitoring.cloud;
 
 import gr.ntua.vision.monitoring.Monitoring;
+import gr.ntua.vision.monitoring.ext.catalog.LocalCatalogFactory;
 import gr.ntua.vision.monitoring.rules.EventReader;
 import gr.ntua.vision.monitoring.rules.RuleEngine;
 
@@ -42,7 +43,7 @@ public class CloudMonitoring implements Monitoring
 	{
 		log.info( "Application begins" );
 		eventReader = new EventReader( ruleEngine );
-		setClusters( "lcl-store" );
+		setClusters( LocalCatalogFactory.getLocalURL() );
 		eventReader.start();
 		ruleEngine.start();
 	}
