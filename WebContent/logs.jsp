@@ -1,4 +1,3 @@
-<%@page import="org.json.JSONObject"%>
 <%@page import="gr.ntua.vision.monitoring.util.Pair"%>
 <%@page import="java.util.List"%>
 <%@page import="com.google.common.collect.Lists"%>
@@ -9,6 +8,7 @@
 <%@page import="gr.ntua.vision.monitoring.ext.catalog.Catalog"%>
 <%@page
 	import="gr.ntua.vision.monitoring.ext.catalog.InMemoryLocalCatalog"%>
+<%@page import="org.codehaus.jettison.json.JSONObject"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -28,7 +28,7 @@
 			<strong>Measurements</strong>
 			<pre>
 		<%
-			Catalog ctg = (Catalog) getServletContext().getAttribute( "lcl-store" );
+			Catalog ctg = LocalCatalogFactory.localCatalogInstance();
 
 			List<Pair<Long, List<Pair<String, Object>>>> items = Lists.newArrayList();
 			ctg.timeRange( "vismo.measurements", new Date().getTime() - 10 * 60 * 1000, new Date().getTime(), items );
