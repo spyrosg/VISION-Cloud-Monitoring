@@ -74,7 +74,11 @@
 		<p>
 			Get the latest vismo monitoring library for <a href="libvismo.jar">java</a><br />
 			Get the sample vismo monitoring client (eclipse) project <a
-				href="vismo-cli.zip">here (zip)</a><br />
+				href="vismo-cli.zip">here (zip)</a><br /> Javadocs for vismo are <a
+				href="doc/index.html">here</a><br /> The javadoc for the vismo
+			library entry point class (that must be used by clients) is <a
+				href="doc/gr/ntua/vision/monitoring/VisionMonitoring.html">VisionMonitoring
+				(javadoc w/ examples)</a><br />
 		</p>
 		<br>
 		<hr width="100%" />
