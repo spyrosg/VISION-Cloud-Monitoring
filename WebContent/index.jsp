@@ -72,9 +72,11 @@
 	</div>
 	<div style="width: 100%; text-align: left;">
 		<p>
-			Get the latest vismo monitoring library for <a href="libvismo.jar">java</a><br />
-			Get the sample vismo monitoring client (eclipse) project <a
-				href="vismo-cli.zip">here (zip)</a><br />
+			Get the latest vismo monitoring library for <a href="libvismo.jar">java</a>
+			and <a href="pyvismo.zip">python</a> <br /> Get the sample vismo
+			monitoring example client (eclipse) project <a href="vismo-cli.zip">here
+				(zip)</a><br /> The python code contains 'test.py' which is the example
+			code for using the library.<br />
 		</p>
 		<br>
 		<hr width="100%" />
@@ -84,20 +86,23 @@
 			<table>
 				<tr>
 					<td>Alive:</td>
-					<td><input size=35 id="cloudAlive"
-						value="<%=VismoCtxListener.instance().isAlive( CloudMonitoring.class )%>">
+					<td><inputVismoCtxListener.instance().isAlive( CloudMonitoring.class )stance().isAlive( CloudMonitoring.class )%>">
+
+						
 					</td>
 					<td><button id="cloudAliveButton">set</button>
 				</tr>
 				<tr>
 					<td>Catalog:</td>
-					<td><input size=35 id="cloudCatalog"
-						value="<%=GlobalCatalogFactory.getGlobalURL()%>"></td>
+					<td><input
+						sGlobalCatalogFactory.getGlobalURL()e="<%=GlobalCatalogFactory.getGlobalURL()%>">
+					</td>
 					<td><button id="cloudCatalogButton">set</button>
 				</tr>
 				<tr>
 					<td>Clusters:</td>
-					<td><input size=35 id="cloudClusters"></td>
+					<td><input size=35 id="cloudClusters">
+					</td>
 					<td><button id="cloudClustersButton">set</button>
 				</tr>
 			</table>
@@ -106,16 +111,18 @@
 			<strong>Cluster</strong>
 			<table>
 				<tr>
-					<td>Alive:</td>
-					<td><input size=35 id="clusterAlive"
-						value="<%=VismoCtxListener.instance().isAlive( ClusterMonitoring.class )%>">
+					<td>Alive:</td> VismoCtxListener.instance().isAlive(
+					ClusterMonitoring.class )istener.instance().isAlive(
+					ClusterMonitoring.class )%>">
 					</td>
 					<td><button id="clusterAliveButton">set</button>
 				</tr>
 				<tr>
 					<td>Catalog:</td>
-					<td><input size=35 id="clusterCatalog"
-						value="<%=LocalCatalogFactory.getLocalURL()%>"></td>
+					<tLocalCatalogFactory.getLocalURL
+						()og"
+						value="<%=LocalCatalogFactory.getLocalURL()%>">
+					</td>
 					<td><button id="clusterCatalogButton">set</button>
 				</tr>
 			</table>
