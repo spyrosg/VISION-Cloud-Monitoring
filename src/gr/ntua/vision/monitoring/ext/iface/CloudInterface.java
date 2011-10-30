@@ -147,6 +147,7 @@ public class CloudInterface
 		if( CloudMonitoring.instance.isInstanceAlive() )
 		{
 			log.debug( "REST: registerAggregationRule(code size: " + rule.length() + " chars)" );
+			log.debug( "Rule:\n" + rule );
 
 			failure_reason = "compilation error";
 			compiled = RuleParser.instance.ruleParser.parse( rule );
