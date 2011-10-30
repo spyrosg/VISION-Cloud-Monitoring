@@ -4,6 +4,7 @@ import gr.ntua.vision.monitoring.VismoCtxListener;
 import gr.ntua.vision.monitoring.cluster.ClusterMonitoring;
 import gr.ntua.vision.monitoring.ext.catalog.LocalCatalogFactory;
 
+import javax.jms.JMSException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -64,7 +65,14 @@ public class ClusterInterface
 			@Override
 			public Void apply(String arg0)
 			{
-				XdasPublisher.setUrl( arg0 );
+				try
+				{
+					XdasPublisher.setUrl( arg0 );
+				}
+				catch( JMSException e )
+				{
+					throw new RuntimeException( e );
+				}
 				return null;
 			}
 		}), ;

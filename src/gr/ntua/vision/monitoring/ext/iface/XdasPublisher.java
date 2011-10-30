@@ -21,19 +21,19 @@ public abstract class XdasPublisher
 	@SuppressWarnings("all")
 	private static final Logger	log			= Logger.getLogger( XdasPublisher.class );
 	/** The connection. */
-	private Connection			connection;
+	private static Connection			connection;
 	/** The session. */
-	private Session				session;
+	private static Session				session;
 	/** The publisher. */
-	private MessageProducer		publisher;
+	private static MessageProducer		publisher;
 	/** The topic. */
-	private Topic				topic;
+	private static Topic				topic;
 	/** The topicname. */
-	private String				topicname	= "vision.xdas";
+	private static String				topicname	= "vision.xdas";
 	/** The url. */
 	private static String		url			= "tcp://10.0.1.71:61616";
 	/** disable activemq flag */
-	private boolean				disable;
+	private static boolean				disable;
 
 
 	/**
@@ -57,17 +57,20 @@ public abstract class XdasPublisher
 	/**
 	 * @param url
 	 *            the url to set
+	 * @throws JMSException 
 	 */
-	public static void setUrl(String url)
+	public static void setUrl(String url) throws JMSException
 	{
+		stop();
 		XdasPublisher.url = url;
+		init();
 	}
 
 
 	/**
 	 * initialize the publisher.
 	 */
-	public void init()
+	public static void init()
 	{
 		try
 		{
@@ -94,7 +97,7 @@ public abstract class XdasPublisher
 	 * 
 	 * @throws JMSException
 	 */
-	public void stop() throws JMSException
+	public static void stop() throws JMSException
 	{
 		if( disable ) return;
 
