@@ -60,7 +60,14 @@ public class ClusterInterface
 			}
 		}),
 		/***/
-		;
+		Compliance(new Function<String, Void>() {
+			@Override
+			public Void apply(String arg0)
+			{
+				XdasPublisher.setUrl( arg0 );
+				return null;
+			}
+		}), ;
 
 		/** value handler */
 		final Function<String, Void>	handler;

@@ -31,7 +31,7 @@ public abstract class XdasPublisher
 	/** The topicname. */
 	private String				topicname	= "vision.xdas";
 	/** The url. */
-	private String				url			= "tcp://10.0.2.71:61616";
+	private static String		url			= "tcp://10.0.1.71:61616";
 	/** disable activemq flag */
 	private boolean				disable;
 
@@ -40,6 +40,34 @@ public abstract class XdasPublisher
 	 * c/tor.
 	 */
 	public XdasPublisher()
+	{
+		init();
+	}
+
+
+	/**
+	 * @return the url
+	 */
+	public static String getUrl()
+	{
+		return url;
+	}
+
+
+	/**
+	 * @param url
+	 *            the url to set
+	 */
+	public static void setUrl(String url)
+	{
+		XdasPublisher.url = url;
+	}
+
+
+	/**
+	 * initialize the publisher.
+	 */
+	public void init()
 	{
 		try
 		{

@@ -1,3 +1,4 @@
+<%@page import="gr.ntua.vision.monitoring.ext.iface.XdasPublisher"%>
 <%@page
 	import="gr.ntua.vision.monitoring.ext.catalog.GlobalCatalogFactory"%>
 <%@page import="gr.ntua.vision.monitoring.cluster.ClusterMonitoring"%>
@@ -63,6 +64,14 @@
 				alert(JSON.stringify(data));
 			});
 		});
+		$("#clusterComplianceButton").click(function() {
+			$.get('/vismo/Monitoring/cluster/setClusterMonitoringParameter', {
+				name : 'Compliance',
+				value : $('#clusterCompliance').val()
+			}, function(data) {
+				alert(JSON.stringify(data));
+			});
+		});
 	});
 </script>
 </head>
@@ -86,23 +95,20 @@
 			<table>
 				<tr>
 					<td>Alive:</td>
-					<td><inputVismoCtxListener.instance().isAlive( CloudMonitoring.class )stance().isAlive( CloudMonitoring.class )%>">
-
-						
+					<td><input size=35 id="cloudAlive"
+						value="<%=VismoCtxListener.instance().isAlive( CloudMonitoring.class )%>">
 					</td>
 					<td><button id="cloudAliveButton">set</button>
 				</tr>
 				<tr>
 					<td>Catalog:</td>
-					<td><input
-						sGlobalCatalogFactory.getGlobalURL()e="<%=GlobalCatalogFactory.getGlobalURL()%>">
-					</td>
+					<td><input size=35 id="cloudCatalog"
+						value="<%=GlobalCatalogFactory.getGlobalURL()%>"></td>
 					<td><button id="cloudCatalogButton">set</button>
 				</tr>
 				<tr>
 					<td>Clusters:</td>
-					<td><input size=35 id="cloudClusters">
-					</td>
+					<td><input size=35 id="cloudClusters"></td>
 					<td><button id="cloudClustersButton">set</button>
 				</tr>
 			</table>
@@ -111,19 +117,23 @@
 			<strong>Cluster</strong>
 			<table>
 				<tr>
-					<td>Alive:</td> VismoCtxListener.instance().isAlive(
-					ClusterMonitoring.class )istener.instance().isAlive(
-					ClusterMonitoring.class )%>">
+					<td>Alive:</td>
+					<td><input size=35 id="clusterAlive"
+						value="<%=VismoCtxListener.instance().isAlive( ClusterMonitoring.class )%>">
 					</td>
 					<td><button id="clusterAliveButton">set</button>
 				</tr>
 				<tr>
 					<td>Catalog:</td>
-					<tLocalCatalogFactory.getLocalURL
-						()og"
-						value="<%=LocalCatalogFactory.getLocalURL()%>">
-					</td>
+					<td><input size=35 id="clusterCatalog"
+						value="<%=LocalCatalogFactory.getLocalURL()%>"></td>
 					<td><button id="clusterCatalogButton">set</button>
+				</tr>
+				<tr>
+					<td>Compliance:</td>
+					<td><input size=35 id="clusterCompliance"
+						value="<%=XdasPublisher.getUrl()%>"></td>
+					<td><button id="clusterComplianceButton">set</button>
 				</tr>
 			</table>
 		</div>
