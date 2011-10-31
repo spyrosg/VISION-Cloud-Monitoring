@@ -5,8 +5,6 @@ import gr.ntua.vision.monitoring.model.Location;
 import gr.ntua.vision.monitoring.model.Resource;
 import gr.ntua.vision.monitoring.util.Pair;
 
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -378,41 +376,5 @@ public class EventImpl implements Event
 			x.printStackTrace();
 		}
 		return pairs;
-	}
-
-
-	/**
-	 * schema export app.
-	 * 
-	 * @param args
-	 *            ignored.
-	 * @throws JSONException
-	 */
-	public static void main(String[] args) throws JSONException
-	{
-		LocationImpl source = new LocationImpl( "localhost", null, null, null, "127.0.0.1" );
-		LocationImpl observer = new LocationImpl( "localhost", null, null, null, "127.0.0.1" );
-
-		List<Resource> resources = Arrays.<Resource> asList(	new ResourceImpl( "execution-time", "seconds", 20.34 ),
-																new ResourceImpl( "memory", "GB", 2.34 ), new ResourceImpl(
-																		"storage", "GB", 200.34 ) );
-
-		EventImpl measurement = new EventImpl( UUID.randomUUID(), UUID.randomUUID(), "event description string",
-				EventType.Measurement, resources, new Date().getTime(), new Date().getTime() + 20, source, null, observer );
-
-		LocationImpl act_source = new LocationImpl( "localhost", "some-component-name", "some-user-id", "some-tenant-id",
-				"127.0.0.1" );
-		LocationImpl act_target = new LocationImpl( "localhost", "some-component-name", "some-user-id", "some-tenant-id",
-				"127.0.0.1" );
-
-		EventImpl action = new EventImpl( UUID.randomUUID(), UUID.randomUUID(), "event action name", EventType.Action, resources,
-				new Date().getTime(), new Date().getTime() + 20, act_source, act_target, observer );
-
-		System.out.println( "measurement event:\n" );
-		System.out.println( measurement.toJSON().toString( 2 ) );
-
-		System.out.println( "\n\n==================================================" );
-		System.out.println( "action event:\n" );
-		System.out.println( action.toJSON().toString( 2 ) );
 	}
 }

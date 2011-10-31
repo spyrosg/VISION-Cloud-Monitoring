@@ -14,19 +14,35 @@ public interface Resource extends JSONExchanged, Comparable<Resource>
 
 
 	/**
-	 * get the resource unit.
-	 * 
-	 * @return the resource unit.
-	 */
-	public String unit();
-
-
-	/**
-	 * get the resource value.
+	 * get the resource value (in KilloBytes).
 	 * 
 	 * @return the resource value.
 	 */
 	public double value();
+
+
+	/**
+	 * get the container name.
+	 * 
+	 * @return the name.
+	 */
+	public String containerName();
+
+
+	/**
+	 * get the object name.
+	 * 
+	 * @return the name.
+	 */
+	public String objectName();
+
+
+	/**
+	 * get the tenant name.
+	 * 
+	 * @return the name.
+	 */
+	public String tenantName();
 
 
 	/**
