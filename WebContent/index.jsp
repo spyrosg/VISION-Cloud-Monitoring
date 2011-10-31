@@ -82,9 +82,7 @@
 	<div style="width: 100%; text-align: left;">
 		<p>
 			Get the latest vismo monitoring library for <a href="libvismo.jar">java</a>
-			and <a href="pyvismo.zip">python</a> <br /> Get the sample vismo
-			monitoring example client (eclipse) project <a href="vismo-cli.zip">here
-				(zip)</a><br /> The python code contains 'test.py' which is the example
+			and <a href="pyvismo.zip">python</a> <br />  The python code contains 'test.py' which is the example
 			code for using the library.<br />
 		</p>
 		<br>
