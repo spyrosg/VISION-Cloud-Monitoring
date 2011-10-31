@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.cloud.CloudMonitoring;
 import gr.ntua.vision.monitoring.cluster.ClusterMonitoring;
+import gr.ntua.vision.monitoring.ext.iface.XdasPublisher;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -9,6 +10,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
+import javax.jms.JMSException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -146,6 +148,15 @@ public class VismoCtxListener implements ServletContextListener
 
 		while( !instances.isEmpty() )
 			instances.remove( 0 ).shutdown();
+		
+		try
+		{
+			XdasPublisher.stop();
+		}
+		catch( JMSException e )
+		{
+			e.printStackTrace();
+		}
 	}
 
 

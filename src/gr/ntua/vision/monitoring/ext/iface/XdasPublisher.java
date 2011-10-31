@@ -46,17 +46,6 @@ public abstract class XdasPublisher
 
 
 	/**
-	 * @see java.lang.Object#finalize()
-	 */
-	@Override
-	protected void finalize() throws Throwable
-	{
-		super.finalize();
-		stop();
-	}
-
-
-	/**
 	 * @return the url
 	 */
 	public static String getUrl()
@@ -111,7 +100,7 @@ public abstract class XdasPublisher
 	 */
 	public static void stop() throws JMSException
 	{
-		if( disable ) return;
+		if( disable || connection == null ) return;
 
 		connection.stop();
 		connection.close();
