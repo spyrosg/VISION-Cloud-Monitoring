@@ -75,7 +75,7 @@ public class ResourceImpl implements Resource
 		type = rsc.getString( "type" );
 		value = rsc.getDouble( "value" );
 		containerName = rsc.getString( "container" );
-		objectName = rsc.getString( "object" );
+		objectName = rsc.optString( "object" );
 		tenantName = rsc.getString( "tenant" );
 	}
 
