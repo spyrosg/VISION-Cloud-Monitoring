@@ -3,7 +3,12 @@ package gr.ntua.vision.monitoring.rules;
 import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.rules.parser.RuleSpec;
 
+import java.util.Arrays;
+
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 
 /**
@@ -57,5 +62,43 @@ public class EventMatcher
 			if( !match ) return false;
 		}
 		return true;
+	}
+
+
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder();
+		builder.append( "EventMatcher [rule=" );
+		builder.append( rule );
+		builder.append( ", andorXpr={" );
+		builder.append( Joiner.on( " AND " ).join(	Iterables.transform(	Arrays.asList( andorXpr ),
+																			new Function<Predicate<Event>[], String>() {
+																				@Override
+																				public String apply(Predicate<Event>[] arg0)
+																				{
+																					return "("
+																							+ Joiner.on( " OR " )
+																									.join(	Iterables
+																													.transform( Arrays.asList( arg0 ),
+																																new Function<Predicate<Event>, String>() {
+
+																																	@Override
+																																	public String apply(
+																																			Predicate<Event> arg0)
+																																	{
+																																		return "<<"
+																																				+ arg0
+																																				+ ">>";
+																																	}
+																																} ) )
+																							+ ")";
+																				}
+																			} ) ) );
+		builder.append( "}]" );
+		return builder.toString();
 	}
 }

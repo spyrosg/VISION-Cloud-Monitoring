@@ -17,6 +17,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -143,32 +144,36 @@ public class EventReader extends Thread
 				{
 					pairs.clear();
 					ctlg.catalog.timeRange( ctlg.key, ctlg.lastInspection, now, pairs );
+					// ctlg.catalog.deleteTimeRange( ctlg.key, ctlg.lastInspection, now );
 					ctlg.lastInspection = now;
 
 					if( pairs.size() > 0 )
 					{
 						log.debug( ctlg.key + ": pushing " + pairs.size() + " events." );
+												
+						// for( Pair<Long, List<Pair<String, Object>>> pair : pairs )
 
 						ruleEngine.push( Iterables.concat( Iterables
 								.transform( pairs, new Function<Pair<Long, List<Pair<String, Object>>>, Iterable<Event>>() {
 									@Override
 									public Iterable<Event> apply(Pair<Long, List<Pair<String, Object>>> arg0)
 									{
-										return Iterables.transform( arg0.b, new Function<Pair<String, Object>, Event>() {
-											@Override
-											public Event apply(Pair<String, Object> arg0)
-											{
-												try
-												{
-													return new EventImpl( new JSONObject( arg0.b.toString() ) );
-												}
-												catch( JSONException x )
-												{
-													x.printStackTrace();
-													return null;
-												}
-											}
-										} );
+										return Iterables.filter( Iterables
+												.transform( arg0.b, new Function<Pair<String, Object>, Event>() {
+													@Override
+													public Event apply(Pair<String, Object> arg0)
+													{
+														try
+														{
+															return new EventImpl( new JSONObject( arg0.b.toString() ) );
+														}
+														catch( JSONException x )
+														{
+															// ignore.
+															return null;
+														}
+													}
+												} ), Predicates.not( Predicates.isNull() ) );
 									}
 								} ) ) );
 					}

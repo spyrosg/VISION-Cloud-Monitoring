@@ -281,39 +281,61 @@ public class RuleEngine implements ActionHandler, Runnable
 			while( true )
 			{
 				Event event = eventQueue.take();
+				if( event == null ) continue;
+				// log.debug( ">> Event goes through rule chain: " + event );
 
 				EventMatcher[] cache = null;
 				synchronized( rulesLock )
 				{
 					cache = matchers;
 				}
+				int matches = 0;
+				int actions = 0;
 				if( cache != null )
 				//
-					for( EventMatcher em : cache )
-						if( em.matches( event ) )
+					try
+					{
+						for( EventMatcher em : cache )
 						{
-							log.trace( "Event match occurred, performing " + em.rule.actions.length + " actions." );
-							for( int i = 0; i < em.rule.actions.length; ++i )
-								try
-								{
-									ActionSpec action = em.rule.actions[i];
-									if( !action.action.apply(	this, event, action.arguments, em.rule.id, i,
-																action.actionFunctor( this ) ) ) //
+							// log.debug( "=== Matching against: " + em );
+							if( em.matches( event ) )
+							{
+								++matches;
+								log.debug( "SUCCESS: Event match occurred, performing " + em.rule.actions.length + " actions." );
+								for( int i = 0; i < em.rule.actions.length; ++i )
+									try
+									{
+										ActionSpec action = em.rule.actions[i];
+										if( !action.action.apply(	this, event, action.arguments, em.rule.id, i,
+																	action.actionFunctor( this ) ) ) //
+											remove( em.rule.id );
+										++actions;
+									}
+									catch( Throwable x )
+									{
+										x.printStackTrace();
 										remove( em.rule.id );
-								}
-								catch( Throwable x )
-								{
-									x.printStackTrace();
-									remove( em.rule.id );
-								}
+									}
+							}
 						}
+					}
+					catch( Throwable x )
+					{
+						x.printStackTrace();
+					}
+
+				if( cache != null ) //
+					log.debug( "Event matched to " + matches + "/" + cache.length + "  actions exec()ed: " + actions );
 			}
 		}
 		catch( InterruptedException x )
 		{
 			// ignore.
 		}
-		log.debug( "rule engine stops" );
+		finally
+		{
+			log.debug( "RULE ENGINE STOPS" );
+		}
 	}
 
 
@@ -347,7 +369,7 @@ public class RuleEngine implements ActionHandler, Runnable
 	@Override
 	public boolean store(Event event, String key)
 	{
-		log.trace( "store " + event.id() + " @ " + key );
+		log.debug( "store " + event.id() + " @ " + key );
 
 		Catalog catalog = GlobalCatalogFactory.globalCatalogInstance();
 
@@ -363,7 +385,7 @@ public class RuleEngine implements ActionHandler, Runnable
 	@Override
 	public boolean transmit(Event event, String pushURL)
 	{
-		log.trace( "trasmit " + event.id() + " @ " + pushURL );
+		log.debug( "trasmit " + event.id() + " @ " + pushURL );
 		try
 		{
 			Form form = new Form();

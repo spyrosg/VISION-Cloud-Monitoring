@@ -136,6 +136,22 @@ public class FieldCheck
 
 				return exact ? value.equals( fvalue.toString() ) : pattern.matcher( fvalue.toString() ).matches();
 			}
+
+
+			@Override
+			public String toString()
+			{
+				boolean exact = FieldCheck.this.exact;
+				String value = FieldCheck.this.value;
+
+				if( inner != null )
+				{
+					exact = inner.exact;
+					value = inner.value;
+				}
+
+				return field.toString() + ( exact ? " = '" : " LIKE '" ) + value + "'";
+			}
 		};
 	}
 }

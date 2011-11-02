@@ -5,6 +5,7 @@ import gr.ntua.vision.monitoring.model.Location;
 import gr.ntua.vision.monitoring.model.Resource;
 import gr.ntua.vision.monitoring.util.Pair;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -376,5 +377,39 @@ public class EventImpl implements Event
 			x.printStackTrace();
 		}
 		return pairs;
+	}
+
+
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder();
+		builder.append( "EventImpl [id=" );
+		builder.append( id );
+		builder.append( ", probe=" );
+		builder.append( probe );
+		builder.append( ", description=" );
+		builder.append( description );
+		builder.append( ", type=" );
+		builder.append( type );
+		builder.append( ", resources=" );
+		builder.append( Arrays.toString( resources.toArray() ) );
+		builder.append( ", start=" );
+		builder.append( start );
+		builder.append( ", end=" );
+		builder.append( end );
+		builder.append( ", source=" );
+		builder.append( source );
+		builder.append( ", target=" );
+		builder.append( target );
+		builder.append( ", observer=" );
+		builder.append( observer );
+		builder.append( ", aggregation_count=" );
+		builder.append( aggregation_count );
+		builder.append( "]" );
+		return builder.toString();
 	}
 }

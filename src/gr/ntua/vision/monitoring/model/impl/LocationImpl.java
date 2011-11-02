@@ -180,4 +180,26 @@ public class LocationImpl implements Location
 	{
 		return address;
 	}
+
+
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder();
+		builder.append( "LocationImpl [host=" );
+		builder.append( host );
+		builder.append( ", service=" );
+		builder.append( service );
+		builder.append( ", user=" );
+		builder.append( user );
+		builder.append( ", tenant=" );
+		builder.append( tenant );
+		builder.append( ", address=" );
+		builder.append( address );
+		builder.append( "]" );
+		return builder.toString();
+	}
 }

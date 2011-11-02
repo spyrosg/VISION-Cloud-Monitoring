@@ -70,7 +70,7 @@ public class MonitoringPushInterface extends XdasPublisher
 	private void handleEvent(Event event)
 	{
 		if( ClusterMonitoring.instance.isInstanceAlive() ) //
-			ProbeExecutor.saveEvents( event.startTime(), Arrays.asList( event ), null );
+			ProbeExecutor.saveEvents( new Date().getTime(), Arrays.asList( event ), null );
 	}
 
 

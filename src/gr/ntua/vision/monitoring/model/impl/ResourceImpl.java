@@ -268,4 +268,26 @@ public class ResourceImpl implements Resource
 			}
 		} ) );
 	}
+
+
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder();
+		builder.append( "ResourceImpl [type=" );
+		builder.append( type );
+		builder.append( ", value=" );
+		builder.append( value );
+		builder.append( ", containerName=" );
+		builder.append( containerName );
+		builder.append( ", objectName=" );
+		builder.append( objectName );
+		builder.append( ", tenantName=" );
+		builder.append( tenantName );
+		builder.append( "]" );
+		return builder.toString();
+	}
 }
