@@ -132,57 +132,69 @@ public class EventReader extends Thread
 	@Override
 	public void run()
 	{
-		while( true )
-			try
-			{
-				Thread.sleep( 5000 );
-
-				List<Pair<Long, List<Pair<String, Object>>>> pairs = Lists.newArrayList();
-
-				long now = new Date().getTime();
-				for( ClusterData ctlg : clusters )
+		log.info( "Event reader starts" );
+		try
+		{
+			while( true )
+				try
 				{
-					pairs.clear();
-					ctlg.catalog.timeRange( ctlg.key, ctlg.lastInspection, now, pairs );
-					// ctlg.catalog.deleteTimeRange( ctlg.key, ctlg.lastInspection, now );
-					ctlg.lastInspection = now;
+					Thread.sleep( 5000 );
 
-					if( pairs.size() > 0 )
+					List<Pair<Long, List<Pair<String, Object>>>> pairs = Lists.newArrayList();
+
+					long now = new Date().getTime();
+					for( ClusterData ctlg : clusters )
 					{
-						log.debug( ctlg.key + ": pushing " + pairs.size() + " events." );
-												
-						// for( Pair<Long, List<Pair<String, Object>>> pair : pairs )
+						pairs.clear();
+						ctlg.catalog.timeRange( ctlg.key, ctlg.lastInspection, now, pairs );
+						// ctlg.catalog.deleteTimeRange( ctlg.key, ctlg.lastInspection, now );
+						ctlg.lastInspection = now;
 
-						ruleEngine.push( Iterables.concat( Iterables
-								.transform( pairs, new Function<Pair<Long, List<Pair<String, Object>>>, Iterable<Event>>() {
-									@Override
-									public Iterable<Event> apply(Pair<Long, List<Pair<String, Object>>> arg0)
-									{
-										return Iterables.filter( Iterables
-												.transform( arg0.b, new Function<Pair<String, Object>, Event>() {
-													@Override
-													public Event apply(Pair<String, Object> arg0)
-													{
-														try
+						if( pairs.size() > 0 )
+						{
+							log.debug( ctlg.key + ": pushing " + pairs.size() + " events." );
+
+							// for( Pair<Long, List<Pair<String, Object>>> pair : pairs )
+
+							ruleEngine.push( Iterables.concat( Iterables
+									.transform( pairs, new Function<Pair<Long, List<Pair<String, Object>>>, Iterable<Event>>() {
+										@Override
+										public Iterable<Event> apply(Pair<Long, List<Pair<String, Object>>> arg0)
+										{
+											return Iterables.filter( Iterables
+													.transform( arg0.b, new Function<Pair<String, Object>, Event>() {
+														@Override
+														public Event apply(Pair<String, Object> arg0)
 														{
-															return new EventImpl( new JSONObject( arg0.b.toString() ) );
+															try
+															{
+																return new EventImpl( new JSONObject( arg0.b.toString() ) );
+															}
+															catch( JSONException x )
+															{
+																// ignore.
+																return null;
+															}
 														}
-														catch( JSONException x )
-														{
-															// ignore.
-															return null;
-														}
-													}
-												} ), Predicates.not( Predicates.isNull() ) );
-									}
-								} ) ) );
+													} ), Predicates.not( Predicates.isNull() ) );
+										}
+									} ) ) );
+						}
 					}
 				}
-			}
-			catch( InterruptedException x )
-			{
-				// ignore.
-				return;
-			}
+				catch( InterruptedException x )
+				{
+					return;
+				}
+				catch( Throwable x )
+				{
+					// ignore.
+					x.printStackTrace();
+				}
+		}
+		finally
+		{
+			log.info( "Event reader stops" );
+		}
 	}
 }

@@ -50,7 +50,8 @@ public class MonitoringPushInterface extends XdasPublisher
 
 		if( jsonEvent.has( "xdasType" ) )
 			pushXdas(	new URL( jsonEvent.getString( "url_source" ) ), new URL( jsonEvent.optString( "url_target" ) ),
-						jsonEvent.optString( "user" ), jsonEvent.optString( "tenant" ), jsonEvent.getInt( "xdasType" ),
+						jsonEvent.isNull( "user" ) ? null : jsonEvent.optString( "user" ),
+						jsonEvent.isNull( "tenant" ) ? null : jsonEvent.optString( "tenant" ), jsonEvent.getInt( "xdasType" ),
 						jsonEvent.getInt( "xdasStatus" ), jsonEvent.getString( "params_str" ) );
 
 		handleEvent( new EventImpl( jsonEvent ) );

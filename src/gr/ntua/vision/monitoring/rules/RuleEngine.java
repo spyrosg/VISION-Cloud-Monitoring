@@ -279,25 +279,21 @@ public class RuleEngine implements ActionHandler, Runnable
 		try
 		{
 			while( true )
-			{
-				Event event = eventQueue.take();
-				if( event == null ) continue;
-				// log.debug( ">> Event goes through rule chain: " + event );
-
-				EventMatcher[] cache = null;
-				synchronized( rulesLock )
+				try
 				{
-					cache = matchers;
-				}
-				int matches = 0;
-				int actions = 0;
-				if( cache != null )
-				//
-					try
+					Event event = eventQueue.take();
+					if( event == null ) continue;
+					// log.debug( ">> Event goes through rule chain: " + event );
+
+					EventMatcher[] cache = null;
+					synchronized( rulesLock )
 					{
+						cache = matchers;
+					}
+					int matches = 0;
+					int actions = 0;
+					if( cache != null ) //
 						for( EventMatcher em : cache )
-						{
-							// log.debug( "=== Matching against: " + em );
 							if( em.matches( event ) )
 							{
 								++matches;
@@ -317,20 +313,18 @@ public class RuleEngine implements ActionHandler, Runnable
 										remove( em.rule.id );
 									}
 							}
-						}
-					}
-					catch( Throwable x )
-					{
-						x.printStackTrace();
-					}
 
-				if( cache != null ) //
-					log.debug( "Event matched to " + matches + "/" + cache.length + "  actions exec()ed: " + actions );
-			}
-		}
-		catch( InterruptedException x )
-		{
-			// ignore.
+					if( cache != null ) //
+						log.debug( "Event matched to " + matches + "/" + cache.length + "  actions exec()ed: " + actions );
+				}
+				catch( InterruptedException x )
+				{
+					break;
+				}
+				catch( Throwable x )
+				{
+					x.printStackTrace();
+				}
 		}
 		finally
 		{

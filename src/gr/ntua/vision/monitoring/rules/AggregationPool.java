@@ -183,5 +183,10 @@ public class AggregationPool extends Thread
 				log.debug( id + " :: committer stops" );
 				return;
 			}
+			catch( Throwable x )
+			{
+				// ignore
+				x.printStackTrace();
+			}
 	}
 }

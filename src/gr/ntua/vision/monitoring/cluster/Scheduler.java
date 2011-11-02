@@ -51,32 +51,36 @@ public class Scheduler implements Runnable
 	{
 		log.info( "Start" );
 		while( !Thread.interrupted() )
-		{
 			try
 			{
 				Thread.sleep( 1000 );
+
+				Set<ProbeExecutor> executors = Sets.newHashSet();
+				synchronized( probes )
+				{
+					executors.addAll( probes );
+				}
+				for( ProbeExecutor x : executors )
+					try
+					{
+						x.tick();
+					}
+					catch( Throwable err )
+					{
+						log.error( err );
+						log.warn( "ignoring last error" );
+					}
 			}
 			catch( InterruptedException x )
 			{
 				break;
 			}
-
-			Set<ProbeExecutor> executors = Sets.newHashSet();
-			synchronized( probes )
+			catch( Throwable x )
 			{
-				executors.addAll( probes );
+				// ignore
+				x.printStackTrace();
 			}
-			for( ProbeExecutor x : executors )
-				try
-				{
-					x.tick();
-				}
-				catch( Throwable err )
-				{
-					log.error( err );
-					log.warn( "ignoring last error" );
-				}
-		}
+			
 		log.info( "Stop" );
 	}
 }
