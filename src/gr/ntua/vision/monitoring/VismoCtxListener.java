@@ -82,38 +82,27 @@ public class VismoCtxListener implements ServletContextListener
 		{
 			log.debug( "ctx init" );
 			ctx = event.getServletContext();
-			// String instances_t = ctx.getInitParameter( "instance.type" );
-			// ctx.setAttribute( "lcl-store", LocalCatalogFactory.localCatalogInstance() );
-			//
-			// String[] types = instances_t.split( ";" );
-			//
-			// for( String instance_t : types )
-			// {
-			// @SuppressWarnings("unchecked")
-			// Class< ? extends Monitoring> mtr_t = (Class< ? extends Monitoring>) Class.forName( instance_t );
-			//
-			// launch( mtr_t );
-			// }
 
-			launch( ClusterMonitoring.class );
+			InetAddress[] cloudAddresses = InetAddress.getAllByName( ctx.getInitParameter( "cloud.instance.host" ) );
 
-			boolean hasMagicAddress = false;
-			InetAddress magicAddress = InetAddress.getByAddress( new byte[] { 10, 0, 2, 111 } );
+			boolean haveCloudAddress = false;
 			Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
 			for( NetworkInterface netint : Collections.list( nets ) )
 			{
 				Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
 				for( InetAddress inetAddress : Collections.list( inetAddresses ) )
-					if( inetAddress.equals( magicAddress ) )
+					if( inetAddress.equals( cloudAddresses ) )
 					{
-						hasMagicAddress = true;
+						haveCloudAddress = true;
 						break;
 					}
-				if( hasMagicAddress ) break;
+				if( haveCloudAddress ) break;
 			}
-
-			if( hasMagicAddress ) //
+			
+			if( haveCloudAddress ) //
 				launch( CloudMonitoring.class );
+
+			launch( ClusterMonitoring.class );
 		}
 		catch( Exception x )
 		{
@@ -148,7 +137,7 @@ public class VismoCtxListener implements ServletContextListener
 
 		while( !instances.isEmpty() )
 			instances.remove( 0 ).shutdown();
-		
+
 		try
 		{
 			XdasPublisher.stop();

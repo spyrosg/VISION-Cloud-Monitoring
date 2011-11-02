@@ -16,8 +16,8 @@
 		<listener-class>gr.ntua.vision.monitoring.VismoCtxListener</listener-class>
 	</listener>
 	<context-param>
-		<param-name>instance.type</param-name>
-		<param-value>gr.ntua.vision.monitoring.cluster.ClusterMonitoring</param-value>
+		<param-name>cloud.instance.host</param-name>
+		<param-value>10.0.2.215</param-value>
 	</context-param>
 	<servlet>
 		<servlet-name>Monitoring</servlet-name>
