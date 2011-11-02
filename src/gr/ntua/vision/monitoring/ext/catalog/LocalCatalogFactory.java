@@ -8,7 +8,7 @@ public abstract class LocalCatalogFactory
 	/** the local catalog used. */
 	private static Catalog	local_catalog	= new InMemoryLocalCatalog();
 	/** local catalog URL */
-	private static String	local_url		= "http://10.0.2.62/vision-cloud/object-service/local-catalog/";
+	private static String	local_url		= "http://localhost/vision-cloud/object-service/local-catalog/";
 
 
 	/**

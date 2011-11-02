@@ -8,7 +8,7 @@ public abstract class GlobalCatalogFactory
 	/** the cloud catalog used. */
 	private static Catalog	global_catalog	= new InMemoryLocalCatalog();
 	/** global catalog URL */
-	private static String	global_url		= "http://10.0.2.62/vision-cloud/object-service/global-catalog/";
+	private static String	global_url		= "http://localhost/vision-cloud/object-service/global-catalog/";
 
 
 	/**
