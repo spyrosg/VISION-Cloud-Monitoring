@@ -2,7 +2,6 @@ package gr.ntua.vision.monitoring.rules;
 
 import gr.ntua.vision.monitoring.ext.catalog.Catalog;
 import gr.ntua.vision.monitoring.ext.catalog.LocalCatalogFactory;
-import gr.ntua.vision.monitoring.model.Event;
 import gr.ntua.vision.monitoring.model.impl.EventImpl;
 import gr.ntua.vision.monitoring.util.Pair;
 
@@ -15,11 +14,10 @@ import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 
 /**
@@ -135,6 +133,9 @@ public class EventReader extends Thread
 		log.info( "Event reader starts" );
 		try
 		{
+			Set<String> recentKeys = null;
+			Set<String> currentKeys = Sets.newHashSet();
+
 			while( true )
 				try
 				{
@@ -150,36 +151,21 @@ public class EventReader extends Thread
 						// ctlg.catalog.deleteTimeRange( ctlg.key, ctlg.lastInspection, now );
 						ctlg.lastInspection = now;
 
-						if( pairs.size() > 0 )
-						{
-							log.debug( ctlg.key + ": pushing " + pairs.size() + " events." );
+						recentKeys = Sets.newHashSet( currentKeys );
+						currentKeys = Sets.newHashSet();
 
-							// for( Pair<Long, List<Pair<String, Object>>> pair : pairs )
-
-							ruleEngine.push( Iterables.concat( Iterables
-									.transform( pairs, new Function<Pair<Long, List<Pair<String, Object>>>, Iterable<Event>>() {
-										@Override
-										public Iterable<Event> apply(Pair<Long, List<Pair<String, Object>>> arg0)
-										{
-											return Iterables.filter( Iterables
-													.transform( arg0.b, new Function<Pair<String, Object>, Event>() {
-														@Override
-														public Event apply(Pair<String, Object> arg0)
-														{
-															try
-															{
-																return new EventImpl( new JSONObject( arg0.b.toString() ) );
-															}
-															catch( JSONException x )
-															{
-																// ignore.
-																return null;
-															}
-														}
-													} ), Predicates.not( Predicates.isNull() ) );
-										}
-									} ) ) );
-						}
+						for( Pair<Long, List<Pair<String, Object>>> pair : pairs )
+							for( Pair<String, Object> event : pair.b )
+								if( !recentKeys.contains( event.a ) ) //
+									try
+									{
+										ruleEngine.push( new EventImpl( new JSONObject( event.b.toString() ) ) );
+										currentKeys.add( event.a );
+									}
+									catch( JSONException x )
+									{
+										// ignore.
+									}
 					}
 				}
 				catch( InterruptedException x )
