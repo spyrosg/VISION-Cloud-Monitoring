@@ -2,7 +2,7 @@
 
 ID="e0b3a92b-c860-4f8b-82f5-17114d0bcd48"
 HOSTNAME=`hostname`
-IP=`hostname -I`
+IP=`hostname -i`
 START_TM=`date +%s`
 START_TM=$(($START_TM * 1000))
 END_TM=$START_TM
