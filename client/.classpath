@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="libs/activemq-all-5.5.0.jar"/>
+	<classpathentry kind="lib" path="libs/compliance-agent.jar"/>
+	<classpathentry kind="lib" path="libs/libvismo.jar"/>
+	<classpathentry kind="lib" path="libs/slf4j-log4j12-1.6.2.jar"/>
+	<classpathentry kind="lib" path="libs/guava-r09.jar"/>
+	<classpathentry kind="lib" path="libs/jettison-1.1.jar"/>
+	<classpathentry kind="lib" path="libs/jsr311-api-1.1.1.jar"/>
+	<classpathentry kind="lib" path="libs/log4j-1.2.16.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Jersey-1.9.1"/>
+	<classpathentry kind="lib" path="/home/mataron/Libraries/jersey-1.9.1/grizzly-servlet-webserver-1.9.18-i.jar"/>
+	<classpathentry kind="lib" path="/home/mataron/Libraries/jersey-1.9.1/jersey-grizzly-1.9.1.jar"/>
+	<classpathentry kind="lib" path="/home/mataron/Libraries/jersey-1.9.1/lib/jersey-json-1.9.1.jar"/>
+	<classpathentry kind="lib" path="/home/mataron/Libraries/jersey-1.9.1/lib/asm-3.1.jar"/>
+	<classpathentry kind="lib" path="/home/mataron/Libraries/jersey-1.9.1/lib/jersey-server-1.9.1.jar"/>
+	<classpathentry kind="lib" path="/home/mataron/Libraries/jersey-1.9.1/lib/jackson-core-asl-1.8.3.jar"/>
+	<classpathentry kind="lib" path="/home/mataron/Libraries/jersey-1.9.1/lib/jackson-xc-1.8.3.jar"/>
+	<classpathentry kind="lib" path="/home/mataron/Libraries/jersey-1.9.1/lib/jersey-core-1.9.1.jar"/>
+	<classpathentry kind="lib" path="/home/mataron/Libraries/jersey-1.9.1/lib/jackson-mapper-asl-1.8.3.jar"/>
+	<classpathentry kind="lib" path="/home/mataron/Libraries/jersey-1.9.1/lib/jettison-1.1.jar"/>
+	<classpathentry kind="lib" path="/home/mataron/Libraries/jersey-1.9.1/lib/jackson-jaxrs-1.8.3.jar"/>
+	<classpathentry kind="lib" path="/home/mataron/Libraries/jersey-1.9.1/lib/jersey-client-1.9.1.jar"/>
+	<classpathentry kind="lib" path="/home/mataron/Libraries/jersey-1.9.1/lib/jsr311-api-1.1.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
