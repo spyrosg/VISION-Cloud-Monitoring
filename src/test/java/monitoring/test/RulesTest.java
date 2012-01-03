@@ -25,18 +25,18 @@ import com.sun.jersey.api.representation.Form;
 @Path("/push")
 public class RulesTest {
     /***/
+    static int          actions      = 0;
+
+    /***/
     static final Client client       = Client.create();
 
+    /***/
+    static int          measurements = 0;
     static final String Rule0        = "rule \"test rule name\"\n" + //
                                              "when\n" + //
                                              "        Event( Source.Address like \".+\" );\n" + //
                                              "then\n" + //
                                              "         PushAsIs( \"http://10.0.0.34:7070/push\" );\n";
-
-    /***/
-    static int          actions      = 0;
-    /***/
-    static int          measurements = 0;
 
 
     /**
@@ -49,7 +49,7 @@ public class RulesTest {
      */
     @POST
     @Produces("application/json")
-    public String receiveEvent(@FormParam("event") String eventJSON) throws JSONException {
+    public String receiveEvent(@FormParam("event") final String eventJSON) throws JSONException {
         System.out.println( eventJSON );
 
         // Event event = new EventImpl( new JSONObject( eventJSON ) );
@@ -78,7 +78,7 @@ public class RulesTest {
      * @throws IOException
      * @throws IllegalArgumentException
      */
-    public static void main(String[] args) throws IllegalArgumentException, IOException {
+    public static void main(final String[] args) throws IllegalArgumentException, IOException {
         // System.out.println(Rule0);
         // System.out.println();
         // System.out.println();
@@ -94,12 +94,12 @@ public class RulesTest {
         System.out.println( "Registering rule." );
 
         try {
-            Form form = new Form();
+            final Form form = new Form();
             form.add( "rule", Rule0 );
-            String response = client.resource( "http://10.0.2.215:8080/vismo/Monitoring/cloud/registerAggregationRule" )
+            final String response = client.resource( "http://10.0.2.215:8080/vismo/Monitoring/cloud/registerAggregationRule" )
                     .post( ClientResponse.class, form ).getEntity( String.class );
             System.out.println( response );
-        } catch( Exception e ) {
+        } catch( final Exception e ) {
             e.printStackTrace();
             System.exit( 0 );
         }

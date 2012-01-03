@@ -5,45 +5,44 @@ package gr.ntua.vision.monitoring.model;
  * information contained here is meaningless. Therefore there are cases in which the methods will return <code>null</code>s to
  * indicate that no relevant data are associated.
  */
-public interface Location extends JSONExchanged
-{
-	/**
-	 * get the hostname.
-	 * 
-	 * @return the hostname.
-	 */
-	public String hostname();
+public interface Location extends JSONExchanged {
+    /**
+     * get the hostname.
+     * 
+     * @return the hostname.
+     */
+    public String hostname();
 
 
-	/**
-	 * get the service name.
-	 * 
-	 * @return the service name.
-	 */
-	public String service();
+    /**
+     * get the network address.
+     * 
+     * @return the network address.
+     */
+    public String netAddress();
 
 
-	/**
-	 * get the user ID.
-	 * 
-	 * @return the user ID.
-	 */
-	public String userID();
+    /**
+     * get the service name.
+     * 
+     * @return the service name.
+     */
+    public String service();
 
 
-	/**
-	 * get the ID of the tenant, in the context of which this event took place. Not all events happen in the context of a tenant
-	 * and for those that don't this method returns <code>null</code>.
-	 * 
-	 * @return the tenant ID.
-	 */
-	public String tenantID();
+    /**
+     * get the ID of the tenant, in the context of which this event took place. Not all events happen in the context of a tenant
+     * and for those that don't this method returns <code>null</code>.
+     * 
+     * @return the tenant ID.
+     */
+    public String tenantID();
 
 
-	/**
-	 * get the network address.
-	 * 
-	 * @return the network address.
-	 */
-	public String netAddress();
+    /**
+     * get the user ID.
+     * 
+     * @return the user ID.
+     */
+    public String userID();
 }

@@ -20,8 +20,6 @@ import com.google.common.collect.Maps;
  */
 public class LibInvoke {
     /***/
-    static final long           Period        = 20000;
-    /***/
     static final String[][]     Actions       = {
             { "http://10.0.2.111:8080/vismo/LibInvoke", "http://10.0.2.111:8080/vismo/Monitoring", "type=event" }, //
             { "http://10.0.2.111:8080/vismo/Monitoring/cluster", "http://10.0.2.111:8080/vismo/Monitoring/cloud", "type=event" }, //
@@ -31,9 +29,11 @@ public class LibInvoke {
             { "http://147.102.19.45/myvisionhost/ManagerObject/createObjectReplica",
             "http://66.135.200.23/myvisionhost/ManagerObject/replicateObject", "object=object1" }, //
                                               };
+    /***/
+    static final long           Period        = 20000;
     private static final String containerName = "test-container";
-    private static final String tenantName    = "ntua";
     private static final String objectName    = "test-object";
+    private static final String tenantName    = "ntua";
 
 
     /**
@@ -43,27 +43,27 @@ public class LibInvoke {
      *            ignored.
      * @throws Exception
      */
-    public static void main(String[] args) throws Exception {
-        UUID appId = UUID.randomUUID();
+    public static void main(final String[] args) throws Exception {
+        final UUID appId = UUID.randomUUID();
         System.out.println( "Initializing app (id= " + appId + ")" );
         VisionMonitoring.initialize( "http://10.0.2.111:8080/vismo/Monitoring/push/event", appId );
 
         while( true ) {
             Thread.sleep( Period );
 
-            List<Resource> resources = Lists.newArrayList();
+            final List<Resource> resources = Lists.newArrayList();
 
             resources.add( new ResourceImpl( "memory", Math.random() * 3096, containerName, objectName, tenantName ) );
             resources.add( new ResourceImpl( "storage", Math.random() * 1024, containerName, objectName, tenantName ) );
 
-            String[] action = Actions[Math.min( (int) Math.floor( Actions.length * Math.random() ), Actions.length - 1 )];
+            final String[] action = Actions[Math.min( (int) Math.floor( Actions.length * Math.random() ), Actions.length - 1 )];
 
-            URL src = new URL( action[0] );
-            URL trg = action[1] == null ? null : new URL( action[1] );
+            final URL src = new URL( action[0] );
+            final URL trg = action[1] == null ? null : new URL( action[1] );
 
-            Map<String, String> params = Maps.newHashMap();
+            final Map<String, String> params = Maps.newHashMap();
             for( int i = 2; i < action.length; ++i ) {
-                String[] parts = action[i].split( "=" );
+                final String[] parts = action[i].split( "=" );
                 params.put( parts[0], parts[1] );
             }
 

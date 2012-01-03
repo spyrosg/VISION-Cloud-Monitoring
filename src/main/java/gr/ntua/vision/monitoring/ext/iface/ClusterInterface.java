@@ -21,109 +21,91 @@ import com.google.common.base.Function;
  * This contains the cluster REST interface entries.
  */
 @Path("/cluster")
-public class ClusterInterface
-{
-	/** variables that may be handled. */
-	private enum Variables
-	{
-		/***/
-		Alive(new Function<String, Void>() {
-			@Override
-			public Void apply(String arg0)
-			{
-				if( Boolean.parseBoolean( arg0 ) )
-				{
-					if( !VismoCtxListener.instance().isAlive( ClusterMonitoring.class ) ) //
-						try
-						{
-							VismoCtxListener.instance().launch( ClusterMonitoring.class );
-						}
-						catch( Throwable x )
-						{
-							throw new RuntimeException( x );
-						}
-				}
-				else
-				{
-					if( VismoCtxListener.instance().isAlive( ClusterMonitoring.class ) )
-						VismoCtxListener.instance().shutdown( ClusterMonitoring.class );
-				}
-				return null;
-			}
-		}),
-		/***/
-		LocalCatalog(new Function<String, Void>() {
-			@Override
-			public Void apply(String arg0)
-			{
-				LocalCatalogFactory.setLocalURL( arg0 );
-				return null;
-			}
-		}),
-		/***/
-		Compliance(new Function<String, Void>() {
-			@Override
-			public Void apply(String arg0)
-			{
-				try
-				{
-					XdasPublisher.setUrl( arg0 );
-				}
-				catch( JMSException e )
-				{
-					throw new RuntimeException( e );
-				}
-				return null;
-			}
-		}), ;
+public class ClusterInterface {
+    /** variables that may be handled. */
+    private enum Variables {
+        /***/
+        Alive(new Function<String, Void>() {
+            @Override
+            public Void apply(final String arg0) {
+                if( Boolean.parseBoolean( arg0 ) ) {
+                    if( !VismoCtxListener.instance().isAlive( ClusterMonitoring.class ) ) //
+                        try {
+                            VismoCtxListener.instance().launch( ClusterMonitoring.class );
+                        } catch( final Throwable x ) {
+                            throw new RuntimeException( x );
+                        }
+                } else if( VismoCtxListener.instance().isAlive( ClusterMonitoring.class ) )
+                    VismoCtxListener.instance().shutdown( ClusterMonitoring.class );
+                return null;
+            }
+        }),
+        /***/
+        Compliance(new Function<String, Void>() {
+            @Override
+            public Void apply(final String arg0) {
+                try {
+                    XdasPublisher.setUrl( arg0 );
+                } catch( final JMSException e ) {
+                    throw new RuntimeException( e );
+                }
+                return null;
+            }
+        }),
+        /***/
+        LocalCatalog(new Function<String, Void>() {
+            @Override
+            public Void apply(final String arg0) {
+                LocalCatalogFactory.setLocalURL( arg0 );
+                return null;
+            }
+        }), ;
 
-		/** value handler */
-		final Function<String, Void>	handler;
+        /** value handler */
+        final Function<String, Void> handler;
 
 
-		/**
-		 * c/tor.
-		 * 
-		 * @param handler
-		 */
-		private Variables(Function<String, Void> handler)
-		{
-			this.handler = handler;
-		}
-	}
+        /**
+         * c/tor.
+         * 
+         * @param handler
+         */
+        private Variables(final Function<String, Void> handler) {
+            this.handler = handler;
+        }
+    }
 
-	/** the logger. */
-	@SuppressWarnings("all")
-	private static final Logger	log	= Logger.getLogger( ClusterInterface.class );
+    /** the logger. */
+    @SuppressWarnings("all")
+    private static final Logger log = Logger.getLogger( ClusterInterface.class );
 
 
-	/**
-	 * This operation is used to change the parameter of the cluster wide monitoring component.
-	 * 
-	 * @param name
-	 *            the name of the parameter to change.
-	 * @param value
-	 *            the value to set to the parameter.
-	 * @return the operation's success status.
-	 * @throws JSONException
-	 */
-	@GET
-	@Path("/setClusterMonitoringParameter")
-	@Produces("application/json")
-	public String setClusterMonitoringParameter(@QueryParam("name") String name, @QueryParam("value") String value)
-			throws JSONException
-	{
-		log.debug( "REST: setClusterMonitoringParameter('" + name + "' -> '" + value + "')" );
+    /**
+     * This operation is used to change the parameter of the cluster wide monitoring component.
+     * 
+     * @param name
+     *            the name of the parameter to change.
+     * @param value
+     *            the value to set to the parameter.
+     * @return the operation's success status.
+     * @throws JSONException
+     */
+    @GET
+    @Path("/setClusterMonitoringParameter")
+    @Produces("application/json")
+    public String setClusterMonitoringParameter(@QueryParam("name") final String name, @QueryParam("value") final String value)
+            throws JSONException {
+        log.debug( "REST: setClusterMonitoringParameter('" + name + "' -> '" + value + "')" );
 
-		if( !name.equals( Variables.Alive.toString() ) && !ClusterMonitoring.instance.isInstanceAlive() )
-		{
-			log.warn( "Cluster instance down, ignoring request" );
-			return new JSONStringer().object().key( "status" ).value( "service down" ).endObject().toString();
-		}
+        if( !name.equals( Variables.Alive.toString() ) && !ClusterMonitoring.instance.isInstanceAlive() ) {
+            log.warn( "Cluster instance down, ignoring request" );
+            return new JSONStringer().object().key( "status" ).value( "service down" ).endObject().toString();
+        }
 
-		Variables var = Variables.valueOf( name );
-		if( var != null ) var.handler.apply( value );
+        final Variables var = Variables.valueOf( name );
+        if( var != null )
+            var.handler.apply( value );
 
-		return new JSONStringer().object().key( "status" ).value( "ok" ).endObject().toString();
-	}
+        return new JSONStringer().object().key( "status" ).value( "ok" ).endObject().toString();
+    }
 }

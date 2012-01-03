@@ -20,173 +20,164 @@ import com.google.common.collect.Maps;
  * An event aggregation pool. Pools aggregate events and create more compact ones. They are responsible for performing the action
  * on the aggregated event when the conditions permit so.
  */
-public class AggregationPool extends Thread
-{
-	/** an aggregated event key. */
-	private class Key
-	{
-		/** the values of the key fields. */
-		final Object[]	values;
-		/** creation timestamp. */
-		final long		timestamp;
+public class AggregationPool extends Thread {
+    /** an aggregated event key. */
+    private class Key {
+        /** creation timestamp. */
+        final long     timestamp;
+        /** the values of the key fields. */
+        final Object[] values;
 
 
-		/**
-		 * c/tor.
-		 * 
-		 * @param event
-		 */
-		Key(Event event)
-		{
-			this.values = new Object[keys.length];
-			for( int i = 0; i < values.length; ++i )
-				values[i] = keys[i].fieldValue( event );
+        /**
+         * c/tor.
+         * 
+         * @param event
+         */
+        Key(final Event event) {
+            this.values = new Object[keys.length];
+            for( int i = 0; i < values.length; ++i )
+                values[i] = keys[i].fieldValue( event );
 
-			this.timestamp = timeWindow > 0 ? new Date().getTime() : 0;
-		}
-
-
-		/**
-		 * @see java.lang.Object#hashCode()
-		 */
-		@Override
-		public int hashCode()
-		{
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + Arrays.hashCode( values );
-			return result;
-		}
+            this.timestamp = timeWindow > 0 ? new Date().getTime() : 0;
+        }
 
 
-		/**
-		 * @see java.lang.Object#equals(java.lang.Object)
-		 */
-		@Override
-		public boolean equals(Object obj)
-		{
-			if( this == obj ) return true;
-			if( obj == null ) return false;
-			if( getClass() != obj.getClass() ) return false;
-			Key other = (Key) obj;
-			if( !Arrays.equals( values, other.values ) ) return false;
-			return true;
-		}
-	}
-
-	/** the logger. */
-	@SuppressWarnings("all")
-	private static final Logger				log			= Logger.getLogger( AggregationPool.class );
-	/** the pool's id. */
-	public final UUID						id;
-	/** the maximum count of events in a group. */
-	private final int						maxCount;
-	/** the maximum time difference between the most recent and the oldest event in the group. */
-	final long								timeWindow;
-	/** the aggregation keys. */
-	final CheckedField[]					keys;
-	/** the action to perform with aggregated events. */
-	private final Function<Event, Boolean>	action;
-	/** the aggregated events. */
-	private final Map<Key, EventImpl>		aggregated	= Maps.newConcurrentMap();
+        /**
+         * @see java.lang.Object#equals(java.lang.Object)
+         */
+        @Override
+        public boolean equals(final Object obj) {
+            if( this == obj )
+                return true;
+            if( obj == null )
+                return false;
+            if( getClass() != obj.getClass() )
+                return false;
+            final Key other = (Key) obj;
+            if( !Arrays.equals( values, other.values ) )
+                return false;
+            return true;
+        }
 
 
-	/**
-	 * c/tor.
-	 * 
-	 * @param id
-	 * @param maxCount
-	 * @param timeWindow
-	 * @param keys
-	 * @param action
-	 */
-	public AggregationPool(UUID id, int maxCount, long timeWindow, CheckedField[] keys, Function<Event, Boolean> action)
-	{
-		if( keys.length == 0 ) throw new IllegalArgumentException( "at least one aggregation field is required." );
+        /**
+         * @see java.lang.Object#hashCode()
+         */
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + Arrays.hashCode( values );
+            return result;
+        }
+    }
 
-		this.id = id;
-		this.maxCount = maxCount;
-		this.timeWindow = timeWindow;
-		this.keys = keys;
-		this.action = action;
-
-		log.info( "Created pool: " + id + " over: " + Arrays.toString( keys ) );
-
-		setName( "AggregationPool[" + id + "]:Scheduler" );
-		start();
-	}
-
-
-	/**
-	 * push the given event in this aggregation pool.
-	 * 
-	 * @param event
-	 *            the event to push.
-	 * @return <code>true</code> if and only if the operation completed successfully.
-	 */
-	public boolean push(Event event)
-	{
-		Key key = new Key( event );
-		EventImpl master = aggregated.get( key );
-
-		if( master != null )
-			master.mergeWith( event );
-		else aggregated.put( key, master = new EventImpl( event ) );
-
-		return true;
-	}
+    /** the logger. */
+    @SuppressWarnings("all")
+    private static final Logger            log        = Logger.getLogger( AggregationPool.class );
+    /** the pool's id. */
+    public final UUID                      id;
+    /** the aggregation keys. */
+    final CheckedField[]                   keys;
+    /** the maximum time difference between the most recent and the oldest event in the group. */
+    final long                             timeWindow;
+    /** the action to perform with aggregated events. */
+    private final Function<Event, Boolean> action;
+    /** the aggregated events. */
+    private final Map<Key, EventImpl>      aggregated = Maps.newConcurrentMap();
+    /** the maximum count of events in a group. */
+    private final int                      maxCount;
 
 
-	/**
-	 * destroy this aggregation pool.
-	 * 
-	 * @throws InterruptedException
-	 */
-	public void shutdown() throws InterruptedException
-	{
-		log.info( "shutdown" );
-		interrupt();
-		join();
-	}
+    /**
+     * c/tor.
+     * 
+     * @param id
+     * @param maxCount
+     * @param timeWindow
+     * @param keys
+     * @param action
+     */
+    public AggregationPool(final UUID id, final int maxCount, final long timeWindow, final CheckedField[] keys,
+            final Function<Event, Boolean> action) {
+        if( keys.length == 0 )
+            throw new IllegalArgumentException( "at least one aggregation field is required." );
+
+        this.id = id;
+        this.maxCount = maxCount;
+        this.timeWindow = timeWindow;
+        this.keys = keys;
+        this.action = action;
+
+        log.info( "Created pool: " + id + " over: " + Arrays.toString( keys ) );
+
+        setName( "AggregationPool[" + id + "]:Scheduler" );
+        start();
+    }
 
 
-	/**
-	 * @see java.lang.Thread#run()
-	 */
-	@Override
-	public void run()
-	{
-		log.debug( id + " :: committer starts" );
-		while( true )
-			try
-			{
-				Thread.sleep( 500 );
+    /**
+     * push the given event in this aggregation pool.
+     * 
+     * @param event
+     *            the event to push.
+     * @return <code>true</code> if and only if the operation completed successfully.
+     */
+    public boolean push(final Event event) {
+        final Key key = new Key( event );
+        EventImpl master = aggregated.get( key );
 
-				long now = timeWindow > 0 ? new Date().getTime() : 0;
+        if( master != null )
+            master.mergeWith( event );
+        else
+            aggregated.put( key, master = new EventImpl( event ) );
 
-				Iterator<Map.Entry<Key, EventImpl>> events = aggregated.entrySet().iterator();
-				while( events.hasNext() )
-				{
-					Map.Entry<Key, EventImpl> entry = events.next();
+        return true;
+    }
 
-					if( ( maxCount > 0 && entry.getValue().aggregationCount() >= maxCount ) || //
-							( timeWindow > 0 && now - entry.getKey().timestamp >= timeWindow ) )
-					{
-						if( !action.apply( entry.getValue() ) ) //
-							CloudMonitoring.instance.ruleEngine.remove( id );
-						events.remove();
-					}
-				}
-			}
-			catch( InterruptedException x )
-			{
-				log.debug( id + " :: committer stops" );
-				return;
-			}
-			catch( Throwable x )
-			{
-				// ignore
-				x.printStackTrace();
-			}
-	}
+
+    /**
+     * @see java.lang.Thread#run()
+     */
+    @Override
+    public void run() {
+        log.debug( id + " :: committer starts" );
+        while( true )
+            try {
+                Thread.sleep( 500 );
+
+                final long now = timeWindow > 0 ? new Date().getTime() : 0;
+
+                final Iterator<Map.Entry<Key, EventImpl>> events = aggregated.entrySet().iterator();
+                while( events.hasNext() ) {
+                    final Map.Entry<Key, EventImpl> entry = events.next();
+
+                    if( ( maxCount > 0 && entry.getValue().aggregationCount() >= maxCount ) || //
+                            ( timeWindow > 0 && now - entry.getKey().timestamp >= timeWindow ) ) {
+                        if( !action.apply( entry.getValue() ) ) //
+                            CloudMonitoring.instance.ruleEngine.remove( id );
+                        events.remove();
+                    }
+                }
+            } catch( final InterruptedException x ) {
+                log.debug( id + " :: committer stops" );
+                return;
+            } catch( final Throwable x ) {
+                // ignore
+                x.printStackTrace();
+            }
+    }
+
+
+    /**
+     * destroy this aggregation pool.
+     * 
+     * @throws InterruptedException
+     */
+    public void shutdown() throws InterruptedException {
+        log.info( "shutdown" );
+        interrupt();
+        join();
+    }
 }

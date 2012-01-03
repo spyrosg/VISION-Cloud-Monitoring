@@ -14,91 +14,83 @@ import com.google.common.collect.Iterables;
 /**
  * The event matcher.
  */
-public class EventMatcher
-{
-	/** The associated rule. */
-	public final RuleSpec				rule;
-	/**
-	 * the event matching expression. The first dimension binds its contents with a logical AND and the second dimension with a
-	 * logical OR.
-	 */
-	private final Predicate<Event>[][]	andorXpr;
+public class EventMatcher {
+    /** The associated rule. */
+    public final RuleSpec              rule;
+    /**
+     * the event matching expression. The first dimension binds its contents with a logical AND and the second dimension with a
+     * logical OR.
+     */
+    private final Predicate<Event>[][] andorXpr;
 
 
-	/**
-	 * c/tor.
-	 * 
-	 * @param rule
-	 *            the associated rule.
-	 * @param andorXpr
-	 *            the event matching expression. The first dimension binds its contents with a logical AND and the second
-	 *            dimension with a logical OR.
-	 */
-	EventMatcher(RuleSpec rule, Predicate<Event>[][] andorXpr)
-	{
-		this.rule = rule;
-		this.andorXpr = andorXpr;
-	}
+    /**
+     * c/tor.
+     * 
+     * @param rule
+     *            the associated rule.
+     * @param andorXpr
+     *            the event matching expression. The first dimension binds its contents with a logical AND and the second
+     *            dimension with a logical OR.
+     */
+    EventMatcher(final RuleSpec rule, final Predicate<Event>[][] andorXpr) {
+        this.rule = rule;
+        this.andorXpr = andorXpr;
+    }
 
 
-	/**
-	 * check if the given event matches the stored expression.
-	 * 
-	 * @param event
-	 *            the event.
-	 * @return <code>true</code> if and only if the given event matches the stored expression.
-	 */
-	public boolean matches(Event event)
-	{
-		for( Predicate<Event>[] ored : andorXpr )
-		{
-			boolean match = false;
-			for( Predicate<Event> prd : ored )
-				if( prd.apply( event ) )
-				{
-					match = true;
-					break;
-				}
-			if( !match ) return false;
-		}
-		return true;
-	}
+    /**
+     * check if the given event matches the stored expression.
+     * 
+     * @param event
+     *            the event.
+     * @return <code>true</code> if and only if the given event matches the stored expression.
+     */
+    public boolean matches(final Event event) {
+        for( final Predicate<Event>[] ored : andorXpr ) {
+            boolean match = false;
+            for( final Predicate<Event> prd : ored )
+                if( prd.apply( event ) ) {
+                    match = true;
+                    break;
+                }
+            if( !match )
+                return false;
+        }
+        return true;
+    }
 
 
-	/**
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		StringBuilder builder = new StringBuilder();
-		builder.append( "EventMatcher [rule=" );
-		builder.append( rule );
-		builder.append( ", andorXpr={" );
-		builder.append( Joiner.on( " AND " ).join(	Iterables.transform(	Arrays.asList( andorXpr ),
-																			new Function<Predicate<Event>[], String>() {
-																				@Override
-																				public String apply(Predicate<Event>[] arg0)
-																				{
-																					return "("
-																							+ Joiner.on( " OR " )
-																									.join(	Iterables
-																													.transform( Arrays.asList( arg0 ),
-																																new Function<Predicate<Event>, String>() {
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append( "EventMatcher [rule=" );
+        builder.append( rule );
+        builder.append( ", andorXpr={" );
+        builder.append( Joiner.on( " AND " ).join( Iterables.transform( Arrays.asList( andorXpr ),
+                                                                        new Function<Predicate<Event>[], String>() {
+                                                                            @Override
+                                                                            public String apply(final Predicate<Event>[] arg0) {
+                                                                                return "("
+                                                                                        + Joiner.on( " OR " )
+                                                                                                .join( Iterables.transform( Arrays.asList( arg0 ),
+                                                                                                                            new Function<Predicate<Event>, String>() {
 
-																																	@Override
-																																	public String apply(
-																																			Predicate<Event> arg0)
-																																	{
-																																		return "<<"
-																																				+ arg0
-																																				+ ">>";
-																																	}
-																																} ) )
-																							+ ")";
-																				}
-																			} ) ) );
-		builder.append( "}]" );
-		return builder.toString();
-	}
+                                                                                                                                @Override
+                                                                                                                                public String apply(
+                                                                                                                                        final Predicate<Event> arg0) {
+                                                                                                                                    return "<<"
+                                                                                                                                            + arg0
+                                                                                                                                            + ">>";
+                                                                                                                                }
+                                                                                                                            } ) )
+                                                                                        + ")";
+                                                                            }
+                                                                        } ) ) );
+        builder.append( "}]" );
+        return builder.toString();
+    }
 }

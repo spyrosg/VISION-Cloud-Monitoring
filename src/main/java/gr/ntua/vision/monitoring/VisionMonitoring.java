@@ -60,163 +60,152 @@ import com.sun.jersey.api.representation.Form;
  * </code></blockquote>
  * </p>
  */
-public class VisionMonitoring
-{
-	/** the client used to make HTTP requests. */
-	private static final Client				client			= Client.create();
-	/** the single object's instance. */
-	private static VisionMonitoring			instance;
-	/** the monitoring URL */
-	private final String					url;
-	/** the id of this component. */
-	private final UUID						id;
+public class VisionMonitoring {
+    /** empty parameters */
+    public static final Map<String, String> EmptyParameters = Collections.unmodifiableMap( Maps.<String, String> newHashMap() );
+    /** empty resource list. */
+    public static final List<Resource>      EmptyResources  = Collections.unmodifiableList( Lists.<Resource> newArrayList() );
+    /** the client used to make HTTP requests. */
+    private static final Client             client          = Client.create();
+    /** the single object's instance. */
+    private static VisionMonitoring         instance;
 
-	/** empty parameters */
-	public static final Map<String, String>	EmptyParameters	= Collections.unmodifiableMap( Maps.<String, String> newHashMap() );
-	/** empty resource list. */
-	public static final List<Resource>		EmptyResources	= Collections.unmodifiableList( Lists.<Resource> newArrayList() );
+    /** the id of this component. */
+    private final UUID                      id;
+    /** the monitoring URL */
+    private final String                    url;
 
-	static
-	{
-		client.setConnectTimeout( 1000 );
-	}
+    static {
+        client.setConnectTimeout( 1000 );
+    }
 
 
-	/**
-	 * c/tor.
-	 * 
-	 * @param url
-	 * @param id
-	 */
-	private VisionMonitoring(String url, UUID id)
-	{
-		this.url = url;
-		this.id = id;
-	}
+    /**
+     * c/tor.
+     * 
+     * @param url
+     * @param id
+     */
+    private VisionMonitoring(final String url, final UUID id) {
+        this.url = url;
+        this.id = id;
+    }
 
 
-	/**
-	 * initialize the single instance.
-	 * 
-	 * @param url
-	 *            the cluster monitoring URL.
-	 * @param id
-	 *            the hot component's ID.
-	 * @return the instance created.
-	 * @throws JMSException
-	 */
-	public static VisionMonitoring initialize(String url, UUID id) throws JMSException
-	{
-		return instance = new VisionMonitoring( url, id );
-	}
+    /**
+     * log an action
+     * 
+     * @param source
+     *            action source
+     * @param target
+     *            action target. It may be <code>null</code>.
+     * @param user
+     *            user performing the action, if any, otherwise <code>null</code>.
+     * @param tenant
+     *            tenant performing the action, if any, otherwise <code>null</code>.
+     * @param xdasType
+     *            type of action. Use the {@link XDasEventType}.*.{@link XDasEventType#getEventCode()} to fill this.
+     * @param xdasStatus
+     *            status of action. Use the {@link XdasOutcomes}.*.{@link XdasOutcomes#getOutcomeCode()} to fill this.
+     * @param parameters
+     *            parameters of action (action specific data). This can be filled in with any values necessary to describe the
+     *            action at the detail level required.
+     * @param resources
+     *            the list with all resources that are consumed by the logged action. The default resource implementation is
+     *            {@link ResourceImpl}.
+     * @throws Exception
+     */
+    public void log(final URL source, final URL target, final String user, final String tenant, final int xdasType,
+            final int xdasStatus, final Map<String, String> parameters, final List<Resource> resources) throws Exception {
+        final StringBuilder buf = new StringBuilder();
+        for( final Map.Entry<String, String> prm : parameters.entrySet() ) {
+            if( buf.length() > 0 )
+                buf.append( ',' );
+            buf.append( prm.getKey() );
+            buf.append( '=' );
+            buf.append( prm.getValue() );
+        }
+        final String paramsBuf = buf.toString();
+
+        // pushXdas( source, target, user, tenant, xdasType, xdasStatus, paramsBuf );
+        pushEvent( source, target, user, tenant, resources, paramsBuf );
+    }
 
 
-	/**
-	 * get the single monitoring instance.
-	 * 
-	 * @return the instance.
-	 */
-	public static VisionMonitoring instance()
-	{
-		return instance;
-	}
+    /**
+     * push an event to the monitoring system.
+     * 
+     * @param event
+     *            the event to push.
+     */
+    private void push(final Event event) {
+        try {
+            final Form form = new Form();
+            form.add( "event", event.toJSON().toString() );
+
+            client.resource( url ).post( form );
+        } catch( final JSONException x ) {
+            x.printStackTrace();
+        }
+    }
 
 
-	/**
-	 * log an action
-	 * 
-	 * @param source
-	 *            action source
-	 * @param target
-	 *            action target. It may be <code>null</code>.
-	 * @param user
-	 *            user performing the action, if any, otherwise <code>null</code>.
-	 * @param tenant
-	 *            tenant performing the action, if any, otherwise <code>null</code>.
-	 * @param xdasType
-	 *            type of action. Use the {@link XDasEventType}.*.{@link XDasEventType#getEventCode()} to fill this.
-	 * @param xdasStatus
-	 *            status of action. Use the {@link XdasOutcomes}.*.{@link XdasOutcomes#getOutcomeCode()} to fill this.
-	 * @param parameters
-	 *            parameters of action (action specific data). This can be filled in with any values necessary to describe the
-	 *            action at the detail level required.
-	 * @param resources
-	 *            the list with all resources that are consumed by the logged action. The default resource implementation is
-	 *            {@link ResourceImpl}.
-	 * @throws Exception
-	 */
-	public void log(URL source, URL target, String user, String tenant, int xdasType, int xdasStatus,
-			Map<String, String> parameters, List<Resource> resources) throws Exception
-	{
-		StringBuilder buf = new StringBuilder();
-		for( Map.Entry<String, String> prm : parameters.entrySet() )
-		{
-			if( buf.length() > 0 ) buf.append( ',' );
-			buf.append( prm.getKey() );
-			buf.append( '=' );
-			buf.append( prm.getValue() );
-		}
-		String paramsBuf = buf.toString();
+    /**
+     * generate and push the event that is emitted by the given data.
+     * 
+     * @param source
+     *            action source
+     * @param target
+     *            action target. It may be <code>null</code>.
+     * @param user
+     *            user performing the action
+     * @param tenant
+     *            tenant performing the action
+     * @param resources
+     *            the list with all resources that are consumed by the logged action.
+     * @param paramsBuf
+     *            a CSV string with the action parameters.
+     * @throws UnknownHostException
+     */
+    private void pushEvent(final URL source, final URL target, final String user, final String tenant,
+            final List<Resource> resources, final String paramsBuf) throws UnknownHostException {
+        final long now = new Date().getTime();
+        final Location src = new LocationImpl( source.getHost(), source.getPath(), user, tenant, InetAddress
+                .getByName( source.getHost() ).getHostAddress() );
+        Location trg = null;
+        if( target != null ) //
+            trg = new LocationImpl( target.getHost(), target.getPath(), user, tenant, InetAddress.getByName( target.getHost() )
+                    .getHostAddress() );
 
-		// pushXdas( source, target, user, tenant, xdasType, xdasStatus, paramsBuf );
-		pushEvent( source, target, user, tenant, resources, paramsBuf );
-	}
+        final String description = String.format( "%s#%s/%s[%s]@%s", source, user, tenant, paramsBuf.toString(), target );
+
+        final Event event = new EventImpl( null, id, description, EventType.Action, resources, now, now, src, trg, null );
+
+        push( event );
+    }
 
 
-	/**
-	 * generate and push the event that is emitted by the given data.
-	 * 
-	 * @param source
-	 *            action source
-	 * @param target
-	 *            action target. It may be <code>null</code>.
-	 * @param user
-	 *            user performing the action
-	 * @param tenant
-	 *            tenant performing the action
-	 * @param resources
-	 *            the list with all resources that are consumed by the logged action.
-	 * @param paramsBuf
-	 *            a CSV string with the action parameters.
-	 * @throws UnknownHostException
-	 */
-	private void pushEvent(URL source, URL target, String user, String tenant, List<Resource> resources, String paramsBuf)
-			throws UnknownHostException
-	{
-		long now = new Date().getTime();
-		Location src = new LocationImpl( source.getHost(), source.getPath(), user, tenant, InetAddress
-				.getByName( source.getHost() ).getHostAddress() );
-		Location trg = null;
-		if( target != null ) //
-			trg = new LocationImpl( target.getHost(), target.getPath(), user, tenant, InetAddress.getByName( target.getHost() )
-					.getHostAddress() );
-
-		String description = String.format( "%s#%s/%s[%s]@%s", source, user, tenant, paramsBuf.toString(), target );
-
-		Event event = new EventImpl( null, id, description, EventType.Action, resources, now, now, src, trg, null );
-
-		push( event );
-	}
+    /**
+     * initialize the single instance.
+     * 
+     * @param url
+     *            the cluster monitoring URL.
+     * @param id
+     *            the hot component's ID.
+     * @return the instance created.
+     * @throws JMSException
+     */
+    public static VisionMonitoring initialize(final String url, final UUID id) throws JMSException {
+        return instance = new VisionMonitoring( url, id );
+    }
 
 
-	/**
-	 * push an event to the monitoring system.
-	 * 
-	 * @param event
-	 *            the event to push.
-	 */
-	private void push(Event event)
-	{
-		try
-		{
-			Form form = new Form();
-			form.add( "event", event.toJSON().toString() );
-
-			client.resource( url ).post( form );
-		}
-		catch( JSONException x )
-		{
-			x.printStackTrace();
-		}
-	}
+    /**
+     * get the single monitoring instance.
+     * 
+     * @return the instance.
+     */
+    public static VisionMonitoring instance() {
+        return instance;
+    }
 }
