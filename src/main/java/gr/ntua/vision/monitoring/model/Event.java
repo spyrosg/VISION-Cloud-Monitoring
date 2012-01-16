@@ -30,7 +30,7 @@ public interface Event extends JSONExchanged {
 
 
     /**
-     * ending time of the event. The time is in UNIX format (milliseconds since midnight, 1/1/1971).
+     * ending time of the event. The time is in UNIX format (milliseconds since midnight, 1/1/1970).
      * 
      * @return the end time.
      */
