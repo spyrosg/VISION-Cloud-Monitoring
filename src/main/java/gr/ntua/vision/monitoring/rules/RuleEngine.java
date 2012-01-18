@@ -196,7 +196,7 @@ public class RuleEngine implements ActionHandler, Runnable {
     public void register(final RuleSpec rule) {
         log.debug( "registering rule: " + rule.id );
         rules.put( rule.id, new EventMatcher( rule, rule.normalizeChecks() ) );
-        synchronized( rules ) {
+        synchronized( rulesLock ) {
             matchers = rules.values().toArray( new EventMatcher[rules.size()] );
         }
     }
