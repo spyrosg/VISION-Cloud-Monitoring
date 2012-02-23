@@ -7,8 +7,6 @@ import gr.ntua.vision.monitoring.model.Resource;
 import gr.ntua.vision.monitoring.model.impl.EventImpl;
 import gr.ntua.vision.monitoring.model.impl.LocationImpl;
 import gr.ntua.vision.monitoring.model.impl.ResourceImpl;
-import it.eng.compliance.xdas.parser.XDasEventType;
-import it.eng.compliance.xdas.parser.XdasOutcomes;
 
 import java.net.InetAddress;
 import java.net.URL;

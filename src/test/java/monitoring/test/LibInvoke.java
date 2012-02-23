@@ -3,8 +3,6 @@ package monitoring.test;
 import gr.ntua.vision.monitoring.VisionMonitoring;
 import gr.ntua.vision.monitoring.model.Resource;
 import gr.ntua.vision.monitoring.model.impl.ResourceImpl;
-import it.eng.compliance.xdas.parser.XDasEventType;
-import it.eng.compliance.xdas.parser.XdasOutcomes;
 
 import java.net.URL;
 import java.util.List;
@@ -66,10 +64,6 @@ public class LibInvoke {
                 final String[] parts = action[i].split( "=" );
                 params.put( parts[0], parts[1] );
             }
-
-            VisionMonitoring.instance().log( src, trg, "foo", "bar",
-                                             XDasEventType.XDAS_AE_MODIFY_DATA_ITEM_ASSOC_CONTEXT.getEventCode(),
-                                             XdasOutcomes.XDAS_OUT_SUCCESS.getOutcomeCode(), params, resources );
 
             System.out.println( "action saved." );
         }
