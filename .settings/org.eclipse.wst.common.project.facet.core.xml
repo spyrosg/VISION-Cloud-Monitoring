@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <faceted-project>
-  <runtime name="openjdk7"/>
+  <runtime name="JVM 1.6.0"/>
   <fixed facet="java"/>
   <installed facet="java" version="1.6"/>
 </faceted-project>
