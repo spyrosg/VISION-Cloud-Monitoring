@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring;
 
-import java.net.SocketException;
+import java.io.IOException;
 import java.net.SocketTimeoutException;
 
 
@@ -14,9 +14,9 @@ public class Main {
 
     /**
      * @param args
-     * @throws SocketException
+     * @throws IOException
      */
-    public static void main(final String... args) throws SocketException {
+    public static void main(final String... args) throws IOException {
         if( args.length == 0 ) {
             showHelp();
             System.exit( 1 );

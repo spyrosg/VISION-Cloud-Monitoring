@@ -10,7 +10,6 @@ import java.net.SocketTimeoutException;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -49,7 +48,7 @@ public class InstanceManagerTest {
         try {
             man2.start();
         } catch( final Throwable x ) {
-            assertTrue( x.getCause() instanceof BindException );
+            assertTrue( x instanceof BindException || x.getCause() instanceof BindException );
         } finally {
             man2.stop();
         }
@@ -75,12 +74,10 @@ public class InstanceManagerTest {
 
 
     /**
-     * @throws SocketTimeoutException
-     * @throws SocketException
+     * @throws IOException
      */
-    @Ignore("todo")
     @Test
-    public void whenStartedStatusShouldReturnStartedVMPID() throws SocketTimeoutException, SocketException {
+    public void whenStartedStatusShouldReturnStartedVMPID() throws IOException {
         man.start();
         assertTrue( man.status() > 1 );
     }

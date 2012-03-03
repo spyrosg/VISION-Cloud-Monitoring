@@ -52,12 +52,9 @@ public class InstanceManager {
                     final byte[] reqBuffer = new byte[64];
                     final DatagramPacket req = new DatagramPacket( reqBuffer, reqBuffer.length );
 
-                    System.err.println( "server: receiving" );
                     sock.receive( req );
 
-                    final String dgram = new String( reqBuffer, 0, reqBuffer.length );
-
-                    System.err.println( "server: received: " + dgram );
+                    final String dgram = new String( req.getData(), 0, req.getLength() );
 
                     if( !dgram.equals( REQ_WORD ) )
                         continue;
@@ -65,7 +62,6 @@ public class InstanceManager {
                     final byte[] resBuffer = String.valueOf( getPID() ).getBytes();
                     final DatagramPacket res = new DatagramPacket( resBuffer, resBuffer.length, req.getAddress(), req.getPort() );
 
-                    System.err.println( "server: sending: " + getPID() );
                     sock.send( res );
                 } catch( final IOException e ) {
                     if( !isInterrupted() )
@@ -106,10 +102,9 @@ public class InstanceManager {
 
     /**
      * @return
-     * @throws SocketTimeoutException
-     * @throws SocketException
+     * @throws IOException
      */
-    public int status() throws SocketTimeoutException, SocketException {
+    public int status() throws IOException {
         return getRunningInstancePID();
     }
 
@@ -128,7 +123,7 @@ public class InstanceManager {
     /**
      * @return this vm's pid.
      */
-    public static int getPID() {
+    static int getPID() {
         // NOTE: expecting something like '<pid>@<hostname>'
         final String vmname = ManagementFactory.getRuntimeMXBean().getName();
         final int atIndex = vmname.indexOf( "@" );
@@ -142,38 +137,29 @@ public class InstanceManager {
 
     /**
      * @return
-     * @throws SocketTimeoutException
-     * @throws SocketException
+     * @throws IOException
      */
-    private static int getRunningInstancePID() throws SocketTimeoutException, SocketException {
-        for( int i = 0; i < 3; ++i ) {
-            final DatagramSocket sock = new DatagramSocket();
+    private static int getRunningInstancePID() throws IOException {
+        final DatagramSocket sock = new DatagramSocket();
 
-            try {
-                sock.setSoTimeout( RESPONSE_TIMEOUT );
-                final byte[] reqBuffer = REQ_WORD.getBytes();
-                final DatagramPacket req = new DatagramPacket( reqBuffer, reqBuffer.length, InetAddress.getLocalHost(),
-                        PID_SERVER_PORT );
+        try {
+            final byte[] reqBuffer = REQ_WORD.getBytes();
+            final DatagramPacket req = new DatagramPacket( reqBuffer, reqBuffer.length, InetAddress.getLocalHost(),
+                    PID_SERVER_PORT );
 
-                sock.send( req );
+            sock.setSoTimeout( RESPONSE_TIMEOUT );
+            sock.send( req );
 
-                final byte[] resBuffer = new byte[64];
-                final DatagramPacket res = new DatagramPacket( resBuffer, reqBuffer.length );
+            final byte[] resBuffer = new byte[64];
+            final DatagramPacket res = new DatagramPacket( resBuffer, resBuffer.length );
 
-                sock.receive( res );
+            sock.receive( res );
 
-                final String response = new String( resBuffer, 0, resBuffer.length );
-
-                return Integer.valueOf( response );
-            } catch( final SocketTimeoutException e ) {
-                throw e;
-            } catch( final IOException e ) {
-                throw new RuntimeException( e );
-            } finally {
-                sock.close();
-            }
+            return Integer.parseInt( new String( res.getData(), 0, res.getLength() ) );
+        } catch( final SocketTimeoutException e ) {
+            throw e;
+        } finally {
+            sock.close();
         }
-
-        throw new SocketTimeoutException();
     }
 }
