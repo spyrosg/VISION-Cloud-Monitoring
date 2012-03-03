@@ -32,7 +32,7 @@ public class Main {
             try {
                 final int pid = man.status();
 
-                System.out.println( "PROG: running with pid " + pid );
+                System.out.println( PROG + ": running with pid " + pid );
             } catch( final SocketTimeoutException e ) {
                 System.out.println( PROG + ": stopped" );
             }
