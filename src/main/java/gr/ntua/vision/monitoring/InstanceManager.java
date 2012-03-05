@@ -47,7 +47,7 @@ public class InstanceManager {
                 throw new RuntimeException( e );
             }
 
-            while( !Thread.currentThread().isInterrupted() )
+            while( !isInterrupted() )
                 try {
                     final byte[] reqBuffer = new byte[64];
                     final DatagramPacket req = new DatagramPacket( reqBuffer, reqBuffer.length );
@@ -56,7 +56,7 @@ public class InstanceManager {
 
                     final String dgram = new String( req.getData(), 0, req.getLength() );
 
-                    if( !dgram.equals( REQ_WORD ) )
+                    if( !dgram.equals( PID_CMD ) )
                         continue;
 
                     final byte[] resBuffer = String.valueOf( getPID() ).getBytes();
@@ -65,7 +65,7 @@ public class InstanceManager {
                     sock.send( res );
                 } catch( final IOException e ) {
                     if( !isInterrupted() )
-                        e.printStackTrace();
+                        throw new RuntimeException( e );
                 }
 
             sock.close();
@@ -75,7 +75,9 @@ public class InstanceManager {
     /***/
     private static final int    PID_SERVER_PORT  = 56431;
     /***/
-    private static final String REQ_WORD         = "pid?";
+    private static final String PID_CMD          = "pid?";
+    /***/
+    private static final String KILL_CMD         = "kill!";
     /***/
     private static final int    RESPONSE_TIMEOUT = 1000;
     /***/
@@ -84,10 +86,8 @@ public class InstanceManager {
 
     /**
      * Constructor.
-     * 
-     * @throws SocketException
      */
-    public InstanceManager() throws SocketException {
+    public InstanceManager() {
         this.server = new PIDServer( PID_SERVER_PORT );
     }
 
@@ -111,12 +111,9 @@ public class InstanceManager {
 
     /**
      * Stop the manager.
-     * 
-     * @return
      */
-    public boolean stop() {
+    public void stop() {
         server.interrupt();
-        return server.isAlive();
     }
 
 
@@ -143,7 +140,7 @@ public class InstanceManager {
         final DatagramSocket sock = new DatagramSocket();
 
         try {
-            final byte[] reqBuffer = REQ_WORD.getBytes();
+            final byte[] reqBuffer = PID_CMD.getBytes();
             final DatagramPacket req = new DatagramPacket( reqBuffer, reqBuffer.length, InetAddress.getLocalHost(),
                     PID_SERVER_PORT );
 
