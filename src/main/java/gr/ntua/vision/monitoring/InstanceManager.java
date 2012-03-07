@@ -17,8 +17,8 @@ public class InstanceManager {
      *
      */
     private static class PIDServer extends Thread {
-        /** the port to bind to */
-        private final int port;
+        /***/
+        private final DatagramSocket sock;
 
 
         /**
@@ -26,10 +26,13 @@ public class InstanceManager {
          * 
          * @param port
          *            the port to bind to
+         * @throws SocketException
          */
-        PIDServer(final int port) {
+        PIDServer(final int port) throws SocketException {
             super( "udp-pid-server" );
-            this.port = port;
+            this.sock = new DatagramSocket( port );
+            this.sock.setReuseAddress( true );
+
         }
 
 
@@ -38,15 +41,6 @@ public class InstanceManager {
          */
         @Override
         public void run() {
-            final DatagramSocket sock;
-
-            try {
-                sock = new DatagramSocket( port );
-                sock.setReuseAddress( true );
-            } catch( final SocketException e ) {
-                throw new RuntimeException( e );
-            }
-
             while( !isInterrupted() )
                 try {
                     final byte[] reqBuffer = new byte[64];
@@ -70,6 +64,14 @@ public class InstanceManager {
 
             sock.close();
         }
+
+
+        /**
+         * 
+         */
+        public void closeSocket() {
+            sock.close();
+        }
     }
 
     /***/
@@ -86,8 +88,10 @@ public class InstanceManager {
 
     /**
      * Constructor.
+     * 
+     * @throws SocketException
      */
-    public InstanceManager() {
+    public InstanceManager() throws SocketException {
         this.server = new PIDServer( PID_SERVER_PORT );
     }
 
@@ -114,6 +118,7 @@ public class InstanceManager {
      */
     public void stop() {
         server.interrupt();
+        server.closeSocket();
     }
 
 

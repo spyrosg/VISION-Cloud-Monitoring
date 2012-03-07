@@ -39,19 +39,11 @@ public class InstanceManagerTest {
     /**
      * @throws SocketException
      */
+    @SuppressWarnings("unused")
     @Test
     public void cannotStartTwoInstances() throws SocketException {
-        final InstanceManager man2 = new InstanceManager();
-
-        man.start();
-
-        try {
-            man2.start();
-        } catch( final Throwable x ) {
-            assertTrue( x instanceof BindException || x.getCause() instanceof BindException );
-        } finally {
-            man2.stop();
-        }
+        exception.expect( BindException.class );
+        new InstanceManager();
     }
 
 
