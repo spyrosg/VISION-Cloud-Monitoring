@@ -1,167 +1,62 @@
 package gr.ntua.vision.monitoring;
 
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
+import gr.ntua.vision.monitoring.lifecycle.Supervisor;
+
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
 
 
 /**
  *
  */
-public class InstanceManager {
-    /**
-     *
-     */
-    private static class PIDServer extends Thread {
-        /***/
-        private final DatagramSocket sock;
-
-
-        /**
-         * Constructor.
-         * 
-         * @param port
-         *            the port to bind to
-         * @throws SocketException
-         */
-        PIDServer(final int port) throws SocketException {
-            super( "udp-pid-server" );
-            this.sock = new DatagramSocket( port );
-            this.sock.setReuseAddress( true );
-
-        }
-
-
-        /**
-         * @see java.lang.Thread#run()
-         */
-        @Override
-        public void run() {
-            while( !isInterrupted() )
-                try {
-                    final byte[] reqBuffer = new byte[64];
-                    final DatagramPacket req = new DatagramPacket( reqBuffer, reqBuffer.length );
-
-                    sock.receive( req );
-
-                    final String dgram = new String( req.getData(), 0, req.getLength() );
-
-                    if( !dgram.equals( PID_CMD ) )
-                        continue;
-
-                    final byte[] resBuffer = String.valueOf( getPID() ).getBytes();
-                    final DatagramPacket res = new DatagramPacket( resBuffer, resBuffer.length, req.getAddress(), req.getPort() );
-
-                    sock.send( res );
-                } catch( final IOException e ) {
-                    if( !isInterrupted() )
-                        throw new RuntimeException( e );
-                }
-
-            sock.close();
-        }
-
-
-        /**
-         * 
-         */
-        public void closeSocket() {
-            sock.close();
-        }
-    }
-
+public class InstanceManager implements Supervisor {
+    /** the configuration object. */
+    private final Config            cnf;
     /***/
-    private static final int    PID_SERVER_PORT  = 56431;
+    private final CommandServer     commandServer;
     /***/
-    private static final String PID_CMD          = "pid?";
-    /***/
-    private static final String KILL_CMD         = "kill!";
-    /***/
-    private static final int    RESPONSE_TIMEOUT = 1000;
-    /***/
-    private final PIDServer     server;
+    private final MonitoringService mon;
 
 
     /**
      * Constructor.
      * 
+     * @param cnf
+     *            the configuration object.
+     * @param mon
      * @throws SocketException
      */
-    public InstanceManager() throws SocketException {
-        this.server = new PIDServer( PID_SERVER_PORT );
+    public InstanceManager(final Config cnf, final MonitoringService mon) throws SocketException {
+        this.cnf = cnf;
+        this.mon = mon;
+        this.commandServer = new CommandServer( cnf, this );
     }
 
 
     /**
      * Start the manager.
      */
+    @Override
     public void start() {
-        server.start();
+        mon.start();
+        startCommandServer();
     }
 
 
     /**
-     * @return
-     * @throws IOException
+     * 
      */
-    public int status() throws IOException {
-        return getRunningInstancePID();
+    void stop() {
+        mon.stop();
+        commandServer.closeConnection();
     }
 
 
     /**
-     * Stop the manager.
+     * 
      */
-    public void stop() {
-        server.interrupt();
-        server.closeSocket();
-    }
-
-
-    /**
-     * @return this vm's pid.
-     */
-    static int getPID() {
-        // NOTE: expecting something like '<pid>@<hostname>'
-        final String vmname = ManagementFactory.getRuntimeMXBean().getName();
-        final int atIndex = vmname.indexOf( "@" );
-
-        if( atIndex < 0 )
-            throw new Error( "Cannot get pid: pid N/A for this jvm." );
-
-        return Integer.valueOf( vmname.substring( 0, atIndex ) );
-    }
-
-
-    /**
-     * @return
-     * @throws IOException
-     */
-    private static int getRunningInstancePID() throws IOException {
-        final DatagramSocket sock = new DatagramSocket();
-
-        try {
-            final byte[] reqBuffer = PID_CMD.getBytes();
-            final DatagramPacket req = new DatagramPacket( reqBuffer, reqBuffer.length, InetAddress.getLocalHost(),
-                    PID_SERVER_PORT );
-
-            sock.setSoTimeout( RESPONSE_TIMEOUT );
-            sock.send( req );
-
-            final byte[] resBuffer = new byte[64];
-            final DatagramPacket res = new DatagramPacket( resBuffer, resBuffer.length );
-
-            sock.receive( res );
-
-            return Integer.parseInt( new String( res.getData(), 0, res.getLength() ) );
-        } catch( final SocketTimeoutException e ) {
-            throw e;
-        } finally {
-            sock.close();
-        }
+    private void startCommandServer() {
+        final Thread t = new Thread( commandServer, "udp-command-server" );
+        t.setDaemon( true );
+        t.start();
     }
 }

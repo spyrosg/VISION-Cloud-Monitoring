@@ -18,12 +18,12 @@ import org.junit.rules.ExpectedException;
  */
 public class CommandClientTest {
     /***/
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
+    /***/
     private CommandClient          client;
     /***/
     private final Config           cnf       = new Config();
-    /***/
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
 
 
     /**

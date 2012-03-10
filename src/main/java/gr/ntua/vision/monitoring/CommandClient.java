@@ -68,7 +68,7 @@ public class CommandClient {
      * 
      * @param sock
      *            the socket.
-     * @return a {@link DatagramPacket}.
+     * @return the datagram received.
      * @throws IOException
      */
     private static DatagramPacket receive(final DatagramSocket sock) throws IOException {
