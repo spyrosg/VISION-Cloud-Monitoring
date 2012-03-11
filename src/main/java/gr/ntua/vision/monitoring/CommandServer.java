@@ -12,11 +12,9 @@ import java.net.SocketException;
  */
 public class CommandServer implements Runnable {
     /** the configuration object. */
-    private final Config          cnf;
+    private final Config         cnf;
     /***/
-    private final InstanceManager man;
-    /***/
-    private final DatagramSocket  sock;
+    private final DatagramSocket sock;
 
 
     /**
@@ -24,12 +22,10 @@ public class CommandServer implements Runnable {
      * 
      * @param cnf
      *            the configuration object.
-     * @param man
      * @throws SocketException
      */
-    public CommandServer(final Config cnf, final InstanceManager man) throws SocketException {
+    public CommandServer(final Config cnf) throws SocketException {
         this.cnf = cnf;
-        this.man = man;
         this.sock = new DatagramSocket( cnf.getPort() );
         this.sock.setReuseAddress( true );
     }
@@ -58,7 +54,6 @@ public class CommandServer implements Runnable {
                     continue;
                 }
                 if( cmd.equals( cnf.getKillCommand() ) ) {
-                    man.stop();
                     send( "ok", req.getAddress(), req.getPort() );
                     break;
                 }

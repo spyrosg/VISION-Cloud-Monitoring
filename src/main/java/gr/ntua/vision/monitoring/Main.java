@@ -1,7 +1,6 @@
 package gr.ntua.vision.monitoring;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 
@@ -9,8 +8,101 @@ import java.net.SocketTimeoutException;
  * The entry point to the monitoring instance.
  */
 public class Main {
-    /** the configuration object. */
-    private static final Config cnf  = new Config();
+    /**
+     * List of available commands understood by the server. They match standard UNIX init.d commands.
+     */
+    private enum Commands {
+        /***/
+        HELP("help") {
+            @Override
+            void run(final Config cnf) throws IOException {
+                System.err.println( "help message" ); // FIXME
+            }
+        },
+        /***/
+        START("start") {
+            @Override
+            void run(final Config cnf) throws IOException {
+                // new InstanceManager( cnf, null ).start(); // FIXME
+                System.out.println( "running" );
+                while( true )
+                    try {
+                        Thread.sleep( 10000 );
+                    } catch( final InterruptedException e ) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+            }
+        },
+        /***/
+        STATUS("status") {
+            @Override
+            void run(final Config cnf) throws IOException {
+                final CommandClient client = new CommandClient( cnf );
+
+                try {
+                    System.out.println( PROG + ": running, pid: " + client.status() );
+                } catch( final SocketTimeoutException e ) {
+                    System.out.println( PROG + ": stopped" );
+                }
+            }
+        },
+        /***/
+        STOP("stop") {
+            @Override
+            void run(final Config cnf) throws IOException {
+                final CommandClient client = new CommandClient( cnf );
+
+                try {
+                    client.stop();
+                    System.out.println( PROG + ": stopping" );
+                } catch( final SocketTimeoutException e ) {
+                    System.out.println( PROG + ": is already stopped" );
+                }
+            }
+        };
+
+        /** the command name. */
+        public final String c;
+
+
+        /**
+         * Constructor.
+         * 
+         * @param c
+         *            the command name.
+         */
+        private Commands(final String c) {
+            this.c = c;
+        }
+
+
+        /**
+         * Execute the command.
+         * 
+         * @param cnf
+         *            the configuration object.
+         * @throws IOException
+         */
+        abstract void run(final Config cnf) throws IOException;
+
+
+        /**
+         * Check that given string is indeed a valid server command.
+         * 
+         * @param str
+         *            the user specified command.
+         * @return <code>true</code> iff the string is a valid server command, <code>false</code> otherwise.
+         */
+        public static boolean isValidCommand(final String str) {
+            for( final Commands cmd : Commands.values() )
+                if( cmd.c.equals( str ) )
+                    return true;
+
+            return false;
+        }
+    }
+
     /** the program name. */
     private static final String PROG = "vismo";
 
@@ -20,57 +112,15 @@ public class Main {
      * @throws IOException
      */
     public static void main(final String... args) throws IOException {
-        if( args.length == 0 ) {
-            showHelp();
+        final Config cnf = new Config();
+
+        if( args.length == 0 || !Commands.isValidCommand( args[0] ) ) {
+            Commands.HELP.run( cnf );
             return;
         }
 
-        final String cmd = args[0];
+        final Commands cmd = Commands.valueOf( args[0].toUpperCase() );
 
-        if( cmd.equals( "start" ) )
-            start();
-        else if( cmd.equals( "status" ) || cmd.equals( "stop" ) )
-            stopOrStatus( cmd );
-        else
-            showHelp();
-    }
-
-
-    /**
-     * 
-     */
-    private static void showHelp() {
-        // TODO Auto-generated method stub
-    }
-
-
-    /**
-     * @throws SocketException
-     */
-    private static void start() throws SocketException {
-        new InstanceManager( cnf, null ).start(); // FIXME
-    }
-
-
-    /**
-     * @param cmd
-     * @throws IOException
-     */
-    private static void stopOrStatus(final String cmd) throws IOException {
-        final CommandClient client = new CommandClient( cnf );
-
-        if( cmd.equals( "status" ) )
-            try {
-                System.out.println( PROG + ": running, pid: " + client.status() );
-            } catch( final SocketTimeoutException e ) {
-                System.out.println( PROG + ": stopped" );
-            }
-        else
-            try {
-                client.stop();
-                System.out.println( PROG + ": stopping" );
-            } catch( final SocketTimeoutException e ) {
-                System.out.println( PROG + ": is already stopped" );
-            }
+        cmd.run( cnf );
     }
 }
