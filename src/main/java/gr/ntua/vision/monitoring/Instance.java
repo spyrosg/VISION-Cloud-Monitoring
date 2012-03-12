@@ -9,8 +9,6 @@ import java.net.SocketException;
  *
  */
 public class Instance implements Supervisor {
-    /** the configuration object. */
-    private final Config        cnf;
     /***/
     private final CommandServer commandServer;
     /***/
@@ -26,7 +24,6 @@ public class Instance implements Supervisor {
      * @throws SocketException
      */
     public Instance(final Config cnf, final Object fixme) throws SocketException {
-        this.cnf = cnf;
         this.commandServer = new CommandServer( cnf, this );
         this.t = new Thread( this.commandServer, "command-server" );
         this.t.setDaemon( true );
@@ -34,7 +31,7 @@ public class Instance implements Supervisor {
 
 
     /**
-     * 
+     * @see gr.ntua.vision.monitoring.lifecycle.Supervisor#start()
      */
     @Override
     public void start() {
@@ -43,7 +40,7 @@ public class Instance implements Supervisor {
 
 
     /**
-     * 
+     * @see gr.ntua.vision.monitoring.lifecycle.Supervisor#stop()
      */
     @Override
     public void stop() {

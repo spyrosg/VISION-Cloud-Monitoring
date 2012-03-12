@@ -20,7 +20,7 @@ public class Config {
 
 
     /**
-     * @return
+     * @return the kill command string.
      */
     public String getKillCommand() {
         return KILL_COMMAND;
@@ -28,7 +28,7 @@ public class Config {
 
 
     /**
-     * @return
+     * @return the pid of the vm.
      */
     public int getPID() {
         return pid;
@@ -36,7 +36,7 @@ public class Config {
 
 
     /**
-     * @return
+     * @return the command server port.
      */
     public int getPort() {
         return COMMAND_SERVER_PORT;
@@ -44,7 +44,7 @@ public class Config {
 
 
     /**
-     * @return
+     * @return the status command string.
      */
     public String getStatusCommand() {
         return STATUS_COMMAND;
@@ -52,7 +52,7 @@ public class Config {
 
 
     /**
-     * @return
+     * @return the command server timeout.
      */
     public int getTimeout() {
         return RESPONSE_TIMEOUT;

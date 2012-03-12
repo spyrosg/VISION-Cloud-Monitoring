@@ -17,7 +17,7 @@ public class CommandServer implements Runnable {
     private final Config         cnf;
     /** the socket. */
     private final DatagramSocket sock;
-    /***/
+    /** the application supervisor. */
     private final Supervisor     supervisor;
 
 
@@ -27,6 +27,7 @@ public class CommandServer implements Runnable {
      * @param cnf
      *            the configuration object.
      * @param supervisor
+     *            the application supervisor.
      * @throws SocketException
      */
     public CommandServer(final Config cnf, final Supervisor supervisor) throws SocketException {
@@ -38,7 +39,8 @@ public class CommandServer implements Runnable {
 
 
     /**
-     * This is used to interrupt/stop the execution of the thread running the server. FIXME: add expected usage, call order.
+     * This is used to interrupt/stop the execution of the thread running the server. Before calling this, you should call
+     * {@link Thread#interrupt()} on the thread that runs the server, so that the server knows it's time to shutdown.
      */
     public void closeConnection() {
         sock.close();

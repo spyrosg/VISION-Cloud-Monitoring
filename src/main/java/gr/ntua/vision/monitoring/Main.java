@@ -15,7 +15,7 @@ public class Main {
         /***/
         HELP("help") {
             @Override
-            void run(final Config cnf) throws IOException {
+            void run(final Config ignored) throws IOException {
                 System.err.println( "help message" ); // TODO
             }
         },
@@ -23,14 +23,7 @@ public class Main {
         START("start") {
             @Override
             void run(final Config cnf) throws IOException {
-                // new InstanceManager( cnf, null ).start(); // FIXME
-                System.out.println( "running" );
-                while( true )
-                    try {
-                        Thread.sleep( 10000 );
-                    } catch( final InterruptedException e ) {
-                        e.printStackTrace();
-                    }
+                new Instance( cnf, null ).start();
             }
         },
         /***/
@@ -62,7 +55,7 @@ public class Main {
         };
 
         /** the command name. */
-        public final String name;
+        private final String name;
 
 
         /**
