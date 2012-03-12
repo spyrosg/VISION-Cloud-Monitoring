@@ -16,7 +16,7 @@ public class Main {
         HELP("help") {
             @Override
             void run(final Config cnf) throws IOException {
-                System.err.println( "help message" ); // FIXME
+                System.err.println( "help message" ); // TODO
             }
         },
         /***/
@@ -29,7 +29,6 @@ public class Main {
                     try {
                         Thread.sleep( 10000 );
                     } catch( final InterruptedException e ) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
             }
@@ -63,17 +62,17 @@ public class Main {
         };
 
         /** the command name. */
-        public final String c;
+        public final String name;
 
 
         /**
          * Constructor.
          * 
-         * @param c
+         * @param name
          *            the command name.
          */
-        private Commands(final String c) {
-            this.c = c;
+        private Commands(final String name) {
+            this.name = name;
         }
 
 
@@ -96,7 +95,7 @@ public class Main {
          */
         public static boolean isValidCommand(final String str) {
             for( final Commands cmd : Commands.values() )
-                if( cmd.c.equals( str ) )
+                if( cmd.name.equals( str ) )
                     return true;
 
             return false;
@@ -112,13 +111,12 @@ public class Main {
      * @throws IOException
      */
     public static void main(final String... args) throws IOException {
-        final Config cnf = new Config();
-
         if( args.length == 0 || !Commands.isValidCommand( args[0] ) ) {
-            Commands.HELP.run( cnf );
+            Commands.HELP.run( null );
             return;
         }
 
+        final Config cnf = new Config();
         final Commands cmd = Commands.valueOf( args[0].toUpperCase() );
 
         cmd.run( cnf );
