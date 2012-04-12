@@ -54,6 +54,70 @@
         </executions>
       </plugin>
 
+      <!-- this is the plugin that generates the rpm -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>rpm-maven-plugin</artifactId>
+        <version>2.1-alpha-1</version>
+
+        <executions>
+          <execution>
+            <goals>
+              <goal>rpm</goal>
+            </goals>
+          </execution>
+        </executions>
+
+        <configuration>
+          <copyright>NOT-SPECIFIED</copyright>
+          <group>Application/System</group>
+          <summary>vismo, the monitoring component of the VISION Cloud stack</summary>
+          <description>vismo, the monitoring component of the VISION Cloud stack</description>
+          <packager>vassilis</packager>
+          <release>1.0</release>
+
+          <requires>
+            <require>java &gt;= 1.6</require>
+          </requires>
+
+          <defineStatements>
+            <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
+          </defineStatements>
+
+          <mappings>
+
+            <mapping>
+              <directory>/srv/vismo</directory>
+              <username>root</username>
+              <groupname>root</groupname>
+              <filemode>0644</filemode>
+              <directoryIncluded>false</directoryIncluded>
+              <sources>
+                <source>
+                  <location>target/vismo-1.0.0-SNAPSHOT.jar</location>
+                  <destination>vismo.jar</destination>
+                </source>
+              </sources>
+            </mapping>
+
+            <mapping>
+              <directory>/etc/init.d</directory>
+              <username>root</username>
+              <groupname>root</groupname>
+              <filemode>0755</filemode>
+              <directoryIncluded>false</directoryIncluded>
+              <sources>
+                <source>
+                  <location>src/main/scripts/init.d</location>
+                  <destination>vision-vismo</destination>
+                </source>
+              </sources>
+            </mapping>
+
+          </mappings>
+        </configuration>
+
+      </plugin>
     </plugins>
   </build>
 

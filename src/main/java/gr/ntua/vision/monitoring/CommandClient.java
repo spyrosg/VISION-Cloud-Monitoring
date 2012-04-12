@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 
 
 /**
- * This is used to query any running monitoring instance.
+ * This is used to query and control any running monitoring instance on the current machine.
  */
 public class CommandClient {
     /** the configuration object. */
@@ -27,9 +28,11 @@ public class CommandClient {
 
     /**
      * @return the PID of the monitoring instance.
+     * @throws SocketTimeoutException
+     *             when no running instance was detected.
      * @throws IOException
      */
-    public int status() throws IOException {
+    public int status() throws SocketTimeoutException, IOException {
         final DatagramSocket sock = new DatagramSocket();
 
         try {
@@ -48,6 +51,8 @@ public class CommandClient {
     /**
      * Ask the running monitoring instance to stop.
      * 
+     * @throws SocketTimeoutException
+     *             when no running instance was detected.
      * @throws IOException
      */
     public void stop() throws IOException {

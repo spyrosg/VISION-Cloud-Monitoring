@@ -10,7 +10,7 @@ import java.net.SocketException;
 
 
 /**
- * 
+ * This is responsible for reporting the status of the monitoring instance and also shutting it down.
  */
 public class CommandServer implements Runnable {
     /** the configuration object. */
