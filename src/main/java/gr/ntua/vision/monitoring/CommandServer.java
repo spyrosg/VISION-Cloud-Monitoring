@@ -67,11 +67,16 @@ public class CommandServer implements Runnable {
                     break;
                 }
             } catch( final IOException e ) {
-                if( !Thread.currentThread().isInterrupted() )
+                if( !Thread.currentThread().isInterrupted() ) {
+                    if( !sock.isClosed() )
+                        sock.close();
+
                     throw new RuntimeException( e );
-            } finally {
-                sock.close();
+                }
             }
+
+        if( !sock.isClosed() )
+            sock.close();
     }
 
 
