@@ -63,12 +63,12 @@ vismo_probe() {
 
 
 case "$1" in
-	start) vismo_start ;;
-	stop) vismo_stop ;;
+	start) vismo_start && exit 0 || exit 1 ;;
+	stop) vismo_stop && exit 0 || exit 1 ;;
 	restart) vismo_restart ;;
 	status) vismo_status ;;
-	probe) echo "vismo: probe not supported at the moment"; exit 0 ;;
-	*) echo "Usage: vision-vismo {start|stop|status|restart[|probe]"; exit 1 ;;
+	probe) vismo_probe ;;
+	*) echo "Usage: vision-vismo {start|stop|status|restart[|probe]}"; exit 1 ;;
 esac
 
 # make sure we always end with a clean status
