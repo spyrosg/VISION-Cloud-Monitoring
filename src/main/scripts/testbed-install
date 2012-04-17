@@ -1,9 +1,9 @@
 #!/bin/bash -ex
 
-cp target/rpm/containers/RPMS/noarch/containers*.rpm /var/rpmsrepo/vision/sl6/x86_64/
+cp target/rpm/vismo/RPMS/noarch/vismo*.rpm /var/rpmsrepo/vision/sl6/x86_64/
 createrepo /var/rpmsrepo/vision/sl6/x86_64/
 /usr/local/bin/command_on_clusters.sh "yum -y clean metadata" 1 4 5
-/usr/local/bin/command_on_clusters.sh "yum -y erase containers" 1 4 5
-/usr/local/bin/command_on_clusters.sh "rm -fr /srv/tomcat7/webapps/containers" 1 4 5
-/usr/local/bin/command_on_clusters.sh "yum -y install containers" 1 4 5
+/usr/local/bin/command_on_clusters.sh "yum -y erase vismo" 1 4 5
+/usr/local/bin/command_on_clusters.sh "rm -fr /srv/vismo" 1 4 5
+/usr/local/bin/command_on_clusters.sh "yum -y install vismo" 1 4 5
 
