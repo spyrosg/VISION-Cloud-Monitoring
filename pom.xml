@@ -13,6 +13,83 @@
     <jersey.version>1.8</jersey.version>
   </properties>
 
+  <profiles>
+
+    <!-- default profile -->
+    <profile>
+      <id>dev-ntua</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+
+      <repositories>
+        <repository>
+          <id>ntua-archiva</id>
+          <name>ntua vision repo</name>
+          <url>
+            http://147.102.19.118:8090/archiva/repository/internal
+          </url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+
+      <pluginRepositories>
+        <pluginRepository>
+          <id>ntua-archiva</id>
+          <name>ntua vision repo</name>
+          <url>
+            http://147.102.19.118:8090/archiva/repository/internal
+          </url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+
+    <!-- profile used in testbed -->
+    <profile>
+      <id>vision-testbed</id>
+
+      <repositories>
+        <repository>
+          <id>testbed-archiva</id>
+          <name>testbed vision repo</name>
+          <url>http://10.0.0.1:8000/archiva/repository/internal/</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+
+      <pluginRepositories>
+        <pluginRepository>
+          <id>testbed-archiva</id>
+          <name>ntua vision repo</name>
+          <url>http://10.0.0.1:8000/archiva/repository/internal/</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+
+  </profiles>
+
   <build>
     <plugins>
 
