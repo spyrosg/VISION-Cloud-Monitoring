@@ -1,4 +1,6 @@
 
+- send log messages to one dedicated machine
+
 - unix style start/stop/status command
 - events
 - libnotify (for the consumers)
