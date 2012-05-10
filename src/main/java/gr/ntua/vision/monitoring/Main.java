@@ -1,6 +1,7 @@
 package gr.ntua.vision.monitoring;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 
 
 /**
@@ -53,7 +54,22 @@ public class Main {
 
             @Override
             void run(final Config cnf) throws IOException {
-                // TODO
+                final int UDP_SERVER_PORT = 56431;
+                final UDPClient client = new UDPClient(UDP_SERVER_PORT);
+                String resp = null;
+
+                for (int i = 0; i < 3; ++i)
+                    try {
+                        resp = client.requestStatus();
+                        break;
+                    } catch (final SocketTimeoutException e) {
+                        //
+                    }
+
+                if (resp == null)
+                    System.out.println(PROG + ": service is stopped.");
+                else
+                    System.out.println(PROG + ": running, pid: " + Integer.parseInt(resp));
             }
         },
         /***/
