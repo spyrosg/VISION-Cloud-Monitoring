@@ -11,8 +11,8 @@ import org.zeromq.ZMQ.Socket;
  *
  */
 public class VisionCloudCluster {
-    /** The no of milliseconds we wait the application to join the cluster. */
-    private static final int JOIN_TIMEOUT = 3000;
+    /** The no of milliseconds we wait the application to join the "cluster". */
+    private static final int JOIN_TIMEOUT = 1000;
     /***/
     private final ZContext   ctx          = new ZContext();
     /***/
