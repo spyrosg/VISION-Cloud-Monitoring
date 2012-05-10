@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,15 +85,16 @@ public class MonitoringInstance {
 
         @Override
         public void run() {
-            try {
-                final DatagramPacket pack = receive();
+            while (true)
+                try {
+                    final DatagramPacket pack = receive();
+                    final String msg = new String(pack.getData(), 0, pack.getLength());
 
-                send("1234", pack.getAddress(), pack.getPort());
-            } catch (final SocketException e) {
-                e.printStackTrace();
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
+                    log.debug("received '{}'", msg);
+                    send("1234", pack.getAddress(), pack.getPort());
+                } catch (final IOException e) {
+                    log.error("while receiving", e);
+                }
         }
 
 
@@ -131,15 +133,13 @@ public class MonitoringInstance {
         }
     }
 
-    /***/
+    /** the zmq context. */
     private final ZContext        ctx             = new ZContext();
-
-    /***/
-    private final ExecutorService executor        = Executors
-                                                          .newFixedThreadPool(/*2 * Runtime.getRuntime().availableProcessors() +*/1);
+    /** the service executor for two tasks: the udp server and the event-loop handler. */
+    private final ExecutorService executor        = Executors.newFixedThreadPool(2);
     /** the log target. */
     private final Logger          log             = LoggerFactory.getLogger(getClass());
-    /***/
+    /** the udp port. */
     private final int             UDP_SERVER_PORT = 56431;
 
 
@@ -147,19 +147,36 @@ public class MonitoringInstance {
      * Constructor.
      */
     public MonitoringInstance() {
-        log.info("Starting up, pid={}, ip={}", getVMPID(), "FIXME");
+        log.info("Starting up, pid={}, ip={}", getVMPID(), getHostNameIP());
         log.info("running zmq version={}", ZMQ.getVersionString());
     }
 
 
     /**
+     * Actually start the application. Setup and run any supporting tasks.
+     * 
      * @throws SocketException
      */
     public void start() throws SocketException {
-        executor.submit(new UDPServer(UDP_SERVER_PORT));
+        startService(new UDPServer(UDP_SERVER_PORT));
         joinCluster();
-        log.info("joined cluster");
-        executor.submit(new EventLoop(ctx));
+        startService(new EventLoop(ctx));
+    }
+
+
+    /**
+     * Stop the application. Wait for the supporting tasks to stop.
+     */
+    public void stop() {
+        executor.shutdown();
+
+        try {
+            executor.awaitTermination(1, TimeUnit.SECONDS);
+        } catch (final InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        log.info("shutting down");
     }
 
 
@@ -172,6 +189,26 @@ public class MonitoringInstance {
         s.connect("ipc://join");
         s.send("new-machine:ip".getBytes(), 0);
         s.recv(0);
+        log.info("joined cluster");
+    }
+
+
+    /**
+     * Start running a task asynchronously.
+     * 
+     * @param task
+     *            the task to run.
+     */
+    private void startService(final Runnable task) {
+        executor.submit(task);
+    }
+
+
+    /**
+     * @return
+     */
+    private static String getHostNameIP() {
+        return "FIXME";
     }
 
 

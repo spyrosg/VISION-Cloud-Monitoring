@@ -6,14 +6,19 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.concurrent.TimeUnit;
 
 
 /**
  *
  */
 public class UDPClient {
-    /** the time to wait for a response. */
-    private static final int     TIMEOUT = 1000;
+    /***/
+    private static final String  KILL    = "stop!";
+    /***/
+    private static final String  STATUS  = "status?";
+    /** the response timeout. */
+    private static final int     TIMEOUT = (int) TimeUnit.SECONDS.toMillis(1);
     /** the port to send messages to. */
     private final int            port;
     /** the socket. */
@@ -43,7 +48,7 @@ public class UDPClient {
      * @throws IOException
      */
     public String requestStatus() throws IOException {
-        return sendMessage("status");
+        return sendMessage(STATUS);
     }
 
 
@@ -53,7 +58,7 @@ public class UDPClient {
      * @throws IOException
      */
     public void requestStop() throws IOException {
-        sendMessage("stop");
+        sendMessage(KILL);
     }
 
 
