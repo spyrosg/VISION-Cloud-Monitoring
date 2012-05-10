@@ -1,10 +1,12 @@
 package endtoend;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.Main;
 import gr.ntua.vision.monitoring.UDPClient;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 
 
 /**
@@ -58,7 +60,17 @@ public class MonitoringDriver {
      */
     public void reportsStatus() throws IOException {
         final UDPClient client = new UDPClient(UDP_SERVER_PORT);
-        final String resp = client.requestStatus();
+        String resp = null;
+
+        for (int i = 0; i < 3; ++i)
+            try {
+                resp = client.requestStatus();
+                break;
+            } catch (SocketTimeoutException e) {
+                //
+            }
+
+        assertNotNull(resp);
         final int pid = Integer.parseInt(resp);
 
         assertTrue(pid > 1);
