@@ -30,6 +30,9 @@ public class VismoEndToEndTest {
     }
 
 
+    /**
+     * 
+     */
     @Before
     public void setUp() {
         System.out.println(ZMQ.getVersionString());

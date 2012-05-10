@@ -90,7 +90,7 @@ public class UDPClient {
 
     /**
      * @param command
-     * @return
+     * @return the message received from the server.
      * @throws IOException
      */
     private String sendMessage(final String command) throws IOException {

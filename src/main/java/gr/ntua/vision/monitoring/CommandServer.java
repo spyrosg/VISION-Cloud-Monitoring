@@ -1,7 +1,5 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.lifecycle.Supervisor;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -17,8 +15,6 @@ public class CommandServer implements Runnable {
     private final Config         cnf;
     /** the socket. */
     private final DatagramSocket sock;
-    /** the application supervisor. */
-    private final Supervisor     supervisor;
 
 
     /**
@@ -26,13 +22,10 @@ public class CommandServer implements Runnable {
      * 
      * @param cnf
      *            the configuration object.
-     * @param supervisor
-     *            the application supervisor.
      * @throws SocketException
      */
-    public CommandServer(final Config cnf, final Supervisor supervisor) throws SocketException {
+    public CommandServer(final Config cnf) throws SocketException {
         this.cnf = cnf;
-        this.supervisor = supervisor;
         this.sock = new DatagramSocket(cnf.getPort());
         this.sock.setReuseAddress(true);
     }
@@ -63,7 +56,6 @@ public class CommandServer implements Runnable {
                 }
                 if (cmd.equals(cnf.getKillCommand())) {
                     send("ok", req.getAddress(), req.getPort());
-                    supervisor.stop();
                     break;
                 }
             } catch (final IOException e) {

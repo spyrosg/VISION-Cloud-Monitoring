@@ -91,7 +91,7 @@ public class FakeVisionCluster {
 
 
     /**
-     * @return
+     * @return the message received from the socket.
      */
     private String receive() {
         final byte[] buf = s.recv(0);
