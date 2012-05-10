@@ -33,8 +33,8 @@ public class CommandServer implements Runnable {
     public CommandServer(final Config cnf, final Supervisor supervisor) throws SocketException {
         this.cnf = cnf;
         this.supervisor = supervisor;
-        this.sock = new DatagramSocket( cnf.getPort() );
-        this.sock.setReuseAddress( true );
+        this.sock = new DatagramSocket(cnf.getPort());
+        this.sock.setReuseAddress(true);
     }
 
 
@@ -52,30 +52,30 @@ public class CommandServer implements Runnable {
      */
     @Override
     public void run() {
-        while( !Thread.currentThread().isInterrupted() )
+        while (!Thread.currentThread().isInterrupted())
             try {
                 final DatagramPacket req = receive();
-                final String cmd = new String( req.getData(), 0, req.getLength() );
+                final String cmd = new String(req.getData(), 0, req.getLength());
 
-                if( cmd.equals( cnf.getStatusCommand() ) ) {
-                    send( String.valueOf( cnf.getPID() ), req.getAddress(), req.getPort() );
+                if (cmd.equals(cnf.getStatusCommand())) {
+                    send(String.valueOf(cnf.getPID()), req.getAddress(), req.getPort());
                     continue;
                 }
-                if( cmd.equals( cnf.getKillCommand() ) ) {
-                    send( "ok", req.getAddress(), req.getPort() );
+                if (cmd.equals(cnf.getKillCommand())) {
+                    send("ok", req.getAddress(), req.getPort());
                     supervisor.stop();
                     break;
                 }
-            } catch( final IOException e ) {
-                if( !Thread.currentThread().isInterrupted() ) {
-                    if( !sock.isClosed() )
+            } catch (final IOException e) {
+                if (!Thread.currentThread().isInterrupted()) {
+                    if (!sock.isClosed())
                         sock.close();
 
-                    throw new RuntimeException( e );
+                    throw new RuntimeException(e);
                 }
             }
 
-        if( !sock.isClosed() )
+        if (!sock.isClosed())
             sock.close();
     }
 
@@ -88,9 +88,9 @@ public class CommandServer implements Runnable {
      */
     private DatagramPacket receive() throws IOException {
         final byte[] buf = new byte[64];
-        final DatagramPacket req = new DatagramPacket( buf, buf.length );
+        final DatagramPacket req = new DatagramPacket(buf, buf.length);
 
-        sock.receive( req );
+        sock.receive(req);
 
         return req;
     }
@@ -109,8 +109,8 @@ public class CommandServer implements Runnable {
      */
     private void send(final String payload, final InetAddress addr, final int port) throws IOException {
         final byte[] buf = payload.getBytes();
-        final DatagramPacket res = new DatagramPacket( buf, buf.length, addr, port );
+        final DatagramPacket res = new DatagramPacket(buf, buf.length, addr, port);
 
-        sock.send( res );
+        sock.send(res);
     }
 }

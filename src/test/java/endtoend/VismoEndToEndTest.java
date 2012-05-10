@@ -11,9 +11,9 @@ import org.zeromq.ZMQ;
  */
 public class VismoEndToEndTest {
     /***/
-    private final VisionCloudCluster cluster    = new VisionCloudCluster();
+    private final FakeVisionCluster cluster    = new FakeVisionCluster();
     /***/
-    private final MonitoringDriver   monitoring = new MonitoringDriver();
+    private final MonitoringDriver  monitoring = new MonitoringDriver();
 
 
     /**

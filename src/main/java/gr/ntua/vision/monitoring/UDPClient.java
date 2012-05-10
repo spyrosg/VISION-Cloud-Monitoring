@@ -74,17 +74,6 @@ public class UDPClient {
 
 
     /**
-     * @param command
-     * @return
-     * @throws IOException
-     */
-    private String sendMessage(final String command) throws IOException {
-        send(command);
-        return receive();
-    }
-
-
-    /**
      * Send as a datagram packet the given content.
      * 
      * @param payload
@@ -96,5 +85,16 @@ public class UDPClient {
         final DatagramPacket req = new DatagramPacket(buf, buf.length, InetAddress.getLocalHost(), port);
 
         sock.send(req);
+    }
+
+
+    /**
+     * @param command
+     * @return
+     * @throws IOException
+     */
+    private String sendMessage(final String command) throws IOException {
+        send(command);
+        return receive();
     }
 }

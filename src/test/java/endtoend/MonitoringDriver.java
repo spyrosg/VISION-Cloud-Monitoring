@@ -66,7 +66,7 @@ public class MonitoringDriver {
             try {
                 resp = client.requestStatus();
                 break;
-            } catch (SocketTimeoutException e) {
+            } catch (final SocketTimeoutException e) {
                 //
             }
 

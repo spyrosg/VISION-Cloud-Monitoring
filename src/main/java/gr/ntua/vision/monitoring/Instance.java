@@ -24,8 +24,8 @@ public class Instance implements Supervisor {
      * @throws SocketException
      */
     public Instance(final Config cnf, final Object fixme) throws SocketException {
-        this.commandServer = new CommandServer( cnf, this );
-        this.t = new Thread( this.commandServer, "command-server" );
+        this.commandServer = new CommandServer(cnf, this);
+        this.t = new Thread(this.commandServer, "command-server");
         // FIXME: this.t.setDaemon(true);
     }
 

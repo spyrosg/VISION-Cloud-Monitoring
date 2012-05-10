@@ -65,11 +65,11 @@ public class Config {
     private static int getVMPID() {
         // NOTE: expecting something like '<pid>@<hostname>'
         final String vmname = ManagementFactory.getRuntimeMXBean().getName();
-        final int atIndex = vmname.indexOf( "@" );
+        final int atIndex = vmname.indexOf("@");
 
-        if( atIndex < 0 )
-            throw new Error( "Cannot get pid: pid N/A for this jvm." );
+        if (atIndex < 0)
+            throw new Error("Cannot get pid: pid N/A for this jvm.");
 
-        return Integer.valueOf( vmname.substring( 0, atIndex ) );
+        return Integer.valueOf(vmname.substring(0, atIndex));
     }
 }

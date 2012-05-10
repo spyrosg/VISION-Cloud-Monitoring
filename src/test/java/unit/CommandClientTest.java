@@ -29,7 +29,7 @@ public class CommandClientTest {
      */
     @Before
     public void setUp() throws SocketException {
-        client = new CommandClient( cnf );
+        client = new CommandClient(cnf);
     }
 
 
@@ -38,7 +38,7 @@ public class CommandClientTest {
      */
     @Test
     public void statusShouldTimeoutExceptionWhenThereIsNoServer() throws IOException {
-        exception.expect( SocketTimeoutException.class );
+        exception.expect(SocketTimeoutException.class);
         client.status();
     }
 
@@ -48,7 +48,7 @@ public class CommandClientTest {
      */
     @Test
     public void stopShouldTimeoutWhenThereIsNoServer() throws IOException {
-        exception.expect( SocketTimeoutException.class );
+        exception.expect(SocketTimeoutException.class);
         client.stop();
     }
 }

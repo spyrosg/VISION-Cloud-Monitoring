@@ -11,7 +11,7 @@ import org.zeromq.ZMQ.Socket;
 /**
  *
  */
-public class VisionCloudCluster {
+public class FakeVisionCluster {
     /** The no of milliseconds we wait the application to join the "cluster". */
     private static final int JOIN_TIMEOUT = 1000;
     /***/
@@ -23,7 +23,7 @@ public class VisionCloudCluster {
     /**
      * 
      */
-    public VisionCloudCluster() {
+    public FakeVisionCluster() {
         this.s = ctx.createSocket(ZMQ.REP);
         this.s.setReceiveTimeOut(JOIN_TIMEOUT);
         this.s.setLinger(0);

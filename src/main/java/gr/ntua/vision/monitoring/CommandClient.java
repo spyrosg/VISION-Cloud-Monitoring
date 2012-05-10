@@ -36,12 +36,12 @@ public class CommandClient {
         final DatagramSocket sock = new DatagramSocket();
 
         try {
-            sock.setSoTimeout( cnf.getTimeout() );
-            send( sock, cnf.getStatusCommand(), InetAddress.getLocalHost(), cnf.getPort() );
+            sock.setSoTimeout(cnf.getTimeout());
+            send(sock, cnf.getStatusCommand(), InetAddress.getLocalHost(), cnf.getPort());
 
-            final DatagramPacket dgram = receive( sock );
+            final DatagramPacket dgram = receive(sock);
 
-            return Integer.parseInt( new String( dgram.getData(), 0, dgram.getLength() ) );
+            return Integer.parseInt(new String(dgram.getData(), 0, dgram.getLength()));
         } finally {
             sock.close();
         }
@@ -59,9 +59,9 @@ public class CommandClient {
         final DatagramSocket sock = new DatagramSocket();
 
         try {
-            sock.setSoTimeout( cnf.getTimeout() );
-            send( sock, cnf.getKillCommand(), InetAddress.getLocalHost(), cnf.getPort() );
-            receive( sock );
+            sock.setSoTimeout(cnf.getTimeout());
+            send(sock, cnf.getKillCommand(), InetAddress.getLocalHost(), cnf.getPort());
+            receive(sock);
         } finally {
             sock.close();
         }
@@ -78,9 +78,9 @@ public class CommandClient {
      */
     private static DatagramPacket receive(final DatagramSocket sock) throws IOException {
         final byte[] buf = new byte[64];
-        final DatagramPacket req = new DatagramPacket( buf, buf.length );
+        final DatagramPacket req = new DatagramPacket(buf, buf.length);
 
-        sock.receive( req );
+        sock.receive(req);
 
         return req;
     }
@@ -102,8 +102,8 @@ public class CommandClient {
     private static void send(final DatagramSocket sock, final String payload, final InetAddress addr, final int port)
             throws IOException {
         final byte[] buf = payload.getBytes();
-        final DatagramPacket req = new DatagramPacket( buf, buf.length, addr, port );
+        final DatagramPacket req = new DatagramPacket(buf, buf.length, addr, port);
 
-        sock.send( req );
+        sock.send(req);
     }
 }

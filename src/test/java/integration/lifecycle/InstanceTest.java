@@ -35,7 +35,7 @@ public class InstanceTest {
      */
     @Before
     public void setUp() throws SocketException {
-        inst = new Instance( cnf, null );
+        inst = new Instance(cnf, null);
     }
 
 
@@ -53,10 +53,10 @@ public class InstanceTest {
     public void whenClientSendsStopCommandServerShouldStop() throws IOException {
         inst.start();
 
-        final CommandClient client = new CommandClient( cnf );
+        final CommandClient client = new CommandClient(cnf);
 
         client.stop();
-        exception.expect( SocketTimeoutException.class );
+        exception.expect(SocketTimeoutException.class);
         client.status();
     }
 
@@ -68,9 +68,9 @@ public class InstanceTest {
     public void whenStartedClientShouldReportVMPIDfromStatus() throws IOException {
         inst.start();
 
-        final CommandClient client = new CommandClient( cnf );
+        final CommandClient client = new CommandClient(cnf);
 
-        assertEquals( cnf.getPID(), client.status() );
+        assertEquals(cnf.getPID(), client.status());
     }
 
 
