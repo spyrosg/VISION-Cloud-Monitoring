@@ -1,9 +1,7 @@
 package endtoend;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.zeromq.ZMQ;
 
 
 /**
@@ -26,16 +24,8 @@ public class VismoEndToEndTest {
         cluster.receivesNewJoin();
         monitoring.reportsStatus();
         cluster.receivesEvents();
+        monitoring.reportsStatus();
         monitoring.leaveCluster();
-    }
-
-
-    /**
-     * 
-     */
-    @Before
-    public void setUp() {
-        System.out.println(ZMQ.getVersionString());
     }
 
 
