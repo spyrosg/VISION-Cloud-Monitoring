@@ -20,7 +20,7 @@ public class VismoEndToEndTest {
      * @throws Exception
      */
     @Test
-    public void monitoringSendsMessagesAcrossTheCluster() throws Exception {
+    public void monitoringConnectsAndSendsMessagesToCluster() throws Exception {
         cluster.start();
         monitoring.start();
         cluster.receivesNewJoin();

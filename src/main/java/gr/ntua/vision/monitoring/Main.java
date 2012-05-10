@@ -1,14 +1,6 @@
 package gr.ntua.vision.monitoring;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-
-import org.zeromq.ZContext;
-import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Socket;
 
 
 /**
@@ -44,91 +36,11 @@ public class Main {
             }
 
 
-            /**
-             * Receive a datagram packet from the socket.
-             * 
-             * @return a {@link DatagramPacket}.
-             * @throws IOException
-             */
-            DatagramPacket receive(final DatagramSocket sock) throws IOException {
-                final byte[] buf = new byte[64];
-                final DatagramPacket req = new DatagramPacket(buf, buf.length);
-
-                sock.receive(req);
-
-                return req;
-            }
-
-
             @Override
             void run(final Config cnf) throws IOException {
-                final ZContext ctx = new ZContext();
-                final Socket s = ctx.createSocket(ZMQ.REQ);
+                final MonitoringInstance mon = new MonitoringInstance();
 
-                s.connect("ipc://join");
-                send(s, "connected");
-                s.recv(0);
-
-                final int UDP_SERVER_PORT = 56431;
-                final Thread t = new Thread("udp-server") {
-                    @Override
-                    public void run() {
-                        try {
-                            final DatagramSocket sock = new DatagramSocket(UDP_SERVER_PORT);
-
-                            sock.setReuseAddress(true);
-
-                            final DatagramPacket pack = receive(sock);
-
-                            send(sock, "1234", pack.getAddress(), pack.getPort());
-                        } catch (final SocketException e) {
-                            e.printStackTrace();
-                        } catch (final IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                };
-                t.start();
-                final Thread eventThread = new Thread("event-loop-thread") {
-                    @Override
-                    public void run() {
-                        final Socket eventSocket = ctx.createSocket(ZMQ.REQ);
-
-                        eventSocket.connect("ipc://events");
-
-                        for (int i = 0; i < 10; ++i) {
-                            send(eventSocket, "foo");
-                            eventSocket.recv(0);
-                        }
-
-                        eventSocket.close();
-                    }
-                };
-                eventThread.start();
-            }
-
-
-            /**
-             * Send as a datagram packet the given content.
-             * 
-             * @param payload
-             *            the payload to send.
-             * @param addr
-             *            the address to sent to.
-             * @param port
-             *            the port to sent to.
-             * @throws IOException
-             */
-            void send(final DatagramSocket sock, final String payload, final InetAddress addr, final int port) throws IOException {
-                final byte[] buf = payload.getBytes();
-                final DatagramPacket res = new DatagramPacket(buf, buf.length, addr, port);
-
-                sock.send(res);
-            }
-
-
-            void send(final Socket sock, final String message) {
-                sock.send(message.getBytes(), 0);
+                mon.start();
             }
         },
         /***/
