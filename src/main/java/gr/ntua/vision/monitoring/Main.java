@@ -65,8 +65,9 @@ public class Main {
                 final ZContext ctx = new ZContext();
                 final Socket s = ctx.createSocket(ZMQ.REQ);
 
-                s.connect("ipc://foo");
+                s.connect("ipc://join");
                 send(s, "connected");
+                s.recv(0);
 
                 final int UDP_SERVER_PORT = 56431;
                 final Thread t = new Thread("udp-server") {
@@ -88,6 +89,22 @@ public class Main {
                     }
                 };
                 t.start();
+                final Thread eventThread = new Thread("event-loop-thread") {
+                    @Override
+                    public void run() {
+                        final Socket eventSocket = ctx.createSocket(ZMQ.REQ);
+
+                        eventSocket.connect("ipc://events");
+
+                        for (int i = 0; i < 10; ++i) {
+                            send(eventSocket, "foo");
+                            eventSocket.recv(0);
+                        }
+
+                        eventSocket.close();
+                    }
+                };
+                eventThread.start();
             }
 
 

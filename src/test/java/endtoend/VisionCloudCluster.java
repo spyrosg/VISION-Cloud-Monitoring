@@ -1,5 +1,6 @@
 package endtoend;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.zeromq.ZContext;
@@ -33,7 +34,30 @@ public class VisionCloudCluster {
      * 
      */
     public void receivesEvents() {
-        fail("NYI");
+        final int EXPECTED_NO_EVENTS = 10;
+        final Socket eventSocket = ctx.createSocket(ZMQ.REP);
+        int receivedEventsNo = 0;
+
+        eventSocket.setReceiveTimeOut(-1);
+        eventSocket.setLinger(0);
+        eventSocket.bind("ipc://events");
+
+        while (true) {
+            final byte[] buf = eventSocket.recv(0);
+
+            if (buf == null)
+                break;
+
+            ++receivedEventsNo;
+            eventSocket.send("bar".getBytes(), 0);
+
+            if (receivedEventsNo >= EXPECTED_NO_EVENTS)
+                break;
+        }
+
+        eventSocket.close();
+
+        assertEquals(EXPECTED_NO_EVENTS, receivedEventsNo);
     }
 
 
@@ -46,7 +70,7 @@ public class VisionCloudCluster {
         if (req == null)
             fail("application did not join");
 
-        System.out.println("received " + req);
+        send("ohai");
     }
 
 
@@ -62,7 +86,7 @@ public class VisionCloudCluster {
      * Start listening for incoming requests.
      */
     public void start() {
-        s.bind("ipc://foo");
+        s.bind("ipc://join");
     }
 
 
@@ -76,5 +100,13 @@ public class VisionCloudCluster {
             return null;
 
         return new String(buf, 0, buf.length);
+    }
+
+
+    /**
+     * @param message
+     */
+    private void send(final String message) {
+        s.send(message.getBytes(), 0);
     }
 }
