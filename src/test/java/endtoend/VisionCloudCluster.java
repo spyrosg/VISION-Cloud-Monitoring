@@ -2,9 +2,6 @@ package endtoend;
 
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
@@ -15,13 +12,11 @@ import org.zeromq.ZMQ.Socket;
  */
 public class VisionCloudCluster {
     /** The no of milliseconds we wait the application to join the cluster. */
-    private static final int   JOIN_TIMEOUT = 1000;
+    private static final int JOIN_TIMEOUT = 3000;
     /***/
-    private final ZContext     ctx          = new ZContext();
+    private final ZContext   ctx          = new ZContext();
     /***/
-    private final List<String> machines     = new ArrayList<String>();
-    /***/
-    private final Socket       s;
+    private final Socket     s;
 
 
     /**
@@ -30,7 +25,7 @@ public class VisionCloudCluster {
     public VisionCloudCluster() {
         this.s = ctx.createSocket(ZMQ.REP);
         this.s.setReceiveTimeOut(JOIN_TIMEOUT);
-        this.s.setLinger(0); // reject messages in the queue.
+        this.s.setLinger(0);
     }
 
 
@@ -64,11 +59,10 @@ public class VisionCloudCluster {
 
 
     /**
-     * 
+     * Start listening for incoming requests.
      */
     public void start() {
-        s.bind("ipc://hellostream:5678");
-
+        s.bind("ipc://foo");
     }
 
 

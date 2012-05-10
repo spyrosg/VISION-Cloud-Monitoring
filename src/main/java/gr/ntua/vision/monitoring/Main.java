@@ -1,7 +1,10 @@
 package gr.ntua.vision.monitoring;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
+
+import org.zeromq.ZContext;
+import org.zeromq.ZMQ;
+import org.zeromq.ZMQ.Socket;
 
 
 /**
@@ -15,42 +18,64 @@ public class Main {
         /***/
         HELP("help") {
             @Override
+            String getHelpString() {
+                return "show this help message and exit.";
+            }
+
+
+            @Override
             void run(final Config ignored) throws IOException {
-                System.err.println( "help message" ); // TODO
+                System.err.println("Usage: java -jar " + PROG + ".jar");
+                System.err.println("Options:\n");
+
+                for (final Commands cmd : Commands.values())
+                    System.err.println(String.format("  %-10s%-40s", cmd.name().toLowerCase(), cmd.getHelpString()));
             }
         },
         /***/
         START("start") {
+            public void send(final Socket sock, final String message) {
+                sock.send(message.getBytes(), 0);
+            }
+
+
+            @Override
+            String getHelpString() {
+                return "start the service.";
+            }
+
+
             @Override
             void run(final Config cnf) throws IOException {
-                new Instance( cnf, null ).start();
+                final ZContext ctx = new ZContext();
+                final Socket s = ctx.createSocket(ZMQ.REQ);
+
+                s.connect("ipc://foo");
+                send(s, "connected");
             }
         },
         /***/
         STATUS("status") {
             @Override
-            void run(final Config cnf) throws IOException {
-                final CommandClient client = new CommandClient( cnf );
+            String getHelpString() {
+                return "print the service status.";
+            }
 
-                try {
-                    System.out.println( PROG + ": running, pid: " + client.status() );
-                } catch( final SocketTimeoutException e ) {
-                    System.out.println( PROG + ": stopped" );
-                }
+
+            @Override
+            void run(final Config cnf) throws IOException {
             }
         },
         /***/
         STOP("stop") {
             @Override
-            void run(final Config cnf) throws IOException {
-                final CommandClient client = new CommandClient( cnf );
+            String getHelpString() {
+                return "stop the service.";
+            }
 
-                try {
-                    client.stop();
-                    System.out.println( PROG + ": stopping" );
-                } catch( final SocketTimeoutException e ) {
-                    System.out.println( PROG + ": is already stopped" );
-                }
+
+            @Override
+            void run(final Config cnf) throws IOException {
             }
         };
 
@@ -67,6 +92,12 @@ public class Main {
         private Commands(final String name) {
             this.name = name;
         }
+
+
+        /**
+         * @return the corresponding explanatory command message.
+         */
+        abstract String getHelpString();
 
 
         /**
@@ -87,8 +118,8 @@ public class Main {
          * @return <code>true</code> iff the string is a valid server command, <code>false</code> otherwise.
          */
         public static boolean isValidCommand(final String str) {
-            for( final Commands cmd : Commands.values() )
-                if( cmd.name.equals( str ) )
+            for (final Commands cmd : Commands.values())
+                if (cmd.name.equals(str))
                     return true;
 
             return false;
@@ -104,14 +135,14 @@ public class Main {
      * @throws IOException
      */
     public static void main(final String... args) throws IOException {
-        if( args.length == 0 || !Commands.isValidCommand( args[0] ) ) {
-            Commands.HELP.run( null );
+        if (args.length == 0 || !Commands.isValidCommand(args[0])) {
+            Commands.HELP.run(null);
             return;
         }
 
         final Config cnf = new Config();
-        final Commands cmd = Commands.valueOf( args[0].toUpperCase() );
+        final Commands cmd = Commands.valueOf(args[0].toUpperCase());
 
-        cmd.run( cnf );
+        cmd.run(cnf);
     }
 }

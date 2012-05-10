@@ -1,7 +1,9 @@
 package endtoend;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.zeromq.ZMQ;
 
 
 /**
@@ -9,9 +11,9 @@ import org.junit.Test;
  */
 public class VismoEndToEndTest {
     /***/
-    private final VisionCloudCluster          cluster    = new VisionCloudCluster();
+    private final VisionCloudCluster cluster    = new VisionCloudCluster();
     /***/
-    private final MonitoringDriver monitoring = new MonitoringDriver();
+    private final MonitoringDriver   monitoring = new MonitoringDriver();
 
 
     /**
@@ -25,6 +27,12 @@ public class VismoEndToEndTest {
         monitoring.reportsStatus();
         cluster.receivesEvents();
         monitoring.leaveCluster();
+    }
+
+
+    @Before
+    public void setUp() {
+        System.out.println(ZMQ.getVersionString());
     }
 
 
