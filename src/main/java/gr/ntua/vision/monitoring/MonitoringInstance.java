@@ -20,7 +20,7 @@ import org.zeromq.ZMQ.Socket;
 /**
  *
  */
-public class MonitoringInstance {
+public class MonitoringInstance implements UDPListener {
     /**
      *
      */
@@ -66,6 +66,8 @@ public class MonitoringInstance {
      *
      */
     private static class UDPServer implements Runnable {
+        /***/
+        private final UDPListener    listener;
         /** the log target. */
         private final Logger         log = LoggerFactory.getLogger(getClass());
         /***/
@@ -74,11 +76,13 @@ public class MonitoringInstance {
 
         /**
          * @param port
+         * @param listener
          * @throws SocketException
          */
-        public UDPServer(final int port) throws SocketException {
+        public UDPServer(final int port, final UDPListener listener) throws SocketException {
             this.sock = new DatagramSocket(port);
             this.sock.setReuseAddress(true);
+            this.listener = listener;
             log.info("upd server started on port={}", port);
         }
 
@@ -91,7 +95,8 @@ public class MonitoringInstance {
                     final String msg = new String(pack.getData(), 0, pack.getLength());
 
                     log.debug("received '{}'", msg);
-                    send("1234", pack.getAddress(), pack.getPort());
+
+                    send(listener.notify(msg), pack.getAddress(), pack.getPort());
                 } catch (final IOException e) {
                     log.error("while receiving", e);
                 }
@@ -133,6 +138,12 @@ public class MonitoringInstance {
         }
     }
 
+    /***/
+    private static final String   KILL            = "stop!";
+
+    /***/
+    private static final String   STATUS          = "status?";
+
     /** the zmq context. */
     private final ZContext        ctx             = new ZContext();
     /** the service executor for two tasks: the udp server and the event-loop handler. */
@@ -153,12 +164,25 @@ public class MonitoringInstance {
 
 
     /**
+     * @see gr.ntua.vision.monitoring.UDPListener#notify(java.lang.String)
+     */
+    @Override
+    public String notify(final String msg) {
+        if (msg.equals(STATUS))
+            return status();
+
+        stop();
+        return KILL;
+    }
+
+
+    /**
      * Actually start the application. Setup and run any supporting tasks.
      * 
      * @throws SocketException
      */
     public void start() throws SocketException {
-        startService(new UDPServer(UDP_SERVER_PORT));
+        startService(new UDPServer(UDP_SERVER_PORT, this));
         joinCluster();
         startService(new EventLoop(ctx));
     }
@@ -201,6 +225,15 @@ public class MonitoringInstance {
      */
     private void startService(final Runnable task) {
         executor.submit(task);
+    }
+
+
+    /**
+     * @return
+     */
+    @SuppressWarnings("static-method")
+    private String status() {
+        return String.valueOf(getVMPID());
     }
 
 

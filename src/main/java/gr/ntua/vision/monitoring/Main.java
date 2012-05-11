@@ -54,13 +54,12 @@ public class Main {
 
             @Override
             void run(final Config cnf) throws IOException {
-                final int UDP_SERVER_PORT = 56431;
                 final UDPClient client = new UDPClient(UDP_SERVER_PORT);
                 String resp = null;
 
                 for (int i = 0; i < 3; ++i)
                     try {
-                        resp = client.requestStatus();
+                        resp = client.getServiceStatus();
                         break;
                     } catch (final SocketTimeoutException e) {
                         //
@@ -82,7 +81,9 @@ public class Main {
 
             @Override
             void run(final Config cnf) throws IOException {
-                // TODO
+                final UDPClient client = new UDPClient(UDP_SERVER_PORT);
+
+                client.shutdownService();
             }
         };
 
@@ -134,7 +135,10 @@ public class Main {
     }
 
     /** the program name. */
-    private static final String PROG = "vismo";
+    private static final String PROG            = "vismo";
+
+    /***/
+    private static final int    UDP_SERVER_PORT = 56431;
 
 
     /**

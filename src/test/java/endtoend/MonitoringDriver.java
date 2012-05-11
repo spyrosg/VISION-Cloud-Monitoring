@@ -38,21 +38,6 @@ public class MonitoringDriver {
 
 
     /**
-     * Stop the application, causing it to leave the cluster.
-     */
-    public void leaveCluster() {
-        try {
-            Main.main("stop");
-            t.join();
-        } catch (final IOException e) {
-            e.printStackTrace();
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    /**
      * Use the udp client to get the status of the monitoring instance. If the instance is normally running, it should return the
      * pid of the running jvm.
      * 
@@ -64,7 +49,7 @@ public class MonitoringDriver {
 
         for (int i = 0; i < 3; ++i)
             try {
-                resp = client.requestStatus();
+                resp = client.getServiceStatus();
                 break;
             } catch (final SocketTimeoutException e) {
                 //
@@ -74,6 +59,21 @@ public class MonitoringDriver {
         final int pid = Integer.parseInt(resp);
 
         assertTrue(pid > 1);
+    }
+
+
+    /**
+     * Stop the application, causing it to leave the cluster.
+     */
+    public void shutdown() {
+        try {
+            Main.main("stop");
+            t.join();
+        } catch (final IOException e) {
+            e.printStackTrace();
+        } catch (final InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 

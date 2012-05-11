@@ -47,7 +47,7 @@ public class UDPClient {
      *             when the server is down.
      * @throws IOException
      */
-    public String requestStatus() throws IOException {
+    public String getServiceStatus() throws IOException {
         return sendMessage(STATUS);
     }
 
@@ -57,7 +57,7 @@ public class UDPClient {
      * 
      * @throws IOException
      */
-    public void requestStop() throws IOException {
+    public void shutdownService() throws IOException {
         sendMessage(KILL);
     }
 
