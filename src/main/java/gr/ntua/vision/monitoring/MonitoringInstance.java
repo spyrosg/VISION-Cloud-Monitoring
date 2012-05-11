@@ -6,9 +6,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,7 @@ public class MonitoringInstance implements UDPListener {
     /**
      *
      */
-    private static class EventLoop implements Runnable {
+    private static class EventLoop extends MonitoringTask {
         /***/
         private final Socket s;
 
@@ -33,6 +32,7 @@ public class MonitoringInstance implements UDPListener {
          * @param ctx
          */
         public EventLoop(final ZContext ctx) {
+            super("event-loop");
             this.s = ctx.createSocket(ZMQ.REQ);
         }
 
@@ -54,6 +54,14 @@ public class MonitoringInstance implements UDPListener {
 
 
         /**
+         * @see gr.ntua.vision.monitoring.MonitoringTask#shutDown()
+         */
+        @Override
+        void shutDown() {
+        }
+
+
+        /**
          * @param message
          */
         private void send(final String message) {
@@ -65,7 +73,7 @@ public class MonitoringInstance implements UDPListener {
     /**
      *
      */
-    private static class UDPServer implements Runnable {
+    private static class UDPServer extends MonitoringTask {
         /***/
         private final UDPListener    listener;
         /** the log target. */
@@ -80,6 +88,7 @@ public class MonitoringInstance implements UDPListener {
          * @throws SocketException
          */
         public UDPServer(final int port, final UDPListener listener) throws SocketException {
+            super("udp-server");
             this.sock = new DatagramSocket(port);
             this.sock.setReuseAddress(true);
             this.listener = listener;
@@ -89,7 +98,7 @@ public class MonitoringInstance implements UDPListener {
 
         @Override
         public void run() {
-            while (true)
+            while (!isInterrupted())
                 try {
                     final DatagramPacket pack = receive();
                     final String msg = new String(pack.getData(), 0, pack.getLength());
@@ -100,6 +109,16 @@ public class MonitoringInstance implements UDPListener {
                 } catch (final IOException e) {
                     log.error("while receiving", e);
                 }
+        }
+
+
+        /**
+         * @see gr.ntua.vision.monitoring.MonitoringTask#shutDown()
+         */
+        @Override
+        void shutDown() {
+            interrupt();
+            sock.close();
         }
 
 
@@ -139,19 +158,17 @@ public class MonitoringInstance implements UDPListener {
     }
 
     /***/
-    private static final String   KILL            = "stop!";
-
+    private static final String        KILL            = "stop!";
     /***/
-    private static final String   STATUS          = "status?";
-
+    private static final String        STATUS          = "status?";
     /** the zmq context. */
-    private final ZContext        ctx             = new ZContext();
-    /** the service executor for two tasks: the udp server and the event-loop handler. */
-    private final ExecutorService executor        = Executors.newFixedThreadPool(2);
+    private final ZContext             ctx             = new ZContext();
     /** the log target. */
-    private final Logger          log             = LoggerFactory.getLogger(getClass());
+    private final Logger               log             = LoggerFactory.getLogger(getClass());
+    /***/
+    private final List<MonitoringTask> tasks           = new ArrayList<MonitoringTask>();
     /** the udp port. */
-    private final int             UDP_SERVER_PORT = 56431;
+    private final int                  UDP_SERVER_PORT = 56431;
 
 
     /**
@@ -192,14 +209,6 @@ public class MonitoringInstance implements UDPListener {
      * Stop the application. Wait for the supporting tasks to stop.
      */
     public void stop() {
-        executor.shutdown();
-
-        try {
-            executor.awaitTermination(1, TimeUnit.SECONDS);
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-        }
-
         log.info("shutting down");
     }
 
@@ -218,13 +227,15 @@ public class MonitoringInstance implements UDPListener {
 
 
     /**
-     * Start running a task asynchronously.
+     * Start running the task asynchronously.
      * 
      * @param task
      *            the task to run.
      */
-    private void startService(final Runnable task) {
-        executor.submit(task);
+    private void startService(final MonitoringTask task) {
+        tasks.add(task);
+        task.setDaemon(true);
+        task.start();
     }
 
 
