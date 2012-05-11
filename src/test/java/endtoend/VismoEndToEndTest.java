@@ -23,12 +23,11 @@ public class VismoEndToEndTest {
      * @throws Exception
      */
     @Test
-    public void monitoringConnectsAndSendsMessagesToCluster() throws Exception {
+    public void monitoringStartsAndStopsPromptly() throws Exception {
         cluster.start();
         monitoring.start();
-        cluster.receivesNewJoin();
         monitoring.reportsStatus();
-        cluster.receivesEvents();
+        Thread.sleep(1000);
         monitoring.reportsStatus();
         monitoring.shutdown();
 

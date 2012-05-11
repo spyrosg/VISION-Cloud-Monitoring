@@ -7,9 +7,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Socket;
 
 
 /**
@@ -20,8 +18,6 @@ public class MonitoringInstance implements UDPListener {
     private static final String        KILL            = "stop!";
     /***/
     private static final String        STATUS          = "status?";
-    /** the zmq context. */
-    private final ZContext             ctx             = new ZContext();
     /** the log target. */
     private final Logger               log             = LoggerFactory.getLogger(getClass());
     /***/
@@ -59,8 +55,6 @@ public class MonitoringInstance implements UDPListener {
      */
     public void start() throws SocketException {
         startService(new UDPServer(UDP_SERVER_PORT, this));
-        joinCluster();
-        startService(new EventLoop(ctx));
     }
 
 
@@ -69,19 +63,11 @@ public class MonitoringInstance implements UDPListener {
      */
     public void stop() {
         log.info("shutting down");
-    }
 
+        for (final MonitoringTask t : tasks)
+            t.shutDown();
 
-    /**
-     * 
-     */
-    private void joinCluster() {
-        final Socket s = ctx.createSocket(ZMQ.REQ);
-
-        s.connect("ipc://join");
-        s.send("new-machine:ip".getBytes(), 0);
-        s.recv(0);
-        log.info("joined cluster");
+        log.debug("successful shutdown");
     }
 
 
@@ -93,13 +79,12 @@ public class MonitoringInstance implements UDPListener {
      */
     private void startService(final MonitoringTask task) {
         tasks.add(task);
-        task.setDaemon(true);
         task.start();
     }
 
 
     /**
-     * @return
+     * @return the pid of the running jvm, as a string.
      */
     @SuppressWarnings("static-method")
     private String status() {

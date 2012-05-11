@@ -53,7 +53,7 @@ public class UDPClient {
 
 
     /**
-     * Ask the server to shutdown.
+     * Tell listener to shutdown.
      * 
      * @throws IOException
      */
