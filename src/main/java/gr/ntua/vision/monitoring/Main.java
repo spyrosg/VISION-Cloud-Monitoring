@@ -16,7 +16,7 @@ public class Main {
         HELP("help") {
             @Override
             String getHelpString() {
-                return "show this help message and exit.";
+                return "print this help message and exit.";
             }
 
 
@@ -83,7 +83,12 @@ public class Main {
             void run(final Config cnf) throws IOException {
                 final UDPClient client = new UDPClient(UDP_SERVER_PORT);
 
-                client.shutdownService();
+                try {
+                    System.out.println(PROG + ": stopping.");
+                    client.shutdownService();
+                } catch (SocketTimeoutException e) {
+                    System.out.println(PROG + " is stopped.");
+                }
             }
         };
 
