@@ -1,8 +1,8 @@
 package integration;
 
 import gr.ntua.vision.monitoring.UDPClient;
-import gr.ntua.vision.monitoring.UDPListener;
 import gr.ntua.vision.monitoring.UDPServer;
+import gr.ntua.vision.monitoring.UDPServer.UDPListener;
 
 import java.net.SocketException;
 

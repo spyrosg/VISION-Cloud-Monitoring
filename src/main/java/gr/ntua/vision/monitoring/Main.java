@@ -86,7 +86,7 @@ public class Main {
                 try {
                     System.out.println(PROG + ": stopping.");
                     client.shutdownService();
-                } catch (SocketTimeoutException e) {
+                } catch (final SocketTimeoutException e) {
                     System.out.println(PROG + " is stopped.");
                 }
             }

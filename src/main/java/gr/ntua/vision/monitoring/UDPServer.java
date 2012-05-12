@@ -14,17 +14,35 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class UDPServer extends Thread {
+    /**
+     * This is used to notify any interested party for incoming udp requests.
+     */
+    public interface UDPListener {
+        /**
+         * Pass to the listener the message receive and report back its response.
+         * 
+         * @param msg
+         *            the message received through udp.
+         * @return the listener's response.
+         */
+        String notify(String msg);
+    }
+
     /** the log target. */
     private static final Logger  log = LoggerFactory.getLogger(UDPServer.class);
-    /***/
+    /** the listener to notify. */
     private final UDPListener    listener;
-    /***/
+    /** the upd sock. */
     private final DatagramSocket sock;
 
 
     /**
+     * Constructor.
+     * 
      * @param port
+     *            the udp port to listen to.
      * @param listener
+     *            the listener to notify.
      * @throws SocketException
      */
     public UDPServer(final int port, final UDPListener listener) throws SocketException {
