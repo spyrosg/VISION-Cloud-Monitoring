@@ -8,7 +8,7 @@ import org.zeromq.ZMQ.Socket;
 /**
  *
  */
-class EventLoop extends MonitoringTask {
+class EventLoop extends Thread {
     /***/
     private final Socket s;
 
@@ -35,14 +35,6 @@ class EventLoop extends MonitoringTask {
         }
 
         s.close();
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.MonitoringTask#shutDown()
-     */
-    @Override
-    void shutDown() {
     }
 
 

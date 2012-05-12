@@ -13,11 +13,11 @@ import org.slf4j.LoggerFactory;
 /**
  *
  */
-public class UDPServer extends MonitoringTask {
+public class UDPServer extends Thread {
+    /** the log target. */
+    private static final Logger  log = LoggerFactory.getLogger(UDPServer.class);
     /***/
     private final UDPListener    listener;
-    /** the log target. */
-    private final Logger         log = LoggerFactory.getLogger(getClass());
     /***/
     private final DatagramSocket sock;
 
@@ -36,6 +36,9 @@ public class UDPServer extends MonitoringTask {
     }
 
 
+    /**
+     * @see java.lang.Thread#run()
+     */
     @Override
     public void run() {
         while (!isInterrupted())
@@ -48,15 +51,6 @@ public class UDPServer extends MonitoringTask {
             } catch (final IOException e) {
                 log.error("while receiving", e);
             }
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.MonitoringTask#shutDown()
-     */
-    @Override
-    public void shutDown() {
-        interrupt();
     }
 
 
