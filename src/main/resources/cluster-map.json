@@ -1,24 +1,24 @@
 
 [
     {
-        "id": "cluster vision-1",
-        "ips": [
+        "id": "vision-1",
+        "machines": [
             "10.0.1.211",
             "10.0.1.212",
             "10.0.1.213",
         ],
     },
     {
-        "id": "cluster vision-4",
-        "ips": [
+        "id": "vision-4",
+        "machines": [
             "10.0.2.214",
             "10.0.2.215",
             "10.0.2.216",
         ],
     },
     {
-        "id": "cluster vision-5",
-        "ips": [
+        "id": "vision-5",
+        "machines": [
             "10.0.3.211",
             "10.0.3.212",
             "10.0.3.213",
