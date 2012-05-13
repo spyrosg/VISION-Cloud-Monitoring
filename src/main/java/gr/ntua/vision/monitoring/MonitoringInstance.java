@@ -69,11 +69,17 @@ public class MonitoringInstance implements UDPListener {
      */
     public void stop() {
         log.info("shutting down");
+        shutdownServices();
+        log.debug("successful shutdown");
+    }
 
+
+    /**
+     * Stop any supporting tasks.
+     */
+    private void shutdownServices() {
         for (final Thread t : tasks)
             t.interrupt();
-
-        log.debug("successful shutdown");
     }
 
 
