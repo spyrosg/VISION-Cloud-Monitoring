@@ -41,7 +41,7 @@ public class Main {
             void run(final Config cnf) throws IOException {
                 final MonitoringInstance mon = new MonitoringInstance();
 
-                mon.start();
+                mon.start(UDP_SERVER_PORT);
             }
         },
         /***/

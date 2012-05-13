@@ -1,6 +1,5 @@
 package endtoend;
 
-import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -12,11 +11,11 @@ import org.junit.rules.ExpectedException;
 public class VismoEndToEndTest {
     /***/
     @Rule
-    public final ExpectedException  thrown     = ExpectedException.none();
+    public final ExpectedException thrown          = ExpectedException.none();
+    /** the udp port. */
+    private final int              UDP_SERVER_PORT = 56431;
     /***/
-    private final FakeVisionCluster cluster    = new FakeVisionCluster();
-    /***/
-    private final MonitoringDriver  monitoring = new MonitoringDriver();
+    private final MonitoringDriver monitoring      = new MonitoringDriver(UDP_SERVER_PORT);
 
 
     /**
@@ -24,7 +23,6 @@ public class VismoEndToEndTest {
      */
     @Test
     public void monitoringStartsAndStopsPromptly() throws Exception {
-        cluster.start();
         monitoring.start();
         monitoring.reportsStatus();
         Thread.sleep(1000);
@@ -33,12 +31,5 @@ public class VismoEndToEndTest {
 
         thrown.expect(AssertionError.class);
         monitoring.reportsStatus();
-    }
-
-
-    /***/
-    @After
-    public void tearDown() {
-        cluster.shutDown();
     }
 }

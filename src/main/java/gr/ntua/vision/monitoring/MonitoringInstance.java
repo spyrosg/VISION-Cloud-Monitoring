@@ -21,15 +21,13 @@ import org.zeromq.ZMQ;
  */
 public class MonitoringInstance implements UDPListener {
     /***/
-    private static final String KILL            = "stop!";
+    private static final String KILL   = "stop!";
     /** the log target. */
-    private static final Logger log             = LoggerFactory.getLogger(MonitoringInstance.class);
+    private static final Logger log    = LoggerFactory.getLogger(MonitoringInstance.class);
     /***/
-    private static final String STATUS          = "status?";
+    private static final String STATUS = "status?";
     /***/
-    private final List<Thread>  tasks           = new ArrayList<Thread>();
-    /** the udp port. */
-    private final int           UDP_SERVER_PORT = 56431;
+    private final List<Thread>  tasks  = new ArrayList<Thread>();
 
 
     /**
@@ -57,10 +55,11 @@ public class MonitoringInstance implements UDPListener {
     /**
      * Actually start the application. Setup and run any supporting tasks.
      * 
+     * @param udpPort
      * @throws SocketException
      */
-    public void start() throws SocketException {
-        startService(new UDPServer(UDP_SERVER_PORT, this));
+    public void start(final int udpPort) throws SocketException {
+        startService(new UDPServer(udpPort, this));
     }
 
 

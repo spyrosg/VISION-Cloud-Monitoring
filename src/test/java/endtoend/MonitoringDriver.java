@@ -14,15 +14,18 @@ import java.net.SocketTimeoutException;
  */
 public class MonitoringDriver {
     /***/
-    private static final int UDP_SERVER_PORT = 56431;
+    private final Thread t;
     /***/
-    private final Thread     t;
+    private final int    udpPort;
 
 
     /**
      * Constructor. Prepare to run the monitoring application.
+     * 
+     * @param udpPort
      */
-    public MonitoringDriver() {
+    public MonitoringDriver(final int udpPort) {
+        this.udpPort = udpPort;
         this.t = new Thread("monitoring-driver") {
             @Override
             public void run() {
@@ -44,7 +47,7 @@ public class MonitoringDriver {
      * @throws IOException
      */
     public void reportsStatus() throws IOException {
-        final UDPClient client = new UDPClient(UDP_SERVER_PORT);
+        final UDPClient client = new UDPClient(udpPort);
         String resp = null;
 
         for (int i = 0; i < 3; ++i)
