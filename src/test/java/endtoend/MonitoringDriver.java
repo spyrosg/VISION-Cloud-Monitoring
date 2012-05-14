@@ -2,6 +2,10 @@ package endtoend;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import gr.ntua.vision.monitoring.Event;
+import gr.ntua.vision.monitoring.EventListener;
+import gr.ntua.vision.monitoring.EventReceiver;
+import gr.ntua.vision.monitoring.LogEventListener;
 import gr.ntua.vision.monitoring.MonitoringInstance;
 import gr.ntua.vision.monitoring.UDPClient;
 
@@ -9,25 +13,71 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
+import org.zeromq.ZContext;
+
 
 /**
  *
  */
 public class MonitoringDriver {
+    /**
+     *
+     */
+    private static class EventCounterListener implements EventListener {
+        /***/
+        private final int noExpectedEvents;
+        /***/
+        private int       noReceivedEvents = 0;
+
+
+        /**
+         * @param noExpectedEvents
+         */
+        public EventCounterListener(final int noExpectedEvents) {
+            this.noExpectedEvents = noExpectedEvents;
+        }
+
+
+        /**
+         * 
+         */
+        public void haveReceivedEnoughMessages() {
+            assertTrue("not enough events received: " + noReceivedEvents, noReceivedEvents >= noExpectedEvents);
+        }
+
+
+        /**
+         * @see gr.ntua.vision.monitoring.EventListener#notify(gr.ntua.vision.monitoring.Event)
+         */
+        @Override
+        public void notify(final Event e) {
+            ++noReceivedEvents;
+        }
+    }
+
     /***/
-    private final MonitoringInstance inst;
+    private final EventCounterListener counter     = new EventCounterListener(10);
     /***/
-    private final int                udpPort;
+    private final MonitoringInstance   inst;
+    /***/
+    private final LogEventListener     logListener = new LogEventListener();
+    /***/
+    private final EventReceiver        receiver;
+    /***/
+    private final int                  udpPort;
 
 
     /**
      * Constructor. Prepare to run the monitoring application.
      * 
+     * @param ctx
      * @param udpPort
+     * @param eventsEndPoint
      */
-    public MonitoringDriver(final int udpPort) {
+    public MonitoringDriver(final ZContext ctx, final int udpPort, final String eventsEndPoint) {
         this.udpPort = udpPort;
         this.inst = new MonitoringInstance();
+        this.receiver = new EventReceiver(ctx, eventsEndPoint);
     }
 
 
@@ -50,6 +100,7 @@ public class MonitoringDriver {
             }
 
         assertNotNull(resp);
+
         final int pid = Integer.parseInt(resp);
 
         assertTrue(pid > 1);
@@ -60,6 +111,7 @@ public class MonitoringDriver {
      * Stop the application, causing it to leave the cluster.
      */
     public void shutdown() {
+        counter.haveReceivedEnoughMessages();
         inst.stop();
     }
 
@@ -71,5 +123,8 @@ public class MonitoringDriver {
      */
     public void start() throws SocketException {
         inst.start(udpPort);
+        receiver.add(logListener);
+        receiver.add(counter);
+        receiver.start();
     }
 }

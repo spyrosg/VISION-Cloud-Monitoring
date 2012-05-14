@@ -13,7 +13,7 @@ import json
 
 ### This is the monitoring dispatch lib code.
 
-EVENTS_ENDPOINT= "tcp://127.0.0.1:45678"
+EVENTS_ENDPOINT= "tcp://127.0.0.1:67891"
 
 
 class MonitoringEventDispatcher(object):

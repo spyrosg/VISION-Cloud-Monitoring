@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
 
@@ -21,13 +22,17 @@ import org.zeromq.ZMQ;
  */
 public class MonitoringInstance implements UDPListener {
     /***/
-    private static final String KILL   = "stop!";
+    private static final String KILL           = "stop!";
     /** the log target. */
-    private static final Logger log    = LoggerFactory.getLogger(MonitoringInstance.class);
+    private static final Logger log            = LoggerFactory.getLogger(MonitoringInstance.class);
     /***/
-    private static final String STATUS = "status?";
+    private static final String STATUS         = "status?";
     /***/
-    private final List<Thread>  tasks  = new ArrayList<Thread>();
+    private final List<Thread>  tasks          = new ArrayList<Thread>();
+    /***/
+    private final ZContext      ctx            = new ZContext();
+    /***/
+    private final String        eventsEndPoint = "tcp://127.0.0.1:67891";
 
 
     /**
@@ -60,6 +65,12 @@ public class MonitoringInstance implements UDPListener {
      */
     public void start(final int udpPort) throws SocketException {
         startService(new UDPServer(udpPort, this));
+
+        final EventReceiver receiver = new EventReceiver(ctx, eventsEndPoint);
+
+        receiver.add(new LogEventListener());
+
+        startService(receiver);
     }
 
 
