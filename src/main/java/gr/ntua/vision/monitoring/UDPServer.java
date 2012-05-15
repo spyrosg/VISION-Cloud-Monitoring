@@ -19,10 +19,10 @@ public class UDPServer extends Thread {
      */
     public interface UDPListener {
         /**
-         * Pass to the listener the message receive and report back its response.
+         * Pass to the listener the message received and report back its response.
          * 
          * @param msg
-         *            the message received through udp.
+         *            the message received.
          * @return the listener's response.
          */
         String notify(String msg);
@@ -32,7 +32,7 @@ public class UDPServer extends Thread {
     private static final Logger  log = LoggerFactory.getLogger(UDPServer.class);
     /** the listener to notify. */
     private final UDPListener    listener;
-    /** the upd sock. */
+    /** the upd sock to listen to. */
     private final DatagramSocket sock;
 
 
@@ -50,7 +50,7 @@ public class UDPServer extends Thread {
         this.sock = new DatagramSocket(port);
         this.sock.setReuseAddress(true);
         this.listener = listener;
-        log.info("upd server started on port={}", port);
+        log.info("upd server listening on port={}", port);
     }
 
 
@@ -59,12 +59,14 @@ public class UDPServer extends Thread {
      */
     @Override
     public void run() {
+        log.debug("entering receive/reply loop");
+
         while (!isInterrupted())
             try {
                 final DatagramPacket pack = receive();
                 final String msg = new String(pack.getData(), 0, pack.getLength());
 
-                log.debug("received '{}'", msg);
+                log.debug("received: {}", msg);
                 send(listener.notify(msg), pack.getAddress(), pack.getPort());
             } catch (final IOException e) {
                 log.error("while receiving", e);
