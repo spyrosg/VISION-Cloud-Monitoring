@@ -8,6 +8,7 @@ import gr.ntua.vision.monitoring.EventReceiver;
 import gr.ntua.vision.monitoring.LogEventListener;
 import gr.ntua.vision.monitoring.MonitoringInstance;
 import gr.ntua.vision.monitoring.UDPClient;
+import gr.ntua.vision.monitoring.UDPServer;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -56,28 +57,38 @@ public class MonitoringDriver {
     }
 
     /***/
-    private final EventCounterListener counter     = new EventCounterListener(10);
+    private final EventCounterListener counter = new EventCounterListener(10);
     /***/
     private final MonitoringInstance   inst;
-    /***/
-    private final LogEventListener     logListener = new LogEventListener();
-    /***/
-    private final EventReceiver        receiver;
-    /***/
-    private final int                  udpPort;
 
 
     /**
      * Constructor. Prepare to run the monitoring application.
-     * 
+     */
+    public MonitoringDriver() {
+        this.inst = new MonitoringInstance();
+    }
+
+
+    /**
      * @param ctx
-     * @param udpPort
      * @param eventsEndPoint
      */
-    public MonitoringDriver(final ZContext ctx, final int udpPort, final String eventsEndPoint) {
-        this.udpPort = udpPort;
-        this.inst = new MonitoringInstance();
-        this.receiver = new EventReceiver(ctx, eventsEndPoint);
+    public void addEventReceiver(final ZContext ctx, final String eventsEndPoint) {
+        final EventReceiver receiver = new EventReceiver(ctx, eventsEndPoint);
+
+        receiver.add(new LogEventListener());
+        receiver.add(counter);
+        inst.addTask(receiver);
+    }
+
+
+    /**
+     * @param udpPort
+     * @throws SocketException
+     */
+    public void addUDPServer(final int udpPort) throws SocketException {
+        inst.addTask(new UDPServer(udpPort, inst));
     }
 
 
@@ -85,9 +96,10 @@ public class MonitoringDriver {
      * Use the udp client to get the status of the monitoring instance. If the instance is normally running, it should return the
      * pid of the running jvm.
      * 
+     * @param udpPort
      * @throws IOException
      */
-    public void reportsStatus() throws IOException {
+    public void reportsMonitoringStatus(final int udpPort) throws IOException {
         final UDPClient client = new UDPClient(udpPort);
         String resp = null;
 
@@ -122,9 +134,6 @@ public class MonitoringDriver {
      * @throws SocketException
      */
     public void start() throws SocketException {
-        inst.start(udpPort);
-        receiver.add(logListener);
-        receiver.add(counter);
-        receiver.start();
+        inst.start();
     }
 }

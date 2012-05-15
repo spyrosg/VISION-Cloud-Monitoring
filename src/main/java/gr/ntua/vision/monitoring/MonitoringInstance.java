@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
 
@@ -22,17 +21,13 @@ import org.zeromq.ZMQ;
  */
 public class MonitoringInstance implements UDPListener {
     /***/
-    private static final String KILL           = "stop!";
+    private static final String KILL   = "stop!";
     /** the log target. */
-    private static final Logger log            = LoggerFactory.getLogger(MonitoringInstance.class);
+    private static final Logger log    = LoggerFactory.getLogger(MonitoringInstance.class);
     /***/
-    private static final String STATUS         = "status?";
-    /***/
-    private final List<Thread>  tasks          = new ArrayList<Thread>();
-    /***/
-    private final ZContext      ctx            = new ZContext();
-    /***/
-    private final String        eventsEndPoint = "tcp://127.0.0.1:67891";
+    private static final String STATUS = "status?";
+    /** the list of supporting tasks. */
+    private final List<Thread>  tasks  = new ArrayList<Thread>();
 
 
     /**
@@ -41,6 +36,16 @@ public class MonitoringInstance implements UDPListener {
     public MonitoringInstance() {
         log.info("Starting up, pid={}, ip={}", getVMPID(), getInterfaceIP());
         log.info("running zmq version={}", ZMQ.getVersionString());
+    }
+
+
+    /**
+     * Prepare the task to run.
+     * 
+     * @param t
+     */
+    public void addTask(final Thread t) {
+        tasks.add(t);
     }
 
 
@@ -58,19 +63,11 @@ public class MonitoringInstance implements UDPListener {
 
 
     /**
-     * Actually start the application. Setup and run any supporting tasks.
-     * 
-     * @param udpPort
-     * @throws SocketException
+     * Start running any supporting tasks.
      */
-    public void start(final int udpPort) throws SocketException {
-        startService(new UDPServer(udpPort, this));
-
-        final EventReceiver receiver = new EventReceiver(ctx, eventsEndPoint);
-
-        receiver.add(new LogEventListener());
-
-        startService(receiver);
+    public void start() {
+        for (final Thread t : tasks)
+            t.start();
     }
 
 
@@ -79,29 +76,16 @@ public class MonitoringInstance implements UDPListener {
      */
     public void stop() {
         log.info("shutting down");
-        shutdownServices();
-        log.debug("successful shutdown");
+        shutdownTasks();
     }
 
 
     /**
      * Stop any supporting tasks.
      */
-    private void shutdownServices() {
+    private void shutdownTasks() {
         for (final Thread t : tasks)
             t.interrupt();
-    }
-
-
-    /**
-     * Start running the task asynchronously.
-     * 
-     * @param task
-     *            the task to run.
-     */
-    private void startService(final Thread task) {
-        tasks.add(task);
-        task.start();
     }
 
 

@@ -13,7 +13,7 @@ import json
 
 ### This is the monitoring dispatch lib code.
 
-EVENTS_ENDPOINT= "tcp://127.0.0.1:67891"
+EVENTS_ENDPOINT= "ipc:///tmp/vision.events"
 
 
 class MonitoringEventDispatcher(object):
@@ -26,10 +26,10 @@ class MonitoringEventDispatcher(object):
         logging.info('monitoring dispatcher startup')
         self.ctx = zmq.Context()
         self.events_end_point = EVENTS_ENDPOINT
-        self.sock = self.ctx.socket(zmq.ROUTER)
+        self.sock = self.ctx.socket(zmq.PUSH)
         self.sock.setsockopt(zmq.LINGER, 0)
-        logging.debug('binding to endpoint=%s', self.events_end_point)
-        self.sock.bind(self.events_end_point)
+        self.sock.connect(self.events_end_point)
+        logging.debug('connecting to endpoint=%s', self.events_end_point)
 
     def send(self, **event):
         event['timestamp'] = int(time())

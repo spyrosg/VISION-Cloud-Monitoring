@@ -18,13 +18,15 @@ import org.zeromq.ZMQ.Socket;
  */
 public class EventReceiver extends Thread {
     /***/
-    private final List<EventListener> listeners = new ArrayList<EventListener>();
+    private final List<EventListener> listeners    = new ArrayList<EventListener>();
     /***/
-    private final Logger              log       = LoggerFactory.getLogger(EventReceiver.class);
+    private final Logger              log          = LoggerFactory.getLogger(EventReceiver.class);
+    /***/
+    private final JSONParser          parser       = new JSONParser();
     /***/
     private final Socket              sock;
     /***/
-    private final JSONParser          parser    = new JSONParser();
+    private final String              STOP_MESSAGE = "STOP!";
 
 
     /**
@@ -34,11 +36,10 @@ public class EventReceiver extends Thread {
      * @param eventsEndPoint
      */
     public EventReceiver(final ZContext ctx, final String eventsEndPoint) {
-        this.sock = ctx.createSocket(ZMQ.DEALER);
-        this.sock.setIdentity("*".getBytes());
-        this.sock.connect(eventsEndPoint);
+        this.sock = ctx.createSocket(ZMQ.PULL);
+        this.sock.bind(eventsEndPoint);
         this.sock.setLinger(0);
-        log.debug("{}: connecting to endpoint={}", getName() + getId(), eventsEndPoint);
+        log.debug("listening on endpoint={}", eventsEndPoint);
     }
 
 
@@ -55,27 +56,29 @@ public class EventReceiver extends Thread {
      */
     @Override
     public void run() {
-        while (true) {
-            log.trace("waiting to receive");
+        log.debug("entering receive loop");
 
+        while (!isInterrupted()) {
             final byte[] buf = sock.recv(0);
 
             if (buf == null) {
                 log.error("receiving null event");
-                return;
+                continue;
             }
 
             final String msg = new String(buf, 0, buf.length);
 
-            if (msg.equals("END"))
+            if (msg.equals(STOP_MESSAGE))
                 break;
+
+            log.trace("received: {}", msg);
 
             try {
                 @SuppressWarnings("rawtypes")
                 final Map dict = (Map) parser.parse(msg);
                 notifyWith(new DummyEvent(dict));
             } catch (final ParseException e) {
-                log.error("error deserializing {}", msg);
+                log.error("error deserializing: {}", msg);
                 log.error("ParseException", e);
             }
         }
@@ -88,7 +91,7 @@ public class EventReceiver extends Thread {
      * @param e
      *            the event.
      */
-    void notifyWith(final Event e) {
+    private void notifyWith(final Event e) {
         for (final EventListener listener : listeners)
             listener.notify(e);
     }

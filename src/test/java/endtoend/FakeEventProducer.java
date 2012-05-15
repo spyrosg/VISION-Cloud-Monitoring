@@ -11,26 +11,24 @@ import org.zeromq.ZMQ.Socket;
 /**
  *
  */
-public class FakeEventGeneratorServer {
+public class FakeEventProducer {
     /***/
-    private static final int    NO_EVENTS_TO_SENT = 10;
+    private static final int NO_EVENTS_TO_SENT = 10;
     /***/
-    private static final byte[] TO_ALL            = "*".getBytes();
+    private final String     eventsEndPoint;
     /***/
-    private final String        eventsEndPoint;
+    private final Logger     log               = LoggerFactory.getLogger(FakeEventProducer.class);
     /***/
-    private final Logger        log               = LoggerFactory.getLogger(FakeEventGeneratorServer.class);
-    /***/
-    private final Socket        sock;
+    private final Socket     sock;
 
 
     /**
      * @param ctx
-     * @param zmqPort
+     * @param eventsEndPoint
      */
-    public FakeEventGeneratorServer(final ZContext ctx, final String zmqPort) {
-        this.eventsEndPoint = zmqPort;
-        this.sock = ctx.createSocket(ZMQ.ROUTER);
+    public FakeEventProducer(final ZContext ctx, final String eventsEndPoint) {
+        this.eventsEndPoint = eventsEndPoint;
+        this.sock = ctx.createSocket(ZMQ.PUSH);
         this.sock.setLinger(0);
     }
 
@@ -48,8 +46,8 @@ public class FakeEventGeneratorServer {
      * 
      */
     public void start() {
-        log.debug("binding to endpoint={}", eventsEndPoint);
-        sock.bind(eventsEndPoint);
+        log.debug("connecting to endpoint={}", eventsEndPoint);
+        sock.connect(eventsEndPoint);
     }
 
 
@@ -64,6 +62,7 @@ public class FakeEventGeneratorServer {
     /**
      * @param s
      */
+    @SuppressWarnings("unchecked")
     private void sendEvent(final String s) {
         log.debug("sending: {}", s);
         final JSONObject o = new JSONObject();
@@ -71,7 +70,6 @@ public class FakeEventGeneratorServer {
         o.put("timestamp", System.currentTimeMillis());
         o.put("val", s);
 
-        sock.send(TO_ALL, ZMQ.SNDMORE);
         sock.send(o.toJSONString().getBytes(), 0);
     }
 }

@@ -3,6 +3,8 @@ package gr.ntua.vision.monitoring;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 
+import org.zeromq.ZContext;
+
 
 /**
  * The entry point to the monitoring instance.
@@ -40,8 +42,11 @@ public class Main {
             @Override
             void run(final Config cnf) throws IOException {
                 final MonitoringInstance mon = new MonitoringInstance();
+                final ZContext ctx = new ZContext();
 
-                mon.start(UDP_SERVER_PORT);
+                mon.addTask(new UDPServer(UDP_PORT, mon));
+                mon.addTask(new EventReceiver(ctx, EVENTS_END_POINT));
+                mon.start();
             }
         },
         /***/
@@ -54,7 +59,7 @@ public class Main {
 
             @Override
             void run(final Config cnf) throws IOException {
-                final UDPClient client = new UDPClient(UDP_SERVER_PORT);
+                final UDPClient client = new UDPClient(UDP_PORT);
                 String resp = null;
 
                 for (int i = 0; i < 3; ++i)
@@ -81,7 +86,7 @@ public class Main {
 
             @Override
             void run(final Config cnf) throws IOException {
-                final UDPClient client = new UDPClient(UDP_SERVER_PORT);
+                final UDPClient client = new UDPClient(UDP_PORT);
 
                 try {
                     System.out.println(PROG + ": stopping.");
@@ -139,11 +144,12 @@ public class Main {
         }
     }
 
+    /** this is the endpoint used to send/receive events. */
+    private static final String EVENTS_END_POINT = "ipc:///tmp/vision.events";
     /** the program name. */
-    private static final String PROG            = "vismo";
-
+    private static final String PROG             = "vismo";
     /***/
-    private static final int    UDP_SERVER_PORT = 56431;
+    private static final int    UDP_PORT         = 56431;
 
 
     /**
