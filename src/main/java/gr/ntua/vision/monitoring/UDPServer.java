@@ -71,6 +71,8 @@ public class UDPServer extends Thread {
             } catch (final IOException e) {
                 log.error("while receiving", e);
             }
+
+        log.debug("shutting down");
     }
 
 

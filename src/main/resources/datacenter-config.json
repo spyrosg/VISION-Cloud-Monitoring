@@ -1,0 +1,62 @@
+
+{
+    "clusters": [
+        {
+            "name": "ing-res-16",
+            "id": "vision-1",
+            "machines": [
+                {
+                    "ip": "10.0.1.211",
+                    "hostname": "vision-1-1",
+                },
+                {
+                    "ip": "10.0.1.212",
+                    "hostname": "vision-1-2",
+                },
+                {
+                    "ip": "10.0.1.213",
+                    "hostname": "vision-1-3",
+                },
+            ],
+        },
+
+        {
+            "name": "ing-res-19",
+            "id": "vision-4",
+            "machines": [
+                {
+                    "ip": "10.0.2.214",
+                    "hostname": "vision-4-1",
+                },
+                {
+                    "ip": "10.0.2.215",
+                    "hostname": "vision-4-2",
+                },
+                {
+                    "ip": "10.0.2.216",
+                    "hostname": "vision-4-3",
+                },
+            ],
+        },
+
+
+        {
+            "name": "ing-res-20",
+            "id": "vision-5",
+            "machines": [
+                {
+                    "ip": "10.0.3.211",
+                    "hostname": "vision-5-1",
+                },
+                {
+                    "ip": "10.0.3.212",
+                    "hostname": "vision-5-2",
+                },
+                {
+                    "ip": "10.0.3.213",
+                    "hostname": "vision-5-3",
+                },
+            ],
+        },
+    ],
+}

@@ -73,15 +73,14 @@ public class EventReceiver extends Thread {
 
             log.trace("received: {}", msg);
 
-            try {
-                @SuppressWarnings("rawtypes")
-                final Map dict = (Map) parser.parse(msg);
+            @SuppressWarnings("rawtypes")
+            final Map dict = parse(msg);
+
+            if (dict != null)
                 notifyWith(new DummyEvent(dict));
-            } catch (final ParseException e) {
-                log.error("error deserializing: {}", msg);
-                log.error("ParseException", e);
-            }
         }
+
+        log.debug("shutting down");
     }
 
 
@@ -94,5 +93,25 @@ public class EventReceiver extends Thread {
     private void notifyWith(final Event e) {
         for (final EventListener listener : listeners)
             listener.notify(e);
+    }
+
+
+    /**
+     * De-serialize the message as a json object.
+     * 
+     * @param msg
+     *            the message string.
+     * @return if successful, return a java {@link Map} representing the json object, <code>null</code> otherwise.
+     */
+    @SuppressWarnings("rawtypes")
+    private Map parse(final String msg) {
+        try {
+            return (Map) parser.parse(msg);
+        } catch (final ParseException e) {
+            log.error("error deserializing: {}", msg);
+            log.error("ParseException", e);
+
+            return null;
+        }
     }
 }
