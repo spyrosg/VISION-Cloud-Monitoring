@@ -16,7 +16,11 @@ import org.zeromq.ZMQ.Socket;
 /**
  * This is used to collect events from the various services.
  */
-public class EventReceiver extends Thread {
+public class EventReceiver extends StoppableTask {
+    /***/
+    private final ZContext            ctx;
+    /***/
+    private final String              eventsEndPoint;
     /***/
     private final List<EventListener> listeners    = new ArrayList<EventListener>();
     /***/
@@ -26,7 +30,7 @@ public class EventReceiver extends Thread {
     /***/
     private final Socket              sock;
     /***/
-    private final String              STOP_MESSAGE = "STOP!";
+    private final String              STOP_MESSAGE = "stop!";
 
 
     /**
@@ -36,6 +40,9 @@ public class EventReceiver extends Thread {
      * @param eventsEndPoint
      */
     public EventReceiver(final ZContext ctx, final String eventsEndPoint) {
+        super("event-receiver");
+        this.ctx = ctx;
+        this.eventsEndPoint = eventsEndPoint;
         this.sock = ctx.createSocket(ZMQ.PULL);
         this.sock.bind(eventsEndPoint);
         this.sock.setLinger(0);
@@ -56,22 +63,20 @@ public class EventReceiver extends Thread {
      */
     @Override
     public void run() {
-        log.debug("entering receive loop");
+        log.debug("ready to pull");
 
-        while (!isInterrupted()) {
-            final byte[] buf = sock.recv(0);
+        while (true) {
+            final String msg = receive(sock);
 
-            if (buf == null) {
+            if (msg == null) {
                 log.error("receiving null event");
                 continue;
             }
 
-            final String msg = new String(buf, 0, buf.length);
+            log.trace("received: {}", msg);
 
             if (msg.equals(STOP_MESSAGE))
                 break;
-
-            log.trace("received: {}", msg);
 
             @SuppressWarnings("rawtypes")
             final Map dict = parse(msg);
@@ -81,6 +86,20 @@ public class EventReceiver extends Thread {
         }
 
         log.debug("shutting down");
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.StoppableTask#shutDown()
+     */
+    @Override
+    public void shutDown() {
+        super.shutDown();
+        final Socket stopSock = ctx.createSocket(ZMQ.PUSH);
+
+        stopSock.connect(eventsEndPoint);
+        stopSock.send(STOP_MESSAGE.getBytes(), 0);
+        stopSock.close();
     }
 
 
@@ -113,5 +132,19 @@ public class EventReceiver extends Thread {
 
             return null;
         }
+    }
+
+
+    /**
+     * @param sock
+     * @return
+     */
+    private static String receive(final Socket sock) {
+        final byte[] buf = sock.recv(0);
+
+        if (buf == null)
+            return null;
+
+        return new String(buf, 0, buf.length);
     }
 }

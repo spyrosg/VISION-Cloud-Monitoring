@@ -21,13 +21,13 @@ import org.zeromq.ZMQ;
  */
 public class MonitoringInstance implements UDPListener {
     /***/
-    private static final String KILL   = "stop!";
+    private static final String       KILL   = "stop!";
     /** the log target. */
-    private static final Logger log    = LoggerFactory.getLogger(MonitoringInstance.class);
+    private static final Logger       log    = LoggerFactory.getLogger(MonitoringInstance.class);
     /***/
-    private static final String STATUS = "status?";
+    private static final String       STATUS = "status?";
     /** the list of supporting tasks. */
-    private final List<Thread>  tasks  = new ArrayList<Thread>();
+    private final List<StoppableTask> tasks  = new ArrayList<StoppableTask>();
 
 
     /**
@@ -44,7 +44,7 @@ public class MonitoringInstance implements UDPListener {
      * 
      * @param t
      */
-    public void addTask(final Thread t) {
+    public void addTask(final StoppableTask t) {
         tasks.add(t);
     }
 
@@ -84,8 +84,8 @@ public class MonitoringInstance implements UDPListener {
      * Stop any supporting tasks.
      */
     private void shutdownTasks() {
-        for (final Thread t : tasks)
-            t.interrupt();
+        for (final StoppableTask t : tasks)
+            t.shutDown();
     }
 
 

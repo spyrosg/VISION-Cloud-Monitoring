@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 /**
  *
  */
-public class UDPServer extends Thread {
+public class UDPServer extends StoppableTask {
     /**
      * This is used to notify any interested party for incoming udp requests.
      */
