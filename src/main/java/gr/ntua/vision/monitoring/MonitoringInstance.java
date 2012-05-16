@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.UDPServer.UDPListener;
+import gr.ntua.vision.monitoring.udp.UDPServer.UDPListener;
 
 import java.lang.management.ManagementFactory;
 import java.net.Inet6Address;
@@ -50,7 +50,7 @@ public class MonitoringInstance implements UDPListener {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.UDPServer.UDPListener#notify(java.lang.String)
+     * @see gr.ntua.vision.monitoring.udp.UDPServer.UDPListener#notify(java.lang.String)
      */
     @Override
     public String notify(final String msg) {

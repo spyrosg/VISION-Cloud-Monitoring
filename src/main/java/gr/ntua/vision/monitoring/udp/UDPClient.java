@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision.monitoring.udp;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

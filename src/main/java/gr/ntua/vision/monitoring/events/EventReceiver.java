@@ -1,11 +1,10 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision.monitoring.events;
+
+import gr.ntua.vision.monitoring.StoppableTask;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeromq.ZContext;
@@ -21,12 +20,12 @@ public class EventReceiver extends StoppableTask {
     private final ZContext            ctx;
     /***/
     private final String              eventsEndPoint;
+    /** the event factory. */
+    private final EventFactory        factory      = new EventFactory();
     /***/
     private final List<EventListener> listeners    = new ArrayList<EventListener>();
     /***/
     private final Logger              log          = LoggerFactory.getLogger(EventReceiver.class);
-    /***/
-    private final JSONParser          parser       = new JSONParser();
     /***/
     private final Socket              sock;
     /***/
@@ -51,15 +50,7 @@ public class EventReceiver extends StoppableTask {
 
 
     /**
-     * @param listener
-     */
-    public void add(final EventListener listener) {
-        listeners.add(listener);
-    }
-
-
-    /**
-     * 
+     * @see java.lang.Thread#run()
      */
     @Override
     public void run() {
@@ -78,11 +69,10 @@ public class EventReceiver extends StoppableTask {
             if (msg.equals(STOP_MESSAGE))
                 break;
 
-            @SuppressWarnings("rawtypes")
-            final Map dict = parse(msg);
+            final Event e = factory.createEvent(msg);
 
-            if (dict != null)
-                notifyWith(new DummyEvent(dict));
+            if (e != null)
+                notifyWith(e);
         }
 
         log.debug("shutting down");
@@ -90,16 +80,25 @@ public class EventReceiver extends StoppableTask {
 
 
     /**
+     * Stop the thread. This call is guaranteed to promptly interrupt <code>this</code> thread execution.
+     * 
      * @see gr.ntua.vision.monitoring.StoppableTask#shutDown()
      */
     @Override
     public void shutDown() {
         super.shutDown();
-        final Socket stopSock = ctx.createSocket(ZMQ.PUSH);
+        sendStopMessage();
+    }
 
-        stopSock.connect(eventsEndPoint);
-        stopSock.send(STOP_MESSAGE.getBytes(), 0);
-        stopSock.close();
+
+    /**
+     * Subscribe a new listener. There is no guarantee in the order the listeners will get notified.
+     * 
+     * @param listener
+     *            the listener to add.
+     */
+    public void subscribe(final EventListener listener) {
+        listeners.add(listener);
     }
 
 
@@ -116,28 +115,23 @@ public class EventReceiver extends StoppableTask {
 
 
     /**
-     * De-serialize the message as a json object.
-     * 
-     * @param msg
-     *            the message string.
-     * @return if successful, return a java {@link Map} representing the json object, <code>null</code> otherwise.
+     * Ask the thread to stop receiving messages.
      */
-    @SuppressWarnings("rawtypes")
-    private Map parse(final String msg) {
-        try {
-            return (Map) parser.parse(msg);
-        } catch (final ParseException e) {
-            log.error("error deserializing: {}", msg);
-            log.error("ParseException", e);
+    private void sendStopMessage() {
+        final Socket stopSock = ctx.createSocket(ZMQ.PUSH);
 
-            return null;
-        }
+        stopSock.connect(eventsEndPoint);
+        stopSock.send(STOP_MESSAGE.getBytes(), 0);
+        stopSock.close();
     }
 
 
     /**
+     * Receive a new message from the socket.
+     * 
      * @param sock
-     * @return
+     *            the socket.
+     * @return the message as a string, or <code>null</code> if there was an error receiving.
      */
     private static String receive(final Socket sock) {
         final byte[] buf = sock.recv(0);

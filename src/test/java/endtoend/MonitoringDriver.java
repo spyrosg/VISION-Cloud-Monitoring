@@ -2,13 +2,13 @@ package endtoend;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import gr.ntua.vision.monitoring.Event;
-import gr.ntua.vision.monitoring.EventListener;
-import gr.ntua.vision.monitoring.EventReceiver;
 import gr.ntua.vision.monitoring.LogEventListener;
 import gr.ntua.vision.monitoring.MonitoringInstance;
-import gr.ntua.vision.monitoring.UDPClient;
-import gr.ntua.vision.monitoring.UDPServer;
+import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.EventListener;
+import gr.ntua.vision.monitoring.events.EventReceiver;
+import gr.ntua.vision.monitoring.udp.UDPClient;
+import gr.ntua.vision.monitoring.udp.UDPServer;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -48,7 +48,7 @@ public class MonitoringDriver {
 
 
         /**
-         * @see gr.ntua.vision.monitoring.EventListener#notify(gr.ntua.vision.monitoring.Event)
+         * @see gr.ntua.vision.monitoring.events.EventListener#notify(gr.ntua.vision.monitoring.events.Event)
          */
         @Override
         public void notify(final Event e) {
@@ -77,8 +77,8 @@ public class MonitoringDriver {
     public void addEventReceiver(final ZContext ctx, final String eventsEndPoint) {
         final EventReceiver receiver = new EventReceiver(ctx, eventsEndPoint);
 
-        receiver.add(new LogEventListener());
-        receiver.add(counter);
+        receiver.subscribe(new LogEventListener());
+        receiver.subscribe(counter);
         inst.addTask(receiver);
     }
 

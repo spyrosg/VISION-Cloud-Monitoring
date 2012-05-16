@@ -15,7 +15,7 @@ import org.zeromq.ZContext;
  */
 public class VismoEndToEndTest {
     /** this is the endpoint used to send/receive events. */
-    private static final String     EVENTS_END_POINT = "ipc:///tmp/vision.events";
+    private static final String     EVENTS_END_POINT = "ipc:///tmp/vision.test.events";
     /** the udp port. */
     private static final int        UDP_PORT         = 56431;
     /***/
@@ -56,9 +56,7 @@ public class VismoEndToEndTest {
     }
 
 
-    /**
-     * 
-     */
+    /***/
     @After
     public void tearDown() {
         eventProducer.stop();

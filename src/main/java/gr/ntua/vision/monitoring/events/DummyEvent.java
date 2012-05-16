@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision.monitoring.events;
 
 import java.util.Map;
 
@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  *
  */
-public class DummyEvent implements Event {
+class DummyEvent implements Event {
     /***/
     @SuppressWarnings("rawtypes")
     private final Map dict;
@@ -21,7 +21,7 @@ public class DummyEvent implements Event {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.Event#get(java.lang.String)
+     * @see gr.ntua.vision.monitoring.events.Event#get(java.lang.String)
      */
     @Override
     public Object get(final String key) {
@@ -30,7 +30,7 @@ public class DummyEvent implements Event {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.Event#timestamp()
+     * @see gr.ntua.vision.monitoring.events.Event#timestamp()
      */
     @Override
     public long timestamp() {

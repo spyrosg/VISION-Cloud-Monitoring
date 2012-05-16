@@ -1,4 +1,6 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision.monitoring.udp;
+
+import gr.ntua.vision.monitoring.StoppableTask;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

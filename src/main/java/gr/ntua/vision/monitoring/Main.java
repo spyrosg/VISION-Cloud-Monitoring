@@ -1,5 +1,9 @@
 package gr.ntua.vision.monitoring;
 
+import gr.ntua.vision.monitoring.events.EventReceiver;
+import gr.ntua.vision.monitoring.udp.UDPClient;
+import gr.ntua.vision.monitoring.udp.UDPServer;
+
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 
