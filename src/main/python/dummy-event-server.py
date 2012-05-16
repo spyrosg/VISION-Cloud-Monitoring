@@ -3,39 +3,10 @@
 
 from __future__ import print_function
 
-from sys import stderr
-from time import sleep, time
+from vismo_dispatch import MonitoringEventDispatcher
+from time import sleep
 import logging
-import zmq
-import json
-
-
-
-### This is the monitoring dispatch lib code.
-
-EVENTS_ENDPOINT= "ipc:///tmp/vision.events"
-
-
-class MonitoringEventDispatcher(object):
-    """
-        This is used as the bridge that handles the event generation code
-        with the event distribution code.
-    """
-
-    def __init__(self):
-        logging.info('monitoring dispatcher startup')
-        self.ctx = zmq.Context()
-        self.events_end_point = EVENTS_ENDPOINT
-        self.sock = self.ctx.socket(zmq.PUSH)
-        self.sock.setsockopt(zmq.LINGER, 0)
-        self.sock.connect(self.events_end_point)
-        logging.debug('connecting to endpoint=%s', self.events_end_point)
-
-    def send(self, **event):
-        event['timestamp'] = int(time())
-        logging.debug("sending event: %s", event)
-        self.sock.send(json.dumps(event))
-
+from random import randint
 
 
 ### The following code emulates object service and its clients.
@@ -43,7 +14,7 @@ class MonitoringEventDispatcher(object):
 class FakeObjectService(object):
     """
         This is the fake object service, which is used
-        to put object requests to by the clients.
+        by the clients to perform object requests.
     """
 
     def __init__(self, dispatcher):
@@ -61,26 +32,28 @@ class FakeObjectService(object):
 
 
 
-ONE_SEC_DELAY = 1
-NO_EVENTS = 1000
-
 class FakeObjectServiceClient(object):
+    # the maximum number of seconds to wait
+    # before sending an event
+    MAX_DELAY = 5
+
+
     def __init__(self, obs):
         self.obs = obs
 
     def run_requests(self):
-        for i in range(NO_EVENTS):
-            if i % 2 == 0:
-                self.obs.read('ntua', 'vassilis', 'foo', 'my-object')
-            else:
+        while True:
+            n = randint(1, 100)
+
+            if n % 3 == 0:
                 self.obs.write('ntua', 'vassilis', 'foo', 'my-object')
+            else:
+                self.obs.read('ntua', 'vassilis', 'foo', 'my-object')
 
-            sleep(ONE_SEC_DELAY)
-
+            sleep(randint(1, FakeObjectServiceClient.MAX_DELAY))
 
 
 if __name__ == '__main__':
-    logging.getLogger().setLevel(logging.DEBUG)
     logging.info('starting on localhost')
 
     # this will be our entry point to object service
