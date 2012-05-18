@@ -18,7 +18,7 @@ import org.zeromq.ZContext;
 
 
 /**
- *
+ * This object is used to drive/direct
  */
 public class MonitoringDriver {
     /**
@@ -79,6 +79,7 @@ public class MonitoringDriver {
 
         receiver.subscribe(new LogEventListener());
         receiver.subscribe(counter);
+        // receiver.subscribe(new EventDistributor());
         inst.addTask(receiver);
     }
 

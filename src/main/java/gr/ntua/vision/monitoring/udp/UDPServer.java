@@ -79,6 +79,15 @@ public class UDPServer extends StoppableTask {
 
 
     /**
+     * @see gr.ntua.vision.monitoring.StoppableTask#shutDown()
+     */
+    @Override
+    public void shutDown() {
+        interrupt();
+    }
+
+
+    /**
      * Receive a datagram packet from the socket.
      * 
      * @return a {@link DatagramPacket}.

@@ -9,7 +9,8 @@ import org.zeromq.ZMQ.Socket;
 
 
 /**
- *
+ * This is used to emulate an external to vismo event producer. It is assumed that the producers are running in the same (Linux)
+ * host.
  */
 public class FakeEventProducer {
     /***/
