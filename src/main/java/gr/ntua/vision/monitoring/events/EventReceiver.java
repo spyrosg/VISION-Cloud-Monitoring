@@ -13,30 +13,34 @@ import org.zeromq.ZMQ.Socket;
 
 
 /**
- * This is used to collect events from the various services.
+ * An event receiver is the main entry point of the various events happening in localhost, that we care to monitor. This is used
+ * to collect these events and pass them around to the rest of the system. Upon event receipt, the interested parties we'll be
+ * notified.
  */
 public class EventReceiver extends StoppableTask {
-    /***/
+    /** the zmq context. */
     private final ZContext            ctx;
-    /***/
+    /** the zmq context. */
     private final String              eventsEndPoint;
     /** the event factory. */
     private final EventFactory        factory      = new EventFactory();
-    /***/
-    private final List<EventListener> listeners    = new ArrayList<EventListener>();
-    /***/
+    /** the log target. */
     private final Logger              log          = LoggerFactory.getLogger(EventReceiver.class);
-    /***/
+    /** the sock receiving events. */
     private final Socket              sock;
-    /***/
+    /** the message used to stop the task. */
     private final String              STOP_MESSAGE = "stop!";
+    /** the subscribers lists. */
+    private final List<EventListener> subscribers  = new ArrayList<EventListener>();
 
 
     /**
      * Constructor.
      * 
      * @param ctx
+     *            the zmq context.
      * @param eventsEndPoint
+     *            the events end-point to bind to.
      */
     public EventReceiver(final ZContext ctx, final String eventsEndPoint) {
         super("event-receiver");
@@ -80,25 +84,24 @@ public class EventReceiver extends StoppableTask {
 
 
     /**
-     * Stop the thread. This call is guaranteed to promptly interrupt <code>this</code> thread execution.
+     * Stop the thread. This call is guaranteed to promptly interrupt <code>this</code> thread's execution.
      * 
      * @see gr.ntua.vision.monitoring.StoppableTask#shutDown()
      */
     @Override
     public void shutDown() {
-        super.shutDown();
         sendStopMessage();
     }
 
 
     /**
-     * Subscribe a new listener. There is no guarantee in the order the listeners will get notified.
+     * Subscribe a new listener. There is no guarantee in the order the listeners will be notified.
      * 
      * @param listener
-     *            the listener to add.
+     *            the listener to subscribe.
      */
     public void subscribe(final EventListener listener) {
-        listeners.add(listener);
+        subscribers.add(listener);
     }
 
 
@@ -109,7 +112,7 @@ public class EventReceiver extends StoppableTask {
      *            the event.
      */
     private void notifyWith(final Event e) {
-        for (final EventListener listener : listeners)
+        for (final EventListener listener : subscribers)
             listener.notify(e);
     }
 
