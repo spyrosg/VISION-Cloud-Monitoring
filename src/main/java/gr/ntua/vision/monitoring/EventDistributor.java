@@ -24,13 +24,15 @@ public class EventDistributor implements EventListener {
 
 
     /**
+     * Constructor.
+     * 
      * @param ctx
      * @param distributionPoint
      */
     public EventDistributor(final ZContext ctx, final String distributionPoint) {
         this.sock = ctx.createSocket(ZMQ.PUSH);
         this.sock.setLinger(0);
-        this.sock.setSendTimeOut(0);
+        this.sock.setSendTimeOut(0); // FIXME: non-blocking for now
         this.sock.bind(distributionPoint);
         log.debug("listening to endpoint={}", distributionPoint);
     }
@@ -45,9 +47,7 @@ public class EventDistributor implements EventListener {
         final Map dict = (Map) e.get("!dict");
         final String msg = JSONValue.toJSONString(dict);
 
-        log.trace("about to distribute event: {}", e);
-
-        // TODO: get back to this? Should we block or should be drop?
+        // TODO: get back to this. Should we block or should be drop?
         if (this.sock.send(msg.getBytes(), 0))
             log.trace("sent");
         else

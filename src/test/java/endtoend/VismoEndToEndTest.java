@@ -1,8 +1,8 @@
 package endtoend;
 
-import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventHandler;
+import gr.ntua.vision.monitoring.events.EventRegistry;
 
 import java.net.SocketException;
 
@@ -18,36 +18,6 @@ import org.zeromq.ZContext;
  *
  */
 public class VismoEndToEndTest {
-    /***/
-    private static class EventCountHandler implements EventHandler {
-        /***/
-        private final int noExpectedEvents;
-        /***/
-        private int       noReceivedEvents = 0;
-
-
-        /**
-         * @param noExpectedEvents
-         */
-        public EventCountHandler(final int noExpectedEvents) {
-            this.noExpectedEvents = noExpectedEvents;
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.events.EventHandler#handler(gr.ntua.vision.monitoring.events.Event)
-         */
-        @Override
-        public void handler(final Event e) {
-            ++noReceivedEvents;
-        }
-
-
-        /***/
-        public void haveReceivedEnoughMessages() {
-            assertTrue("not enough events received: " + noReceivedEvents, noReceivedEvents >= noExpectedEvents);
-        }
-    }
     private static final String     EVENTS_DISTRIBUTION_PORT = "tcp://127.0.0.1:34890";
     private static final String     LOCAL_EVENTS_ENTRY_PORT  = "ipc:///tmp/vision.test.events";
     /** the maximum number of events to sent for the test. */
@@ -66,7 +36,7 @@ public class VismoEndToEndTest {
     private final FakeEventProducer eventProducer            = new FakeEventProducer(ctx, LOCAL_EVENTS_ENTRY_PORT,
                                                                      NO_EVENTS_TO_SENT);
     /***/
-    private final EventRegister     registry                 = new EventRegister(ctx, EVENTS_DISTRIBUTION_PORT);
+    private final EventRegistry     registry                 = new EventRegistry(ctx, EVENTS_DISTRIBUTION_PORT);
 
 
     /**
@@ -90,6 +60,24 @@ public class VismoEndToEndTest {
     @Before
     public void setUp() throws SocketException {
         driver.setup(UDP_PORT, ctx, LOCAL_EVENTS_ENTRY_PORT, EVENTS_DISTRIBUTION_PORT);
+        setupConsumer();
+        eventProducer.start();
+        registry.start();
+    }
+
+
+    /***/
+    @After
+    public void tearDown() {
+        eventConsumerCounter.haveReceivedEnoughMessages();
+        eventProducer.stop();
+    }
+
+
+    /**
+     * 
+     */
+    private void setupConsumer() {
         eventConsumer = new FakeEventConsumer(registry);
         eventConsumer.registerToAll(new EventHandler() {
             private final Logger log = LoggerFactory.getLogger(getClass());
@@ -101,16 +89,6 @@ public class VismoEndToEndTest {
             }
         });
         eventConsumer.registerToAll(eventConsumerCounter);
-        eventProducer.start();
-        registry.start();
-    }
-
-
-    /***/
-    @After
-    public void tearDown() {
-        eventConsumerCounter.haveReceivedEnoughMessages();
-        eventProducer.stop();
     }
 
 

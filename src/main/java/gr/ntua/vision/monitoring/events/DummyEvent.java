@@ -46,6 +46,6 @@ class DummyEvent implements Event {
      */
     @Override
     public String toString() {
-        return "#<DummyEvent: " + dict;
+        return "#<DummyEvent: " + dict + ">";
     }
 }

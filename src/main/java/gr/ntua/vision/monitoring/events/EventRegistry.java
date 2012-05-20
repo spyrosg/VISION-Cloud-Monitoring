@@ -1,8 +1,4 @@
-package endtoend;
-
-import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.events.EventFactory;
-import gr.ntua.vision.monitoring.events.EventHandler;
+package gr.ntua.vision.monitoring.events;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,32 +13,33 @@ import org.zeromq.ZMQ.Socket;
 
 
 /**
- *
+ * The event registry is the mechanism through which an event consumer is notified of new events.
  */
-public class EventRegister extends Thread {
+public class EventRegistry extends Thread {
     /** the log target. */
-    private static final Logger                   log                = LoggerFactory.getLogger(EventRegister.class);
-    /***/
+    private static final Logger                   log                = LoggerFactory.getLogger(EventRegistry.class);
+    /** the event factory. */
     private final EventFactory                    factory            = new EventFactory();
     /** the list of event handlers, per topic. */
     private final Map<String, List<EventHandler>> registeredHandlers = new HashMap<String, List<EventHandler>>();
-    /***/
+    /** the socket. */
     private final Socket                          sock;
 
 
     /**
-     * Constructor
+     * Constructor.
      * 
      * @param ctx
      *            the zmq context.
      * @param distributionEventsPort
+     *            the zmq port in which events arrive from the main vismo component.
      */
-    public EventRegister(final ZContext ctx, final String distributionEventsPort) {
+    public EventRegistry(final ZContext ctx, final String distributionEventsPort) {
         super("event-registration");
         this.sock = ctx.createSocket(ZMQ.PULL);
         this.sock.setLinger(0);
         this.sock.connect(distributionEventsPort);
-        log.info("connecting to {}", distributionEventsPort);
+        log.debug("connecting to endpoint={}", distributionEventsPort);
     }
 
 
@@ -55,7 +52,7 @@ public class EventRegister extends Thread {
      *            the handler.
      */
     public void register(final String topic, final EventHandler handler) {
-        log.trace("registering {} for topic '{}'", handler, topic);
+        log.debug("registering {} for topic '{}'", handler, topic);
 
         final List<EventHandler> handlers = registeredHandlers.get(topic);
 
@@ -65,6 +62,7 @@ public class EventRegister extends Thread {
         }
 
         final List<EventHandler> newHandlerList = new ArrayList<EventHandler>();
+
         newHandlerList.add(handler);
         registeredHandlers.put(topic, newHandlerList);
     }
@@ -88,42 +86,16 @@ public class EventRegister extends Thread {
             final Event e = factory.createEvent(msg);
 
             if (e != null)
-                notify(e);
+                notifyOf(e);
         }
-    }
-
-
-    /**
-     * @return
-     */
-    private int countRegisteredHandlers() {
-        int sum = 0;
-
-        for (final List<EventHandler> handlerList : registeredHandlers.values())
-            sum += handlerList.size();
-
-        return sum;
-    }
-
-
-    /**
-     * @param topic
-     * @return
-     */
-    private List<EventHandler> getTopicList(final String topic) {
-        final List<EventHandler> list = registeredHandlers.get(topic);
-
-        return list != null ? list : new ArrayList<EventHandler>();
     }
 
 
     /**
      * @param e
      */
-    private void notify(final Event e) {
+    private void notifyOf(final Event e) {
         // FIXME: for now, push all events to all handlers
-
-        log.trace("about to notify {} handlers", countRegisteredHandlers());
 
         for (final List<EventHandler> handlerList : registeredHandlers.values())
             for (final EventHandler handler : handlerList) {

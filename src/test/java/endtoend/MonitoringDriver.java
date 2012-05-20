@@ -5,8 +5,6 @@ import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.EventDistributor;
 import gr.ntua.vision.monitoring.LogEventListener;
 import gr.ntua.vision.monitoring.MonitoringInstance;
-import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.events.EventListener;
 import gr.ntua.vision.monitoring.events.LocalEventCollector;
 import gr.ntua.vision.monitoring.udp.UDPClient;
 import gr.ntua.vision.monitoring.udp.UDPServer;
@@ -22,39 +20,6 @@ import org.zeromq.ZContext;
  * This object is used to drive/direct the execution of the top level monitoring objects.
  */
 public class MonitoringDriver {
-    /**
-     *
-     */
-    private static class EventCounterListener implements EventListener {
-        /***/
-        private final int noExpectedEvents;
-        /***/
-        private int       noReceivedEvents = 0;
-
-
-        /**
-         * @param noExpectedEvents
-         */
-        public EventCounterListener(final int noExpectedEvents) {
-            this.noExpectedEvents = noExpectedEvents;
-        }
-
-
-        /***/
-        public void haveReceivedEnoughMessages() {
-            assertTrue("not enough events received: " + noReceivedEvents, noReceivedEvents >= noExpectedEvents);
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.events.EventListener#notify(gr.ntua.vision.monitoring.events.Event)
-         */
-        @Override
-        public void notify(final Event e) {
-            ++noReceivedEvents;
-        }
-    }
-
     /***/
     private final EventCounterListener counter = new EventCounterListener(10);
     /***/

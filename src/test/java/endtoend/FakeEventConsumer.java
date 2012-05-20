@@ -1,6 +1,7 @@
 package endtoend;
 
 import gr.ntua.vision.monitoring.events.EventHandler;
+import gr.ntua.vision.monitoring.events.EventRegistry;
 
 
 /**
@@ -8,7 +9,7 @@ import gr.ntua.vision.monitoring.events.EventHandler;
  */
 public class FakeEventConsumer {
     /***/
-    private final EventRegister registry;
+    private final EventRegistry registry;
 
 
     /**
@@ -16,7 +17,7 @@ public class FakeEventConsumer {
      * 
      * @param registry
      */
-    public FakeEventConsumer(final EventRegister registry) {
+    public FakeEventConsumer(final EventRegistry registry) {
         this.registry = registry;
     }
 
