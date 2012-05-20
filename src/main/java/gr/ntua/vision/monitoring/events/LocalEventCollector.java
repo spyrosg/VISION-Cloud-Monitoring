@@ -13,25 +13,25 @@ import org.zeromq.ZMQ.Socket;
 
 
 /**
- * An event receiver is the main entry point of the various events happening in localhost, that we care to monitor. This is used
+ * An event collector is the main entry point of the various events happening in localhost, that we care to monitor. This is used
  * to collect these events and pass them around to the rest of the system. Upon event receipt, the interested parties we'll be
  * notified.
  */
-public class EventReceiver extends StoppableTask {
+public class LocalEventCollector extends StoppableTask {
     /** the zmq context. */
     private final ZContext            ctx;
-    /** the zmq context. */
-    private final String              eventsEndPoint;
     /** the event factory. */
     private final EventFactory        factory      = new EventFactory();
+    /** the listeners lists. */
+    private final List<EventListener> listeners    = new ArrayList<EventListener>();
+    /** the zmq context. */
+    private final String              localEventsPort;
     /** the log target. */
-    private final Logger              log          = LoggerFactory.getLogger(EventReceiver.class);
+    private final Logger              log          = LoggerFactory.getLogger(LocalEventCollector.class);
     /** the sock receiving events. */
     private final Socket              sock;
     /** the message used to stop the task. */
     private final String              STOP_MESSAGE = "stop!";
-    /** the subscribers lists. */
-    private final List<EventListener> subscribers  = new ArrayList<EventListener>();
 
 
     /**
@@ -39,17 +39,17 @@ public class EventReceiver extends StoppableTask {
      * 
      * @param ctx
      *            the zmq context.
-     * @param eventsEndPoint
+     * @param localEventsPort
      *            the events end-point to bind to.
      */
-    public EventReceiver(final ZContext ctx, final String eventsEndPoint) {
+    public LocalEventCollector(final ZContext ctx, final String localEventsPort) {
         super("event-receiver");
         this.ctx = ctx;
-        this.eventsEndPoint = eventsEndPoint;
+        this.localEventsPort = localEventsPort;
         this.sock = ctx.createSocket(ZMQ.PULL);
-        this.sock.bind(eventsEndPoint);
+        this.sock.bind(localEventsPort);
         this.sock.setLinger(0);
-        log.debug("listening on endpoint={}", eventsEndPoint);
+        log.debug("listening on endpoint={}", localEventsPort);
     }
 
 
@@ -63,10 +63,8 @@ public class EventReceiver extends StoppableTask {
         while (true) {
             final String msg = receive(sock);
 
-            if (msg == null) {
-                log.error("receiving null event");
+            if (msg == null)
                 continue;
-            }
 
             log.trace("received: {}", msg);
 
@@ -76,7 +74,7 @@ public class EventReceiver extends StoppableTask {
             final Event e = factory.createEvent(msg);
 
             if (e != null)
-                notifyWith(e);
+                notifyOf(e);
         }
 
         log.debug("shutting down");
@@ -101,7 +99,7 @@ public class EventReceiver extends StoppableTask {
      *            the listener to subscribe.
      */
     public void subscribe(final EventListener listener) {
-        subscribers.add(listener);
+        listeners.add(listener);
     }
 
 
@@ -111,8 +109,8 @@ public class EventReceiver extends StoppableTask {
      * @param e
      *            the event.
      */
-    private void notifyWith(final Event e) {
-        for (final EventListener listener : subscribers)
+    private void notifyOf(final Event e) {
+        for (final EventListener listener : listeners)
             listener.notify(e);
     }
 
@@ -123,7 +121,7 @@ public class EventReceiver extends StoppableTask {
     private void sendStopMessage() {
         final Socket stopSock = ctx.createSocket(ZMQ.PUSH);
 
-        stopSock.connect(eventsEndPoint);
+        stopSock.connect(localEventsPort);
         stopSock.send(STOP_MESSAGE.getBytes(), 0);
         stopSock.close();
     }

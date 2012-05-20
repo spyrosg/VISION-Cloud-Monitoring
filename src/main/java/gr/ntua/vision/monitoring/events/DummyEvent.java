@@ -25,6 +25,9 @@ class DummyEvent implements Event {
      */
     @Override
     public Object get(final String key) {
+        if (key.equals("!dict"))
+            return dict;
+
         return dict.get(key);
     }
 

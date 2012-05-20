@@ -1,6 +1,7 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.events.EventReceiver;
+import gr.ntua.vision.monitoring.events.EventListener;
+import gr.ntua.vision.monitoring.events.LocalEventCollector;
 import gr.ntua.vision.monitoring.udp.UDPClient;
 import gr.ntua.vision.monitoring.udp.UDPServer;
 
@@ -46,10 +47,17 @@ public class Main {
             @Override
             void run(final Config cnf) throws IOException {
                 final MonitoringInstance mon = new MonitoringInstance();
-                final ZContext ctx = new ZContext();
 
                 mon.addTask(new UDPServer(UDP_PORT, mon));
-                mon.addTask(new EventReceiver(ctx, EVENTS_END_POINT));
+
+                final ZContext ctx = new ZContext();
+                final LocalEventCollector receiver = new LocalEventCollector(ctx, EVENTS_END_POINT);
+                final EventListener logListener = new LogEventListener();
+                final EventListener eventDistributor = new EventDistributor(ctx, DISTRIBUTION_POINT);
+
+                receiver.subscribe(logListener);
+                receiver.subscribe(eventDistributor);
+                mon.addTask(receiver);
                 mon.start();
             }
         },
@@ -148,12 +156,14 @@ public class Main {
         }
     }
 
-    /** this is the endpoint used to send/receive events. */
-    private static final String EVENTS_END_POINT = "ipc:///tmp/vision.events";
-    /** the program name. */
-    private static final String PROG             = "vismo";
     /***/
-    private static final int    UDP_PORT         = 56431;
+    private static final String DISTRIBUTION_POINT = "tcp://127.0.0.1:27890";
+    /** this is the endpoint used to send/receive events. */
+    private static final String EVENTS_END_POINT   = "ipc:///tmp/vision.events";
+    /** the program name. */
+    private static final String PROG               = "vismo";
+    /***/
+    private static final int    UDP_PORT           = 56431;
 
 
     /**

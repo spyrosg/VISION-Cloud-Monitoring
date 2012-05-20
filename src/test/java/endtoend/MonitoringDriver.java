@@ -2,11 +2,12 @@ package endtoend;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import gr.ntua.vision.monitoring.EventDistributor;
 import gr.ntua.vision.monitoring.LogEventListener;
 import gr.ntua.vision.monitoring.MonitoringInstance;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventListener;
-import gr.ntua.vision.monitoring.events.EventReceiver;
+import gr.ntua.vision.monitoring.events.LocalEventCollector;
 import gr.ntua.vision.monitoring.udp.UDPClient;
 import gr.ntua.vision.monitoring.udp.UDPServer;
 
@@ -18,7 +19,7 @@ import org.zeromq.ZContext;
 
 
 /**
- *
+ * This object is used to drive/direct the execution of the top level monitoring objects.
  */
 public class MonitoringDriver {
     /**
@@ -39,9 +40,7 @@ public class MonitoringDriver {
         }
 
 
-        /**
-         * 
-         */
+        /***/
         public void haveReceivedEnoughMessages() {
             assertTrue("not enough events received: " + noReceivedEvents, noReceivedEvents >= noExpectedEvents);
         }
@@ -67,28 +66,6 @@ public class MonitoringDriver {
      */
     public MonitoringDriver() {
         this.inst = new MonitoringInstance();
-    }
-
-
-    /**
-     * @param ctx
-     * @param eventsEndPoint
-     */
-    public void addEventReceiver(final ZContext ctx, final String eventsEndPoint) {
-        final EventReceiver receiver = new EventReceiver(ctx, eventsEndPoint);
-
-        receiver.subscribe(new LogEventListener());
-        receiver.subscribe(counter);
-        inst.addTask(receiver);
-    }
-
-
-    /**
-     * @param udpPort
-     * @throws SocketException
-     */
-    public void addUDPServer(final int udpPort) throws SocketException {
-        inst.addTask(new UDPServer(udpPort, inst));
     }
 
 
@@ -120,6 +97,20 @@ public class MonitoringDriver {
 
 
     /**
+     * @param udpPort
+     * @param ctx
+     * @param localEventsPort
+     * @param externalDistributionPort
+     * @throws SocketException
+     */
+    public void setup(final int udpPort, final ZContext ctx, final String localEventsPort, final String externalDistributionPort)
+            throws SocketException {
+        setupUDPServer(udpPort);
+        setupLocalEventCollector(ctx, localEventsPort, externalDistributionPort);
+    }
+
+
+    /**
      * Stop the application, causing it to leave the cluster.
      */
     public void shutdown() {
@@ -135,5 +126,30 @@ public class MonitoringDriver {
      */
     public void start() throws SocketException {
         inst.start();
+    }
+
+
+    /**
+     * @param ctx
+     * @param localEventsPort
+     * @param externalDistributionPort
+     */
+    private void setupLocalEventCollector(final ZContext ctx, final String localEventsPort, final String externalDistributionPort) {
+        final LocalEventCollector receiver = new LocalEventCollector(ctx, localEventsPort);
+        final EventDistributor distributor = new EventDistributor(ctx, externalDistributionPort);
+
+        receiver.subscribe(new LogEventListener());
+        receiver.subscribe(counter);
+        receiver.subscribe(distributor);
+        inst.addTask(receiver);
+    }
+
+
+    /**
+     * @param udpPort
+     * @throws SocketException
+     */
+    private void setupUDPServer(final int udpPort) throws SocketException {
+        inst.addTask(new UDPServer(udpPort, inst));
     }
 }

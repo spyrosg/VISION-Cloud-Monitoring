@@ -1,6 +1,7 @@
 
 - add an event consumer
 - add another event producer
+- add/config vismo-dispatch logger
 
 - select a role in the mess: node, cluster, cloud
 - send log output to one dedicated machine
