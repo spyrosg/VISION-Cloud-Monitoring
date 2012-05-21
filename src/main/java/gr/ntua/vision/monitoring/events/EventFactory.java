@@ -9,8 +9,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * This is used to de-serialize strings to {@link Event} objects and also hide the {@link Event} implementations from the rest of
- * the system.
+ * This is used to de-serialize events received from the wire to actual java objects of type {@link Event}.
  */
 public class EventFactory {
     /** the log target. */
@@ -30,7 +29,7 @@ public class EventFactory {
         @SuppressWarnings("rawtypes")
         final Map dict = parse(str);
 
-        return dict != null ? new DummyEvent(dict) : null;
+        return dict != null ? new VismoEvent(dict) : null;
     }
 
 
