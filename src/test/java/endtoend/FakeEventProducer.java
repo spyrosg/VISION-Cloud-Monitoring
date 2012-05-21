@@ -1,5 +1,7 @@
 package endtoend;
 
+import java.util.UUID;
+
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,13 +16,13 @@ import org.zeromq.ZMQ.Socket;
  */
 public class FakeEventProducer {
     /***/
-    private final String eventsEntryPoint;
+    private static final Logger log = LoggerFactory.getLogger(FakeEventProducer.class);
     /***/
-    private final Logger log = LoggerFactory.getLogger(FakeEventProducer.class);
+    private final String        eventsEntryPoint;
     /***/
-    private final int    noEventsToSend;
+    private final int           noEventsToSend;
     /***/
-    private final Socket sock;
+    private final Socket        sock;
 
 
     /**
@@ -41,7 +43,7 @@ public class FakeEventProducer {
     /***/
     public void sendEvents() {
         for (int i = 0; i < noEventsToSend; ++i)
-            sendEvent("foo");
+            sendEvent();
     }
 
 
@@ -58,16 +60,18 @@ public class FakeEventProducer {
     }
 
 
-    /**
-     * @param s
-     */
+    /***/
     @SuppressWarnings("unchecked")
-    private void sendEvent(final String s) {
-        log.debug("sending: {}", s);
+    private void sendEvent() {
         final JSONObject o = new JSONObject();
 
         o.put("timestamp", System.currentTimeMillis());
-        o.put("val", s);
+        o.put("topic", "my-topic");
+        o.put("originating-service", "fake-event-producer");
+        o.put("originating-ip", "localhost");
+        o.put("id", UUID.randomUUID());
+
+        log.trace("sending {}", o);
 
         sock.send(o.toJSONString().getBytes(), 0);
     }
