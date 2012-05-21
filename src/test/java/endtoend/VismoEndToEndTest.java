@@ -1,7 +1,5 @@
 package endtoend;
 
-import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.events.EventHandler;
 import gr.ntua.vision.monitoring.events.EventRegistry;
 
 import java.net.SocketException;
@@ -9,8 +7,6 @@ import java.net.SocketException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.zeromq.ZContext;
 
 
@@ -48,7 +44,7 @@ public class VismoEndToEndTest {
         driver.reportsMonitoringStatus(UDP_PORT);
         Thread.sleep(1000);
         eventProducer.sendEvents();
-        giveEnoughTimeToReceiveEvents();
+        waitForEventsToBeFullyReceived();
         driver.reportsMonitoringStatus(UDP_PORT);
         driver.shutdown();
     }
@@ -73,20 +69,9 @@ public class VismoEndToEndTest {
     }
 
 
-    /**
-     * 
-     */
+    /***/
     private void setupConsumer() {
         eventConsumer = new FakeEventConsumer(registry);
-        eventConsumer.registerToAll(new EventHandler() {
-            private final Logger log = LoggerFactory.getLogger(getClass());
-
-
-            @Override
-            public void handle(final Event e) {
-                log.trace("eventConsumer.received: {}", e);
-            }
-        });
         eventConsumer.registerToAll(eventConsumerCounter);
     }
 
@@ -94,7 +79,7 @@ public class VismoEndToEndTest {
     /**
      * @throws InterruptedException
      */
-    private static void giveEnoughTimeToReceiveEvents() throws InterruptedException {
-        Thread.sleep(1000);
+    private static void waitForEventsToBeFullyReceived() throws InterruptedException {
+        Thread.sleep(1100);
     }
 }
