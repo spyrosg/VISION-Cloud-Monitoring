@@ -69,7 +69,7 @@ public class FakeEventProducer {
         o.put("topic", "my-topic");
         o.put("originating-service", "fake-event-producer");
         o.put("originating-ip", "localhost");
-        o.put("id", UUID.randomUUID());
+        o.put("id", UUID.randomUUID().toString());
 
         log.trace("sending {}", o);
 
