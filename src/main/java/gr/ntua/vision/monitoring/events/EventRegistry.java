@@ -18,6 +18,8 @@ import org.zeromq.ZMQ.Socket;
 public class EventRegistry extends Thread {
     /** the log target. */
     private static final Logger                   log                = LoggerFactory.getLogger(EventRegistry.class);
+    /***/
+    private static final byte[]                   TO_ALL             = "".getBytes();
     /** the event factory. */
     private final EventFactory                    factory            = new EventFactory();
     /** the list of event handlers, per topic. */
@@ -36,9 +38,10 @@ public class EventRegistry extends Thread {
      */
     public EventRegistry(final ZContext ctx, final String distributionEventsPort) {
         super("event-registration");
-        this.sock = ctx.createSocket(ZMQ.PULL);
+        this.sock = ctx.createSocket(ZMQ.SUB);
         this.sock.setLinger(0);
         this.sock.connect(distributionEventsPort);
+        this.sock.subscribe(TO_ALL);
         log.debug("connecting to endpoint={}", distributionEventsPort);
     }
 

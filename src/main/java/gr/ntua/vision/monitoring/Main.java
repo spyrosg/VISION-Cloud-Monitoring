@@ -52,10 +52,9 @@ public class Main {
 
                 final ZContext ctx = new ZContext();
                 final LocalEventCollector receiver = new LocalEventCollector(ctx, EVENTS_END_POINT);
-                final EventListener logListener = new LogEventListener();
                 final EventListener eventDistributor = new EventDistributor(ctx, DISTRIBUTION_POINT);
 
-                receiver.subscribe(logListener);
+                receiver.subscribe(new LogEventListener());
                 receiver.subscribe(eventDistributor);
                 mon.addTask(receiver);
                 mon.start();

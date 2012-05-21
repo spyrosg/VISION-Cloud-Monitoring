@@ -6,8 +6,8 @@ import gr.ntua.vision.monitoring.events.EventHandler;
 
 
 /**
- * This is used to verify that the {@link FakeEventConsumer} receives the expected number of events from the main monitoring
- * instance, during the test.
+ * This is used to verify that {@link FakeEventConsumer} receives the expected number of events from the main monitoring instance,
+ * during the test.
  */
 class EventCountHandler implements EventHandler {
     /***/

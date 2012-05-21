@@ -60,9 +60,9 @@ public class VismoEndToEndTest {
     @Before
     public void setUp() throws SocketException {
         driver.setup(UDP_PORT, ctx, LOCAL_EVENTS_ENTRY_PORT, EVENTS_DISTRIBUTION_PORT);
-        setupConsumer();
         eventProducer.start();
         registry.start();
+        setupConsumer();
     }
 
 

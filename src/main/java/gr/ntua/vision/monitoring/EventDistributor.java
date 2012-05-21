@@ -30,7 +30,7 @@ public class EventDistributor implements EventListener {
      * @param distributionPoint
      */
     public EventDistributor(final ZContext ctx, final String distributionPoint) {
-        this.sock = ctx.createSocket(ZMQ.PUSH);
+        this.sock = ctx.createSocket(ZMQ.PUB);
         this.sock.setLinger(0);
         this.sock.setSendTimeOut(0); // FIXME: non-blocking for now
         this.sock.bind(distributionPoint);
