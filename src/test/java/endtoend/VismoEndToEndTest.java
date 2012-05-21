@@ -61,7 +61,6 @@ public class VismoEndToEndTest {
     public void setUp() throws SocketException {
         driver.setup(UDP_PORT, ctx, LOCAL_EVENTS_ENTRY_PORT, EVENTS_DISTRIBUTION_PORT);
         eventProducer.start();
-        registry.start();
         setupConsumer();
     }
 
@@ -84,7 +83,7 @@ public class VismoEndToEndTest {
 
 
             @Override
-            public void handler(final Event e) {
+            public void handle(final Event e) {
                 log.trace("eventConsumer.received: {}", e);
             }
         });

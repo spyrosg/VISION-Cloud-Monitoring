@@ -25,10 +25,10 @@ class EventCountHandler implements EventHandler {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.events.EventHandler#handler(gr.ntua.vision.monitoring.events.Event)
+     * @see gr.ntua.vision.monitoring.events.EventHandler#handle(gr.ntua.vision.monitoring.events.Event)
      */
     @Override
-    public void handler(final Event e) {
+    public void handle(final Event e) {
         ++noReceivedEvents;
     }
 

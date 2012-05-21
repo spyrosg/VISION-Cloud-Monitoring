@@ -1,7 +1,5 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.events.EventListener;
-import gr.ntua.vision.monitoring.events.LocalEventCollector;
 import gr.ntua.vision.monitoring.udp.UDPClient;
 import gr.ntua.vision.monitoring.udp.UDPServer;
 
@@ -47,16 +45,13 @@ public class Main {
             @Override
             void run(final Config cnf) throws IOException {
                 final MonitoringInstance mon = new MonitoringInstance();
-
-                mon.addTask(new UDPServer(UDP_PORT, mon));
-
                 final ZContext ctx = new ZContext();
                 final LocalEventCollector receiver = new LocalEventCollector(ctx, EVENTS_END_POINT);
-                final EventListener eventDistributor = new EventDistributor(ctx, DISTRIBUTION_POINT);
 
-                receiver.subscribe(new LogEventListener());
-                receiver.subscribe(eventDistributor);
+                receiver.subscribe(new EventDistributor(ctx, DISTRIBUTION_POINT));
+
                 mon.addTask(receiver);
+                mon.addTask(new UDPServer(UDP_PORT, mon));
                 mon.start();
             }
         },

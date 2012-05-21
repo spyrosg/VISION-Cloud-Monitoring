@@ -1,6 +1,7 @@
-package gr.ntua.vision.monitoring.events;
+package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.StoppableTask;
+import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.EventFactory;
 
 import java.util.ArrayList;
 import java.util.List;

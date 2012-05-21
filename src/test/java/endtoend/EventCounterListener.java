@@ -1,8 +1,8 @@
 package endtoend;
 
 import static org.junit.Assert.assertTrue;
+import gr.ntua.vision.monitoring.EventListener;
 import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.events.EventListener;
 
 
 /**
@@ -31,7 +31,7 @@ class EventCounterListener implements EventListener {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.events.EventListener#notify(gr.ntua.vision.monitoring.events.Event)
+     * @see gr.ntua.vision.monitoring.EventListener#notify(gr.ntua.vision.monitoring.events.Event)
      */
     @Override
     public void notify(final Event e) {
