@@ -57,6 +57,8 @@ public class EventRegistry {
 
                 if (msg == null)
                     continue;
+                if (!msg.startsWith("{")) // it's the topic
+                    continue;
 
                 final Event e = getFactory().createEvent(msg);
 
