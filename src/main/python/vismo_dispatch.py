@@ -67,8 +67,8 @@ class MonitoringEventDispatcher(object):
     def __init__(self):
         (iface, ip) = get_iface_ip()
         self.ip = ip
-        self.info('dispatcher startup, with pid={}, ip={}'.format(getpid(), iface + '/' + ip))
-        self.debug('connecting to endpoint={}'.format(MonitoringEventDispatcher.EVENTS_ENDPOINT))
+        self.info('dispatcher startup, with pid={0}, ip={1}'.format(getpid(), iface + '/' + ip))
+        self.debug('connecting to endpoint={0}'.format(MonitoringEventDispatcher.EVENTS_ENDPOINT))
         self.sock = self.create_push_socket(MonitoringEventDispatcher.EVENTS_ENDPOINT)
 
 
@@ -85,7 +85,7 @@ class MonitoringEventDispatcher(object):
         event['timestamp'] = int(time())
         event['originating-machine'] = self.ip
         event['originating-service'] = 'object-service'
-        self.debug('=> {}'.format(event))
+        self.debug('=> {0}'.format(event))
         self.sock.send(json.dumps(event))
 
 
