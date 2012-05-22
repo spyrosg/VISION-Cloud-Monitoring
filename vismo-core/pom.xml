@@ -101,7 +101,7 @@
               <directoryIncluded>false</directoryIncluded>
               <sources>
                 <source>
-                  <location>vismo-core/target/vismo-core-1.0.0-SNAPSHOT.jar</location>
+                  <location>target/vismo-core-1.0.0-SNAPSHOT.jar</location>
                   <destination>vismo.jar</destination>
                 </source>
               </sources>
