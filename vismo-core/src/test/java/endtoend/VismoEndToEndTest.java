@@ -15,7 +15,8 @@ import org.zeromq.ZContext;
  */
 public class VismoEndToEndTest {
     private static final String     EVENTS_DISTRIBUTION_PORT = "tcp://127.0.0.1:34890";
-    private static final String     LOCAL_EVENTS_ENTRY_PORT  = "ipc:///tmp/vision.test.events";
+    private static final String     LOCAL_EVENTS_ENTRY_PORT  = "ipc:///tmp/vision." + System.getProperty("user.name")
+                                                                     + ".test.events";
     /** the maximum number of events to sent for the test. */
     private static final int        NO_EVENTS_TO_SENT        = 10;
     /** the udp port. */

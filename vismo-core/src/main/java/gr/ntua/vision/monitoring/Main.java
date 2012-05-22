@@ -153,7 +153,7 @@ public class Main {
     /***/
     private static final String DISTRIBUTION_POINT = "tcp://127.0.0.1:27890";
     /** this is the endpoint used to send/receive events. */
-    private static final String EVENTS_END_POINT   = "ipc:///tmp/vision.events";
+    private static final String EVENTS_END_POINT   = "ipc:///tmp/vision." + System.getProperty("user.name") + ".events";
     /** the program name. */
     private static final String PROG               = "vismo";
     /***/
