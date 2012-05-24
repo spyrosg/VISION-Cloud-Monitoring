@@ -2,6 +2,8 @@ package endtoend;
 
 import gr.ntua.vision.monitoring.events.EventRegistry;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.SocketException;
 
 import org.junit.After;
@@ -15,10 +17,11 @@ import org.zeromq.ZContext;
  */
 public class VismoEndToEndTest {
     private static final String     EVENTS_DISTRIBUTION_PORT = "tcp://127.0.0.1:34890";
-    private static final String     LOCAL_EVENTS_ENTRY_PORT  = "ipc:///tmp/vision." + System.getProperty("user.name")
-                                                                     + ".test.events";
+    private static final String     LOCAL_EVENTS_ENTRY_PORT;
     /** the maximum number of events to sent for the test. */
     private static final int        NO_EVENTS_TO_SENT        = 10;
+    /***/
+    private static final File       tmp;
     /** the udp port. */
     private static final int        UDP_PORT                 = 56431;
     /***/
@@ -34,6 +37,16 @@ public class VismoEndToEndTest {
                                                                      NO_EVENTS_TO_SENT);
     /***/
     private final EventRegistry     registry                 = new EventRegistry(ctx, EVENTS_DISTRIBUTION_PORT);
+
+    static {
+        try {
+            tmp = File.createTempFile("vismo.", ".ports", new File(System.getProperty("java.io.tmpdir")));
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        LOCAL_EVENTS_ENTRY_PORT = "ipc://" + tmp;
+    }
 
 
     /**
