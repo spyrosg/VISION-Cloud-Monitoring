@@ -22,7 +22,7 @@ public class EventRegistry {
      */
     private static class EventHandlerTask implements Runnable {
         /** the log target. */
-        private static final Logger ilog = LoggerFactory.getLogger(EventHandler.class);
+        private static final Logger ilog = LoggerFactory.getLogger(EventHandlerTask.class);
         /** the actual handler. */
         private final EventHandler  handler;
         /** the zmq socket. */
@@ -123,6 +123,17 @@ public class EventRegistry {
 
         log.debug("registering {} for topic '{}'", handler, topic);
         pool.submit(new EventHandlerTask(sock, handler));
+    }
+
+
+    /**
+     * Register the handler to receive events from all topics.
+     * 
+     * @param handler
+     *            the handler.
+     */
+    public void registerToAll(final EventHandler handler) {
+        register("", handler);
     }
 
 

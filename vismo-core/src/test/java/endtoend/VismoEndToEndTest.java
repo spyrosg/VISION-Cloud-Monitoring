@@ -29,8 +29,6 @@ public class VismoEndToEndTest {
     /***/
     private final MonitoringDriver  driver                   = new MonitoringDriver();
     /***/
-    private FakeEventConsumer       eventConsumer;
-    /***/
     private final EventCountHandler eventConsumerCounter     = new EventCountHandler(NO_EVENTS_TO_SENT);
     /***/
     private final FakeEventProducer eventProducer            = new FakeEventProducer(ctx, LOCAL_EVENTS_ENTRY_PORT,
@@ -58,7 +56,7 @@ public class VismoEndToEndTest {
         driver.reportsMonitoringStatus(UDP_PORT);
         Thread.sleep(1000);
         eventProducer.sendEvents();
-        waitForEventsToBeFullyReceived();
+        waitForAllEventsToBeReceived();
         driver.reportsMonitoringStatus(UDP_PORT);
         driver.shutdown();
     }
@@ -85,15 +83,14 @@ public class VismoEndToEndTest {
 
     /***/
     private void setupConsumer() {
-        eventConsumer = new FakeEventConsumer(registry);
-        eventConsumer.registerToAll(eventConsumerCounter);
+        registry.registerToAll(eventConsumerCounter);
     }
 
 
     /**
      * @throws InterruptedException
      */
-    private static void waitForEventsToBeFullyReceived() throws InterruptedException {
+    private static void waitForAllEventsToBeReceived() throws InterruptedException {
         Thread.sleep(1100);
     }
 }

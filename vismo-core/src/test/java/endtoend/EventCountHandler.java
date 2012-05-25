@@ -3,11 +3,12 @@ package endtoend;
 import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventHandler;
+import gr.ntua.vision.monitoring.events.EventRegistry;
 
 
 /**
- * This is used to verify that {@link FakeEventConsumer} receives the expected number of events from the main monitoring instance,
- * during the test.
+ * This is used to verify that {@link EventRegistry} passes to consumers the expected number of events from the main monitoring
+ * instance, during the test.
  */
 class EventCountHandler implements EventHandler {
     /***/
