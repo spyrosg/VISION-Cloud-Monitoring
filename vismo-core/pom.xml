@@ -15,16 +15,6 @@
   <build>
     <plugins>
 
-      <!-- compiler plugin: we require javac 1.6 -->
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
-        <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
-        </configuration>
-      </plugin>
-
       <!-- produce an a fat or uber jar, with mvn package -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
