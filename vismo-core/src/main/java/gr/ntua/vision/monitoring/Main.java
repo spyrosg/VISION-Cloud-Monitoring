@@ -44,7 +44,7 @@ public class Main {
 
             @Override
             void run(final Config cnf) throws IOException {
-                final MonitoringInstance mon = new MonitoringInstance();
+                final MonitoringInstance mon = new MonitoringInstance(new VismoVMInfo());
                 final ZContext ctx = new ZContext();
                 final LocalEventCollector receiver = new LocalEventCollector(ctx, EVENTS_END_POINT);
 

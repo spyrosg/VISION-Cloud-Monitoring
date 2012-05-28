@@ -27,7 +27,7 @@ public class VismoEndToEndTest {
     /***/
     private final ZContext          ctx                      = new ZContext();
     /***/
-    private final MonitoringDriver  driver                   = new MonitoringDriver();
+    private MonitoringDriver        driver;
     /***/
     private final EventCountHandler eventConsumerCounter     = new EventCountHandler(NO_EVENTS_TO_SENT);
     /***/
@@ -67,6 +67,7 @@ public class VismoEndToEndTest {
      */
     @Before
     public void setUp() throws SocketException {
+        driver = new MonitoringDriver();
         driver.setup(UDP_PORT, ctx, LOCAL_EVENTS_ENTRY_PORT, EVENTS_DISTRIBUTION_PORT);
         eventProducer.start();
         setupConsumer();

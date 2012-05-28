@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.EventDistributor;
 import gr.ntua.vision.monitoring.LocalEventCollector;
 import gr.ntua.vision.monitoring.MonitoringInstance;
+import gr.ntua.vision.monitoring.VismoVMInfo;
 import gr.ntua.vision.monitoring.udp.UDPClient;
 import gr.ntua.vision.monitoring.udp.UDPServer;
 
@@ -27,9 +28,11 @@ public class MonitoringDriver {
 
     /**
      * Constructor. Prepare to run the monitoring application.
+     * 
+     * @throws SocketException
      */
-    public MonitoringDriver() {
-        this.inst = new MonitoringInstance();
+    public MonitoringDriver() throws SocketException {
+        this.inst = new MonitoringInstance(new VismoVMInfo());
     }
 
 

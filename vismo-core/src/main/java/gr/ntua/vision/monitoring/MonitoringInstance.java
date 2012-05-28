@@ -2,13 +2,8 @@ package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.udp.UDPServer.UDPListener;
 
-import java.lang.management.ManagementFactory;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -28,13 +23,19 @@ public class MonitoringInstance implements UDPListener {
     private static final String       STATUS = "status?";
     /** the list of supporting tasks. */
     private final List<StoppableTask> tasks  = new ArrayList<StoppableTask>();
+    /***/
+    private final VMInfo              vminfo;
 
 
     /**
      * Constructor.
+     * 
+     * @param vminfo
+     * @throws SocketException
      */
-    public MonitoringInstance() {
-        log.info("Starting up, pid={}, ip={}", getVMPID(), getInterfaceIP());
+    public MonitoringInstance(final VMInfo vminfo) throws SocketException {
+        this.vminfo = vminfo;
+        log.info("Starting up, pid={}, ip={}", vminfo.getPID(), vminfo.getInterface().getDisplayName() + vminfo.getAddress());
         log.info("running zmq version={}", ZMQ.getVersionString());
     }
 
@@ -92,59 +93,7 @@ public class MonitoringInstance implements UDPListener {
     /**
      * @return the pid of the running jvm, as a string.
      */
-    @SuppressWarnings("static-method")
     private String status() {
-        return String.valueOf(getVMPID());
-    }
-
-
-    /**
-     * Try to get the name of the first public, not loop-back interface that is up on the host machine, plus, the first non inet6
-     * address of that interface.
-     * 
-     * @return on success, the name of the interface and the inet address, separated by a slash, <code>null</code> otherwise.
-     */
-    private static String getInterfaceIP() {
-        try {
-            final Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
-
-            while (ifaces.hasMoreElements()) {
-                final NetworkInterface iface = ifaces.nextElement();
-
-                if (iface.isLoopback() || !iface.isUp())
-                    continue;
-
-                final Enumeration<InetAddress> addresses = iface.getInetAddresses();
-
-                while (addresses.hasMoreElements()) {
-                    final InetAddress addr = addresses.nextElement();
-
-                    if (addr instanceof Inet6Address)
-                        continue;
-
-                    return iface.getDisplayName() + "/" + addr.getHostAddress();
-                }
-            }
-        } catch (final SocketException e) {
-            // ignore
-        }
-
-        return null;
-    }
-
-
-    /**
-     * @return the pid of the running jvm.
-     * @throws Error
-     *             when the pid is not available for this jvm.
-     */
-    private static int getVMPID() {
-        final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
-        final int index = jvmName.indexOf("@");
-
-        if (index < 0)
-            throw new Error("Cannot get the pid of this jvm");
-
-        return Integer.parseInt(jvmName.substring(0, index));
+        return String.valueOf(vminfo.getPID());
     }
 }
