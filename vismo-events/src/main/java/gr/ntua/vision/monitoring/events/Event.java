@@ -6,8 +6,8 @@ import java.net.UnknownHostException;
 
 /**
  * This is the interface implemented by all <em>Vismo</em> specific events. In abstract terms, an event is just a collection of
- * key/value pairs. The keys are of type {@link String} and the values are of type {@link Object} - that is we cannot, generally,
- * make any type guarantees of the values found in the event; or that the key/value will be even found in the event. For some well
+ * key/value pairs. The keys are of type {@link String} and the values are of type {@link Object} - that is we cannot, in general,
+ * make any type guarantees of the values found in the event; or that the key/value will even be found in the event. For some well
  * known keys, keys that are expected to be found in every event and whose corresponding value returns a non <code>null</code>
  * value, a method convenience is provided.
  */

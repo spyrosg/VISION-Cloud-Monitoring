@@ -54,7 +54,6 @@ public class VismoEndToEndTest {
     public void monitoringReceivesEventsFromEventProducer() throws Exception {
         driver.start();
         driver.reportsMonitoringStatus(UDP_PORT);
-        Thread.sleep(1000);
         eventProducer.sendEvents();
         waitForAllEventsToBeReceived();
         driver.reportsMonitoringStatus(UDP_PORT);
