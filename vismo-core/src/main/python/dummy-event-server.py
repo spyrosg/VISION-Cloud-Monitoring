@@ -22,12 +22,12 @@ class FakeObjectService(object):
 
 
     def read(self, tenant, user, container, obj):
-        self.dispatcher.send(event_type='read', tenant=tenant, user=user, container=container, obj=obj)
+        self.dispatcher.send(type='read', tenant=tenant, user=user, container=container, obj=obj)
         return 'ok' # assume success for now
 
 
     def write(self, tenant, user, container, obj):
-        self.dispatcher.send(event_type='write', tenant=tenant, user=user, container=container, obj=obj)
+        self.dispatcher.send(type='write', tenant=tenant, user=user, container=container, obj=obj)
         return 'ok' # assume success for now
 
 
