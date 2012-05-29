@@ -93,7 +93,7 @@
               <directoryIncluded>false</directoryIncluded>
               <sources>
                 <source>
-                  <location>target/vismo-core-1.0.0-SNAPSHOT.jar</location>
+                  <location>target/vismo-core-${project.version}.jar</location>
                   <destination>vismo.jar</destination>
                 </source>
               </sources>
