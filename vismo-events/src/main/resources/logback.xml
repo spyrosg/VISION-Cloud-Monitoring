@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-  <!-- logger name="com.sun.jersey.api.container.filter" level="trace" / -->
-
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>%-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m\n%ex</pattern>
@@ -15,7 +13,7 @@
     <suffixPattern>%-5p %C: %M %d [%t] %c -%m%n</suffixPattern>
   </appender>
 
-  <root level="TRACE">
+  <root level="DEBUG">
     <appender-ref ref="STDOUT" />
     <appender-ref ref="SYSLOG" />
   </root>
