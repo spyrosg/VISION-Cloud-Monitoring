@@ -22,7 +22,9 @@ public class EventRegistry {
      */
     private static class EventHandlerTask implements Runnable {
         /** the log target. */
-        private static final Logger ilog = LoggerFactory.getLogger(EventHandlerTask.class);
+        private static final Logger ilog    = LoggerFactory.getLogger(EventHandlerTask.class);
+        /** the event factory. */
+        private final EventFactory  factory = new EventFactory();
         /** the actual handler. */
         private final EventHandler  handler;
         /** the zmq socket. */
@@ -60,7 +62,7 @@ public class EventRegistry {
                 if (!msg.startsWith("{")) // it's the topic
                     continue;
 
-                final Event e = getFactory().createEvent(msg);
+                final Event e = factory.createEvent(msg);
 
                 if (e != null)
                     handler.handle(e);
@@ -84,16 +86,14 @@ public class EventRegistry {
             return new String(buf, 0, buf.length);
         }
     }
-    /** the event factory. */
-    private static final EventFactory factory = new EventFactory();
     /** the ilog target. */
-    private static final Logger       log     = LoggerFactory.getLogger(EventRegistry.class);
+    private static final Logger   log  = LoggerFactory.getLogger(EventRegistry.class);
     /** the zmq context. */
-    private final ZContext            ctx;
+    private final ZContext        ctx;
     /** the zmq port in which events arrive from the main vismo component. */
-    private final String              distributionPort;
+    private final String          distributionPort;
     /** the pool of threads. Each thread corresponds to one event handler. */
-    private final ExecutorService     pool    = Executors.newCachedThreadPool();
+    private final ExecutorService pool = Executors.newCachedThreadPool();
 
 
     /**
@@ -134,14 +134,6 @@ public class EventRegistry {
      */
     public void registerToAll(final EventHandler handler) {
         register("", handler);
-    }
-
-
-    /**
-     * @return the event factory
-     */
-    static EventFactory getFactory() {
-        return factory;
     }
 
 

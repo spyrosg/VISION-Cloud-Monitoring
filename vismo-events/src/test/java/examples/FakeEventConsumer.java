@@ -1,4 +1,4 @@
-package endtoend;
+package examples;
 
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventHandler;
