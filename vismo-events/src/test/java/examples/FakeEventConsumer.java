@@ -26,7 +26,8 @@ public class FakeEventConsumer {
          */
         @Override
         public void handle(final Event e) {
-            log.info("received: {}", e);
+            log.info(String.format("received: timestamp=%s, service=%s, topic=%s, type=%s", e.timestamp(),
+                                   e.originatingService(), e.topic(), e.get("type")));
         }
     }
 
