@@ -1,0 +1,12 @@
+#!/bin/bash -ex
+
+REPO=/var/rpmsrepo/vision/sl6/x86_64
+
+cp vismo-core/target/rpm/vismo/RPMS/noarch/vismo-*.rpm "$REPO"
+createrepo "$REPO"
+/usr/local/bin/command_on_clusters.sh "yum -y clean metadata" 1 4 5
+/usr/local/bin/command_on_clusters.sh "test -f /etc/init.d/vision-vismo && service vision-vismo stop" 1 4 5
+/usr/local/bin/command_on_clusters.sh "yum -y erase vismo" 1 4 5
+/usr/local/bin/command_on_clusters.sh "yum -y install vismo" 1 4 5
+/usr/local/bin/command_on_clusters.sh "service vision-vismo start" 1 4 5
+
