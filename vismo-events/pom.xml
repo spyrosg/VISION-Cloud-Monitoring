@@ -68,7 +68,7 @@
 
     <dependency>
       <groupId>org.zeromq</groupId>
-      <artifactId>jzmq</artifactId>
+      <artifactId>jzmq-all</artifactId>
       <version>1.0.0</version>
     </dependency>
 
