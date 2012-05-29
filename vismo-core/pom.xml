@@ -75,6 +75,8 @@
 
           <requires>
             <require>java &gt;= 1.6</require>
+            <require>zeromq &gt;= 2.1.9</require>
+            <require>python-zmq &gt;= 2.1.9</require>
           </requires>
 
           <defineStatements>
