@@ -66,6 +66,7 @@
         </executions>
 
         <configuration>
+          <name>vismo</name>
           <copyright>NOT-SPECIFIED</copyright>
           <group>Application/System</group>
           <summary>The monitoring infrastructure of the VISION Cloud.</summary>
@@ -95,6 +96,16 @@
                 <source>
                   <location>target/vismo-core-${project.version}.jar</location>
                   <destination>vismo.jar</destination>
+                </source>
+
+                <source>
+                  <location>src/main/python/dummy-event-server.py</location>
+                  <destination>dummy-event-server.py</destination>
+                </source>
+
+                <source>
+                  <location>src/main/python/vismo_dispatch.py</location>
+                  <destination>vismo_dispatch.py</destination>
                 </source>
               </sources>
             </mapping>
