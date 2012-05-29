@@ -59,7 +59,7 @@ class MonitoringEventDispatcher(object):
         with the event distribution code.
     """
 
-    EVENTS_ENDPOINT = 'ipc:///tmp/vision.bill.events'
+    EVENTS_ENDPOINT = 'ipc:///tmp/vision.root.events'
     log = logging.getLogger('vismo')
     setup_logger(log)
 
