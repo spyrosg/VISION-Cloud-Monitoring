@@ -85,7 +85,6 @@ class MonitoringEventDispatcher(object):
         event['timestamp'] = int(time())
         event['originating-machine'] = self.ip
         event['originating-service'] = 'object-service'
-        event['topic'] = '*'
         self.debug('=> {0}'.format(event))
         self.sock.send(json.dumps(event))
 
