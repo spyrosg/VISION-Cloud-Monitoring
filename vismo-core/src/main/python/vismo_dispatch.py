@@ -5,6 +5,7 @@ from subprocess import Popen, PIPE
 from os import getpid
 from time import time
 import logging
+from logging.handlers import TimedRotatingFileHandler
 import zmq
 import json
 
@@ -46,13 +47,6 @@ def get_iface_ip():
 
 
 
-def setup_logger(logger):
-    # TRACE [2010-04-06 06:42:35,271] com.example.dw.Thing: Contemplating doing a thing.
-    logger.setLevel(logging.DEBUG)
-    logging.basicConfig(format='%(levelname)s [%(asctime)-15s] %(clazz)s: %(message)s')
-
-
-
 class MonitoringEventDispatcher(object):
     """
         This is used as the bridge that handles the event generation code
@@ -60,8 +54,14 @@ class MonitoringEventDispatcher(object):
     """
 
     EVENTS_ENDPOINT = 'ipc:///tmp/vision.root.events'
+
+    rolling_handler = TimedRotatingFileHandler('/var/log/vismo_dispatch.log', backupCount=10, when='midnight')
+    rolling_handler.doRollover()
+    # TRACE [2010-04-06 06:42:35,271] com.example.dw.Thing: Contemplating doing a thing.
+    rolling_handler.setFormatter(logging.Formatter('%(levelname)s [%(asctime)-15s] %(clazz)s: %(message)s'))
     log = logging.getLogger('vismo')
-    setup_logger(log)
+    log.addHandler(rolling_handler)
+    log.setLevel(logging.DEBUG)
 
 
     def __init__(self):

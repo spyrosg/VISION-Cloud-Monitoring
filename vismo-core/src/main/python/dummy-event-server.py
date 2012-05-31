@@ -1,10 +1,10 @@
-#!/usr/bin/python2 # vim: set fileencoding=utf-8
+#!/usr/bin/python2
+# vim: set fileencoding=utf-8
 
 from __future__ import print_function
 
 from vismo_dispatch import MonitoringEventDispatcher
 from time import sleep
-import logging
 from random import randint, choice
 
 
@@ -72,8 +72,6 @@ class FakeObjectServiceClient(object):
 
 
 if __name__ == '__main__':
-    logging.info('starting on localhost')
-
     # this will be our entry point to object service
     # which will be normally imported to the actual object
     # service code
