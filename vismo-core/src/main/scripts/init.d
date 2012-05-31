@@ -7,7 +7,6 @@
 . /etc/rc.d/init.d/functions
 
 VISMO_JAR=/srv/vismo/vismo.jar
-VISMO_LOG=/var/log/vismo.log
 
 
 is_vismo_running() {
@@ -17,7 +16,7 @@ is_vismo_running() {
 
 vismo_start() {
 	echo -n "vismo: "
-	setsid java -jar "$VISMO_JAR" start >>"$VISMO_LOG" 2>&1 &
+	setsid java -jar "$VISMO_JAR" start </dev/null >&/dev/null &
         sleep 1
 
 	if `is_vismo_running`; then
