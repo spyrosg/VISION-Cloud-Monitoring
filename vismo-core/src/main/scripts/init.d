@@ -21,7 +21,7 @@ vismo_start() {
 
 	if `is_vismo_running`; then
 		echo started
-		logger -t vrsion-vismo "Starting vismo service: ok"
+		logger -t vision-vismo "Starting vismo service: ok"
                 return 0
 	else
 		echo failed
