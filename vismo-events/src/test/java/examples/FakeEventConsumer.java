@@ -5,8 +5,7 @@ import gr.ntua.vision.monitoring.events.EventHandler;
 import gr.ntua.vision.monitoring.events.EventRegistry;
 import gr.ntua.vision.monitoring.events.VismoEventRegistry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 
 /**
@@ -18,7 +17,7 @@ public class FakeEventConsumer {
      */
     public static class LoggingHandler implements EventHandler {
         /***/
-        private static Logger log = LoggerFactory.getLogger(LoggingHandler.class);
+        private static Logger log = Logger.getLogger(LoggingHandler.class.getName());
 
 
         /**
@@ -36,7 +35,7 @@ public class FakeEventConsumer {
      * @param args
      */
     public static void main(final String... args) {
-        final EventRegistry registry = new VismoEventRegistry();
+        final EventRegistry registry = new VismoEventRegistry(true);
 
         registry.registerToAll(new LoggingHandler());
     }

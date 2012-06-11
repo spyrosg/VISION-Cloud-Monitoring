@@ -68,7 +68,7 @@ public class TopicHandlersTest {
     private final FakeMonitoringInstance  inst                   = new FakeMonitoringInstance(ctx, eventsDistributionPort, 10,
                                                                          topics);
     /***/
-    private final EventRegistry           registry               = new EventRegistry(ctx, eventsDistributionPort);
+    private final EventRegistry           registry               = new EventRegistry(ctx, eventsDistributionPort, true);
 
 
     /**
@@ -101,6 +101,6 @@ public class TopicHandlersTest {
      * @throws InterruptedException
      */
     private static void waitForEventsToBeReceived() throws InterruptedException {
-        Thread.sleep(2000);
+        Thread.sleep(3000);
     }
 }

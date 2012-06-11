@@ -2,10 +2,9 @@ package endtoend;
 
 import java.util.Random;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
@@ -17,7 +16,7 @@ import org.zeromq.ZMQ.Socket;
  */
 public class FakeMonitoringInstance {
     /***/
-    private static final Logger log = LoggerFactory.getLogger(FakeMonitoringInstance.class);
+    private static final Logger log = Logger.getLogger(FakeMonitoringInstance.class.getName());
     /***/
     private static final Random rng = new Random();
     /***/
@@ -43,7 +42,7 @@ public class FakeMonitoringInstance {
         this.sock.bind(eventsEntryPoint);
         this.noEventsToSend = noEventsToSend;
         this.topics = topics;
-        log.debug("listening on endpoint={}", eventsEntryPoint);
+        log.config("listening on endpoint=" + eventsEntryPoint);
     }
 
 
@@ -66,7 +65,7 @@ public class FakeMonitoringInstance {
         o.put("originating-ip", "localhost");
         o.put("id", UUID.randomUUID().toString());
 
-        log.trace("sending {}", o);
+        log.fine("sending " + o);
 
         sock.send(topic.getBytes(), ZMQ.SNDMORE);
         sock.send(o.toJSONString().getBytes(), 0);

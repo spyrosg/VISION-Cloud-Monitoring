@@ -17,4 +17,15 @@ public class VismoEventRegistry extends EventRegistry {
     public VismoEventRegistry() {
         super(new ZContext(), DISTRIBUTION_POINT);
     }
+
+
+    /**
+     * Constructor.
+     * 
+     * @param debug
+     *            when <code>true</code>, it activates the console logger for this package.
+     */
+    public VismoEventRegistry(final boolean debug) {
+        super(new ZContext(), DISTRIBUTION_POINT, debug);
+    }
 }

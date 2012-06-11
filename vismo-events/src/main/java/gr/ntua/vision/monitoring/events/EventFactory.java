@@ -1,11 +1,11 @@
 package gr.ntua.vision.monitoring.events;
 
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EventFactory {
     /** the log target. */
-    private static final Logger log    = LoggerFactory.getLogger(EventFactory.class);
+    private static final Logger log    = Logger.getLogger(EventFactory.class.getName());
     /** the JSON parser. */
     private final JSONParser    parser = new JSONParser();
 
@@ -45,8 +45,8 @@ public class EventFactory {
         try {
             return (Map) parser.parse(msg);
         } catch (final ParseException e) {
-            log.error("error deserializing: {}", msg);
-            log.error("ParseException", e);
+            log.severe("error deserializing: " + msg);
+            log.log(Level.SEVERE, "ParseException", e);
 
             return null;
         }
