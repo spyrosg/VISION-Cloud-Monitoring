@@ -7,7 +7,7 @@
   <parent>
     <artifactId>vismo</artifactId>
     <groupId>gr.ntua.vision</groupId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>vismo-events</artifactId>
@@ -26,23 +26,16 @@
   </distributionManagement>
 
   <dependencies>
+    <dependency>
+      <groupId>org.zeromq</groupId>
+      <artifactId>jzmq-all</artifactId>
+      <version>1.0.0</version>
+    </dependency>
 
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
       <version>1.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
-      <version>${logback.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>${logback.version}</version>
     </dependency>
 
     <dependency>
@@ -65,13 +58,6 @@
       <version>1.1</version>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.zeromq</groupId>
-      <artifactId>jzmq-all</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-
   </dependencies>
 
 </project>
