@@ -84,19 +84,18 @@ def grep_log(pattern):
 
 
 @task(alias='reinstall')
-@hosts('')
 def reinstall_rpm():
     def get_rpm(dir):
         """Get the name of the rpm."""
 
         return filter(lambda f: f.startswith(RPM_NAME) and f.endswith('.rpm'), listdir(dir))[0]
 
-    rpm_file = get_rpm('../../../target/rpm/vismo/RPMS/noarch')
+    rpm_file = get_rpm('.')
     tmp_dir = '/tmp/vismo-tmp'
 
     run('mkdir -p {0}'.format(tmp_dir))
     put(rpm_file, tmp_dir)
-    run('rpm -e {0}'.format(RPM_NAME))
-    run('rpm -i {0}/{1}'.format(tmp_dir, RPM_NAME))
+    run('rpm -e {0} || echo'.format(RPM_NAME))
+    run('rpm -i {0}/{1}'.format(tmp_dir, rpm_file))
     run('rm -fr {0}'.format(tmp_dir))
 
