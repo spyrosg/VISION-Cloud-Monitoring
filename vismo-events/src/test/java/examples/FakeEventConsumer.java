@@ -3,9 +3,8 @@ package examples;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventHandler;
 import gr.ntua.vision.monitoring.events.EventRegistry;
-import gr.ntua.vision.monitoring.events.VismoEventRegistry;
 
-import java.util.logging.Logger;
+import org.zeromq.ZContext;
 
 
 /**
@@ -16,17 +15,15 @@ public class FakeEventConsumer {
      *
      */
     public static class LoggingHandler implements EventHandler {
-        /***/
-        private static Logger log = Logger.getLogger(LoggingHandler.class.getName());
-
-
         /**
          * @see gr.ntua.vision.monitoring.events.EventHandler#handle(gr.ntua.vision.monitoring.events.Event)
          */
         @Override
         public void handle(final Event e) {
-            log.info(String.format("received: timestamp=%s, service=%s, topic=%s, type=%s", e.timestamp(),
-                                   e.originatingService(), e.topic(), e.get("type")));
+            System.out.println(String
+                    .format("received: timestamp=%s, service=%s, topic=%s, type=%s, tenant=%s, user=%s, container=%s, object=%s",
+                            e.timestamp(), e.originatingService(), e.topic(), e.get("type"), e.get("tenant"), e.get("user"),
+                            e.get("container"), e.get("obj")));
         }
     }
 
@@ -35,7 +32,7 @@ public class FakeEventConsumer {
      * @param args
      */
     public static void main(final String... args) {
-        final EventRegistry registry = new VismoEventRegistry(true);
+        final EventRegistry registry = new EventRegistry(new ZContext(), "tcp://10.0.1.214:27890");
 
         registry.registerToAll(new LoggingHandler());
     }
