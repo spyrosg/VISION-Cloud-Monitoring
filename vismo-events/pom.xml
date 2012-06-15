@@ -7,23 +7,13 @@
   <parent>
     <artifactId>vismo</artifactId>
     <groupId>gr.ntua.vision</groupId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
-  <artifactId>vismo-events</artifactId>
 
-  <distributionManagement>
-    <snapshotRepository>
-      <id>archiva.snapshots</id>
-      <name>ntua internal snapshots</name>
-      <url>http://147.102.19.118:8090/archiva/repository/snapshots/</url>
-    </snapshotRepository>
-    <repository>
-      <id>archiva.internal</id>
-      <name>ntua internal releases</name>
-      <url>http://147.102.19.118:8090/archiva/repository/internal/</url>
-    </repository>
-  </distributionManagement>
+  <artifactId>vismo-events</artifactId>
+  <name>Vismo Events</name>
+  <description>The api for event consumers in the VISION Cloud</description>
 
   <dependencies>
     <dependency>

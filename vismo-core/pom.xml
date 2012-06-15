@@ -7,10 +7,14 @@
   <parent>
     <artifactId>vismo</artifactId>
     <groupId>gr.ntua.vision</groupId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
+
   <artifactId>vismo-core</artifactId>
+  <name>Vismo</name>
+  <description>The distributed infrastructure that moves around events in VISION Cloud.</description>
+
 
   <build>
     <plugins>

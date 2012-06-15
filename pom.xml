@@ -7,15 +7,16 @@
 
   <groupId>gr.ntua.vision</groupId>
   <artifactId>vismo</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>vismo</name>
+  <name>Vismo Project</name>
   <url>http://147.102.19.118:8080/git/vismo.git</url>
   <description>The monitoring infrastructure and libraries of the VISION Cloud.</description>
 
   <modules>
     <module>vismo-core</module>
     <module>vismo-events</module>
+    <module>vismo-dispatch</module>
   </modules>
 
   <properties>
@@ -49,75 +50,105 @@
     <url>http://147.102.19.118:8080/git/vismo.git</url>
   </scm>
 
+  <distributionManagement>
+    <repository>
+      <id>testbed.releases</id>
+      <name>vision testbed releases</name>
+      <url>http://10.0.0.1:8000/archiva/repository/internal/</url>
+    </repository>
+
+    <snapshotRepository>
+      <id>testbed.snapshots</id>
+      <name>vision testbed snapshots</name>
+      <url>http://10.0.0.1:8000/archiva/repository/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+
   <profiles>
 
     <!-- default profile -->
     <profile>
-      <id>dev-ntua</id>
+      <id>dev.ntua</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
 
       <repositories>
         <repository>
-          <id>ntua-archiva</id>
-          <name>ntua vision repo</name>
+          <id>ntua.releases</id>
+          <name>ntua releases repo</name>
           <url>http://147.102.19.118:8090/archiva/repository/internal</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+
+        <repository>
+          <id>ntua.snapshots</id>
+          <name>ntua snapshots repo</name>
+          <url>http://147.102.19.118:8090/archiva/repository/snapshots</url>
+          <releases><enabled>false</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
         </repository>
       </repositories>
 
       <pluginRepositories>
         <pluginRepository>
-          <id>ntua-archiva</id>
-          <name>ntua vision repo</name>
+          <id>ntua.releases</id>
+          <name>ntua releases repo</name>
           <url>http://147.102.19.118:8090/archiva/repository/internal</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </pluginRepository>
+
+        <pluginRepository>
+          <id>ntua.snapshots</id>
+          <name>ntua snapshots repo</name>
+          <url>http://147.102.19.118:8090/archiva/repository/snapshots</url>
+          <releases><enabled>false</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
         </pluginRepository>
       </pluginRepositories>
     </profile>
 
     <!-- profile used in testbed -->
     <profile>
-      <id>vision-testbed</id>
+      <id>vision.testbed</id>
 
       <repositories>
         <repository>
-          <id>testbed-archiva</id>
-          <name>testbed vision repo</name>
-          <url>http://10.0.0.1:8000/archiva/repository/internal/</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
+          <id>testbed.releases</id>
+          <name>testbed releases repo</name>
+          <url>http://10.0.0.1:8000/archiva/repository/internal</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>false</enabled></snapshots>
         </repository>
-      </repositories>
 
-      <pluginRepositories>
-        <pluginRepository>
-          <id>testbed-archiva</id>
-          <name>ntua vision repo</name>
-          <url>http://10.0.0.1:8000/archiva/repository/internal/</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </pluginRepository>
-      </pluginRepositories>
+        <repository>
+          <id>testbed.snapshots</id>
+          <name>testbed snapshots repo</name>
+          <url>http://10.0.0.1:8000/archiva/repository/snapshots</url>
+          <releases><enabled>false</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+
+        <pluginRepositories>
+          <pluginRepository>
+            <id>testbed.releases</id>
+            <name>testbed releases repo</name>
+            <url>http://10.0.0.1:8000/archiva/repository/internal</url>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+          </pluginRepository>
+
+          <pluginRepository>
+            <id>testbed.snapshots</id>
+            <name>testbed snapshots repo</name>
+            <url>http://10.0.0.1:8000/archiva/repository/snapshots</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+          </pluginRepository>
+        </pluginRepositories>
+      </repositories>
     </profile>
 
   </profiles>
