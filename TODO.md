@@ -1,4 +1,5 @@
 
+- todo for python vismo-dispatch
 - fix configuration
 - add event producers api
 - test with at a number of event consumers
