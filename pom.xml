@@ -17,6 +17,7 @@
     <module>vismo-core</module>
     <module>vismo-events</module>
     <module>vismo-dispatch</module>
+    <module>vismo-notify</module>
   </modules>
 
   <properties>
