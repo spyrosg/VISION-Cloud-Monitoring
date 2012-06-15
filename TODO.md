@@ -1,5 +1,6 @@
 
-
+- fix configuration
+- add event producers api
 - test with at a number of event consumers
 - select a role in the mess: node, cluster, cloud
 - send log output to one dedicated machine
