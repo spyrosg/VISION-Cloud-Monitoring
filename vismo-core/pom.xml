@@ -138,7 +138,7 @@
   <dependencies>
 
     <dependency>
-      <artifactId>vismo-events</artifactId>
+      <artifactId>vismo-notify</artifactId>
       <groupId>gr.ntua.vision</groupId>
       <version>1.0.3-SNAPSHOT</version>
     </dependency>

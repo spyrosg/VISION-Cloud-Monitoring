@@ -1,8 +1,8 @@
 package examples;
 
 import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.events.EventHandler;
-import gr.ntua.vision.monitoring.events.EventRegistry;
+import gr.ntua.vision.monitoring.notify.EventHandler;
+import gr.ntua.vision.monitoring.notify.EventRegistry;
 
 import org.zeromq.ZContext;
 
@@ -16,7 +16,7 @@ public class FakeEventConsumer {
      */
     public static class LoggingHandler implements EventHandler {
         /**
-         * @see gr.ntua.vision.monitoring.events.EventHandler#handle(gr.ntua.vision.monitoring.events.Event)
+         * @see gr.ntua.vision.monitoring.notify.EventHandler#handle(gr.ntua.vision.monitoring.events.Event)
          */
         @Override
         public void handle(final Event e) {

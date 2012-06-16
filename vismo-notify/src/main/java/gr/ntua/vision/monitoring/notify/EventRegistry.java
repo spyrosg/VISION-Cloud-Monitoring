@@ -1,4 +1,7 @@
-package gr.ntua.vision.monitoring.events;
+package gr.ntua.vision.monitoring.notify;
+
+import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.EventFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -23,7 +26,7 @@ import org.zeromq.ZMQ.Socket;
  * The event registry is the mechanism through which an event consumer is notified of new events. The user is expected to register
  * one or more event handlers, each for one the topics of interest. A thread pool is maintained, such that each handler gets its
  * own thread, without blocking the rest of the application or other handlers. This also means that the event handlers will be
- * notified asynchronounsly to the main client program loop.
+ * notified asynchronously to the main client program loop.
  */
 public class EventRegistry {
     /**

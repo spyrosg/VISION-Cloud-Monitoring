@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring.events;
+package gr.ntua.vision.monitoring.notify;
 
 import org.zeromq.ZContext;
 

@@ -1,4 +1,7 @@
-package gr.ntua.vision.monitoring.events;
+package gr.ntua.vision.monitoring.notify;
+
+import gr.ntua.vision.monitoring.events.Event;
+
 
 /**
  * This is interface is expected to be implemented by the various <em>Vismo</em> consumers. The {@link EventRegistry} is

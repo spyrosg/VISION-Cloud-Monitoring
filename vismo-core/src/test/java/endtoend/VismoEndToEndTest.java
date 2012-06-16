@@ -1,6 +1,6 @@
 package endtoend;
 
-import gr.ntua.vision.monitoring.events.EventRegistry;
+import gr.ntua.vision.monitoring.notify.EventRegistry;
 
 import java.io.File;
 import java.io.IOException;

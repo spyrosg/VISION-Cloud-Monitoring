@@ -2,8 +2,8 @@ package endtoend;
 
 import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.events.EventHandler;
-import gr.ntua.vision.monitoring.events.EventRegistry;
+import gr.ntua.vision.monitoring.notify.EventHandler;
+import gr.ntua.vision.monitoring.notify.EventRegistry;
 
 
 /**
@@ -26,7 +26,7 @@ class EventCountHandler implements EventHandler {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.events.EventHandler#handle(gr.ntua.vision.monitoring.events.Event)
+     * @see gr.ntua.vision.monitoring.notify.EventHandler#handle(gr.ntua.vision.monitoring.events.Event)
      */
     @Override
     public void handle(final Event e) {
