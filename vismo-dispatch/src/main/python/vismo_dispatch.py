@@ -82,7 +82,7 @@ class MonitoringEventDispatcher(object):
 
 
     def send(self, **event):
-        event['timestamp'] = int(time())
+        event['timestamp'] = int(1000 * time())
         event['originating-machine'] = self.ip
         event['originating-service'] = 'object-service'
         self.debug('=> {0}'.format(event))
