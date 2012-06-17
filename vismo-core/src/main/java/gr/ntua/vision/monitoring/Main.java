@@ -26,7 +26,7 @@ public class Main {
 
 
             @Override
-            void run(final Config ignored) throws IOException {
+            void run(final Configuration ignored) throws IOException {
                 System.err.println("Usage: java -jar " + PROG + ".jar");
                 System.err.println("Options:\n");
 
@@ -43,7 +43,7 @@ public class Main {
 
 
             @Override
-            void run(final Config cnf) throws IOException {
+            void run(final Configuration cnf) throws IOException {
                 final MonitoringInstance mon = new MonitoringInstance(new VismoVMInfo());
                 final ZContext ctx = new ZContext();
                 final LocalEventCollector receiver = new LocalEventCollector(ctx, EVENTS_END_POINT);
@@ -51,7 +51,9 @@ public class Main {
                 receiver.subscribe(new EventDistributor(ctx, DISTRIBUTION_POINT));
 
                 mon.addTask(receiver);
-                mon.addTask(new UDPServer(UDP_PORT, mon));
+                System.err.println("keys: " + cnf.keys());
+                System.err.println("port: " + cnf.get("udp.port"));
+                mon.addTask(new UDPServer(Integer.valueOf(cnf.get("udp.port")), mon));
                 mon.start();
             }
         },
@@ -64,8 +66,8 @@ public class Main {
 
 
             @Override
-            void run(final Config cnf) throws IOException {
-                final UDPClient client = new UDPClient(UDP_PORT);
+            void run(final Configuration cnf) throws IOException {
+                final UDPClient client = new UDPClient(Integer.valueOf(cnf.get("udp.port")));
                 String resp = null;
 
                 for (int i = 0; i < 3; ++i)
@@ -91,8 +93,8 @@ public class Main {
 
 
             @Override
-            void run(final Config cnf) throws IOException {
-                final UDPClient client = new UDPClient(UDP_PORT);
+            void run(final Configuration cnf) throws IOException {
+                final UDPClient client = new UDPClient(Integer.valueOf(cnf.get("udp.port")));
 
                 try {
                     System.out.println(PROG + ": stopping.");
@@ -131,7 +133,7 @@ public class Main {
          *            the configuration object.
          * @throws IOException
          */
-        abstract void run(final Config cnf) throws IOException;
+        abstract void run(final Configuration cnf) throws IOException;
 
 
         /**
@@ -157,7 +159,7 @@ public class Main {
     /** the program name. */
     private static final String PROG               = "vismo";
     /***/
-    private static final int    UDP_PORT           = 56431;
+    private static final String VISMO_CONFIG       = "/vismo.properties";
 
 
     /**
@@ -170,7 +172,7 @@ public class Main {
             return;
         }
 
-        final Config cnf = new Config();
+        final Configuration cnf = PropertiesConfiguration.loadFromFile("../src/main/resources/vismo.properties");
         final Commands cmd = Commands.valueOf(args[0].toUpperCase());
 
         cmd.run(cnf);

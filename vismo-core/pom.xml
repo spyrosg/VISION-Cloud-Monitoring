@@ -15,7 +15,6 @@
   <name>Vismo</name>
   <description>The distributed infrastructure that moves around events in VISION Cloud.</description>
 
-
   <build>
     <plugins>
 
@@ -136,6 +135,12 @@
   </build>
 
   <dependencies>
+
+    <dependency>
+      <artifactId>vismo-config</artifactId>
+      <groupId>gr.ntua.vision</groupId>
+      <version>1.0.3-SNAPSHOT</version>
+    </dependency>
 
     <dependency>
       <artifactId>vismo-notify</artifactId>
