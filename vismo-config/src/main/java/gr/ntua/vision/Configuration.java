@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision;
 
 import java.util.Set;
 
@@ -18,6 +18,12 @@ public interface Configuration {
 
 
     /**
+     * @return the available configuration keys.
+     */
+    Set<String> keys();
+
+
+    /**
      * Update the configuration key with given value.
      * 
      * @param key
@@ -26,10 +32,4 @@ public interface Configuration {
      *            the new value.
      */
     void put(String key, String val);
-
-
-    /**
-     * @return the available configuration keys.
-     */
-    Set<String> keys();
 }

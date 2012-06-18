@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;

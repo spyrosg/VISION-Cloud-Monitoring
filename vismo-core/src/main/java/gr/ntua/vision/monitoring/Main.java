@@ -1,5 +1,7 @@
 package gr.ntua.vision.monitoring;
 
+import gr.ntua.vision.Configuration;
+import gr.ntua.vision.PropertiesConfiguration;
 import gr.ntua.vision.monitoring.udp.UDPClient;
 import gr.ntua.vision.monitoring.udp.UDPServer;
 
