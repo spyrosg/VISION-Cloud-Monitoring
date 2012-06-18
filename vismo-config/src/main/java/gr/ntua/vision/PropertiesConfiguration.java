@@ -28,7 +28,7 @@ public class PropertiesConfiguration implements Configuration {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.Configuration#get(java.lang.String)
+     * @see gr.ntua.vision.Configuration#get(java.lang.String)
      */
     @Override
     public String get(final String key) {
@@ -37,7 +37,7 @@ public class PropertiesConfiguration implements Configuration {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.Configuration#keys()
+     * @see gr.ntua.vision.Configuration#keys()
      */
     @Override
     public Set<String> keys() {
@@ -52,7 +52,7 @@ public class PropertiesConfiguration implements Configuration {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.Configuration#put(java.lang.String, java.lang.String)
+     * @see gr.ntua.vision.Configuration#put(java.lang.String, java.lang.String)
      */
     @Override
     public void put(final String key, final String val) {

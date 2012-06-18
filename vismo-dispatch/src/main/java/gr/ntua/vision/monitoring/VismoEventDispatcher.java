@@ -1,31 +1,33 @@
 package gr.ntua.vision.monitoring;
 
-import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.json.simple.JSONValue;
+import org.zeromq.ZContext;
+import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
 
 /**
  *
  */
-public class VismoEventDispatcher implements EventDispatcher {
+public class VismoEventDispatcher {
     /**
      * This is a convenience object in generating events.
      */
     public static class EventBuilder {
         /***/
-        private final Map<String, Object> dict = new HashMap<String, Object>();
+        private final Map<String, Object>  dict = new HashMap<String, Object>();
         /***/
-        private final EventDispatcher     dispatcher;
+        private final VismoEventDispatcher dispatcher;
 
 
         /**
          * @param dispatcher
          */
-        public EventBuilder(final EventDispatcher dispatcher) {
+        public EventBuilder(final VismoEventDispatcher dispatcher) {
             this.dispatcher = dispatcher;
         }
 
@@ -50,29 +52,27 @@ public class VismoEventDispatcher implements EventDispatcher {
     }
 
     /***/
-    private final Socket      sock;
+    private final String ip;
     /***/
-    private final String      originatingService;
+    private final String originatingService;
     /***/
-    private final InetAddress ip;
+    private final Socket sock;
 
 
     /**
+     * @param ctx
+     * @param localEventsPort
      * @param serviceName
+     * @throws SocketException
      */
-    public VismoEventDispatcher(final String serviceName) {
+    public VismoEventDispatcher(final ZContext ctx, final String localEventsPort, final String serviceName)
+            throws SocketException {
         this.originatingService = serviceName;
-        this.sock = null;
-        this.ip = getInetAddress();
-    }
-
-
-    /**
-     * @return
-     */
-    private InetAddress getInetAddress() {
-        // TODO Auto-generated method stub
-        return null;
+        this.sock = ctx.createSocket(ZMQ.PUSH);
+        this.sock.connect(localEventsPort);
+        this.sock.setLinger(0);
+        this.ip = new VismoVMInfo().getAddress().getHostAddress();
+        System.err.println("connected to port=" + localEventsPort + ", ip=" + this.ip);
     }
 
 
@@ -87,13 +87,13 @@ public class VismoEventDispatcher implements EventDispatcher {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.EventDispatcher#send(java.util.Map)
+     * @param map
      */
-    @Override
     public void send(final Map<String, Object> map) {
         map.put("originating-service", originatingService);
         map.put("originating-ip", ip);
         map.put("timestamp", System.currentTimeMillis());
+        System.err.println("sending: " + map);
         sock.send(JSONValue.toJSONString(map).getBytes(), 0);
     }
 }
