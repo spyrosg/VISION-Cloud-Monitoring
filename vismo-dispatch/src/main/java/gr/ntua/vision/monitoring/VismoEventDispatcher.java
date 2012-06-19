@@ -11,21 +11,24 @@ import org.zeromq.ZMQ.Socket;
 
 
 /**
- *
+ * This object is used to
  */
 public class VismoEventDispatcher {
     /**
-     * This is a convenience object in generating events.
+     * This is a convenience object helping generate events.
      */
     public static class EventBuilder {
-        /***/
+        /** this is used to keep track of the event fields. */
         private final Map<String, Object>  dict = new HashMap<String, Object>();
-        /***/
+        /** the dispatcher. */
         private final VismoEventDispatcher dispatcher;
 
 
         /**
+         * Constructor.
+         * 
          * @param dispatcher
+         *            the dispatcher.
          */
         public EventBuilder(final VismoEventDispatcher dispatcher) {
             this.dispatcher = dispatcher;
@@ -33,9 +36,13 @@ public class VismoEventDispatcher {
 
 
         /**
+         * Append to the current event a new key/value pair.
+         * 
          * @param key
+         *            the key.
          * @param value
-         * @return
+         *            the value.
+         * @return <code>this</code>.
          */
         public EventBuilder field(final String key, final Object value) {
             dict.put(key, value);
@@ -44,25 +51,29 @@ public class VismoEventDispatcher {
 
 
         /**
-         * 
+         * Send the event to the locally running <code>vismo</code> instance.
          */
         public void send() {
             dispatcher.send(dict);
         }
     }
 
-    /***/
+    /** the machine's external ip address. */
     private final String ip;
-    /***/
+    /** the name of the service that generate events. */
     private final String originatingService;
-    /***/
+    /** the socket to push events. */
     private final Socket sock;
 
 
     /**
+     * Constructor.
+     * 
      * @param ctx
+     *            the zqm context.
      * @param localEventsPort
      * @param serviceName
+     *            the name of the service that generate events.
      * @throws SocketException
      */
     public VismoEventDispatcher(final ZContext ctx, final String localEventsPort, final String serviceName)
@@ -77,17 +88,20 @@ public class VismoEventDispatcher {
 
 
     /**
-     * @param key
-     * @param value
-     * @return
+     * Prepare to send an event. The {@link EventBuilder} object is used to keep track of the event properties.
+     * 
+     * @return an {@link EventBuilder} object.
      */
-    public EventBuilder field(final String key, final Object value) {
-        return new EventBuilder(this).field(key, value);
+    public EventBuilder newEvent() {
+        return new EventBuilder(this);
     }
 
 
     /**
+     * Send the event to the locally running <code>vismo</code> instance.
+     * 
      * @param map
+     *            the map used to represent the event.
      */
     public void send(final Map<String, Object> map) {
         map.put("originating-service", originatingService);

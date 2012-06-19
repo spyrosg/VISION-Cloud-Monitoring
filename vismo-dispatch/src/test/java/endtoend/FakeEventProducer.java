@@ -40,7 +40,7 @@ public class FakeEventProducer extends Thread {
      * @param obj
      */
     private void sendReadEvent(final String tenant, final String user, final String container, final String obj) {
-        dispatcher.field("topic", "reads").field("type", "read").field("tenant", tenant).field("user", user)
+        dispatcher.newEvent().field("topic", "reads").field("type", "read").field("tenant", tenant).field("user", user)
                 .field("container", container).field("obj", obj).send();
     }
 }
