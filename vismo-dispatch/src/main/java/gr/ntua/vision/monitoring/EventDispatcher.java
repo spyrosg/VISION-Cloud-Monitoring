@@ -13,15 +13,15 @@ import org.zeromq.ZMQ.Socket;
 /**
  * This object is used to
  */
-public class VismoEventDispatcher {
+public class EventDispatcher {
     /**
      * This is a convenience object helping generate events.
      */
     public static class EventBuilder {
         /** this is used to keep track of the event fields. */
-        private final Map<String, Object>  dict = new HashMap<String, Object>();
+        private final Map<String, Object> dict = new HashMap<String, Object>();
         /** the dispatcher. */
-        private final VismoEventDispatcher dispatcher;
+        private final EventDispatcher     dispatcher;
 
 
         /**
@@ -30,7 +30,7 @@ public class VismoEventDispatcher {
          * @param dispatcher
          *            the dispatcher.
          */
-        public EventBuilder(final VismoEventDispatcher dispatcher) {
+        public EventBuilder(final EventDispatcher dispatcher) {
             this.dispatcher = dispatcher;
         }
 
@@ -76,8 +76,7 @@ public class VismoEventDispatcher {
      *            the name of the service that generate events.
      * @throws SocketException
      */
-    public VismoEventDispatcher(final ZContext ctx, final String localEventsPort, final String serviceName)
-            throws SocketException {
+    public EventDispatcher(final ZContext ctx, final String localEventsPort, final String serviceName) throws SocketException {
         this.originatingService = serviceName;
         this.sock = ctx.createSocket(ZMQ.PUSH);
         this.sock.connect(localEventsPort);

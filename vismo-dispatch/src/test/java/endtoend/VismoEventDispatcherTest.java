@@ -1,6 +1,6 @@
 package endtoend;
 
-import gr.ntua.vision.monitoring.VismoEventDispatcher;
+import gr.ntua.vision.monitoring.EventDispatcher;
 
 import java.net.SocketException;
 
@@ -15,17 +15,17 @@ import org.zeromq.ZContext;
  */
 public class VismoEventDispatcherTest {
     /***/
-    private final ZContext       ctx                = new ZContext();
+    private final ZContext    ctx                = new ZContext();
     /***/
-    private VismoEventDispatcher dispatcher;
+    private EventDispatcher   dispatcher;
     /***/
-    private final String         LOCAL_EVENTS_PORT  = "ipc:///tmp/dispatch-events-test";
+    private final String      LOCAL_EVENTS_PORT  = "ipc:///tmp/dispatch-events-test";
     /***/
-    private final int            NO_EXPECTED_EVENTS = 10;
+    private final int         NO_EXPECTED_EVENTS = 10;
     /***/
-    private FakeEventProducer    producer;
+    private FakeEventProducer producer;
     /***/
-    private FakeVismoInstance    vismo;
+    private FakeVismoInstance vismo;
 
 
     /**
@@ -35,7 +35,7 @@ public class VismoEventDispatcherTest {
     public void setUp() throws SocketException {
         vismo = new FakeVismoInstance(ctx, LOCAL_EVENTS_PORT, NO_EXPECTED_EVENTS);
         vismo.start();
-        dispatcher = new VismoEventDispatcher(ctx, LOCAL_EVENTS_PORT, "foo-bar");
+        dispatcher = new EventDispatcher(ctx, LOCAL_EVENTS_PORT, "foo-bar");
         producer = new FakeEventProducer(dispatcher, NO_EXPECTED_EVENTS);
     }
 
