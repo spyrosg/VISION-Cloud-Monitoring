@@ -102,12 +102,12 @@
                 </source>
 
                 <source>
-                  <location>src/main/python/dummy-event-server.py</location>
+                  <location>vismo-dispatch/src/main/python/dummy-event-server.py</location>
                   <destination>dummy-event-server.py</destination>
                 </source>
 
                 <source>
-                  <location>src/main/python/vismo_dispatch.py</location>
+                  <location>vismo-dispatch/src/main/python/vismo_dispatch.py</location>
                   <destination>vismo_dispatch.py</destination>
                 </source>
               </sources>
