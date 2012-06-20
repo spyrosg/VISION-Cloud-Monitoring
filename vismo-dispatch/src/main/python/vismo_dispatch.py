@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 # vim: set fileencoding=utf-8
 
-from subprocess import Popen, PIPE
+import socket, struct, fcntl, sys
 from os import getpid
 from time import time
 import logging
@@ -10,41 +10,27 @@ import zmq
 import json
 
 
-
-
-def get_iface_ip():
+def get_public_ip(iface='eth0'):
     """
         Return a tuple whose first element contains the first non loopback interface
         and the second elements is the first not inet6 address of that interface.
     """
 
-    pipe = Popen('ip addr', shell=True, bufsize=1024, stdout=PIPE).stdout
-    iface, ip = None, None
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sockfd = sock.fileno()
+    SIOCGIFADDR = 0x8915
+    ifreq = struct.pack('16sH14s', iface, socket.AF_INET, '\x00'*14)
 
-    for line in pipe:
-        if line[0].isdigit():
-            fs = line.split()
-            iface = fs[1][:-1]
+    try:
+        res = fcntl.ioctl(sockfd, SIOCGIFADDR, ifreq)
+    except:
+        return None
+    finally:
+        sock.close()
 
-        if iface == 'lo':
-            continue
-        if 'inet6' in line:
-            continue
+    ip = struct.unpack('16sH2x4s8x', res)[2]
 
-        if 'inet' in line:
-            fs = line.split()
-            ind = fs[1].index('/')
-
-            if ind >= 0:
-                ip = fs[1][0:ind]
-            else:
-                ip = fs[1]
-
-            pipe.close()
-            return iface, ip
-
-    pipe.close()
-
+    return socket.inet_ntoa(ip)
 
 
 class MonitoringEventDispatcher(object):
@@ -53,7 +39,7 @@ class MonitoringEventDispatcher(object):
         with the event distribution code.
     """
 
-    EVENTS_ENDPOINT = 'ipc:///tmp/vision.root.events'
+    EVENTS_ENDPOINT = 'tcp://127.0.0.1:26891'
 
     rolling_handler = TimedRotatingFileHandler('/var/log/vismo_dispatch.log', backupCount=10, when='midnight')
     rolling_handler.doRollover()
@@ -65,9 +51,9 @@ class MonitoringEventDispatcher(object):
 
 
     def __init__(self):
-        (iface, ip) = get_iface_ip()
-        self.ip = ip
-        self.info('dispatcher startup, with pid={0}, ip={1}'.format(getpid(), iface + '/' + ip))
+        self.iface = 'eth0'
+        self.ip = get_public_ip(self.iface)
+        self.info('dispatcher startup, with pid={0}, ip={1}'.format(getpid(), self.iface + '/' + self.ip))
         self.debug('connecting to endpoint={0}'.format(MonitoringEventDispatcher.EVENTS_ENDPOINT))
         self.sock = self.create_push_socket(MonitoringEventDispatcher.EVENTS_ENDPOINT)
 
