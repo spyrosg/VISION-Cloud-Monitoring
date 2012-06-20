@@ -5,7 +5,7 @@ import socket, struct, fcntl, sys
 from os import getpid
 from time import time
 import logging
-from logging.handlers import TimedRotatingFileHandler
+#from logging.handlers import TimedRotatingFileHandler
 import zmq
 import json
 
@@ -41,20 +41,20 @@ class MonitoringEventDispatcher(object):
 
     EVENTS_ENDPOINT = 'tcp://127.0.0.1:26891'
 
-    rolling_handler = TimedRotatingFileHandler('/var/log/vismo_dispatch.log', backupCount=10, when='midnight')
-    rolling_handler.doRollover()
+    #rolling_handler = TimedRotatingFileHandler('/var/log/vismo_dispatch.log', backupCount=10, when='midnight')
+    #rolling_handler.doRollover()
     # TRACE [2010-04-06 06:42:35,271] com.example.dw.Thing: Contemplating doing a thing.
-    rolling_handler.setFormatter(logging.Formatter('%(levelname)s [%(asctime)-15s] %(clazz)s: %(message)s'))
-    log = logging.getLogger('vismo')
-    log.addHandler(rolling_handler)
-    log.setLevel(logging.DEBUG)
+    #rolling_handler.setFormatter(logging.Formatter('%(levelname)s [%(asctime)-15s] %(clazz)s: %(message)s'))
+    #log = logging.getLogger('vismo')
+    #log.addHandler(rolling_handler)
+    #log.setLevel(logging.DEBUG)
 
 
     def __init__(self):
         self.iface = 'eth0'
         self.ip = get_public_ip(self.iface)
-        self.info('dispatcher startup, with pid={0}, ip={1}'.format(getpid(), self.iface + '/' + self.ip))
-        self.debug('connecting to endpoint={0}'.format(MonitoringEventDispatcher.EVENTS_ENDPOINT))
+        #self.info('dispatcher startup, with pid={0}, ip={1}'.format(getpid(), self.iface + '/' + self.ip))
+        #self.debug('connecting to endpoint={0}'.format(MonitoringEventDispatcher.EVENTS_ENDPOINT))
         self.sock = self.create_push_socket(MonitoringEventDispatcher.EVENTS_ENDPOINT)
 
 
@@ -71,7 +71,7 @@ class MonitoringEventDispatcher(object):
         event['timestamp'] = int(1000 * time())
         event['originating-machine'] = self.ip
         event['originating-service'] = 'object-service'
-        self.debug('=> {0}'.format(event))
+        #self.debug('=> {0}'.format(event))
         self.sock.send(json.dumps(event))
 
 
