@@ -1,7 +1,6 @@
 package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.Configuration;
-import gr.ntua.vision.PropertiesConfiguration;
 import gr.ntua.vision.monitoring.udp.UDPClient;
 import gr.ntua.vision.monitoring.udp.UDPServer;
 
@@ -53,9 +52,7 @@ public class Main {
                 receiver.subscribe(new EventDistributor(ctx, DISTRIBUTION_POINT));
 
                 mon.addTask(receiver);
-                System.err.println("keys: " + cnf.keys());
-                System.err.println("port: " + cnf.get("udp.port"));
-                mon.addTask(new UDPServer(Integer.valueOf(cnf.get("udp.port")), mon));
+                mon.addTask(new UDPServer(UDP_PORT, mon));
                 mon.start();
             }
         },
@@ -69,7 +66,7 @@ public class Main {
 
             @Override
             void run(final Configuration cnf) throws IOException {
-                final UDPClient client = new UDPClient(Integer.valueOf(cnf.get("udp.port")));
+                final UDPClient client = new UDPClient(UDP_PORT);
                 String resp = null;
 
                 for (int i = 0; i < 3; ++i)
@@ -96,7 +93,7 @@ public class Main {
 
             @Override
             void run(final Configuration cnf) throws IOException {
-                final UDPClient client = new UDPClient(Integer.valueOf(cnf.get("udp.port")));
+                final UDPClient client = new UDPClient(UDP_PORT);
 
                 try {
                     System.out.println(PROG + ": stopping.");
@@ -161,6 +158,8 @@ public class Main {
     /** the program name. */
     private static final String PROG               = "vismo";
     /***/
+    private static final int    UDP_PORT           = 56431;
+    /***/
     private static final String VISMO_CONFIG       = "/vismo.properties";
 
 
@@ -174,7 +173,7 @@ public class Main {
             return;
         }
 
-        final Configuration cnf = PropertiesConfiguration.loadFromFile("../src/main/resources/vismo.properties");
+        final Configuration cnf = null;
         final Commands cmd = Commands.valueOf(args[0].toUpperCase());
 
         cmd.run(cnf);
