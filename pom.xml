@@ -1,89 +1,154 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <prerequisites>
+    <maven>3.0.0</maven>
+  </prerequisites>
+
   <groupId>gr.ntua.vision</groupId>
   <artifactId>vismo</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
-  <packaging>war</packaging>
+  <version>1.0.3-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>Vismo Project</name>
+  <url>http://147.102.19.118:8080/git/vismo.git</url>
+  <description>The monitoring infrastructure and libraries of the VISION Cloud.</description>
+
+  <modules>
+    <module>vismo-core</module>
+    <module>vismo-events</module>
+    <module>vismo-dispatch</module>
+    <module>vismo-notify</module>
+    <module>vismo-config</module>
+  </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>1.6</java.version>
     <jersey.version>1.8</jersey.version>
+    <jetty.version>8.0.4.v20111024</jetty.version>
+    <logback.version>1.0.1</logback.version>
   </properties>
+
+  <developers>
+    <developer>
+      <id>mataron6</id>
+      <name>Στέφανος Κούτσουτος</name>
+      <email>stefk@mail.ntua.gr</email>
+      <timezone>+2</timezone>
+    </developer>
+
+    <developer>
+      <id>autre</id>
+      <name>Βασίλης Αλεξάνδρου</name>
+      <email>alexv@mail.ntua.gr</email>
+      <timezone>+2</timezone>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:http://147.102.19.118:8080/git/vismo.git</connection>
+    <developerConnection>scm:git:git@147.102.19.118:vismo.git</developerConnection>
+    <url>http://147.102.19.118:8080/git/vismo.git</url>
+  </scm>
+
+  <distributionManagement>
+    <repository>
+      <id>testbed.releases</id>
+      <name>vision testbed releases</name>
+      <url>http://10.0.0.1:8000/archiva/repository/internal/</url>
+    </repository>
+
+    <snapshotRepository>
+      <id>testbed.snapshots</id>
+      <name>vision testbed snapshots</name>
+      <url>http://10.0.0.1:8000/archiva/repository/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
 
   <profiles>
 
     <!-- default profile -->
     <profile>
-      <id>dev-ntua</id>
+      <id>dev.ntua</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
 
       <repositories>
         <repository>
-          <id>ntua-archiva</id>
-          <name>ntua vision repo</name>
-          <url>
-            http://147.102.19.118:8090/archiva/repository/internal
-          </url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
+          <id>ntua.releases</id>
+          <name>ntua releases repo</name>
+          <url>http://147.102.19.118:8090/archiva/repository/internal</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+
+        <repository>
+          <id>ntua.snapshots</id>
+          <name>ntua snapshots repo</name>
+          <url>http://147.102.19.118:8090/archiva/repository/snapshots</url>
+          <releases><enabled>false</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
         </repository>
       </repositories>
 
       <pluginRepositories>
         <pluginRepository>
-          <id>ntua-archiva</id>
-          <name>ntua vision repo</name>
-          <url>
-            http://147.102.19.118:8090/archiva/repository/internal
-          </url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
+          <id>ntua.releases</id>
+          <name>ntua releases repo</name>
+          <url>http://147.102.19.118:8090/archiva/repository/internal</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </pluginRepository>
+
+        <pluginRepository>
+          <id>ntua.snapshots</id>
+          <name>ntua snapshots repo</name>
+          <url>http://147.102.19.118:8090/archiva/repository/snapshots</url>
+          <releases><enabled>false</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
         </pluginRepository>
       </pluginRepositories>
     </profile>
 
     <!-- profile used in testbed -->
     <profile>
-      <id>vision-testbed</id>
+      <id>vision.testbed</id>
 
       <repositories>
         <repository>
-          <id>testbed-archiva</id>
-          <name>testbed vision repo</name>
-          <url>http://10.0.0.1:8000/archiva/repository/internal/</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
+          <id>testbed.releases</id>
+          <name>testbed releases repo</name>
+          <url>http://10.0.0.1:8000/archiva/repository/internal</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+
+        <repository>
+          <id>testbed.snapshots</id>
+          <name>testbed snapshots repo</name>
+          <url>http://10.0.0.1:8000/archiva/repository/snapshots</url>
+          <releases><enabled>false</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
         </repository>
       </repositories>
 
       <pluginRepositories>
         <pluginRepository>
-          <id>testbed-archiva</id>
-          <name>ntua vision repo</name>
-          <url>http://10.0.0.1:8000/archiva/repository/internal/</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
+          <id>testbed.releases</id>
+          <name>testbed releases repo</name>
+          <url>http://10.0.0.1:8000/archiva/repository/internal</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </pluginRepository>
+
+        <pluginRepository>
+          <id>testbed.snapshots</id>
+          <name>testbed snapshots repo</name>
+          <url>http://10.0.0.1:8000/archiva/repository/snapshots</url>
+          <releases><enabled>false</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
         </pluginRepository>
       </pluginRepositories>
     </profile>
@@ -93,6 +158,7 @@
   <build>
     <plugins>
 
+      <!-- compiler plugin -->
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.3.2</version>
@@ -102,94 +168,48 @@
         </configuration>
       </plugin>
 
+      <!-- testing plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.8.1</version>
+        <configuration>
+          <parallel>classes</parallel>
+        </configuration>
+      </plugin>
+
+      <!-- source plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.2</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- javadoc plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.8.1</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
-
-  <dependencies>
-
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-server</artifactId>
-      <version>${jersey.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-core</artifactId>
-      <version>${jersey.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-client</artifactId>
-      <version>${jersey.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>r09</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-json</artifactId>
-      <version>${jersey.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.16</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-all</artifactId>
-      <version>5.5.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>it.eng</groupId>
-      <artifactId>compliance</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>jparsec</groupId>
-      <artifactId>jparsec</artifactId>
-      <version>2.0.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.6.4</version>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>javax</groupId>
-      <artifactId>javaee-web-api</artifactId>
-      <version>6.0</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-grizzly</artifactId>
-      <version>${jersey.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.sun.grizzly</groupId>
-      <artifactId>grizzly-servlet-webserver</artifactId>
-      <version>1.8.0</version>
-      <scope>test</scope>
-    </dependency>
-
-  </dependencies>
 
 </project>
 

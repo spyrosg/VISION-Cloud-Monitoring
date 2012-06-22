@@ -1,0 +1,216 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <prerequisites>
+    <maven>3.0.0</maven>
+  </prerequisites>
+
+  <parent>
+    <artifactId>vismo</artifactId>
+    <groupId>gr.ntua.vision</groupId>
+    <version>1.0.3-SNAPSHOT</version>
+    <relativePath>..</relativePath>
+  </parent>
+
+  <artifactId>vismo-core</artifactId>
+  <name>Vismo</name>
+  <description>The distributed infrastructure that moves around events in VISION Cloud.</description>
+
+  <build>
+    <plugins>
+
+      <!-- produce an a fat or uber jar, with mvn package -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.6</version>
+        <configuration>
+          <createDependencyReducedPom>true</createDependencyReducedPom>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+              </excludes>
+            </filter>
+          </filters>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>gr.ntua.vision.monitoring.Main</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- also generate a rpm -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>rpm-maven-plugin</artifactId>
+        <version>2.1-alpha-1</version>
+
+        <executions>
+          <execution>
+            <goals>
+              <goal>rpm</goal>
+            </goals>
+          </execution>
+        </executions>
+
+        <configuration>
+          <name>vismo</name>
+          <copyright>NOT-SPECIFIED</copyright>
+          <group>Application/System</group>
+          <summary>The monitoring infrastructure of the VISION Cloud.</summary>
+          <description>The monitoring infrastructure of the VISION Cloud.</description>
+          <packager>vassilis</packager>
+          <release>1.0</release>
+
+          <requires>
+            <require>java &gt;= 1.6</require>
+            <require>zeromq &gt;= 2.1.9</require>
+            <require>python-zmq &gt;= 2.1.9</require>
+          </requires>
+
+          <defineStatements>
+            <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
+          </defineStatements>
+
+          <mappings>
+
+            <mapping>
+              <directory>/srv/vismo</directory>
+              <username>root</username>
+              <groupname>root</groupname>
+              <filemode>0644</filemode>
+              <directoryIncluded>false</directoryIncluded>
+              <sources>
+                <source>
+                  <location>target/vismo-core-${project.version}.jar</location>
+                  <destination>vismo.jar</destination>
+                </source>
+
+                <source>
+                  <location>../vismo-dispatch/src/main/python/dummy-event-server.py</location>
+                  <destination>dummy-event-server.py</destination>
+                </source>
+
+                <source>
+                  <location>../vismo-dispatch/src/main/python/vismo_dispatch.py</location>
+                  <destination>vismo_dispatch.py</destination>
+                </source>
+              </sources>
+            </mapping>
+
+            <mapping>
+              <directory>/etc/init.d</directory>
+              <username>root</username>
+              <groupname>root</groupname>
+              <filemode>0755</filemode>
+              <directoryIncluded>false</directoryIncluded>
+              <sources>
+                <source>
+                  <location>src/main/scripts/init.d</location>
+                  <destination>vision-vismo</destination>
+                </source>
+              </sources>
+            </mapping>
+
+          </mappings>
+        </configuration>
+
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+
+    <dependency>
+      <artifactId>vismo-config</artifactId>
+      <groupId>gr.ntua.vision</groupId>
+      <version>1.0.3-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <artifactId>vismo-notify</artifactId>
+      <groupId>gr.ntua.vision</groupId>
+      <version>1.0.3-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-server</artifactId>
+      <version>${jersey.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-client</artifactId>
+      <version>${jersey.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+      <version>${jetty.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.json-simple</groupId>
+      <artifactId>json-simple</artifactId>
+      <version>1.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.10</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-junit4</artifactId>
+      <version>2.5.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <version>1.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.zeromq</groupId>
+      <artifactId>jzmq-all</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+
+  </dependencies>
+
+</project>

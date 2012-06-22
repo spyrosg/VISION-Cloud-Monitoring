@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <prerequisites>
+    <maven>3.0.0</maven>
+  </prerequisites>
+
+  <parent>
+    <artifactId>vismo</artifactId>
+    <groupId>gr.ntua.vision</groupId>
+    <version>1.0.3-SNAPSHOT</version>
+    <relativePath>..</relativePath>
+  </parent>
+
+  <artifactId>vismo-dispatch</artifactId>
+  <name>Vismo Dispatch</name>
+  <description>The api for event producers in VISION Cloud.</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>gr.ntua.vision</groupId>
+      <artifactId>vismo-events</artifactId>
+      <version>1.0.3-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>gr.ntua.vision</groupId>
+      <artifactId>vismo-config</artifactId>
+      <version>1.0.3-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.10</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>
