@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.udp.UDPServer.UDPListener;
+import gr.ntua.vision.monitoring.udp.UDPListener;
 
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -14,11 +14,11 @@ import org.zeromq.ZMQ;
 /**
  *
  */
-public class MonitoringInstance implements UDPListener {
+public class Vismo implements UDPListener {
     /***/
     private static final String       KILL   = "stop!";
     /** the log target. */
-    private static final Logger       log    = LoggerFactory.getLogger(MonitoringInstance.class);
+    private static final Logger       log    = LoggerFactory.getLogger(Vismo.class);
     /***/
     private static final String       STATUS = "status?";
     /** the list of supporting tasks. */
@@ -33,7 +33,7 @@ public class MonitoringInstance implements UDPListener {
      * @param vminfo
      * @throws SocketException
      */
-    public MonitoringInstance(final VMInfo vminfo) throws SocketException {
+    public Vismo(final VMInfo vminfo) throws SocketException {
         this.vminfo = vminfo;
         log.info("Starting up, pid={}, ip={}", vminfo.getPID(), vminfo.getInterface().getDisplayName() + vminfo.getAddress());
         log.info("running zmq version={}", ZMQ.getVersionString());
