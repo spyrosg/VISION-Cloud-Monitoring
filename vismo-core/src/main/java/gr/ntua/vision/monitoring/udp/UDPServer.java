@@ -16,20 +16,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class UDPServer extends StoppableTask {
-    /**
-     * This is used to notify any interested party for incoming udp requests.
-     */
-    public interface UDPListener {
-        /**
-         * Pass to the listener the message received and report back its response.
-         * 
-         * @param msg
-         *            the message received.
-         * @return the listener's response.
-         */
-        String notify(String msg);
-    }
-
     /** the log target. */
     private static final Logger  log = LoggerFactory.getLogger(UDPServer.class);
     /** the listener to notify. */

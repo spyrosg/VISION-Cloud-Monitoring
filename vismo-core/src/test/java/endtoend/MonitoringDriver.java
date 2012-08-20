@@ -4,7 +4,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.EventDistributor;
 import gr.ntua.vision.monitoring.LocalEventCollector;
-import gr.ntua.vision.monitoring.MonitoringInstance;
+import gr.ntua.vision.monitoring.Vismo;
 import gr.ntua.vision.monitoring.VismoVMInfo;
 import gr.ntua.vision.monitoring.udp.UDPClient;
 import gr.ntua.vision.monitoring.udp.UDPServer;
@@ -23,7 +23,7 @@ public class MonitoringDriver {
     /***/
     private final EventCounterListener counter = new EventCounterListener(10);
     /***/
-    private final MonitoringInstance   inst;
+    private final Vismo                inst;
 
 
     /**
@@ -32,7 +32,7 @@ public class MonitoringDriver {
      * @throws SocketException
      */
     public MonitoringDriver() throws SocketException {
-        this.inst = new MonitoringInstance(new VismoVMInfo());
+        this.inst = new Vismo(new VismoVMInfo());
     }
 
 
@@ -43,13 +43,14 @@ public class MonitoringDriver {
      * @param udpPort
      * @throws IOException
      */
+    @SuppressWarnings("static-method")
     public void reportsMonitoringStatus(final int udpPort) throws IOException {
         final UDPClient client = new UDPClient(udpPort);
         String resp = null;
 
         for (int i = 0; i < 3; ++i)
             try {
-                resp = client.getServiceStatus();
+                resp = client.getVismoStatus();
                 break;
             } catch (final SocketTimeoutException e) {
                 //
@@ -88,10 +89,8 @@ public class MonitoringDriver {
 
     /**
      * Start the application. The application should join the cluster and start sending new events.
-     * 
-     * @throws SocketException
      */
-    public void start() throws SocketException {
+    public void start() {
         inst.start();
     }
 
