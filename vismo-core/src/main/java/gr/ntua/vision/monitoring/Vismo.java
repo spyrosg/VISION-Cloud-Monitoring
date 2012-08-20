@@ -51,7 +51,7 @@ public class Vismo implements UDPListener {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.udp.UDPServer.UDPListener#notify(java.lang.String)
+     * @see gr.ntua.vision.monitoring.udp.UDPListener#notify(java.lang.String)
      */
     @Override
     public String notify(final String msg) {

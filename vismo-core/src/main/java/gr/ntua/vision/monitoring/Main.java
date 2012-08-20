@@ -68,7 +68,7 @@ public class Main {
      * 
      */
     private static void showHelp() {
-        System.err.println("Usage: java -jar " + PROG + ".jar command config-file");
+        System.err.println("Usage: java -jar " + PROG + ".jar config-file command");
         System.err.println("Commands:\n");
         System.err.println("  start   start a vismo instance.");
         System.err.println("  status  report the status of vismo.");

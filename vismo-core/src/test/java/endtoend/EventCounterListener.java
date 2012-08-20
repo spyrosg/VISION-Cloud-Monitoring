@@ -34,7 +34,7 @@ class EventCounterListener implements EventListener {
      * @see gr.ntua.vision.monitoring.EventListener#notify(gr.ntua.vision.monitoring.events.Event)
      */
     @Override
-    public void notify(final Event e) {
+    public void notify(@SuppressWarnings("unused") final Event e) {
         ++noReceivedEvents;
     }
 }

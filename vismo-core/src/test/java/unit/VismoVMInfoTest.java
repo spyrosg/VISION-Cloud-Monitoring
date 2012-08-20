@@ -25,11 +25,9 @@ public class VismoVMInfoTest {
     }
 
 
-    /**
-     * @throws Exception
-     */
+    /***/
     @Test
-    public void looksLikePID() throws Exception {
+    public void looksLikePID() {
         assertTrue(vminfo.getPID() > 1);
     }
 }
