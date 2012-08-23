@@ -51,8 +51,8 @@ public class EventDistributor implements EventListener {
         final String topic = (String) dict.get("topic");
 
         // TODO: get back to this. Should we block or should be drop?
-        sock.send(topic.getBytes(), ZMQ.SNDMORE);
-        final boolean success = sock.send(msg.getBytes(), 0);
+        final boolean success = sock.send(topic.getBytes(), ZMQ.SNDMORE) && sock.send(msg.getBytes(), 0);
+        
         log.trace("sent: {}", success ? "ok" : "dropped");
     }
 }
