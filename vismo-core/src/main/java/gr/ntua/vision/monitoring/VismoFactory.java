@@ -35,7 +35,7 @@ public class VismoFactory {
     public Vismo build() throws SocketException {
         final Vismo mon = new Vismo(new VismoVMInfo());
         final ZContext ctx = new ZContext();
-        final LocalEventCollector receiver = new LocalEventCollector(ctx, config.getProducersPoint());
+        final LocalEventsCollector receiver = new LocalEventsCollector(ctx, config.getProducersPoint());
 
         receiver.subscribe(new EventDistributor(ctx, config.getConsumersPoint()));
 

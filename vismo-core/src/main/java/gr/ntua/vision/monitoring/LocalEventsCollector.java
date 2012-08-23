@@ -18,7 +18,7 @@ import org.zeromq.ZMQ.Socket;
  * to collect these events and pass them around to the rest of the system. Upon event receipt, the interested parties we'll be
  * notified.
  */
-public class LocalEventCollector extends StoppableTask {
+public class LocalEventsCollector extends StoppableTask {
     /** the zmq context. */
     private final ZContext            ctx;
     /** the event factory. */
@@ -28,7 +28,7 @@ public class LocalEventCollector extends StoppableTask {
     /** the zmq context. */
     private final String              localEventsPort;
     /** the log target. */
-    private final Logger              log          = LoggerFactory.getLogger(LocalEventCollector.class);
+    private final Logger              log          = LoggerFactory.getLogger(LocalEventsCollector.class);
     /** the sock receiving events. */
     private final Socket              sock;
     /** the message used to stop the task. */
@@ -43,7 +43,7 @@ public class LocalEventCollector extends StoppableTask {
      * @param localEventsPort
      *            the events end-point to bind to.
      */
-    public LocalEventCollector(final ZContext ctx, final String localEventsPort) {
+    public LocalEventsCollector(final ZContext ctx, final String localEventsPort) {
         super("event-receiver");
         this.ctx = ctx;
         this.localEventsPort = localEventsPort;

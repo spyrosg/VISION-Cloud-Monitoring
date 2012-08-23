@@ -3,7 +3,7 @@ package endtoend;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.EventDistributor;
-import gr.ntua.vision.monitoring.LocalEventCollector;
+import gr.ntua.vision.monitoring.LocalEventsCollector;
 import gr.ntua.vision.monitoring.Vismo;
 import gr.ntua.vision.monitoring.VismoVMInfo;
 import gr.ntua.vision.monitoring.udp.UDPClient;
@@ -101,7 +101,7 @@ public class MonitoringDriver {
      * @param externalDistributionPort
      */
     private void setupLocalEventCollector(final ZContext ctx, final String localEventsPort, final String externalDistributionPort) {
-        final LocalEventCollector receiver = new LocalEventCollector(ctx, localEventsPort);
+        final LocalEventsCollector receiver = new LocalEventsCollector(ctx, localEventsPort);
         final EventDistributor distributor = new EventDistributor(ctx, externalDistributionPort);
 
         receiver.subscribe(counter);
