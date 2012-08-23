@@ -12,8 +12,8 @@ import json
 
 
 # this is the file that holds the lib's configuration
-CONFIGURATION_PROPERTIES = '/srv/vismo/config.properties'
-#CONFIGURATION_PROPERTIES = 'config.properties'
+#CONFIGURATION_PROPERTIES = '/srv/vismo/config.properties'
+CONFIGURATION_PROPERTIES = 'config.properties'
 
 
 def get_public_ip(iface='eth0'):
@@ -147,8 +147,10 @@ class MonitoringEventDispatcher(object):
 
         if 'content_size' in event:
             event['content-size'] = event['content_size']
+            del event['content_size']
         if 'obj' in event:
             event['object'] = event['obj']
+            del event['obj']
 
 
     def send(self, **event):
@@ -181,10 +183,10 @@ class MonitoringEventDispatcher(object):
 ## Utilities
 
     def log(self, msg):
-        print(msg, file=sys.stderr)
+        print('vismo-local-event-dispatcher:' + msg, file=sys.stderr)
 
     def log_and_raise(msg, excp):
-        print(msg, file=sys.stderr)
+        print('vismo-local-event-dispatcher:' + msg, file=sys.stderr)
         raise excp(msg)
 
     def is_effectively_zero(self, n):
