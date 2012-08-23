@@ -154,7 +154,7 @@ class MonitoringEventDispatcher(object):
     def send(self, **event):
         self.cleanup_event(event)
         self.add_basic_properties(event)
-        self.log('{}: {}'.format(event['timestamp'], event['tag']))
+        self.log('{0}: {1}'.format(event['timestamp'], event['tag']))
         self.collect_event(event)
 
 
