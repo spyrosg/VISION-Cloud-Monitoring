@@ -110,6 +110,16 @@
                   <location>../vismo-dispatch/src/main/python/vismo_dispatch.py</location>
                   <destination>vismo_dispatch.py</destination>
                 </source>
+
+                <source>
+                  <location>../vismo-dispatch/src/main/python/pyjavaproperties.py</location>
+                  <destination>pyjavaproperties.py</destination>
+                </source>
+
+                <source>
+                  <location>../vismo-config/src/main/resources/config.properties</location>
+                  <destination>config.properties</destination>
+                </source>
               </sources>
             </mapping>
 
