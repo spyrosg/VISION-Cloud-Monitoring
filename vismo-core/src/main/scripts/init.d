@@ -7,16 +7,17 @@
 . /etc/rc.d/init.d/functions
 
 VISMO_JAR=/srv/vismo/vismo.jar
+VISMO_CONFIG=/srv/vismo/config.properties
 
 
 is_vismo_running() {
-	java -jar "$VISMO_JAR" status | grep -q '[0-9]$' 2>/dev/null
+	java -jar "$VISMO_JAR" "$VISMO_CONFIG" status | grep -q '[0-9]$' 2>/dev/null
 }
 
 
 vismo_start() {
 	echo -n "vismo: "
-	setsid java -jar "$VISMO_JAR" start </dev/null >&/dev/null &
+	setsid java -jar "$VISMO_JAR" "$VISMO_CONFIG" start </dev/null >&/dev/null &
         sleep 1
 
 	if `is_vismo_running`; then
@@ -32,7 +33,7 @@ vismo_start() {
 
 
 vismo_stop() {
-	java -jar "$VISMO_JAR" stop
+	java -jar "$VISMO_JAR" "$VISMO_CONFIG" stop
 
 	if ! `is_vismo_running`; then
 		logger -t vision-vismo "Stopping vismo service: ok"
@@ -45,7 +46,7 @@ vismo_stop() {
 
 
 vismo_status() {
-	java -jar "$VISMO_JAR" status
+	java -jar "$VISMO_JAR" "$VISMO_CONFIG" status
 	return 0
 }
 
