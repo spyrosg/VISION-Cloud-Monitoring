@@ -7,6 +7,7 @@ import socket, struct, fcntl, sys
 from os import getpid
 from time import time
 from pyjavaproperties import Properties
+from uuid uuid4
 import zmq
 import json
 
@@ -164,6 +165,7 @@ class MonitoringEventDispatcher(EventDispatcher):
         event['originating-machine'] = self.ip
         event['originating-service'] = self.service_name
         event['cluster'] = self.cluster_name
+        event['id'] = str(uuid4())
 
 
     def _sock_send(self, event):
