@@ -314,16 +314,12 @@ if __name__ == '__main__':
             self.assertAlmostEquals(self.time_till_start_of_response + self.time_till_end_of_response, transaction_time, delta=self.delta)
 
 
-    #unittest.main()
+    unittest.main()
 
-    mon = MonitoringEventDispatcher('foo')
-    mon.send(topic='off-course', tag='start_request_event', content_size=1000, obj='ofdesire', status=1)
-    sleep(1)
-    mon.send(topic='off-course', tag='start_response_event', obj='ofdesire', status=1)
-    sleep(1)
-    mon.send(topic='off-course', tag='end_response_event', obj='ofdesire', status=1)
-
-# TRACE [2012-08-23 11:21:51,396] gr.ntua.vision.monitoring.LocalEventCollector: received: {"status": "SUCCESS", "originating-machine": "10.0.1.101", "container": "2-vassilis-tmp", "timestamp": 1345720911396, "topic": "reads", "tag": "start-request", "user": "unauthorized", "originating-service": "object-service", "content_size": 0, "obj": "1", "type": "read", "tenant": "ntua"}
-# TRACE [2012-08-23 11:21:51,771] gr.ntua.vision.monitoring.LocalEventCollector: received: {"status": "SUCCESS", "originating-machine": "10.0.1.101", "container": "2-vassilis-tmp", "timestamp": 1345720911770, "topic": "reads", "tag": "start-response", "user": "unauthorized", "originating-service": "object-service", "content_size": 0, "obj": "1", "type": "read", "tenant": "ntua"}
-# TRACE [2012-08-23 11:21:51,787] gr.ntua.vision.monitoring.LocalEventCollector: received: {"status": "SUCCESS", "originating-machine": "10.0.1.101", "container": "2-vassilis-tmp", "timestamp": 1345720911786, "topic": "reads", "tag": "end-response", "user": "unauthorized", "originating-service": "object-service", "content_size": 0, "obj": "1", "type": "read", "tenant": "ntua"}
+#    mon = MonitoringEventDispatcher('foo')
+#    mon.send(topic='off-course', tag='start_request_event', content_size=1000, obj='ofdesire', status=1)
+#    sleep(1)
+#    mon.send(topic='off-course', tag='start_response_event', obj='ofdesire', status=1)
+#    sleep(1)
+#    mon.send(topic='off-course', tag='end_response_event', obj='ofdesire', status=1)
 
