@@ -5,7 +5,7 @@ from __future__ import print_function
 
 import socket, struct, fcntl, sys
 from os import getpid
-from time import time, sleep
+from time import time
 from pyjavaproperties import Properties
 import zmq
 import json
@@ -15,6 +15,12 @@ import json
 #CONFIGURATION_PROPERTIES = '/srv/vismo/config.properties'
 CONFIGURATION_PROPERTIES = 'config.properties'
 
+
+###
+##
+## Utilities
+##
+###
 
 def get_public_ip(iface='eth0'):
     """
@@ -38,12 +44,63 @@ def get_public_ip(iface='eth0'):
 
     return socket.inet_ntoa(ip)
 
+def is_effectively_zero(n):
+    return abs(n) <= 5e-9
 
-class MonitoringEventDispatcher(object):
+def log(msg):
+    print('vismo-local-event-dispatcher: {0}'.format(msg), file=sys.stderr)
+
+def log_and_raise(excp):
+    print('vismo-local-event-dispatcher: {0}'.format(msg), file=sys.stderr)
+    raise excp(msg)
+
+
+
+## core
+
+class EventDispatcher(object):
+    """
+        An event dispatcher is used to pass around events to
+        interested parties.
+    """
+
+    def __init__(self, service_name, sock):
+        self.service_name = service_name
+        self.sock = sock
+
+
+    def send(self, **event):
+        """Actually dispatch the event."""
+
+        self.sock.send(event)
+
+
+    def calculate_event_time_difference(self, e1, e2):
+        """
+            Calculates the time difference of the two events. It is assumed
+            that e1 ``happens before'' e2, so that a positive difference is
+            returned.
+
+            It is also assumed that the event timestamps are in millis and
+            the returned value is in seconds.
+        """
+
+        return (float(e2['timestamp']) - float(e1['timestamp'])) / 1000.0
+
+
+    def calculate_mean_value_per_time_unit(self, val, time_diff):
+        if is_effectively_zero(time_diff):
+            return 0.0
+
+        return val / time_diff
+
+
+class MonitoringEventDispatcher(EventDispatcher):
     """
         This is used as the bridge that handles the event generation code
-        with the event distribution code. This instance talks directly
-        to the locally running vismo instance.
+        (the caller of this library) the event distribution code (the main
+        monitoring instance). This instance talks directly to the locally
+        running vismo instance.
 
         The services of this library are called by the Object Service on
         each request/response cycle. Since each request in object service
@@ -54,90 +111,39 @@ class MonitoringEventDispatcher(object):
 
     def __init__(self, service_name):
         self.load_configuration()
-        self.service_name = service_name
-        self.iface = 'eth0'
-        self.ip = get_public_ip(self.iface)
-        self.sock = self.create_push_socket(self.producers_point)
+        sock = self.create_push_socket(self.producers_point)
+        super(MonitoringEventDispatcher, self).__init__(service_name, sock)
         self.start_request_event = None
         self.start_response_event = None
         self.end_response_event = None
 
+    def load_configuration(self):
+        p = Properties()
+        p.load(open(CONFIGURATION_PROPERTIES))
+        self.producers_point = p['producers.point']
+        # FIXME: auto acquire the name according to the machine's ip
+        self.cluster_name = p['cluster1Name']
+        self.iface = 'eth0'
+        self.ip = get_public_ip(self.iface)
 
-    def collect_event(self, event):
+    def create_push_socket(self, end_point):
+        ctx = zmq.Context()
+        sock = ctx.socket(zmq.PUSH)
+        sock.setsockopt(zmq.LINGER, 0)
+        sock.connect(end_point)
+
+        return sock
+
+
+    def send(self, **event):
         """
-        """
-
-        # is the event of interest to monitoring?
-        if 'tag' not in event:
-            self._sock_send(event)
-            return
-
-        tag = event['tag']
-
-        if tag == 'start_request_event':
-            self.start_request_event = event
-        elif tag == 'start_response_event':
-            self.start_response_event = event
-        elif tag == 'end_response_event':
-            self.end_response_event = event
-        else:
-            log_and_raise('handed event with incomprehensible tag: ' +  tag + ', event: ' + str(event), ValueError)
-
-        # if we have all the events of interest
-        if self.start_request_event and self.start_response_event and self.end_response_event:
-            main_event = self.start_request_event
-
-            main_event['latency'] = self.calculate_latency()
-            main_event['transaction-time'] = self.calculate_transaction_time()
-            main_event['throughput'] = self.calculate_throughput()
-            # not needed
-            del main_event['status']
-            del main_event['tag']
-
-            self._sock_send(main_event)
-
-
-    def calculate_latency(self):
-        """
-            Latency is defined as the time it took from receiving
-            the request till the time that we're ready to start sending
-            the response. Input units are in millis, output in seconds.
+            This is the single public entry point to the object.
         """
 
-        return (float(self.start_response_event['timestamp']) - float(self.start_request_event['timestamp'])) / 1000.0
-
-
-    def calculate_throughput(self):
-        """
-            Throughput is defined as the the number of bytes served in the unit of time.
-            Input units are in bytes and millis, output in bytes/second.
-        """
-
-        transaction_time = self.calculate_transaction_time()
-
-        if self.is_effectively_zero(transaction_time):
-            return 0.0
-
-        return self.start_request_event['content-size'] / transaction_time
-
-
-    def calculate_transaction_time(self):
-        """
-            Transaction time is defined as the time it took from receiving
-            the request till the time that the response was completely
-            handed off to the user. Input units are in millis, output in seconds.
-
-        """
-
-        return (float(self.end_response_event['timestamp']) - float(self.start_request_event['timestamp'])) / 1000.0
-
-
-
-    def add_basic_properties(self, event):
-        event['timestamp'] = int(1000 * time())
-        event['originating-machine'] = self.ip
-        event['originating-service'] = self.service_name
-        event['cluster'] = self.cluster_name
+        self.cleanup_event(event)
+        self.add_basic_properties(event)
+        log('{0}: {1}'.format(event['timestamp'], event['tag']))
+        self.handle_event(event)
 
 
     def cleanup_event(self, event):
@@ -153,48 +159,163 @@ class MonitoringEventDispatcher(object):
             del event['obj']
 
 
-    def send(self, **event):
-        self.cleanup_event(event)
-        self.add_basic_properties(event)
-        self.log('{0}: {1}'.format(event['timestamp'], event['tag']))
-        self.collect_event(event)
+    def add_basic_properties(self, event):
+        event['timestamp'] = int(1000 * time())
+        event['originating-machine'] = self.ip
+        event['originating-service'] = self.service_name
+        event['cluster'] = self.cluster_name
 
 
     def _sock_send(self, event):
         self.sock.send(json.dumps(event))
 
 
-    def load_configuration(self):
-        p = Properties()
-        p.load(open(CONFIGURATION_PROPERTIES))
-        self.producers_point = p['producers.point']
-        # FIXME: auto acquire the name according to the machine's ip
-        self.cluster_name = p['cluster1Name']
+    def handle_event(self, event):
+        """
+            This does most of the work. It accumulates the interesting events,
+            and upon arrival of all events, makes some request calculations and
+            sends the event to the main monitoring instance.
+        """
+
+        # has the event anything to do with request/response?
+        if 'tag' not in event:
+            self._sock_send(event)
+            return
+
+        tag = event['tag']
+
+        if tag == 'start_request_event':
+            self.start_request_event = event
+        elif tag == 'start_response_event':
+            self.start_response_event = event
+        elif tag == 'end_response_event':
+            self.end_response_event = event
+        else:
+            log_and_raise('handed event with incomprehensible tag: {0}, event: {1}', tag, event, ValueError)
+
+        # if we have all the events
+        if self.start_request_event and self.start_response_event and self.end_response_event:
+            main_event = self.start_request_event
+
+            main_event['latency'] = self.calculate_latency()
+            main_event['transaction-time'] = self.calculate_transaction_time()
+            main_event['throughput'] = self.calculate_throughput(main_event['transaction-time'])
+            # TODO: Calculate availability and other Niki's required stuff
+
+            # not needed
+            del main_event['status']
+            del main_event['tag']
+
+            self._sock_send(main_event)
 
 
-    def create_push_socket(self, end_point):
-        ctx = zmq.Context()
-        sock = ctx.socket(zmq.PUSH)
-        sock.setsockopt(zmq.LINGER, 0)
-        sock.connect(end_point)
+    def calculate_latency(self):
+        """
+            Latency here is defined as the time duration from the time the system received
+            the start request event till the time the system is ready to start serving the
+            response, as seen by the start response event.
+        """
 
-        return sock
+        return self.calculate_event_time_difference(self.start_request_event, self.start_response_event)
 
-## Utilities
 
-    def log(self, msg):
-        print('vismo-local-event-dispatcher:' + msg, file=sys.stderr)
+    def calculate_transaction_time(self):
+        """
+            Transaction time is the time spent serving the request. More accurately, is the
+            duration from the time the system received the start request event till the time the
+            system received the end response event.
+        """
 
-    def log_and_raise(msg, excp):
-        print('vismo-local-event-dispatcher:' + msg, file=sys.stderr)
-        raise excp(msg)
+        return self.calculate_event_time_difference(self.start_request_event, self.end_response_event)
 
-    def is_effectively_zero(self, n):
-        return abs(n) <= 1e-9
+
+    def calculate_throughput(self, transaction_time):
+        """
+            Throughput is defined as the the number of bytes served in the unit of time.
+            Transaction size is measured in bytes, transaction_time in seconds.
+            Output value is in bytes per second.
+        """
+
+        transaction_size = self.start_request_event['content-size']
+
+        return self.calculate_mean_value_per_time_unit(transaction_size, transaction_time)
+
+
 
 
 
 if __name__ == '__main__':
+    import unittest
+    from time import sleep
+
+
+    class EventDispatcherTest(unittest.TestCase):
+        def setUp(self):
+            self.topic = 'off-course'
+            self.content_size = 1000 # in bytes
+            self.obj = 'ofdesire'
+            self.success_status = 'SUCCESS'
+            self.fail_status = 'SUCCESS'
+            self.time_till_start_of_response = 0.1 # in seconds
+            self.time_till_end_of_response = 0.1 # in seconds
+            self.delta = 0.0005
+            self.sent_events = []
+            self.sock = object()
+            def sock(): pass
+            sock.send = lambda e: self.sent_events.append(e)
+            self.dispatcher = EventDispatcher('foo', sock)
+
+        def send_event(self, **args):
+            args['timestamp'] = int(1000 * time())
+            self.dispatcher.send(**args)
+
+        def send_start_request(self):
+            self.send_event(tag='start_request_event', topic=self.topic, content_size=self.content_size, obj=self.obj, status=self.success_status)
+
+        def send_start_response(self):
+            self.send_event(tag='start_response_event', topic=self.topic, content_size=self.content_size, obj=self.obj, status=self.success_status)
+
+        def send_end_response(self):
+            self.send_event(tag='end_response_event', topic=self.topic, content_size=self.content_size, obj=self.obj, status=self.success_status)
+
+        def perform_full_request_response_event_generation(self):
+            self.send_start_request()
+            sleep(self.time_till_start_of_response)
+            self.send_start_response()
+            sleep(self.time_till_end_of_response)
+            self.send_end_response()
+
+
+        def test_that_event_was_sent(self):
+            self.send_event(topic=self.topic, tag='start_request_event', content_size=1000, obj='ofdesire', status=1)
+            self.assertEquals(self.topic, self.sent_events[0]['topic'])
+
+
+        def test_event_latency(self):
+            self.perform_full_request_response_event_generation()
+
+            latency = self.dispatcher.calculate_event_time_difference(self.sent_events[0], self.sent_events[1])
+            self.assertGreater(latency, 0)
+            self.assertAlmostEquals(self.time_till_start_of_response, latency, delta=self.delta)
+
+
+        def test_event_throughput(self):
+            self.perform_full_request_response_event_generation()
+
+            throughput = self.dispatcher.calculate_mean_value_per_time_unit(self.sent_events[0]['content_size'], self.time_till_start_of_response + self.time_till_end_of_response)
+            self.assertAlmostEquals(self.content_size / (self.time_till_start_of_response + self.time_till_end_of_response), throughput, delta=self.delta)
+
+
+        def test_event_transaction_time(self):
+            self.perform_full_request_response_event_generation()
+
+            transaction_time = self.dispatcher.calculate_event_time_difference(self.sent_events[0], self.sent_events[2])
+            self.assertGreater(transaction_time, 0)
+            self.assertAlmostEquals(self.time_till_start_of_response + self.time_till_end_of_response, transaction_time, delta=self.delta)
+
+
+    #unittest.main()
+
     mon = MonitoringEventDispatcher('foo')
     mon.send(topic='off-course', tag='start_request_event', content_size=1000, obj='ofdesire', status=1)
     sleep(1)
