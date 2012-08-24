@@ -1,9 +1,11 @@
 package integration;
 
+import gr.ntua.vision.monitoring.VismoFactory;
 import gr.ntua.vision.monitoring.udp.UDPClient;
 import gr.ntua.vision.monitoring.udp.UDPListener;
 import gr.ntua.vision.monitoring.udp.UDPServer;
 
+import java.net.DatagramSocket;
 import java.net.SocketException;
 
 import org.jmock.Expectations;
@@ -52,8 +54,8 @@ public class UDPClientServerTest {
     @Before
     public void setUp() throws SocketException {
         listener = context.mock(UDPListener.class);
-        client = new UDPClient(PORT);
-        server = new UDPServer(PORT, listener);
+        client = new UDPClient(new DatagramSocket(), PORT);
+        server = new UDPServer(VismoFactory.getUDPServeSocket(PORT), listener);
         server.setDaemon(true);
         server.start();
     }

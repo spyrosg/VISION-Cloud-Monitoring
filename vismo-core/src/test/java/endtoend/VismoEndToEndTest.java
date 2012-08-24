@@ -16,6 +16,8 @@ import org.zeromq.ZContext;
  *
  */
 public class VismoEndToEndTest {
+    /** the maximum number of events to sent for the test. */
+    private static final int         NO_EVENTS_TO_SENT    = 10;
     /***/
     @SuppressWarnings("serial")
     private static final Properties  props                = new Properties() {
@@ -25,11 +27,9 @@ public class VismoEndToEndTest {
                                                                   setProperty("udp.port", "56431");
                                                               }
                                                           };
+
     /***/
     private final VismoConfiguration conf                 = new VismoConfiguration(props);
-
-    /** the maximum number of events to sent for the test. */
-    private static final int         NO_EVENTS_TO_SENT    = 10;
     /***/
     private final ZContext           ctx                  = new ZContext();
     /***/
@@ -37,9 +37,11 @@ public class VismoEndToEndTest {
     /***/
     private final EventCountHandler  eventConsumerCounter = new EventCountHandler(NO_EVENTS_TO_SENT);
     /***/
-    private final FakeEventProducer  eventProducer        = new FakeEventProducer(ctx, conf.getProducersPoint(), NO_EVENTS_TO_SENT);
+    private final FakeEventProducer  eventProducer        = new FakeEventProducer(ctx, conf.getProducersPoint(),
+                                                                  NO_EVENTS_TO_SENT);
     /***/
     private final EventRegistry      registry             = new EventRegistry(ctx, conf.getConsumersPoint());
+
 
     /**
      * @throws Exception

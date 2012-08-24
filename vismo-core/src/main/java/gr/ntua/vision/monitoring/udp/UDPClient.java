@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -14,28 +12,26 @@ import java.util.concurrent.TimeUnit;
  */
 public class UDPClient {
     /***/
-    private static final String  KILL    = "stop!";
+    private static final String  KILL   = "stop!";
     /***/
-    private static final String  STATUS  = "status?";
-    /** the response timeout. */
-    private static final int     TIMEOUT = (int) TimeUnit.SECONDS.toMillis(1);
-    /** the port to send messages to. */
+    private static final String  STATUS = "status?";
+    /** the port to use. */
     private final int            port;
-    /** the socket. */
+    /** the sock to use. */
     private final DatagramSocket sock;
 
 
     /**
      * Constructor.
      * 
+     * @param sock
+     *            the sock to use.
      * @param port
-     *            the port to send messages to.
-     * @throws SocketException
+     *            the port to use.
      */
-    public UDPClient(final int port) throws SocketException {
+    public UDPClient(final DatagramSocket sock, final int port) {
+        this.sock = sock;
         this.port = port;
-        this.sock = new DatagramSocket();
-        this.sock.setSoTimeout(TIMEOUT);
     }
 
 

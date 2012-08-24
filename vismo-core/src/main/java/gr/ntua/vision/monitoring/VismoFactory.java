@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.udp.UDPServer;
 
+import java.net.DatagramSocket;
 import java.net.SocketException;
 
 import org.zeromq.ZContext;
@@ -40,8 +41,22 @@ public class VismoFactory {
         receiver.subscribe(new EventDistributor(ctx, config.getConsumersPoint()));
 
         mon.addTask(receiver);
-        mon.addTask(new UDPServer(config.getUDPPort(), mon));
+        mon.addTask(new UDPServer(getUDPServeSocket(config.getUDPPort()), mon));
 
         return mon;
+    }
+
+
+    /**
+     * @param port
+     * @return
+     * @throws SocketException
+     */
+    public static DatagramSocket getUDPServeSocket(final int port) throws SocketException {
+        final DatagramSocket sock = new DatagramSocket(port);
+
+        sock.setReuseAddress(true);
+
+        return sock;
     }
 }

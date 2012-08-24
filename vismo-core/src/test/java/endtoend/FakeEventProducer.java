@@ -43,7 +43,7 @@ public class FakeEventProducer {
     /***/
     public void sendEvents() {
         for (int i = 0; i < noEventsToSend; ++i)
-            sendEvent();
+            sendEvent(generateEvent());
     }
 
 
@@ -60,9 +60,20 @@ public class FakeEventProducer {
     }
 
 
-    /***/
+    /**
+     * @param o
+     */
+    private void sendEvent(final JSONObject o) {
+        log.trace("sending {}", o);
+        sock.send(o.toJSONString().getBytes(), 0);
+    }
+
+
+    /**
+     * @return
+     */
     @SuppressWarnings("unchecked")
-    private void sendEvent() {
+    private static JSONObject generateEvent() {
         final JSONObject o = new JSONObject();
 
         o.put("timestamp", System.currentTimeMillis());
@@ -71,8 +82,6 @@ public class FakeEventProducer {
         o.put("originating-ip", "localhost");
         o.put("id", UUID.randomUUID().toString());
 
-        log.trace("sending {}", o);
-
-        sock.send(o.toJSONString().getBytes(), 0);
+        return o;
     }
 }

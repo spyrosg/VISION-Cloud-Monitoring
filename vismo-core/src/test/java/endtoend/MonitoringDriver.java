@@ -5,11 +5,13 @@ import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.EventDistributor;
 import gr.ntua.vision.monitoring.LocalEventsCollector;
 import gr.ntua.vision.monitoring.Vismo;
+import gr.ntua.vision.monitoring.VismoFactory;
 import gr.ntua.vision.monitoring.VismoVMInfo;
 import gr.ntua.vision.monitoring.udp.UDPClient;
 import gr.ntua.vision.monitoring.udp.UDPServer;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
@@ -45,7 +47,7 @@ public class MonitoringDriver {
      */
     @SuppressWarnings("static-method")
     public void reportsMonitoringStatus(final int udpPort) throws IOException {
-        final UDPClient client = new UDPClient(udpPort);
+        final UDPClient client = new UDPClient(new DatagramSocket(), udpPort);
         String resp = null;
 
         for (int i = 0; i < 3; ++i)
@@ -73,7 +75,7 @@ public class MonitoringDriver {
      */
     public void setup(final int udpPort, final ZContext ctx, final String localEventsPort, final String externalDistributionPort)
             throws SocketException {
-        setupUDPServer(udpPort);
+        setupUDPServer(VismoFactory.getUDPServeSocket(udpPort));
         setupLocalEventCollector(ctx, localEventsPort, externalDistributionPort);
     }
 
@@ -111,10 +113,10 @@ public class MonitoringDriver {
 
 
     /**
-     * @param udpPort
+     * @param sock
      * @throws SocketException
      */
-    private void setupUDPServer(final int udpPort) throws SocketException {
-        inst.addTask(new UDPServer(udpPort, inst));
+    private void setupUDPServer(final DatagramSocket sock) throws SocketException {
+        inst.addTask(new UDPServer(sock, inst));
     }
 }

@@ -20,25 +20,26 @@ public class UDPServer extends StoppableTask {
     private static final Logger  log = LoggerFactory.getLogger(UDPServer.class);
     /** the listener to notify. */
     private final UDPListener    listener;
-    /** the upd sock to listen to. */
+    /** the socket to use. */
     private final DatagramSocket sock;
 
 
     /**
      * Constructor.
      * 
-     * @param port
-     *            the udp port to listen to.
+     * @param sock
+     *            the socket to use.
      * @param listener
      *            the listener to notify.
      * @throws SocketException
      */
-    public UDPServer(final int port, final UDPListener listener) throws SocketException {
+    public UDPServer(final DatagramSocket sock, final UDPListener listener) throws SocketException {
         super("udp-server");
-        this.sock = new DatagramSocket(port);
-        this.sock.setReuseAddress(true);
+        this.sock = sock;
+        // this.sock = new DatagramSocket(port);
+        // this.sock.setReuseAddress(true);
         this.listener = listener;
-        log.info("upd server listening on port={}", port);
+        log.info("upd server listening on port={}", sock.getPort());
     }
 
 

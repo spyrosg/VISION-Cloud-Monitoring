@@ -52,7 +52,7 @@ public class EventDistributor implements EventListener {
 
         // TODO: get back to this. Should we block or should be drop?
         final boolean success = sock.send(topic.getBytes(), ZMQ.SNDMORE) && sock.send(msg.getBytes(), 0);
-        
+
         log.trace("sent: {}", success ? "ok" : "dropped");
     }
 }

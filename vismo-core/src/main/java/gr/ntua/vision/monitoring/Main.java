@@ -3,6 +3,7 @@ package gr.ntua.vision.monitoring;
 import gr.ntua.vision.monitoring.udp.UDPClient;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.SocketTimeoutException;
 
 
@@ -32,7 +33,7 @@ public class Main {
 
             vismo.start();
         } else {
-            final UDPClient client = new UDPClient(config.getUDPPort());
+            final UDPClient client = new UDPClient(new DatagramSocket(), config.getUDPPort());
 
             if (command.equals("status"))
                 reportVismoStatus(client);
