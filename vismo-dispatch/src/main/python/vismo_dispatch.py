@@ -248,8 +248,58 @@ if __name__ == '__main__':
     import unittest
     from time import sleep
 
+    class MyTestCase(unittest.TestCase):
+        """
+            This is used to reproduce to methods missing from
+            python 2.6.6
+        """
 
-    class EventDispatcherTest(unittest.TestCase):
+        def assertGreater(self, a, b, msg=None):
+            """Just like self.assertTrue(a > b), but with a nicer default message."""
+            if not a > b:
+                standardMsg = '%s not greater than %s' % (safe_repr(a), safe_repr(b))
+                self.fail(self._formatMessage(msg, standardMsg))
+
+        def assertAlmostEqual(self, first, second, places=None, msg=None, delta=None):
+            """Fail if the two objects are unequal as determined by their
+               difference rounded to the given number of decimal places
+               (default 7) and comparing to zero, or by comparing that the
+               between the two objects is more than the given delta.
+
+               Note that decimal places (from zero) are usually not the same
+               as significant digits (measured from the most signficant digit).
+
+               If the two objects compare equal then they will automatically
+               compare almost equal.
+            """
+            if first == second:
+                # shortcut
+                return
+            if delta is not None and places is not None:
+                raise TypeError("specify delta or places not both")
+
+            if delta is not None:
+                if abs(first - second) <= delta:
+                    return
+
+                standardMsg = '%s != %s within %s delta' % (safe_repr(first),
+                                                            safe_repr(second),
+                                                            safe_repr(delta))
+            else:
+                if places is None:
+                    places = 7
+
+                if round(abs(second-first), places) == 0:
+                    return
+
+                standardMsg = '%s != %s within %r places' % (safe_repr(first),
+                                                              safe_repr(second),
+                                                              places)
+            msg = self._formatMessage(msg, standardMsg)
+            raise self.failureException(msg)
+
+
+    class EventDispatcherTest(MyTestCase):
         def setUp(self):
             self.topic = 'off-course'
             self.content_size = 1000 # in bytes
@@ -296,14 +346,14 @@ if __name__ == '__main__':
 
             latency = self.dispatcher.calculate_event_time_difference(self.sent_events[0], self.sent_events[1])
             self.assertGreater(latency, 0)
-            self.assertAlmostEquals(self.time_till_start_of_response, latency, delta=self.delta)
+            self.assertAlmostEqual(self.time_till_start_of_response, latency, delta=self.delta)
 
 
         def test_event_throughput(self):
             self.perform_full_request_response_event_generation()
 
             throughput = self.dispatcher.calculate_mean_value_per_time_unit(self.sent_events[0]['content_size'], self.time_till_start_of_response + self.time_till_end_of_response)
-            self.assertAlmostEquals(self.content_size / (self.time_till_start_of_response + self.time_till_end_of_response), throughput, delta=self.delta)
+            self.assertAlmostEqual(self.content_size / (self.time_till_start_of_response + self.time_till_end_of_response), throughput, delta=self.delta)
 
 
         def test_event_transaction_time(self):
@@ -311,7 +361,7 @@ if __name__ == '__main__':
 
             transaction_time = self.dispatcher.calculate_event_time_difference(self.sent_events[0], self.sent_events[2])
             self.assertGreater(transaction_time, 0)
-            self.assertAlmostEquals(self.time_till_start_of_response + self.time_till_end_of_response, transaction_time, delta=self.delta)
+            self.assertAlmostEqual(self.time_till_start_of_response + self.time_till_end_of_response, transaction_time, delta=self.delta)
 
 
     unittest.main()
