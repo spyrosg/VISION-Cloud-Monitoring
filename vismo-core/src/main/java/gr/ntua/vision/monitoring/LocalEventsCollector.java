@@ -8,8 +8,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeromq.ZContext;
-import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
 
@@ -19,18 +17,16 @@ import org.zeromq.ZMQ.Socket;
  * notified.
  */
 public class LocalEventsCollector extends StoppableTask {
-    /** the zmq context. */
-    private final ZContext            ctx;
     /** the event factory. */
     private final EventFactory        factory      = new EventFactory();
     /** the listeners lists. */
     private final List<EventListener> listeners    = new ArrayList<EventListener>();
-    /** the zmq context. */
-    private final String              localEventsPort;
     /** the log target. */
     private final Logger              log          = LoggerFactory.getLogger(LocalEventsCollector.class);
     /** the sock receiving events. */
-    private final Socket              sock;
+    private final Socket              receiveEventsSock;
+    /***/
+    private final Socket              sendMessagesSock;
     /** the message used to stop the task. */
     private final String              STOP_MESSAGE = "stop!";
 
@@ -38,19 +34,15 @@ public class LocalEventsCollector extends StoppableTask {
     /**
      * Constructor.
      * 
-     * @param ctx
-     *            the zmq context.
-     * @param localEventsPort
-     *            the events end-point to bind to.
+     * @param receiveEventsSock
+     *            the socket used to receive events.
+     * @param sendMessagesSock
+     *            the socket used to send messages.
      */
-    public LocalEventsCollector(final ZContext ctx, final String localEventsPort) {
+    public LocalEventsCollector(final Socket receiveEventsSock, final Socket sendMessagesSock) {
         super("event-receiver");
-        this.ctx = ctx;
-        this.localEventsPort = localEventsPort;
-        this.sock = ctx.createSocket(ZMQ.PULL);
-        this.sock.bind(localEventsPort);
-        this.sock.setLinger(0);
-        log.debug("listening on endpoint={}", localEventsPort);
+        this.receiveEventsSock = receiveEventsSock;
+        this.sendMessagesSock = sendMessagesSock;
     }
 
 
@@ -62,7 +54,7 @@ public class LocalEventsCollector extends StoppableTask {
         log.debug("ready to pull");
 
         while (true) {
-            final String msg = receive(sock);
+            final String msg = receive(receiveEventsSock);
 
             if (msg == null)
                 continue;
@@ -120,11 +112,8 @@ public class LocalEventsCollector extends StoppableTask {
      * Ask the thread to stop receiving messages.
      */
     private void sendStopMessage() {
-        final Socket stopSock = ctx.createSocket(ZMQ.PUSH);
-
-        stopSock.connect(localEventsPort);
-        stopSock.send(STOP_MESSAGE.getBytes(), 0);
-        stopSock.close();
+        sendMessagesSock.send(STOP_MESSAGE.getBytes(), 0);
+        sendMessagesSock.close();
     }
 
 

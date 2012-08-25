@@ -9,15 +9,22 @@ import java.util.Properties;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeromq.ZContext;
+import org.zeromq.ZMQ;
+import org.zeromq.ZMQ.Socket;
 
 
 /**
  *
  */
 public class VismoEndToEndTest {
+    /***/
+    private static final Logger      log                  = LoggerFactory.getLogger(VismoEndToEndTest.class);
     /** the maximum number of events to sent for the test. */
     private static final int         NO_EVENTS_TO_SENT    = 10;
+
     /***/
     @SuppressWarnings("serial")
     private static final Properties  props                = new Properties() {
@@ -27,7 +34,6 @@ public class VismoEndToEndTest {
                                                                   setProperty("udp.port", "56431");
                                                               }
                                                           };
-
     /***/
     private final VismoConfiguration conf                 = new VismoConfiguration(props);
     /***/
@@ -37,8 +43,7 @@ public class VismoEndToEndTest {
     /***/
     private final EventCountHandler  eventConsumerCounter = new EventCountHandler(NO_EVENTS_TO_SENT);
     /***/
-    private final FakeEventProducer  eventProducer        = new FakeEventProducer(ctx, conf.getProducersPoint(),
-                                                                  NO_EVENTS_TO_SENT);
+    private final FakeEventProducer  eventProducer        = buildFakeEventProducer();
     /***/
     private final EventRegistry      registry             = new EventRegistry(ctx, conf.getConsumersPoint());
 
@@ -62,9 +67,8 @@ public class VismoEndToEndTest {
      */
     @Before
     public void setUp() throws SocketException {
-        driver = new MonitoringDriver();
-        driver.setup(conf.getUDPPort(), ctx, conf.getProducersPoint(), conf.getConsumersPoint());
-        eventProducer.start();
+        driver = new MonitoringDriver(conf);
+        driver.setup();
         setupConsumer();
     }
 
@@ -74,6 +78,20 @@ public class VismoEndToEndTest {
     public void tearDown() {
         eventConsumerCounter.haveReceivedEnoughMessages();
         eventProducer.stop();
+    }
+
+
+    /**
+     * @return
+     */
+    private FakeEventProducer buildFakeEventProducer() {
+        final Socket sock = ctx.createSocket(ZMQ.PUSH);
+
+        sock.setLinger(0);
+        sock.connect(conf.getProducersPoint());
+        log.debug("connecting to endpoint={}", conf.getProducersPoint());
+
+        return new FakeEventProducer(sock, NO_EVENTS_TO_SENT);
     }
 
 

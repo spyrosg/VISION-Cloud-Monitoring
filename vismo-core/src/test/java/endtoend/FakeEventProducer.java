@@ -5,8 +5,6 @@ import java.util.UUID;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeromq.ZContext;
-import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
 
@@ -18,8 +16,6 @@ public class FakeEventProducer {
     /***/
     private static final Logger log = LoggerFactory.getLogger(FakeEventProducer.class);
     /***/
-    private final String        eventsEntryPoint;
-    /***/
     private final int           noEventsToSend;
     /***/
     private final Socket        sock;
@@ -28,14 +24,11 @@ public class FakeEventProducer {
     /**
      * Constructor.
      * 
-     * @param ctx
-     * @param eventsEntryPoint
+     * @param sock
      * @param noEventsToSend
      */
-    public FakeEventProducer(final ZContext ctx, final String eventsEntryPoint, final int noEventsToSend) {
-        this.eventsEntryPoint = eventsEntryPoint;
-        this.sock = ctx.createSocket(ZMQ.PUSH);
-        this.sock.setLinger(0);
+    public FakeEventProducer(final Socket sock, final int noEventsToSend) {
+        this.sock = sock;
         this.noEventsToSend = noEventsToSend;
     }
 
@@ -44,13 +37,6 @@ public class FakeEventProducer {
     public void sendEvents() {
         for (int i = 0; i < noEventsToSend; ++i)
             sendEvent(generateEvent());
-    }
-
-
-    /***/
-    public void start() {
-        log.debug("connecting to endpoint={}", eventsEntryPoint);
-        sock.connect(eventsEntryPoint);
     }
 
 

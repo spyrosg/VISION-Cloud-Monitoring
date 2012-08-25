@@ -29,7 +29,7 @@ public class UDPClient {
      * @param port
      *            the port to use.
      */
-    public UDPClient(final DatagramSocket sock, final int port) {
+    UDPClient(final DatagramSocket sock, final int port) {
         this.sock = sock;
         this.port = port;
     }

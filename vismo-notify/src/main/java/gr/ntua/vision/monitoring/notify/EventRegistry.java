@@ -145,7 +145,6 @@ public class EventRegistry {
     private final ZContext        ctx;
     /** the zmq port in which events arrive from the main vismo component. */
     private final String          distributionPort;
-
     /** the pool of threads. Each thread corresponds to one event handler. */
     private final ExecutorService pool = Executors.newCachedThreadPool();
 
@@ -234,7 +233,7 @@ public class EventRegistry {
      * @return the zmq socket.
      */
     private static Socket getPubSocketForTopic(final ZContext ctx, final String port, final String topic) {
-        final org.zeromq.ZMQ.Socket sock = ctx.createSocket(ZMQ.SUB);
+        final Socket sock = ctx.createSocket(ZMQ.SUB);
 
         sock.setLinger(0);
         sock.connect(port);

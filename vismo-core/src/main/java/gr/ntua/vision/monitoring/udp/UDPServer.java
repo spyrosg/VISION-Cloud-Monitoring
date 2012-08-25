@@ -33,13 +33,11 @@ public class UDPServer extends StoppableTask {
      *            the listener to notify.
      * @throws SocketException
      */
-    public UDPServer(final DatagramSocket sock, final UDPListener listener) throws SocketException {
+    UDPServer(final DatagramSocket sock, final UDPListener listener) throws SocketException {
         super("udp-server");
         this.sock = sock;
-        // this.sock = new DatagramSocket(port);
-        // this.sock.setReuseAddress(true);
         this.listener = listener;
-        log.info("upd server listening on port={}", sock.getPort());
+        log.info("upd server listening on port={}", sock.getLocalPort());
     }
 
 

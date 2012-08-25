@@ -4,14 +4,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.EventDistributor;
 import gr.ntua.vision.monitoring.LocalEventsCollector;
+import gr.ntua.vision.monitoring.LocalEventsCollectorFactory;
 import gr.ntua.vision.monitoring.Vismo;
+import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.VismoFactory;
-import gr.ntua.vision.monitoring.VismoVMInfo;
 import gr.ntua.vision.monitoring.udp.UDPClient;
-import gr.ntua.vision.monitoring.udp.UDPServer;
+import gr.ntua.vision.monitoring.udp.UDPFactory;
 
 import java.io.IOException;
-import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
@@ -23,18 +23,20 @@ import org.zeromq.ZContext;
  */
 public class MonitoringDriver {
     /***/
+    private final VismoConfiguration   conf;
+    /***/
     private final EventCounterListener counter = new EventCounterListener(10);
     /***/
-    private final Vismo                inst;
+    private Vismo                      vismo   = null;
 
 
     /**
      * Constructor. Prepare to run the monitoring application.
      * 
-     * @throws SocketException
+     * @param conf
      */
-    public MonitoringDriver() throws SocketException {
-        this.inst = new Vismo(new VismoVMInfo());
+    public MonitoringDriver(final VismoConfiguration conf) {
+        this.conf = conf;
     }
 
 
@@ -47,7 +49,7 @@ public class MonitoringDriver {
      */
     @SuppressWarnings("static-method")
     public void reportsMonitoringStatus(final int udpPort) throws IOException {
-        final UDPClient client = new UDPClient(new DatagramSocket(), udpPort);
+        final UDPClient client = new UDPFactory(udpPort).buildClient();
         String resp = null;
 
         for (int i = 0; i < 3; ++i)
@@ -67,16 +69,17 @@ public class MonitoringDriver {
 
 
     /**
-     * @param udpPort
-     * @param ctx
-     * @param localEventsPort
-     * @param externalDistributionPort
      * @throws SocketException
      */
-    public void setup(final int udpPort, final ZContext ctx, final String localEventsPort, final String externalDistributionPort)
-            throws SocketException {
-        setupUDPServer(VismoFactory.getUDPServeSocket(udpPort));
-        setupLocalEventCollector(ctx, localEventsPort, externalDistributionPort);
+    public void setup() throws SocketException {
+        final ZContext ctx = new ZContext();
+        final LocalEventsCollector receiver = new LocalEventsCollectorFactory(conf, ctx).build();
+
+        receiver.subscribe(new EventDistributor(ctx, conf.getConsumersPoint()));
+        receiver.subscribe(counter);
+
+        vismo = new VismoFactory(conf).build();
+        vismo.addTask(receiver);
     }
 
 
@@ -85,7 +88,9 @@ public class MonitoringDriver {
      */
     public void shutdown() {
         counter.haveReceivedEnoughMessages();
-        inst.stop();
+
+        if (vismo != null)
+            vismo.stop();
     }
 
 
@@ -93,30 +98,7 @@ public class MonitoringDriver {
      * Start the application. The application should join the cluster and start sending new events.
      */
     public void start() {
-        inst.start();
-    }
-
-
-    /**
-     * @param ctx
-     * @param localEventsPort
-     * @param externalDistributionPort
-     */
-    private void setupLocalEventCollector(final ZContext ctx, final String localEventsPort, final String externalDistributionPort) {
-        final LocalEventsCollector receiver = new LocalEventsCollector(ctx, localEventsPort);
-        final EventDistributor distributor = new EventDistributor(ctx, externalDistributionPort);
-
-        receiver.subscribe(counter);
-        receiver.subscribe(distributor);
-        inst.addTask(receiver);
-    }
-
-
-    /**
-     * @param sock
-     * @throws SocketException
-     */
-    private void setupUDPServer(final DatagramSocket sock) throws SocketException {
-        inst.addTask(new UDPServer(sock, inst));
+        if (vismo != null)
+            vismo.start();
     }
 }

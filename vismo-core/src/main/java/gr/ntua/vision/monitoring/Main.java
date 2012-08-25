@@ -1,10 +1,12 @@
 package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.udp.UDPClient;
+import gr.ntua.vision.monitoring.udp.UDPFactory;
 
 import java.io.IOException;
-import java.net.DatagramSocket;
 import java.net.SocketTimeoutException;
+
+import org.zeromq.ZContext;
 
 
 /**
@@ -30,10 +32,15 @@ public class Main {
 
         if (command.equals("start")) {
             final Vismo vismo = new VismoFactory(config).build();
+            final ZContext ctx = new ZContext();
+            final LocalEventsCollector receiver = new LocalEventsCollectorFactory(config, ctx).build();
+
+            receiver.subscribe(new EventDistributor(ctx, config.getConsumersPoint()));
+            vismo.addTask(receiver);
 
             vismo.start();
         } else {
-            final UDPClient client = new UDPClient(new DatagramSocket(), config.getUDPPort());
+            final UDPClient client = new UDPFactory(config.getUDPPort()).buildClient();
 
             if (command.equals("status"))
                 reportVismoStatus(client);
