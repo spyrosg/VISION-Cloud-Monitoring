@@ -55,6 +55,16 @@ def log_and_raise(excp):
     print('vismo-local-event-dispatcher: {0}'.format(msg), file=sys.stderr)
     raise excp(msg)
 
+_MAX_LENGTH = 80
+def safe_repr(obj, short=False):
+    try:
+        result = repr(obj)
+    except Exception:
+        result = object.__repr__(obj)
+    if not short or len(result) < _MAX_LENGTH:
+        return result
+    return result[:_MAX_LENGTH] + ' [truncated]...'
+
 
 
 ## core
