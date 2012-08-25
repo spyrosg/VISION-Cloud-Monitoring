@@ -219,7 +219,11 @@ class MonitoringEventDispatcher(EventDispatcher):
             del main_event['status']
             del main_event['tag']
 
+            self._sock_send(event)
             self._sock_send(main_event)
+        else:
+            # send anyway
+            self._sock_send(event)
 
 
     def calculate_latency(self):
@@ -377,7 +381,7 @@ if __name__ == '__main__':
             self.assertAlmostEqual(self.time_till_start_of_response + self.time_till_end_of_response, transaction_time, delta=self.delta)
 
 
-    #unittest.main()
+    unittest.main()
 
     mon = MonitoringEventDispatcher('foo')
     mon.send(topic='off-course', tag='start_request_event', content_size=1000, obj='ofdesire', status=1)
