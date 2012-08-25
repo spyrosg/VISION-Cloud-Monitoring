@@ -7,7 +7,7 @@ import socket, struct, fcntl, sys
 from os import getpid
 from time import time
 from pyjavaproperties import Properties
-from uuid uuid4
+from uuid import uuid4
 import zmq
 import json
 
@@ -132,6 +132,7 @@ class MonitoringEventDispatcher(EventDispatcher):
         sock = ctx.socket(zmq.PUSH)
         sock.setsockopt(zmq.LINGER, 0)
         sock.connect(end_point)
+        log('connecting to endpoint={0}'.format(end_point))
 
         return sock
 
@@ -366,12 +367,12 @@ if __name__ == '__main__':
             self.assertAlmostEqual(self.time_till_start_of_response + self.time_till_end_of_response, transaction_time, delta=self.delta)
 
 
-    unittest.main()
+    #unittest.main()
 
-#    mon = MonitoringEventDispatcher('foo')
-#    mon.send(topic='off-course', tag='start_request_event', content_size=1000, obj='ofdesire', status=1)
-#    sleep(1)
-#    mon.send(topic='off-course', tag='start_response_event', obj='ofdesire', status=1)
-#    sleep(1)
-#    mon.send(topic='off-course', tag='end_response_event', obj='ofdesire', status=1)
+    mon = MonitoringEventDispatcher('foo')
+    mon.send(topic='off-course', tag='start_request_event', content_size=1000, obj='ofdesire', status=1)
+    sleep(1)
+    mon.send(topic='off-course', tag='start_response_event', obj='ofdesire', status=1)
+    sleep(1)
+    mon.send(topic='off-course', tag='end_response_event', obj='ofdesire', status=1)
 
