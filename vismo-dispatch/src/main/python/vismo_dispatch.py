@@ -210,9 +210,9 @@ class MonitoringEventDispatcher(EventDispatcher):
         if self.start_request_event and self.start_response_event and self.end_response_event:
             main_event = self.start_request_event
 
-            main_event['latency'] = self.calculate_latency()
-            main_event['transaction-time'] = self.calculate_transaction_time()
-            main_event['throughput'] = self.calculate_throughput(main_event['transaction-time'])
+            main_event['transaction-latency'] = self.calculate_latency()
+            main_event['transaction-duration'] = self.calculate_transaction_duration()
+            main_event['transaction-throughput'] = self.calculate_throughput(main_event['transaction-duration'])
             # TODO: Calculate availability and other Niki's required stuff
 
             # not needed
@@ -232,9 +232,9 @@ class MonitoringEventDispatcher(EventDispatcher):
         return self.calculate_event_time_difference(self.start_request_event, self.start_response_event)
 
 
-    def calculate_transaction_time(self):
+    def calculate_transaction_duration(self):
         """
-            Transaction time is the time spent serving the request. More accurately, is the
+            Transaction duration is the time spent serving the request. More accurately, is the
             duration from the time the system received the start request event till the time the
             system received the end response event.
         """
