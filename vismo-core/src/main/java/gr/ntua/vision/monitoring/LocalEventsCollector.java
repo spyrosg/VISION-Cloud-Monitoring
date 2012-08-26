@@ -23,9 +23,9 @@ public class LocalEventsCollector extends StoppableTask {
     private final List<EventListener> listeners    = new ArrayList<EventListener>();
     /** the log target. */
     private final Logger              log          = LoggerFactory.getLogger(LocalEventsCollector.class);
-    /** the sock receiving events. */
+    /** the socket used to receive events. */
     private final Socket              receiveEventsSock;
-    /***/
+    /** the socket used to send messages. */
     private final Socket              sendMessagesSock;
     /** the message used to stop the task. */
     private final String              STOP_MESSAGE = "stop!";
@@ -39,7 +39,7 @@ public class LocalEventsCollector extends StoppableTask {
      * @param sendMessagesSock
      *            the socket used to send messages.
      */
-    public LocalEventsCollector(final Socket receiveEventsSock, final Socket sendMessagesSock) {
+    LocalEventsCollector(final Socket receiveEventsSock, final Socket sendMessagesSock) {
         super("event-receiver");
         this.receiveEventsSock = receiveEventsSock;
         this.sendMessagesSock = sendMessagesSock;

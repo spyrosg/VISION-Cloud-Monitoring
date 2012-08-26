@@ -7,7 +7,6 @@ import java.util.Map;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
@@ -27,16 +26,11 @@ public class EventDistributor implements EventListener {
     /**
      * Constructor.
      * 
-     * @param ctx
-     *            the zmq context.
-     * @param distributionPoint
+     * @param sock
+     *            the socket to use.
      */
-    public EventDistributor(final ZContext ctx, final String distributionPoint) {
-        this.sock = ctx.createSocket(ZMQ.PUB);
-        this.sock.setLinger(0);
-        this.sock.setSendTimeOut(0); // FIXME: non-blocking for now
-        this.sock.bind(distributionPoint);
-        log.debug("listening on endpoint={}", distributionPoint);
+    EventDistributor(final Socket sock) {
+        this.sock = sock;
     }
 
 

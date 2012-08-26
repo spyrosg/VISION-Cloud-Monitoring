@@ -31,9 +31,10 @@ public class Vismo implements UDPListener {
      * Constructor.
      * 
      * @param vminfo
+     *            the vm info object.
      * @throws SocketException
      */
-    public Vismo(final VMInfo vminfo) throws SocketException {
+    Vismo(final VMInfo vminfo) throws SocketException {
         this.vminfo = vminfo;
         log.info("Starting up, pid={}, ip={}", vminfo.getPID(), vminfo.getInterface().getDisplayName() + vminfo.getAddress());
         log.info("running zmq version={}", ZMQ.getVersionString());
@@ -41,9 +42,18 @@ public class Vismo implements UDPListener {
 
 
     /**
+     * @param listener
+     */
+    public void addEventListener(final EventListener listener) {
+        // TODO Auto-generated method stub
+    }
+
+
+    /**
      * Prepare the task to run.
      * 
      * @param t
+     *            the task.
      */
     public void addTask(final StoppableTask t) {
         tasks.add(t);

@@ -6,6 +6,9 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  *
@@ -13,6 +16,8 @@ import java.net.SocketTimeoutException;
 public class UDPClient {
     /***/
     private static final String  KILL   = "stop!";
+    /** the log target. */
+    private static final Logger  log    = LoggerFactory.getLogger(UDPClient.class);
     /***/
     private static final String  STATUS = "status?";
     /** the port to use. */
@@ -32,6 +37,7 @@ public class UDPClient {
     UDPClient(final DatagramSocket sock, final int port) {
         this.sock = sock;
         this.port = port;
+        log.debug("upd client will connect to port={}", port);
     }
 
 

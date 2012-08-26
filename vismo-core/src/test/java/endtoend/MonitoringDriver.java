@@ -2,9 +2,6 @@ package endtoend;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import gr.ntua.vision.monitoring.EventDistributor;
-import gr.ntua.vision.monitoring.LocalEventsCollector;
-import gr.ntua.vision.monitoring.LocalEventsCollectorFactory;
 import gr.ntua.vision.monitoring.Vismo;
 import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.VismoFactory;
@@ -14,8 +11,6 @@ import gr.ntua.vision.monitoring.udp.UDPFactory;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-
-import org.zeromq.ZContext;
 
 
 /**
@@ -72,14 +67,7 @@ public class MonitoringDriver {
      * @throws SocketException
      */
     public void setup() throws SocketException {
-        final ZContext ctx = new ZContext();
-        final LocalEventsCollector receiver = new LocalEventsCollectorFactory(conf, ctx).build();
-
-        receiver.subscribe(new EventDistributor(ctx, conf.getConsumersPoint()));
-        receiver.subscribe(counter);
-
-        vismo = new VismoFactory(conf).build();
-        vismo.addTask(receiver);
+        vismo = new VismoFactory(conf).build(counter);
     }
 
 

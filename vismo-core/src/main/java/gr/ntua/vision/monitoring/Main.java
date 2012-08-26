@@ -6,8 +6,6 @@ import gr.ntua.vision.monitoring.udp.UDPFactory;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 
-import org.zeromq.ZContext;
-
 
 /**
  * The entry point to the monitoring instance.
@@ -32,11 +30,6 @@ public class Main {
 
         if (command.equals("start")) {
             final Vismo vismo = new VismoFactory(config).build();
-            final ZContext ctx = new ZContext();
-            final LocalEventsCollector receiver = new LocalEventsCollectorFactory(config, ctx).build();
-
-            receiver.subscribe(new EventDistributor(ctx, config.getConsumersPoint()));
-            vismo.addTask(receiver);
 
             vismo.start();
         } else {

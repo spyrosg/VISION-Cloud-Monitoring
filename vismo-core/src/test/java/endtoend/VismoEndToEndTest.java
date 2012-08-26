@@ -24,14 +24,13 @@ public class VismoEndToEndTest {
     private static final Logger      log                  = LoggerFactory.getLogger(VismoEndToEndTest.class);
     /** the maximum number of events to sent for the test. */
     private static final int         NO_EVENTS_TO_SENT    = 10;
-
     /***/
     @SuppressWarnings("serial")
     private static final Properties  props                = new Properties() {
                                                               {
                                                                   setProperty("producers.point", "tcp://127.0.0.1:34890");
-                                                                  setProperty("consumers.point", "ipc:///tmp/vismo.test.port");
-                                                                  setProperty("udp.port", "56431");
+                                                                  setProperty("consumers.point", "tcp://127.0.0.1:34891");
+                                                                  setProperty("udp.port", "34892");
                                                               }
                                                           };
     /***/
@@ -82,6 +81,8 @@ public class VismoEndToEndTest {
 
 
     /**
+     * FIXME
+     * 
      * @return
      */
     private FakeEventProducer buildFakeEventProducer() {
