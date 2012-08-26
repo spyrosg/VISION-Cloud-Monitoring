@@ -69,4 +69,20 @@ public class ZMQSockets {
 
         return sock;
     }
+
+
+    /**
+     * @param addr
+     * @param topic
+     * @return
+     */
+    public Socket newPubSocketForTopic(final String addr, final String topic) {
+        final Socket sock = ctx.createSocket(ZMQ.SUB);
+
+        sock.setLinger(0);
+        sock.connect(addr);
+        sock.subscribe(topic.getBytes());
+
+        return sock;
+    }
 }

@@ -3,6 +3,7 @@ package examples;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.EventRegistry;
+import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import org.zeromq.ZContext;
 
@@ -32,7 +33,7 @@ public class FakeEventConsumer {
      * @param args
      */
     public static void main(final String... args) {
-        final EventRegistry registry = new EventRegistry(new ZContext(), "tcp://10.0.1.214:27890");
+        final EventRegistry registry = new EventRegistry(new ZMQSockets(new ZContext()), "tcp://10.0.1.214:27890");
 
         registry.registerToAll(new LoggingHandler());
     }

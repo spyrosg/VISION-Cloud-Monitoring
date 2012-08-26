@@ -1,5 +1,8 @@
 package gr.ntua.vision.monitoring.notify;
 
+import gr.ntua.vision.monitoring.VismoConfiguration;
+import gr.ntua.vision.monitoring.zmq.ZMQSockets;
+
 import org.zeromq.ZContext;
 
 
@@ -7,15 +10,17 @@ import org.zeromq.ZContext;
  *
  */
 public class VismoEventRegistry extends EventRegistry {
+    /** FIXME */
+    private final static VismoConfiguration conf = null;
     /***/
-    private static final String DISTRIBUTION_POINT = "tcp://127.0.0.1:27890";
+    private static final ZMQSockets         zmq  = new ZMQSockets(new ZContext());
 
 
     /**
      * Constructor.
      */
     public VismoEventRegistry() {
-        super(new ZContext(), DISTRIBUTION_POINT);
+        super(zmq, conf.getConsumersPoint());
     }
 
 
@@ -26,6 +31,6 @@ public class VismoEventRegistry extends EventRegistry {
      *            when <code>true</code>, it activates the console logger for this package.
      */
     public VismoEventRegistry(final boolean debug) {
-        super(new ZContext(), DISTRIBUTION_POINT, debug);
+        super(zmq, conf.getConsumersPoint(), debug);
     }
 }

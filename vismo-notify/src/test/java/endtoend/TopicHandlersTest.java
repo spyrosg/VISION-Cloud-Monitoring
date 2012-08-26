@@ -5,8 +5,10 @@ import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.EventRegistry;
+import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.zeromq.ZContext;
 
@@ -56,19 +58,17 @@ public class TopicHandlersTest {
             assertEquals(expectedTopic, topic);
         }
     }
+
     /***/
-    private static final ZContext         ctx                    = new ZContext();
+    private static final String           CONSUMERS_PORT = "tcp://127.0.0.1:27890";
     /***/
-    private static final String           eventsDistributionPort = "tcp://127.0.0.1:27890";
+    private static final String[]         topics         = new String[] { "A", "B" };
     /***/
-    private static final String[]         topics                 = new String[] { "A", "B" };
+    private final TopicAssertionHandler[] handlers       = new TopicAssertionHandler[topics.length];
     /***/
-    private final TopicAssertionHandler[] handlers               = new TopicAssertionHandler[topics.length];
+    private FakeMonitoringInstance        inst;
     /***/
-    private final FakeMonitoringInstance  inst                   = new FakeMonitoringInstance(ctx, eventsDistributionPort, 10,
-                                                                         topics);
-    /***/
-    private final EventRegistry           registry               = new EventRegistry(ctx, eventsDistributionPort, true);
+    private EventRegistry                 registry;
 
 
     /**
@@ -87,6 +87,16 @@ public class TopicHandlersTest {
     }
 
 
+    /***/
+    @Before
+    public void setUp() {
+        final ZMQSockets zmq = new ZMQSockets(new ZContext());
+
+        setupFakeMonitoring(zmq);
+        setupRegistry(zmq);
+    }
+
+
     /**
      * 
      */
@@ -94,6 +104,22 @@ public class TopicHandlersTest {
     public void tearDown() {
         for (final TopicAssertionHandler handler : handlers)
             handler.hasReceivedEvents();
+    }
+
+
+    /**
+     * @param zmq
+     */
+    private void setupFakeMonitoring(final ZMQSockets zmq) {
+        inst = new FakeMonitoringInstance(zmq.newBoundPubSocket(CONSUMERS_PORT), 10, topics);
+    }
+
+
+    /**
+     * @param zmq
+     */
+    private void setupRegistry(final ZMQSockets zmq) {
+        registry = new EventRegistry(zmq, CONSUMERS_PORT, true);
     }
 
 

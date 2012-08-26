@@ -5,7 +5,6 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.json.simple.JSONObject;
-import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
@@ -30,19 +29,14 @@ public class FakeMonitoringInstance {
     /**
      * Constructor.
      * 
-     * @param ctx
-     * @param eventsEntryPoint
+     * @param sock
      * @param noEventsToSend
      * @param topics
      */
-    public FakeMonitoringInstance(final ZContext ctx, final String eventsEntryPoint, final int noEventsToSend,
-            final String[] topics) {
-        this.sock = ctx.createSocket(ZMQ.PUB);
-        this.sock.setLinger(0);
-        this.sock.bind(eventsEntryPoint);
+    public FakeMonitoringInstance(final Socket sock, final int noEventsToSend, final String[] topics) {
+        this.sock = sock;
         this.noEventsToSend = noEventsToSend;
         this.topics = topics;
-        log.config("listening on endpoint=" + eventsEntryPoint);
     }
 
 

@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring.notify;
 
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventFactory;
+import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -17,8 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import org.zeromq.ZContext;
-import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
 
@@ -34,9 +33,9 @@ public class EventRegistry {
      */
     private static class EventHandlerTask implements Runnable {
         /** the log target. */
-        private static final Logger ilog    = Logger.getLogger(EventHandlerTask.class.getName());
+        private static final Logger ilog = Logger.getLogger(EventHandlerTask.class.getName());
         /** the event factory. */
-        private final EventFactory  factory = new EventFactory();
+        private final EventFactory  factory;
         /** the actual handler. */
         private final EventHandler  handler;
         /** the zmq socket. */
@@ -46,12 +45,15 @@ public class EventRegistry {
         /**
          * Constructor.
          * 
+         * @param factory
+         *            the event factory.
          * @param sock
          *            the zmq socket.
          * @param handler
          *            the actual handler.
          */
-        public EventHandlerTask(final Socket sock, final EventHandler handler) {
+        public EventHandlerTask(final EventFactory factory, final Socket sock, final EventHandler handler) {
+            this.factory = factory;
             this.sock = sock;
             this.handler = handler;
         }
@@ -65,7 +67,7 @@ public class EventRegistry {
             ilog.config("entering receive/notify loop");
 
             while (!Thread.currentThread().isInterrupted()) {
-                final String msg = receive(sock);
+                final String msg = receive();
 
                 ilog.fine("received: " + msg);
 
@@ -85,11 +87,9 @@ public class EventRegistry {
         /**
          * Receive a new message from the socket.
          * 
-         * @param sock
-         *            the socket.
          * @return the message as a string, or <code>null</code> if there was an error receiving.
          */
-        private static String receive(final Socket sock) {
+        private String receive() {
             final byte[] buf = sock.recv(0);
 
             if (buf == null)
@@ -139,42 +139,41 @@ public class EventRegistry {
             return s;
         }
     }
-    /** the ilog target. */
+
+    /** the log target. */
     private static final Logger   log  = Logger.getLogger(EventRegistry.class.getName());
-    /** the zmq context. */
-    private final ZContext        ctx;
-    /** the zmq port in which events arrive from the main vismo component. */
-    private final String          distributionPort;
+    /** the address all consumers will connect to. */
+    private final String          addr;
     /** the pool of threads. Each thread corresponds to one event handler. */
     private final ExecutorService pool = Executors.newCachedThreadPool();
+    /***/
+    private final ZMQSockets      zmq;
 
 
     /**
      * Constructor.
      * 
-     * @param ctx
-     *            the zmq context.
-     * @param distributionPort
-     *            the zmq port in which events arrive from the main vismo component.
+     * @param zmq
+     * @param addr
+     *            the address all consumers will connect to.
      */
-    public EventRegistry(final ZContext ctx, final String distributionPort) {
-        this(ctx, distributionPort, false);
+    public EventRegistry(final ZMQSockets zmq, final String addr) {
+        this(zmq, addr, false);
     }
 
 
     /**
      * Constructor.
      * 
-     * @param ctx
-     *            the zmq context.
-     * @param distributionPort
-     *            the zmq port in which events arrive from the main vismo component.
+     * @param zmq
+     * @param addr
+     *            the address all consumers will listen to.
      * @param debug
      *            when <code>true</code>, it activates the console logger for this package.
      */
-    public EventRegistry(final ZContext ctx, final String distributionPort, final boolean debug) {
-        this.ctx = ctx;
-        this.distributionPort = distributionPort;
+    public EventRegistry(final ZMQSockets zmq, final String addr, final boolean debug) {
+        this.zmq = zmq;
+        this.addr = addr;
 
         if (debug)
             activateLogger();
@@ -190,10 +189,10 @@ public class EventRegistry {
      *            the handler.
      */
     public void register(final String topic, final EventHandler handler) {
-        final Socket sock = getPubSocketForTopic(ctx, distributionPort, topic);
+        final Socket sock = zmq.newPubSocketForTopic(addr, topic);
 
         log.config("registering " + handler + " for topic '" + topic + "'");
-        pool.submit(new EventHandlerTask(sock, handler));
+        pool.submit(new EventHandlerTask(new EventFactory(), sock, handler));
     }
 
 
@@ -208,9 +207,7 @@ public class EventRegistry {
     }
 
 
-    /**
-     * 
-     */
+    /***/
     private static void activateLogger() {
         final ConsoleHandler h = new ConsoleHandler();
         h.setFormatter(new VisionFormatter());
@@ -218,27 +215,5 @@ public class EventRegistry {
         h.setLevel(Level.ALL);
         Logger.getLogger("").addHandler(h);
         Logger.getLogger("").setLevel(Level.ALL);
-    }
-
-
-    /**
-     * Create and return a new pub socket, filtering only events of given topic.
-     * 
-     * @param ctx
-     *            the zmq context.
-     * @param port
-     *            the port to connect to.
-     * @param topic
-     *            the event topic.
-     * @return the zmq socket.
-     */
-    private static Socket getPubSocketForTopic(final ZContext ctx, final String port, final String topic) {
-        final Socket sock = ctx.createSocket(ZMQ.SUB);
-
-        sock.setLinger(0);
-        sock.connect(port);
-        sock.subscribe(topic.getBytes());
-
-        return sock;
     }
 }
