@@ -11,7 +11,7 @@ import org.zeromq.ZMQ.Socket;
 
 
 /**
- * This object is used to
+ * FIXME: use ZMQSockets.
  */
 public class EventDispatcher {
     /**
@@ -70,7 +70,7 @@ public class EventDispatcher {
      * Constructor.
      * 
      * @param ctx
-     *            the zqm context.
+     *            the zmq context.
      * @param localEventsPort
      * @param serviceName
      *            the name of the service that generate events.
