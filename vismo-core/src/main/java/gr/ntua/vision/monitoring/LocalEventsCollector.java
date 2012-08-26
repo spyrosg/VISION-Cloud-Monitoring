@@ -1,8 +1,5 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.events.VismoEventFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,8 +14,6 @@ import org.zeromq.ZMQ.Socket;
  * notified.
  */
 public class LocalEventsCollector extends StoppableTask {
-    /** the event factory. */
-    private final VismoEventFactory   factory      = new VismoEventFactory();
     /** the listeners lists. */
     private final List<EventListener> listeners    = new ArrayList<EventListener>();
     /** the log target. */
@@ -51,23 +46,20 @@ public class LocalEventsCollector extends StoppableTask {
      */
     @Override
     public void run() {
-        log.debug("ready to pull");
+        log.debug("ready - awaiting events");
 
         while (true) {
-            final String msg = receive(receiveEventsSock);
+            final String message = receive(receiveEventsSock);
 
-            if (msg == null)
+            if (message == null)
                 continue;
 
-            log.trace("received: {}", msg);
+            log.trace("received: {}", message);
 
-            if (msg.equals(STOP_MESSAGE))
+            if (message.equals(STOP_MESSAGE))
                 break;
 
-            final Event e = factory.createEvent(msg);
-
-            if (e != null)
-                notifyOf(e);
+            notifyAllOf(message);
         }
 
         log.debug("shutting down");
@@ -97,14 +89,14 @@ public class LocalEventsCollector extends StoppableTask {
 
 
     /**
-     * Notify any listeners of the incoming event.
+     * Notify any listeners of the incoming message.
      * 
-     * @param e
-     *            the event.
+     * @param message
+     *            the message.
      */
-    private void notifyOf(final Event e) {
+    private void notifyAllOf(final String message) {
         for (final EventListener listener : listeners)
-            listener.notify(e);
+            listener.notify(message);
     }
 
 

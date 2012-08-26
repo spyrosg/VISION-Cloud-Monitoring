@@ -61,9 +61,9 @@ public class VismoEndToEndTest {
     public void setUp() throws SocketException {
         final ZMQSockets zmq = new ZMQSockets(new ZContext());
 
-        setupProducer(zmq);
         setupRegistry(zmq);
         setupConsumer();
+        setupProducer(zmq);
 
         driver = new MonitoringDriver(conf);
         driver.setup();

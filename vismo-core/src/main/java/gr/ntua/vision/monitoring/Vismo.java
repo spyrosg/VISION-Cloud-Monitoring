@@ -42,14 +42,6 @@ public class Vismo implements UDPListener {
 
 
     /**
-     * @param listener
-     */
-    public void addEventListener(final EventListener listener) {
-        // TODO Auto-generated method stub
-    }
-
-
-    /**
      * Prepare the task to run.
      * 
      * @param t

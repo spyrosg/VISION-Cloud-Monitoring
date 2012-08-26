@@ -1,13 +1,7 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.events.Event;
-
-import java.util.Map;
-
-import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
 
@@ -35,17 +29,11 @@ public class EventDistributor implements EventListener {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.EventListener#notify(gr.ntua.vision.monitoring.events.Event)
+     * @see gr.ntua.vision.monitoring.EventListener#notify(java.lang.String)
      */
     @Override
-    public void notify(final Event e) {
-        @SuppressWarnings("rawtypes")
-        final Map dict = (Map) e.get("!dict");
-        final String msg = JSONValue.toJSONString(dict);
-        final String topic = (String) dict.get("topic");
-
-        // TODO: get back to this. Should we block or should be drop?
-        final boolean success = sock.send(topic.getBytes(), ZMQ.SNDMORE) && sock.send(msg.getBytes(), 0);
+    public void notify(final String message) {
+        final boolean success = sock.send(message.getBytes(), 0);
 
         log.trace("sent: {}", success ? "ok" : "dropped");
     }
