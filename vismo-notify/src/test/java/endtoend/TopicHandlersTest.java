@@ -97,9 +97,7 @@ public class TopicHandlersTest {
     }
 
 
-    /**
-     * 
-     */
+    /***/
     @After
     public void tearDown() {
         for (final TopicAssertionHandler handler : handlers)

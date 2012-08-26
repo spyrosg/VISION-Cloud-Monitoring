@@ -5,7 +5,6 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.json.simple.JSONObject;
-import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
 
@@ -61,14 +60,13 @@ public class FakeMonitoringInstance {
 
         log.fine("sending " + o);
 
-        sock.send(topic.getBytes(), ZMQ.SNDMORE);
-        sock.send(o.toJSONString().getBytes(), 0);
+        sock.send((topic + " " + o.toJSONString()).getBytes(), 0);
     }
 
 
     /**
      * @param n
-     * @return a
+     * @return a pseudo random number in the range [0, n).
      */
     private static int choice(final int n) {
         return rng.nextInt(n);

@@ -64,19 +64,18 @@ public class EventRegistry {
          */
         @Override
         public void run() {
-            ilog.config("entering receive/notify loop");
+            ilog.config("entering receive/handle loop");
 
-            while (!Thread.currentThread().isInterrupted()) {
+            while (true) {
                 final String msg = receive();
 
                 ilog.fine("received: " + msg);
 
                 if (msg == null)
                     continue;
-                if (!msg.startsWith("{")) // it's the topic
-                    continue;
 
-                final Event e = factory.createEvent(msg);
+                final int topicIndex = msg.indexOf(" ");
+                final Event e = factory.createEvent(msg.substring(topicIndex + 1));
 
                 if (e != null)
                     handler.handle(e);
@@ -189,9 +188,9 @@ public class EventRegistry {
      *            the handler.
      */
     public void register(final String topic, final EventHandler handler) {
-        final Socket sock = zmq.newPubSocketForTopic(addr, topic);
+        final Socket sock = zmq.newSubSocketForTopic(addr, topic);
 
-        log.config("registering " + handler + " for topic '" + topic + "'");
+        log.config("registering " + handler + " for topic '" + topic + "' on port=" + addr);
         pool.submit(new EventHandlerTask(new VismoEventFactory(), sock, handler));
     }
 

@@ -7,12 +7,14 @@ import org.zeromq.ZMQ.Socket;
 
 /**
  * A helper object over zmq contexts and sockets. This is used mainly to encapsulate and guarantee the use of just one
- * {@link ZContext} in the entire application. TODO: move to vismo-events.
+ * {@link ZContext} in the entire application.
  */
 public class ZMQSockets {
     /** the context. */
     private final ZContext ctx;
 
+
+    // TODO: maybe use a builder?
 
     /**
      * Constructor.
@@ -73,10 +75,12 @@ public class ZMQSockets {
 
     /**
      * @param addr
+     *            the address to connect to.
      * @param topic
-     * @return
+     *            the topic to subscribe to.
+     * @return a connected socket, subscribed to the given topic.
      */
-    public Socket newPubSocketForTopic(final String addr, final String topic) {
+    public Socket newSubSocketForTopic(final String addr, final String topic) {
         final Socket sock = ctx.createSocket(ZMQ.SUB);
 
         sock.setLinger(0);
