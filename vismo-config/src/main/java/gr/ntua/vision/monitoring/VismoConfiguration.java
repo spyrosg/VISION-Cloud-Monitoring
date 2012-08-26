@@ -1,6 +1,7 @@
 package gr.ntua.vision.monitoring;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 
@@ -60,5 +61,22 @@ public class VismoConfiguration extends PropertiesConfiguration {
      */
     public int getUDPPort() {
         return Integer.valueOf(get(UDP_PORT_PROPERTY));
+    }
+
+
+    /**
+     * Load configuration from the given stream.
+     * 
+     * @param inp
+     *            the input stream.
+     * @return a {@link VismoConfiguration} object.
+     * @throws IOException
+     */
+    public static VismoConfiguration loadFromResource(final InputStream inp) throws IOException {
+        final Properties props = new Properties();
+
+        loadFromStream(props, inp);
+
+        return new VismoConfiguration(props);
     }
 }

@@ -96,7 +96,7 @@ public class VismoEndToEndTest {
      * @param zmq
      */
     private void setupRegistry(final ZMQSockets zmq) {
-        registry = new EventRegistry(zmq, conf.getConsumersPoint());
+        registry = new EventRegistry(conf.getConsumersPoint());
     }
 
 

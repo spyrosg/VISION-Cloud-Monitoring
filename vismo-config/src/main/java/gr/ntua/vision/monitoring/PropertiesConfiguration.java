@@ -65,6 +65,24 @@ public abstract class PropertiesConfiguration {
 
 
     /**
+     * Load the properties from the stream.
+     * 
+     * @param props
+     *            the properties object.
+     * @param inp
+     *            the stream to load from.
+     * @throws IOException
+     */
+    protected static void loadFromStream(final Properties props, final InputStream inp) throws IOException {
+        try {
+            props.load(inp);
+        } finally {
+            inp.close();
+        }
+    }
+
+
+    /**
      * Load the properties from the file.
      * 
      * @param props
@@ -74,12 +92,6 @@ public abstract class PropertiesConfiguration {
      * @throws IOException
      */
     private static void loadFromFile(final Properties props, final String filename) throws IOException {
-        final InputStream inp = new BufferedInputStream(new FileInputStream(filename));
-
-        try {
-            props.load(inp);
-        } finally {
-            inp.close();
-        }
+        loadFromStream(props, new BufferedInputStream(new FileInputStream(filename)));
     }
 }

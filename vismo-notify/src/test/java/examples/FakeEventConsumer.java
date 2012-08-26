@@ -3,9 +3,7 @@ package examples;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.EventRegistry;
-import gr.ntua.vision.monitoring.zmq.ZMQSockets;
-
-import org.zeromq.ZContext;
+import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
 
 
 /**
@@ -22,9 +20,9 @@ public class FakeEventConsumer {
         @Override
         public void handle(final Event e) {
             System.out.println(String
-                    .format("received: timestamp=%s, service=%s, topic=%s, type=%s, tenant=%s, user=%s, container=%s, object=%s",
-                            e.timestamp(), e.originatingService(), e.topic(), e.get("type"), e.get("tenant"), e.get("user"),
-                            e.get("container"), e.get("obj")));
+                    .format("received: timestamp=%s, service=%s, topic=%s, tenant=%s, user=%s, container=%s, object=%s",
+                            e.timestamp(), e.originatingService(), e.topic(), e.get("tenant"), e.get("user"), e.get("container"),
+                            e.get("object")));
         }
     }
 
@@ -33,7 +31,7 @@ public class FakeEventConsumer {
      * @param args
      */
     public static void main(final String... args) {
-        final EventRegistry registry = new EventRegistry(new ZMQSockets(new ZContext()), "tcp://10.0.1.214:27890");
+        final EventRegistry registry = new VismoEventRegistry();
 
         registry.registerToAll(new LoggingHandler());
     }

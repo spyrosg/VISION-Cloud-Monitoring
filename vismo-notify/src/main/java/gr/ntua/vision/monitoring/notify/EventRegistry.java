@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import org.zeromq.ZContext;
 import org.zeromq.ZMQ.Socket;
 
 
@@ -146,32 +147,29 @@ public class EventRegistry {
     /** the pool of threads. Each thread corresponds to one event handler. */
     private final ExecutorService pool = Executors.newCachedThreadPool();
     /***/
-    private final ZMQSockets      zmq;
+    private final ZMQSockets      zmq  = new ZMQSockets(new ZContext());
 
 
     /**
      * Constructor.
      * 
-     * @param zmq
      * @param addr
-     *            the address all consumers will connect to.
+     *            the address to connect to for incoming events.
      */
-    public EventRegistry(final ZMQSockets zmq, final String addr) {
-        this(zmq, addr, false);
+    public EventRegistry(final String addr) {
+        this(addr, false);
     }
 
 
     /**
      * Constructor.
      * 
-     * @param zmq
      * @param addr
-     *            the address all consumers will listen to.
+     *            the address to connect to for incoming events.
      * @param debug
-     *            when <code>true</code>, it activates the console logger for this package.
+     *            when this is <code>true</code> enable debugging output.
      */
-    public EventRegistry(final ZMQSockets zmq, final String addr, final boolean debug) {
-        this.zmq = zmq;
+    public EventRegistry(final String addr, final boolean debug) {
         this.addr = addr;
 
         if (debug)

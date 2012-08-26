@@ -117,7 +117,7 @@ public class TopicHandlersTest {
      * @param zmq
      */
     private void setupRegistry(final ZMQSockets zmq) {
-        registry = new EventRegistry(zmq, CONSUMERS_PORT, true);
+        registry = new EventRegistry(CONSUMERS_PORT, true);
     }
 
 

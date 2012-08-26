@@ -1,26 +1,35 @@
 package gr.ntua.vision.monitoring.notify;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
-import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
-import org.zeromq.ZContext;
+import java.io.IOException;
 
 
 /**
  *
  */
 public class VismoEventRegistry extends EventRegistry {
-    /** FIXME */
-    private final static VismoConfiguration conf = null;
     /***/
-    private static final ZMQSockets         zmq  = new ZMQSockets(new ZContext());
+    private static VismoConfiguration conf;
+    /***/
+    private static final String       VISMO_CONFIG_RESOURCE        = "/config.properties";
+    /***/
+    private static final String       VISMO_CONFIG_SYSTEM_PROPERTY = "vismo.config.properties";
+
+    static {
+        try {
+            loadConfiguration();
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
     /**
      * Constructor.
      */
     public VismoEventRegistry() {
-        super(zmq, conf.getConsumersPoint());
+        super(conf.getConsumersPoint());
     }
 
 
@@ -31,6 +40,24 @@ public class VismoEventRegistry extends EventRegistry {
      *            when <code>true</code>, it activates the console logger for this package.
      */
     public VismoEventRegistry(final boolean debug) {
-        super(zmq, conf.getConsumersPoint(), debug);
+        super(conf.getConsumersPoint(), debug);
+    }
+
+
+    /**
+     * Try to load the configuration. First try reading the file specified in the system property; if the property is null, try
+     * loading the configuration from inside the jar.
+     * 
+     * @throws IOException
+     */
+    private static void loadConfiguration() throws IOException {
+        final String configFile = System.getProperty(VISMO_CONFIG_SYSTEM_PROPERTY);
+
+        if (configFile != null) {
+            conf = new VismoConfiguration(configFile);
+            return;
+        }
+
+        conf = VismoConfiguration.loadFromResource(VismoEventRegistry.class.getResourceAsStream((VISMO_CONFIG_RESOURCE)));
     }
 }
