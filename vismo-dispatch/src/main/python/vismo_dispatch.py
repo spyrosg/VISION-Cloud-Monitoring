@@ -180,7 +180,7 @@ class MonitoringEventDispatcher(EventDispatcher):
 
 
     def _sock_send(self, event):
-        self.sock.send(json.dumps(event))
+        self.sock.send(event['topic'] + ' ' + json.dumps(event))
 
 
     def handle_event(self, event):
@@ -381,7 +381,7 @@ if __name__ == '__main__':
             self.assertAlmostEqual(self.time_till_start_of_response + self.time_till_end_of_response, transaction_time, delta=self.delta)
 
 
-    unittest.main()
+    #unittest.main()
 
     mon = MonitoringEventDispatcher('foo')
     mon.send(topic='off-course', tag='start_request_event', content_size=1000, obj='ofdesire', status=1)
