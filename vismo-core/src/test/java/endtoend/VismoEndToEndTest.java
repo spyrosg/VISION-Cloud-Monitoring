@@ -2,6 +2,7 @@ package endtoend;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.notify.EventRegistry;
+import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.net.SocketException;
 import java.util.Properties;
@@ -9,19 +10,13 @@ import java.util.Properties;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.zeromq.ZContext;
-import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Socket;
 
 
 /**
  *
  */
 public class VismoEndToEndTest {
-    /***/
-    private static final Logger      log                  = LoggerFactory.getLogger(VismoEndToEndTest.class);
     /** the maximum number of events to sent for the test. */
     private static final int         NO_EVENTS_TO_SENT    = 10;
     /***/
@@ -36,15 +31,13 @@ public class VismoEndToEndTest {
     /***/
     private final VismoConfiguration conf                 = new VismoConfiguration(props);
     /***/
-    private final ZContext           ctx                  = new ZContext();
-    /***/
     private MonitoringDriver         driver;
     /***/
     private final EventCountHandler  eventConsumerCounter = new EventCountHandler(NO_EVENTS_TO_SENT);
     /***/
-    private final FakeEventProducer  eventProducer        = buildFakeEventProducer();
+    private FakeEventProducer        eventProducer;
     /***/
-    private final EventRegistry      registry             = new EventRegistry(ctx, conf.getConsumersPoint());
+    private EventRegistry            registry;
 
 
     /**
@@ -66,9 +59,14 @@ public class VismoEndToEndTest {
      */
     @Before
     public void setUp() throws SocketException {
+        final ZMQSockets zmq = new ZMQSockets(new ZContext());
+
+        setupProducer(zmq);
+        setupRegistry(zmq);
+        setupConsumer();
+
         driver = new MonitoringDriver(conf);
         driver.setup();
-        setupConsumer();
     }
 
 
@@ -80,25 +78,25 @@ public class VismoEndToEndTest {
     }
 
 
-    /**
-     * FIXME
-     * 
-     * @return
-     */
-    private FakeEventProducer buildFakeEventProducer() {
-        final Socket sock = ctx.createSocket(ZMQ.PUSH);
-
-        sock.setLinger(0);
-        sock.connect(conf.getProducersPoint());
-        log.debug("connecting to endpoint={}", conf.getProducersPoint());
-
-        return new FakeEventProducer(sock, NO_EVENTS_TO_SENT);
-    }
-
-
     /***/
     private void setupConsumer() {
         registry.registerToAll(eventConsumerCounter);
+    }
+
+
+    /**
+     * @param zmq
+     */
+    private void setupProducer(final ZMQSockets zmq) {
+        eventProducer = new FakeEventProducer(zmq.newConnectedPushSocket(conf.getProducersPoint()), NO_EVENTS_TO_SENT);
+    }
+
+
+    /**
+     * @param zmq
+     */
+    private void setupRegistry(final ZMQSockets zmq) {
+        registry = new EventRegistry(zmq, conf.getConsumersPoint());
     }
 
 

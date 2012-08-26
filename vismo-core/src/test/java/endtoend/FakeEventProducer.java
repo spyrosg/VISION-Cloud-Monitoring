@@ -25,6 +25,7 @@ public class FakeEventProducer {
      * Constructor.
      * 
      * @param sock
+     *            the socket to use.
      * @param noEventsToSend
      */
     public FakeEventProducer(final Socket sock, final int noEventsToSend) {
