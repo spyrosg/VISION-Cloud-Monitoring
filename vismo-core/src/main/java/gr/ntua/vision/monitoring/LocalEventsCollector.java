@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.events.EventFactory;
+import gr.ntua.vision.monitoring.events.VismoEventFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import org.zeromq.ZMQ.Socket;
  */
 public class LocalEventsCollector extends StoppableTask {
     /** the event factory. */
-    private final EventFactory        factory      = new EventFactory();
+    private final VismoEventFactory   factory      = new VismoEventFactory();
     /** the listeners lists. */
     private final List<EventListener> listeners    = new ArrayList<EventListener>();
     /** the log target. */

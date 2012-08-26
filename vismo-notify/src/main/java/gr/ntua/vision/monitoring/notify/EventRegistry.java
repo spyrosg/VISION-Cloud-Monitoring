@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.notify;
 
 import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.events.EventFactory;
+import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.io.PrintWriter;
@@ -33,13 +33,13 @@ public class EventRegistry {
      */
     private static class EventHandlerTask implements Runnable {
         /** the log target. */
-        private static final Logger ilog = Logger.getLogger(EventHandlerTask.class.getName());
+        private static final Logger     ilog = Logger.getLogger(EventHandlerTask.class.getName());
         /** the event factory. */
-        private final EventFactory  factory;
+        private final VismoEventFactory factory;
         /** the actual handler. */
-        private final EventHandler  handler;
+        private final EventHandler      handler;
         /** the zmq socket. */
-        private final Socket        sock;
+        private final Socket            sock;
 
 
         /**
@@ -52,7 +52,7 @@ public class EventRegistry {
          * @param handler
          *            the actual handler.
          */
-        public EventHandlerTask(final EventFactory factory, final Socket sock, final EventHandler handler) {
+        public EventHandlerTask(final VismoEventFactory factory, final Socket sock, final EventHandler handler) {
             this.factory = factory;
             this.sock = sock;
             this.handler = handler;
@@ -192,7 +192,7 @@ public class EventRegistry {
         final Socket sock = zmq.newPubSocketForTopic(addr, topic);
 
         log.config("registering " + handler + " for topic '" + topic + "'");
-        pool.submit(new EventHandlerTask(new EventFactory(), sock, handler));
+        pool.submit(new EventHandlerTask(new VismoEventFactory(), sock, handler));
     }
 
 

@@ -11,9 +11,9 @@ import org.json.simple.parser.ParseException;
 /**
  * This is used to de-serialize events received from the wire to actual java objects of type {@link Event}.
  */
-public class EventFactory {
+public class VismoEventFactory {
     /** the log target. */
-    private static final Logger log    = Logger.getLogger(EventFactory.class.getName());
+    private static final Logger log    = Logger.getLogger(VismoEventFactory.class.getName());
     /** the JSON parser. */
     private final JSONParser    parser = new JSONParser();
 
