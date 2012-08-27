@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +30,8 @@ public class UDPServer extends StoppableTask {
      *            the socket to use.
      * @param listener
      *            the listener to notify.
-     * @throws SocketException
      */
-    UDPServer(final DatagramSocket sock, final UDPListener listener) throws SocketException {
+    UDPServer(final DatagramSocket sock, final UDPListener listener) {
         super("udp-server");
         this.sock = sock;
         this.listener = listener;

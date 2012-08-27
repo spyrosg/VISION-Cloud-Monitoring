@@ -61,7 +61,7 @@ public class VismoEndToEndTest {
     public void setUp() throws SocketException {
         final ZMQSockets zmq = new ZMQSockets(new ZContext());
 
-        setupRegistry(zmq);
+        setupRegistry();
         setupConsumer();
         setupProducer(zmq);
 
@@ -92,10 +92,8 @@ public class VismoEndToEndTest {
     }
 
 
-    /**
-     * @param zmq
-     */
-    private void setupRegistry(final ZMQSockets zmq) {
+    /***/
+    private void setupRegistry() {
         registry = new EventRegistry(conf.getConsumersPoint());
     }
 

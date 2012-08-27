@@ -140,14 +140,14 @@ public class EventRegistry {
         }
     }
 
-    /** the log target. */
-    private static final Logger   log  = Logger.getLogger(EventRegistry.class.getName());
+    /***/
+    private static boolean        logActivated = false;
     /** the address all consumers will connect to. */
     private final String          addr;
     /** the pool of threads. Each thread corresponds to one event handler. */
-    private final ExecutorService pool = Executors.newCachedThreadPool();
+    private final ExecutorService pool         = Executors.newCachedThreadPool();
     /***/
-    private final ZMQSockets      zmq  = new ZMQSockets(new ZContext());
+    private final ZMQSockets      zmq          = new ZMQSockets(new ZContext());
 
 
     /**
@@ -188,7 +188,6 @@ public class EventRegistry {
     public void register(final String topic, final EventHandler handler) {
         final Socket sock = zmq.newSubSocketForTopic(addr, topic);
 
-        log.config("registering " + handler + " for topic '" + topic + "' on port=" + addr);
         pool.submit(new EventHandlerTask(new VismoEventFactory(), sock, handler));
     }
 
@@ -205,12 +204,16 @@ public class EventRegistry {
 
 
     /***/
-    private static void activateLogger() {
-        final ConsoleHandler h = new ConsoleHandler();
-        h.setFormatter(new VisionFormatter());
+    public static void activateLogger() {
+        if (!logActivated) {
+            logActivated = true;
 
-        h.setLevel(Level.ALL);
-        Logger.getLogger("").addHandler(h);
-        Logger.getLogger("").setLevel(Level.ALL);
+            final ConsoleHandler h = new ConsoleHandler();
+            h.setFormatter(new VisionFormatter());
+
+            h.setLevel(Level.ALL);
+            Logger.getLogger("").addHandler(h);
+            Logger.getLogger("").setLevel(Level.ALL);
+        }
     }
 }

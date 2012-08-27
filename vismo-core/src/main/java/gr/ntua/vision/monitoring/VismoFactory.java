@@ -43,7 +43,6 @@ public class VismoFactory {
         final LocalEventsCollector receiver = new LocalEventsCollectorFactory(conf).build(zmq);
         final Vismo vismo = new Vismo(new VismoVMInfo());
 
-        log.debug("new zsocket for {} bound to={}", EventDistributor.class, conf.getConsumersPoint());
         receiver.subscribe(new EventDistributor(zmq.newBoundPubSocket(conf.getConsumersPoint())));
 
         for (final EventListener listener : listeners)

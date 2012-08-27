@@ -57,7 +57,7 @@ public class FakeEventProducer {
 
 
     /**
-     * @return
+     * @return a dummy event in json format.
      */
     @SuppressWarnings("unchecked")
     private static JSONObject generateEvent() {

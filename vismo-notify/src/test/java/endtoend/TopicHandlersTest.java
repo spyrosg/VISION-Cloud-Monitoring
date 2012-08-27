@@ -93,7 +93,7 @@ public class TopicHandlersTest {
         final ZMQSockets zmq = new ZMQSockets(new ZContext());
 
         setupFakeMonitoring(zmq);
-        setupRegistry(zmq);
+        setupRegistry();
     }
 
 
@@ -113,10 +113,8 @@ public class TopicHandlersTest {
     }
 
 
-    /**
-     * @param zmq
-     */
-    private void setupRegistry(final ZMQSockets zmq) {
+    /***/
+    private void setupRegistry() {
         registry = new EventRegistry(CONSUMERS_PORT, true);
     }
 
