@@ -7,7 +7,7 @@
   <parent>
     <artifactId>vismo</artifactId>
     <groupId>gr.ntua.vision</groupId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4</version>
     <relativePath>..</relativePath>
   </parent>
 
@@ -18,14 +18,14 @@
   <dependencies>
     <dependency>
       <groupId>gr.ntua.vision</groupId>
-      <artifactId>vismo-events</artifactId>
-      <version>1.0.3-SNAPSHOT</version>
+      <artifactId>vismo-config</artifactId>
+      <version>1.0.4</version>
     </dependency>
 
     <dependency>
       <groupId>gr.ntua.vision</groupId>
-      <artifactId>vismo-config</artifactId>
-      <version>1.0.3-SNAPSHOT</version>
+      <artifactId>vismo-events</artifactId>
+      <version>1.0.4</version>
     </dependency>
 
     <dependency>

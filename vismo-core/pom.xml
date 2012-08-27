@@ -7,7 +7,7 @@
   <parent>
     <artifactId>vismo</artifactId>
     <groupId>gr.ntua.vision</groupId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4</version>
     <relativePath>..</relativePath>
   </parent>
 
@@ -149,13 +149,13 @@
     <dependency>
       <artifactId>vismo-config</artifactId>
       <groupId>gr.ntua.vision</groupId>
-      <version>1.0.3-SNAPSHOT</version>
+      <version>1.0.4</version>
     </dependency>
 
     <dependency>
       <artifactId>vismo-notify</artifactId>
       <groupId>gr.ntua.vision</groupId>
-      <version>1.0.3-SNAPSHOT</version>
+      <version>1.0.4</version>
     </dependency>
 
     <dependency>
