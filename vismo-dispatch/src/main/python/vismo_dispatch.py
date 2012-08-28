@@ -106,10 +106,10 @@ class EventDispatcher(object):
         return val / time_diff
 
 
-class MonitoringEventDispatcher(EventDispatcher):
+class VismoEventDispatcher(EventDispatcher):
     """
-        This is used as the bridge that handles the event generation code
-        (the caller of this library) the event distribution code (the main
+        This the bridge that handles the event generation code (the caller
+        of this library) with the event distribution code (the main
         monitoring instance). This instance talks directly to the locally
         running vismo instance.
 
@@ -123,7 +123,7 @@ class MonitoringEventDispatcher(EventDispatcher):
     def __init__(self, service_name):
         self.load_configuration()
         sock = self.create_push_socket(self.producers_point)
-        super(MonitoringEventDispatcher, self).__init__(service_name, sock)
+        super(VismoEventDispatcher, self).__init__(service_name, sock)
         self.start_request_event = None
         self.start_response_event = None
         self.end_response_event = None
@@ -154,7 +154,7 @@ class MonitoringEventDispatcher(EventDispatcher):
         """
 
         self.cleanup_event(event)
-        self.add_basic_properties(event)
+        self.add_basic_fields(event)
         log('{0}: {1}'.format(event['timestamp'], event['tag']))
         self.handle_event(event)
 
@@ -172,11 +172,11 @@ class MonitoringEventDispatcher(EventDispatcher):
             del event['obj']
 
 
-    def add_basic_properties(self, event):
+    def add_basic_fields(self, event):
         event['timestamp'] = int(1000 * time())
         event['originating-machine'] = self.ip
         event['originating-service'] = self.service_name
-        event['cluster'] = self.cluster_name
+        event['originating-cluster'] = self.cluster_name
         event['id'] = self.id
 
 
@@ -384,7 +384,7 @@ if __name__ == '__main__':
 
     unittest.main()
 
-    mon = MonitoringEventDispatcher('foo')
+    mon = VismoEventDispatcher('foo')
     mon.send(topic='off-course', tag='start_request_event', content_size=1000, obj='ofdesire', status=1)
     sleep(1)
     mon.send(topic='off-course', tag='start_response_event', obj='ofdesire', status=1)
