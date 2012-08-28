@@ -127,6 +127,7 @@ class MonitoringEventDispatcher(EventDispatcher):
         self.start_request_event = None
         self.start_response_event = None
         self.end_response_event = None
+        self.id = str(uuid4())
 
     def load_configuration(self):
         p = Properties()
@@ -176,7 +177,7 @@ class MonitoringEventDispatcher(EventDispatcher):
         event['originating-machine'] = self.ip
         event['originating-service'] = self.service_name
         event['cluster'] = self.cluster_name
-        event['id'] = str(uuid4())
+        event['id'] = self.id
 
 
     def _sock_send(self, event):
