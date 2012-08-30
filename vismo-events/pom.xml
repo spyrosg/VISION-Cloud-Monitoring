@@ -7,7 +7,7 @@
   <parent>
     <artifactId>vismo</artifactId>
     <groupId>gr.ntua.vision</groupId>
-    <version>1.0.4</version>
+    <version>1.0.4-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
@@ -16,12 +16,6 @@
   <description>The api for event consumers in the VISION Cloud</description>
 
   <dependencies>
-    <dependency>
-      <groupId>org.zeromq</groupId>
-      <artifactId>jzmq-all</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>

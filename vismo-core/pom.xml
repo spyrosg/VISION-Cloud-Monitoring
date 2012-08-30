@@ -7,7 +7,7 @@
   <parent>
     <artifactId>vismo</artifactId>
     <groupId>gr.ntua.vision</groupId>
-    <version>1.0.4</version>
+    <version>1.0.4-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
@@ -149,13 +149,19 @@
     <dependency>
       <artifactId>vismo-config</artifactId>
       <groupId>gr.ntua.vision</groupId>
-      <version>1.0.4</version>
+      <version>1.0.4-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <artifactId>vismo-notify</artifactId>
       <groupId>gr.ntua.vision</groupId>
-      <version>1.0.4</version>
+      <version>1.0.4-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <artifactId>vismo-zmq</artifactId>
+      <groupId>gr.ntua.vision</groupId>
+      <version>1.0.4-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -213,12 +219,6 @@
       <artifactId>hamcrest-library</artifactId>
       <version>1.1</version>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.zeromq</groupId>
-      <artifactId>jzmq-all</artifactId>
-      <version>1.0.0</version>
     </dependency>
 
   </dependencies>
