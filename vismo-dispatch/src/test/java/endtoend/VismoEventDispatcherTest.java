@@ -1,7 +1,7 @@
 package endtoend;
 
-import gr.ntua.vision.monitoring.EventDispatcher;
 import gr.ntua.vision.monitoring.VismoConfiguration;
+import gr.ntua.vision.monitoring.VismoEventDispatcher;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.net.SocketException;
@@ -29,8 +29,6 @@ public class VismoEventDispatcherTest {
     /***/
     private final VismoConfiguration conf               = new VismoConfiguration(props);
     /***/
-    private EventDispatcher          dispatcher;
-    /***/
     private final int                NO_EXPECTED_EVENTS = 10;
     /***/
     private FakeEventProducer        producer;
@@ -47,8 +45,9 @@ public class VismoEventDispatcherTest {
     public void setUp() throws SocketException {
         vismo = new FakeVismoInstance(zmq.newBoundPullSocket(conf.getProducersPoint()), NO_EXPECTED_EVENTS);
         vismo.start();
-        dispatcher = new EventDispatcher(zmq.newConnectedPushSocket(conf.getProducersPoint()), "foo-bar");
-        producer = new FakeEventProducer(dispatcher, NO_EXPECTED_EVENTS);
+        final VismoEventDispatcher d = new VismoEventDispatcher(VismoEventDispatcherTest.class.getName(),
+                zmq.newConnectedPushSocket(conf.getProducersPoint()));
+        producer = new FakeEventProducer(d, NO_EXPECTED_EVENTS);
     }
 
 

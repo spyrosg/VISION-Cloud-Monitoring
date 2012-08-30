@@ -1,6 +1,6 @@
 package endtoend;
 
-import gr.ntua.vision.monitoring.EventDispatcher;
+import gr.ntua.vision.monitoring.VismoEventDispatcher;
 
 
 /**
@@ -9,16 +9,16 @@ import gr.ntua.vision.monitoring.EventDispatcher;
  */
 public class FakeEventProducer extends Thread {
     /***/
-    private final EventDispatcher dispatcher;
+    private final VismoEventDispatcher dispatcher;
     /***/
-    private final int             noEventsToSend;
+    private final int                  noEventsToSend;
 
 
     /**
      * @param dispatcher
      * @param noEventsToSend
      */
-    public FakeEventProducer(final EventDispatcher dispatcher, final int noEventsToSend) {
+    public FakeEventProducer(final VismoEventDispatcher dispatcher, final int noEventsToSend) {
         this.dispatcher = dispatcher;
         this.noEventsToSend = noEventsToSend;
     }
