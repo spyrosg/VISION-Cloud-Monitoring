@@ -1,9 +1,5 @@
 package gr.ntua.vision.monitoring.zmq;
 
-import gr.ntua.vision.monitoring.notify.EventRegistry;
-
-import java.util.logging.Logger;
-
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
@@ -14,14 +10,8 @@ import org.zeromq.ZMQ.Socket;
  * {@link ZContext} in the entire application.
  */
 public class ZMQSockets {
-    /** the log target. */
-    private static final Logger log = Logger.getLogger(ZMQSockets.class.getName());
     /** the context. */
-    private final ZContext      ctx;
-
-    static {
-        EventRegistry.activateLogger();
-    }
+    private final ZContext ctx;
 
 
     // TODO: maybe use a builder?
@@ -43,8 +33,6 @@ public class ZMQSockets {
      * @return a new bound pub socket.
      */
     public Socket newBoundPubSocket(final String addr) {
-        log.config("new PUB zsocket bound to port=" + addr);
-
         final Socket sock = ctx.createSocket(ZMQ.PUB);
 
         sock.setLinger(0);
@@ -61,8 +49,6 @@ public class ZMQSockets {
      * @return a bound to the address pull socket.
      */
     public Socket newBoundPullSocket(final String addr) {
-        log.config("new PULL zsocket bound to port=" + addr);
-
         final Socket sock = ctx.createSocket(ZMQ.PULL);
 
         sock.bind(addr);
@@ -78,8 +64,6 @@ public class ZMQSockets {
      * @return a connected to the address push socket.
      */
     public Socket newConnectedPushSocket(final String addr) {
-        log.config("new PUSH zsocket connecting on port=" + addr);
-
         final Socket sock = ctx.createSocket(ZMQ.PUSH);
 
         sock.connect(addr);
@@ -97,8 +81,6 @@ public class ZMQSockets {
      * @return a connected socket, subscribed to the given topic.
      */
     public Socket newSubSocketForTopic(final String addr, final String topic) {
-        log.config("new SUB zsocket connecting on port=" + addr + ", for topic=" + topic);
-
         final Socket sock = ctx.createSocket(ZMQ.SUB);
 
         sock.setLinger(0);
