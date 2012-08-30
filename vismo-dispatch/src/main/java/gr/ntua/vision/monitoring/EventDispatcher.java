@@ -5,13 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.json.simple.JSONValue;
-import org.zeromq.ZContext;
-import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
 
 /**
- * FIXME: use ZMQSockets.
+ * 
  */
 public class EventDispatcher {
     /**
@@ -62,27 +60,23 @@ public class EventDispatcher {
     private final String ip;
     /** the name of the service that generate events. */
     private final String originatingService;
-    /** the socket to push events. */
+    /** the socket to use. */
     private final Socket sock;
 
 
     /**
      * Constructor.
      * 
-     * @param ctx
-     *            the zmq context.
-     * @param localEventsPort
+     * @param sock
+     *            the socket to use.
      * @param serviceName
      *            the name of the service that generate events.
      * @throws SocketException
      */
-    public EventDispatcher(final ZContext ctx, final String localEventsPort, final String serviceName) throws SocketException {
+    public EventDispatcher(final Socket sock, final String serviceName) throws SocketException {
+        this.sock = sock;
         this.originatingService = serviceName;
-        this.sock = ctx.createSocket(ZMQ.PUSH);
-        this.sock.connect(localEventsPort);
-        this.sock.setLinger(0);
         this.ip = new VismoVMInfo().getAddress().getHostAddress();
-        System.err.println("connected to port=" + localEventsPort + ", ip=" + this.ip);
     }
 
 

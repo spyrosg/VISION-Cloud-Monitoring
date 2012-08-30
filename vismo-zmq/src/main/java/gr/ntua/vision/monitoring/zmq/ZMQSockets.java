@@ -51,8 +51,8 @@ public class ZMQSockets {
     public Socket newBoundPullSocket(final String addr) {
         final Socket sock = ctx.createSocket(ZMQ.PULL);
 
-        sock.bind(addr);
         sock.setLinger(0);
+        sock.bind(addr);
 
         return sock;
     }
@@ -66,8 +66,8 @@ public class ZMQSockets {
     public Socket newConnectedPushSocket(final String addr) {
         final Socket sock = ctx.createSocket(ZMQ.PUSH);
 
-        sock.connect(addr);
         sock.setLinger(0);
+        sock.connect(addr);
 
         return sock;
     }

@@ -1,8 +1,11 @@
 package endtoend;
 
 import gr.ntua.vision.monitoring.EventDispatcher;
+import gr.ntua.vision.monitoring.VismoConfiguration;
+import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.net.SocketException;
+import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Before;
@@ -15,17 +18,26 @@ import org.zeromq.ZContext;
  */
 public class VismoEventDispatcherTest {
     /***/
-    private final ZContext    ctx                = new ZContext();
+    @SuppressWarnings("serial")
+    private static final Properties  props              = new Properties() {
+                                                            {
+                                                                setProperty("producers.point", "tcp://127.0.0.1:34890");
+                                                                setProperty("consumers.point", "tcp://127.0.0.1:34891");
+                                                                setProperty("udp.port", "34892");
+                                                            }
+                                                        };
     /***/
-    private EventDispatcher   dispatcher;
+    private final VismoConfiguration conf               = new VismoConfiguration(props);
     /***/
-    private final String      LOCAL_EVENTS_PORT  = "ipc:///tmp/dispatch-events-test";
+    private EventDispatcher          dispatcher;
     /***/
-    private final int         NO_EXPECTED_EVENTS = 10;
+    private final int                NO_EXPECTED_EVENTS = 10;
     /***/
-    private FakeEventProducer producer;
+    private FakeEventProducer        producer;
     /***/
-    private FakeVismoInstance vismo;
+    private FakeVismoInstance        vismo;
+    /***/
+    private final ZMQSockets         zmq                = new ZMQSockets(new ZContext());
 
 
     /**
@@ -33,9 +45,9 @@ public class VismoEventDispatcherTest {
      */
     @Before
     public void setUp() throws SocketException {
-        vismo = new FakeVismoInstance(ctx, LOCAL_EVENTS_PORT, NO_EXPECTED_EVENTS);
+        vismo = new FakeVismoInstance(zmq.newBoundPullSocket(conf.getProducersPoint()), NO_EXPECTED_EVENTS);
         vismo.start();
-        dispatcher = new EventDispatcher(ctx, LOCAL_EVENTS_PORT, "foo-bar");
+        dispatcher = new EventDispatcher(zmq.newConnectedPushSocket(conf.getProducersPoint()), "foo-bar");
         producer = new FakeEventProducer(dispatcher, NO_EXPECTED_EVENTS);
     }
 
@@ -46,7 +58,6 @@ public class VismoEventDispatcherTest {
     @After
     public void tearDown() {
         vismo.hasReceivedAllEvents();
-        vismo.shutDown();
     }
 
 
