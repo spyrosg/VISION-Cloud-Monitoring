@@ -19,6 +19,7 @@
     <module>vismo-dispatch</module>
     <module>vismo-notify</module>
     <module>vismo-config</module>
+    <module>vismo-zmq</module>
   </modules>
 
   <properties>
