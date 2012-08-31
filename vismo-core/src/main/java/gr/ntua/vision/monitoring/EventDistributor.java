@@ -1,8 +1,9 @@
 package gr.ntua.vision.monitoring;
 
+import gr.ntua.vision.monitoring.zmq.VismoSocket;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeromq.ZMQ.Socket;
 
 
 /**
@@ -14,7 +15,7 @@ public class EventDistributor implements EventListener {
     /** the log target. */
     private static final Logger log = LoggerFactory.getLogger(EventDistributor.class);
     /** the socket. */
-    private final Socket        sock;
+    private final VismoSocket   sock;
 
 
     /**
@@ -23,8 +24,9 @@ public class EventDistributor implements EventListener {
      * @param sock
      *            the socket to use.
      */
-    EventDistributor(final Socket sock) {
+    EventDistributor(final VismoSocket sock) {
         this.sock = sock;
+        log.debug("using: {}", sock);
     }
 
 
@@ -33,7 +35,7 @@ public class EventDistributor implements EventListener {
      */
     @Override
     public void notify(final String message) {
-        final boolean success = sock.send(message.getBytes(), 0);
+        final boolean success = sock.send(message);
 
         log.trace("sent: {}", success ? "ok" : "dropped");
     }

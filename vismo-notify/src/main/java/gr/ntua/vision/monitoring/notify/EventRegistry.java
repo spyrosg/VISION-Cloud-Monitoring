@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring.notify;
 
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
+import gr.ntua.vision.monitoring.zmq.VismoSocket;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.io.PrintWriter;
@@ -19,7 +20,6 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.zeromq.ZContext;
-import org.zeromq.ZMQ.Socket;
 
 
 /**
@@ -40,7 +40,7 @@ public class EventRegistry {
         /** the actual handler. */
         private final EventHandler      handler;
         /** the zmq socket. */
-        private final Socket            sock;
+        private final VismoSocket       sock;
 
 
         /**
@@ -53,10 +53,11 @@ public class EventRegistry {
          * @param handler
          *            the actual handler.
          */
-        public EventHandlerTask(final VismoEventFactory factory, final Socket sock, final EventHandler handler) {
+        public EventHandlerTask(final VismoEventFactory factory, final VismoSocket sock, final EventHandler handler) {
             this.factory = factory;
             this.sock = sock;
             this.handler = handler;
+            ilog.config("using: " + sock);
         }
 
 
@@ -68,34 +69,20 @@ public class EventRegistry {
             ilog.config("entering receive/handle loop");
 
             while (true) {
-                final String msg = receive();
+                final String msg = sock.receive();
 
                 ilog.fine("received: " + msg);
 
                 if (msg == null)
                     continue;
 
+                // bypass topic
                 final int topicIndex = msg.indexOf(" ");
                 final Event e = factory.createEvent(msg.substring(topicIndex + 1));
 
                 if (e != null)
                     handler.handle(e);
             }
-        }
-
-
-        /**
-         * Receive a new message from the socket.
-         * 
-         * @return the message as a string, or <code>null</code> if there was an error receiving.
-         */
-        private String receive() {
-            final byte[] buf = sock.recv(0);
-
-            if (buf == null)
-                return null;
-
-            return new String(buf, 0, buf.length);
         }
     }
 
@@ -146,7 +133,7 @@ public class EventRegistry {
     private final String          addr;
     /** the pool of threads. Each thread corresponds to one event handler. */
     private final ExecutorService pool         = Executors.newCachedThreadPool();
-    /***/
+    /** the zmq object. */
     private final ZMQSockets      zmq          = new ZMQSockets(new ZContext());
 
 
@@ -186,7 +173,7 @@ public class EventRegistry {
      *            the handler.
      */
     public void register(final String topic, final EventHandler handler) {
-        final Socket sock = zmq.newSubSocketForTopic(addr, topic);
+        final VismoSocket sock = zmq.newSubSocketForTopic(addr, topic);
 
         pool.submit(new EventHandlerTask(new VismoEventFactory(), sock, handler));
     }
@@ -204,7 +191,7 @@ public class EventRegistry {
 
 
     /***/
-    public static void activateLogger() {
+    private static void activateLogger() {
         if (!logActivated) {
             logActivated = true;
 

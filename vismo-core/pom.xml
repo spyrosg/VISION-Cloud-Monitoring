@@ -55,7 +55,7 @@
       </plugin>
 
       <!-- also generate a rpm -->
-      <plugin>
+      <!-- plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>rpm-maven-plugin</artifactId>
         <version>2.1-alpha-1</version>
@@ -140,7 +140,7 @@
           </mappings>
         </configuration>
 
-      </plugin>
+      </plugin -->
     </plugins>
   </build>
 

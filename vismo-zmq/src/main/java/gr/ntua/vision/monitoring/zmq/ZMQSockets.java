@@ -32,14 +32,14 @@ public class ZMQSockets {
      *            the address to bind to.
      * @return a new bound pub socket.
      */
-    public Socket newBoundPubSocket(final String addr) {
+    public VismoSocket newBoundPubSocket(final String addr) {
         final Socket sock = ctx.createSocket(ZMQ.PUB);
 
         sock.setLinger(0);
         sock.setSendTimeOut(0); // FIXME: non-blocking for now
         sock.bind(addr);
 
-        return sock;
+        return new VismoSocket(sock, addr);
     }
 
 
@@ -48,13 +48,13 @@ public class ZMQSockets {
      *            the address to bind to.
      * @return a bound to the address pull socket.
      */
-    public Socket newBoundPullSocket(final String addr) {
+    public VismoSocket newBoundPullSocket(final String addr) {
         final Socket sock = ctx.createSocket(ZMQ.PULL);
 
         sock.setLinger(0);
         sock.bind(addr);
 
-        return sock;
+        return new VismoSocket(sock, addr);
     }
 
 
@@ -63,13 +63,13 @@ public class ZMQSockets {
      *            the address to connect to.
      * @return a connected to the address push socket.
      */
-    public Socket newConnectedPushSocket(final String addr) {
+    public VismoSocket newConnectedPushSocket(final String addr) {
         final Socket sock = ctx.createSocket(ZMQ.PUSH);
 
         sock.setLinger(0);
         sock.connect(addr);
 
-        return sock;
+        return new VismoSocket(sock, addr);
     }
 
 
@@ -80,13 +80,13 @@ public class ZMQSockets {
      *            the topic to subscribe to.
      * @return a connected socket, subscribed to the given topic.
      */
-    public Socket newSubSocketForTopic(final String addr, final String topic) {
+    public VismoSocket newSubSocketForTopic(final String addr, final String topic) {
         final Socket sock = ctx.createSocket(ZMQ.SUB);
 
         sock.setLinger(0);
         sock.connect(addr);
         sock.subscribe(topic.getBytes());
 
-        return sock;
+        return new VismoSocket(sock, addr);
     }
 }

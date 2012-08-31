@@ -1,5 +1,6 @@
 package gr.ntua.vision.monitoring;
 
+import gr.ntua.vision.monitoring.zmq.VismoSocket;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.io.IOException;
@@ -9,7 +10,6 @@ import java.util.UUID;
 
 import org.json.simple.JSONValue;
 import org.zeromq.ZContext;
-import org.zeromq.ZMQ.Socket;
 
 
 /**
@@ -32,7 +32,7 @@ public class VismoEventDispatcher implements EventDispatcher {
     /** the name of the service that generate events. */
     private final String              originatingService;
     /** the socket to use. */
-    private final Socket              sock;
+    private final VismoSocket         sock;
 
     static {
         try {
@@ -64,7 +64,7 @@ public class VismoEventDispatcher implements EventDispatcher {
      *            the socket to use.
      * @throws SocketException
      */
-    public VismoEventDispatcher(final String serviceName, final Socket sock) throws SocketException {
+    public VismoEventDispatcher(final String serviceName, final VismoSocket sock) throws SocketException {
         this.sock = sock;
         this.originatingService = serviceName;
         this.ip = new VismoVMInfo().getAddress().getHostAddress();
@@ -99,7 +99,7 @@ public class VismoEventDispatcher implements EventDispatcher {
      */
     void send(final Map<String, Object> map) {
         addBasicFields(map);
-        sock.send(JSONValue.toJSONString(map).getBytes(), 0);
+        sock.send(JSONValue.toJSONString(map));
     }
 
 

@@ -35,7 +35,7 @@ public class UDPServer extends StoppableTask {
         super("udp-server");
         this.sock = sock;
         this.listener = listener;
-        log.info("upd server listening on port={}", sock.getLocalPort());
+        log.info("listening on port={}", sock.getLocalPort());
     }
 
 

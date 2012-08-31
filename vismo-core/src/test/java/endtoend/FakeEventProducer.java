@@ -1,11 +1,12 @@
 package endtoend;
 
+import gr.ntua.vision.monitoring.zmq.VismoSocket;
+
 import java.util.UUID;
 
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeromq.ZMQ.Socket;
 
 
 /**
@@ -18,7 +19,7 @@ public class FakeEventProducer {
     /***/
     private final int           noEventsToSend;
     /***/
-    private final Socket        sock;
+    private final VismoSocket   sock;
 
 
     /**
@@ -28,7 +29,7 @@ public class FakeEventProducer {
      *            the socket to use.
      * @param noEventsToSend
      */
-    public FakeEventProducer(final Socket sock, final int noEventsToSend) {
+    public FakeEventProducer(final VismoSocket sock, final int noEventsToSend) {
         this.sock = sock;
         this.noEventsToSend = noEventsToSend;
     }
@@ -52,7 +53,7 @@ public class FakeEventProducer {
      */
     private void sendEvent(final JSONObject o) {
         log.trace("sending {}", o);
-        sock.send(((String) o.get("topic") + " " + o.toJSONString()).getBytes(), 0);
+        sock.send((String) o.get("topic") + " " + o.toJSONString());
     }
 
 

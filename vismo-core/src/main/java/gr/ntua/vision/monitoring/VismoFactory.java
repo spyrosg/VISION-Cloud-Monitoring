@@ -5,8 +5,6 @@ import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.net.SocketException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.zeromq.ZContext;
 
 
@@ -14,8 +12,6 @@ import org.zeromq.ZContext;
  * This is used to configure and properly initialize the application graph.
  */
 public class VismoFactory {
-    /** the log target. */
-    private static final Logger      log = LoggerFactory.getLogger(VismoFactory.class);
     /** the configuration object. */
     private final VismoConfiguration conf;
 
@@ -40,8 +36,8 @@ public class VismoFactory {
      */
     public Vismo build(final EventListener... listeners) throws SocketException {
         final ZMQSockets zmq = new ZMQSockets(new ZContext());
-        final LocalEventsCollector receiver = new LocalEventsCollectorFactory(conf).build(zmq);
         final Vismo vismo = new Vismo(new VismoVMInfo());
+        final LocalEventsCollector receiver = new LocalEventsCollectorFactory(conf).build(zmq);
 
         receiver.subscribe(new EventDistributor(zmq.newBoundPubSocket(conf.getConsumersPoint())));
 

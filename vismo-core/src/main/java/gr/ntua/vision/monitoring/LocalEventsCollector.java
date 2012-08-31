@@ -1,11 +1,12 @@
 package gr.ntua.vision.monitoring;
 
+import gr.ntua.vision.monitoring.zmq.VismoSocket;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeromq.ZMQ.Socket;
 
 
 /**
@@ -19,9 +20,9 @@ public class LocalEventsCollector extends StoppableTask {
     /** the log target. */
     private final Logger              log          = LoggerFactory.getLogger(LocalEventsCollector.class);
     /** the socket used to receive events. */
-    private final Socket              receiveEventsSock;
+    private final VismoSocket         receiveEventsSock;
     /** the socket used to send messages. */
-    private final Socket              sendMessagesSock;
+    private final VismoSocket         sendMessagesSock;
     /** the message used to stop the task. */
     private final String              STOP_MESSAGE = "stop!";
 
@@ -34,8 +35,10 @@ public class LocalEventsCollector extends StoppableTask {
      * @param sendMessagesSock
      *            the socket used to send messages.
      */
-    LocalEventsCollector(final Socket receiveEventsSock, final Socket sendMessagesSock) {
+    LocalEventsCollector(final VismoSocket receiveEventsSock, final VismoSocket sendMessagesSock) {
         super("event-receiver");
+        log.debug("using {}", receiveEventsSock.toString());
+        log.debug("using {}", sendMessagesSock.toString());
         this.receiveEventsSock = receiveEventsSock;
         this.sendMessagesSock = sendMessagesSock;
     }
@@ -49,7 +52,7 @@ public class LocalEventsCollector extends StoppableTask {
         log.debug("ready - awaiting events");
 
         while (true) {
-            final String message = receive(receiveEventsSock);
+            final String message = receiveEventsSock.receive();
 
             if (message == null)
                 continue;
@@ -104,24 +107,7 @@ public class LocalEventsCollector extends StoppableTask {
      * Ask the thread to stop receiving messages.
      */
     private void sendStopMessage() {
-        sendMessagesSock.send(STOP_MESSAGE.getBytes(), 0);
+        sendMessagesSock.send(STOP_MESSAGE);
         sendMessagesSock.close();
-    }
-
-
-    /**
-     * Receive a new message from the socket.
-     * 
-     * @param sock
-     *            the socket.
-     * @return the message as a string, or <code>null</code> if there was an error receiving.
-     */
-    private static String receive(final Socket sock) {
-        final byte[] buf = sock.recv(0);
-
-        if (buf == null)
-            return null;
-
-        return new String(buf, 0, buf.length);
     }
 }
