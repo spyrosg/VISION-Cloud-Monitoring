@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 # vim: set fileencoding=utf-8
 
 from __future__ import print_function
@@ -13,8 +13,8 @@ import json
 
 
 # this is the file that holds the lib's configuration
-#CONFIGURATION_PROPERTIES = '/srv/vismo/config.properties'
-CONFIGURATION_PROPERTIES = 'config.properties'
+CONFIGURATION_PROPERTIES = '/srv/vismo/config.properties'
+#CONFIGURATION_PROPERTIES = 'config.properties'
 
 
 ###
@@ -323,7 +323,7 @@ if __name__ == '__main__':
             self.content_size = 1000 # in bytes
             self.obj = 'ofdesire'
             self.success_status = 'SUCCESS'
-            self.fail_status = 'SUCCESS'
+            self.fail_status = 'FAIL'
             self.time_till_start_of_response = 0.1 # in seconds
             self.time_till_end_of_response = 0.1 # in seconds
             self.delta = 0.0005
