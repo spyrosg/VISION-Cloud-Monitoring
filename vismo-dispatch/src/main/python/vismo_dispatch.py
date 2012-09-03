@@ -155,7 +155,7 @@ class VismoEventDispatcher(EventDispatcher):
 
         self.cleanup_event(event)
         self.add_basic_fields(event)
-        log('{0}: {1}'.format(event['timestamp'], event['tag']))
+        log('sending: {0}'.format(event))
         self.handle_event(event)
 
 
@@ -210,7 +210,7 @@ class VismoEventDispatcher(EventDispatcher):
         ## TODO: handle object services failures => availability
         # if we have all the events
         if self.start_request_event and self.start_response_event and self.end_response_event:
-            main_event = self.end_response_event
+            main_event = dict(self.end_response_event)
 
             main_event['transaction-latency'] = self.calculate_latency()
             main_event['transaction-duration'] = self.calculate_transaction_duration()
