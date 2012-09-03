@@ -207,13 +207,14 @@ class VismoEventDispatcher(EventDispatcher):
         else:
             log_and_raise('handed event with incomprehensible tag: {0}, event: {1}'.format(tag, event), ValueError)
 
+        ## TODO: handle object services failures => availability
         # if we have all the events
         if self.start_request_event and self.start_response_event and self.end_response_event:
-            main_event = self.start_request_event
+            main_event = self.end_response_event
 
             main_event['transaction-latency'] = self.calculate_latency()
             main_event['transaction-duration'] = self.calculate_transaction_duration()
-            main_event['transaction-throughput'] = self.calculate_throughput(main_event['transaction-duration'])
+            main_event['transaction-throughput'] = self.calculate_throughput(main_event['content-size'], main_event['transaction-duration'])
             # TODO: Calculate availability and other Niki's required stuff
 
             # not needed
@@ -247,16 +248,14 @@ class VismoEventDispatcher(EventDispatcher):
         return self.calculate_event_time_difference(self.start_request_event, self.end_response_event)
 
 
-    def calculate_throughput(self, transaction_time):
+    def calculate_throughput(self, content_size, transaction_time):
         """
             Throughput is defined as the the number of bytes served in the unit of time.
             Transaction size is measured in bytes, transaction_time in seconds.
             Output value is in bytes per second.
         """
 
-        transaction_size = self.start_request_event['content-size']
-
-        return self.calculate_mean_value_per_time_unit(transaction_size, transaction_time)
+        return self.calculate_mean_value_per_time_unit(content_size, transaction_time)
 
 
 
@@ -326,7 +325,7 @@ if __name__ == '__main__':
             self.fail_status = 'FAIL'
             self.time_till_start_of_response = 0.1 # in seconds
             self.time_till_end_of_response = 0.1 # in seconds
-            self.delta = 0.0005
+            self.delta = 0.005
             self.sent_events = []
             self.sock = object()
             def sock(): pass
