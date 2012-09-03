@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python2
 # vim: set fileencoding=utf-8
 
 from __future__ import print_function
