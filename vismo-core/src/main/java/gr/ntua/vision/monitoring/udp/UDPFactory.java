@@ -11,7 +11,11 @@ import java.net.SocketException;
 public class UDPFactory {
     /** the port number to use. */
     private final int port;
+    /***/
+    private static final int CLIENT_TIMEOUT = 1000;
 
+    // FIXME: remove udp port from config
+    // FIXME: the stop/status reporting
 
     /**
      * Constructor.
@@ -29,7 +33,11 @@ public class UDPFactory {
      * @throws SocketException
      */
     public UDPClient buildClient() throws SocketException {
-        return new UDPClient(new DatagramSocket(), port);
+    	final DatagramSocket sock = new DatagramSocket();
+    	
+    	sock.setSoTimeout(CLIENT_TIMEOUT);
+    	
+        return new UDPClient(sock, port);
     }
 
 
