@@ -51,7 +51,7 @@ def is_effectively_zero(n):
 def log(msg):
     print('vismo-local-event-dispatcher: {0}'.format(msg), file=sys.stderr)
 
-def log_and_raise(excp):
+def log_and_raise(msg, excp):
     print('vismo-local-event-dispatcher: {0}'.format(msg), file=sys.stderr)
     raise excp(msg)
 
@@ -198,14 +198,14 @@ class VismoEventDispatcher(EventDispatcher):
 
         tag = event['tag']
 
-        if tag == 'start_request_event':
+        if tag == 'start-request':
             self.start_request_event = event
-        elif tag == 'start_response_event':
+        elif tag == 'start-response':
             self.start_response_event = event
-        elif tag == 'end_response_event':
+        elif tag == 'end-response':
             self.end_response_event = event
         else:
-            log_and_raise('handed event with incomprehensible tag: {0}, event: {1}', tag, event, ValueError)
+            log_and_raise('handed event with incomprehensible tag: {0}, event: {1}'.format(tag, event), ValueError)
 
         # if we have all the events
         if self.start_request_event and self.start_response_event and self.end_response_event:
@@ -338,13 +338,13 @@ if __name__ == '__main__':
             self.dispatcher.send(**args)
 
         def send_start_request(self):
-            self.send_event(tag='start_request_event', topic=self.topic, content_size=self.content_size, obj=self.obj, status=self.success_status)
+            self.send_event(tag='start-request', topic=self.topic, content_size=self.content_size, obj=self.obj, status=self.success_status)
 
         def send_start_response(self):
-            self.send_event(tag='start_response_event', topic=self.topic, content_size=self.content_size, obj=self.obj, status=self.success_status)
+            self.send_event(tag='start-response', topic=self.topic, content_size=self.content_size, obj=self.obj, status=self.success_status)
 
         def send_end_response(self):
-            self.send_event(tag='end_response_event', topic=self.topic, content_size=self.content_size, obj=self.obj, status=self.success_status)
+            self.send_event(tag='end-response', topic=self.topic, content_size=self.content_size, obj=self.obj, status=self.success_status)
 
         def perform_full_request_response_event_generation(self):
             self.send_start_request()
@@ -355,7 +355,7 @@ if __name__ == '__main__':
 
 
         def test_that_event_was_sent(self):
-            self.send_event(topic=self.topic, tag='start_request_event', content_size=1000, obj='ofdesire', status=1)
+            self.send_event(topic=self.topic, tag='start-request', content_size=1000, obj='ofdesire', status=1)
             self.assertEquals(self.topic, self.sent_events[0]['topic'])
 
 
@@ -385,9 +385,9 @@ if __name__ == '__main__':
     unittest.main()
 
     mon = VismoEventDispatcher('foo')
-    mon.send(topic='off-course', tag='start_request_event', content_size=1000, obj='ofdesire', status=1)
+    mon.send(topic='off-course', tag='start-request', content_size=1000, obj='ofdesire', status=1)
     sleep(1)
-    mon.send(topic='off-course', tag='start_response_event', obj='ofdesire', status=1)
+    mon.send(topic='off-course', tag='start-response', obj='ofdesire', status=1)
     sleep(1)
-    mon.send(topic='off-course', tag='end_response_event', obj='ofdesire', status=1)
+    mon.send(topic='off-course', tag='end-response', obj='ofdesire', status=2)
 
