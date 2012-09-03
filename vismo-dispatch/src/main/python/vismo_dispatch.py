@@ -384,9 +384,9 @@ if __name__ == '__main__':
     unittest.main()
 
     mon = VismoEventDispatcher('foo')
-    mon.send(topic='off-course', tag='start-request', content_size=1000, obj='ofdesire', status=1)
+    mon.send(topic='off-course', tag='start-request', obj='ofdesire', status=1)
     sleep(1)
-    mon.send(topic='off-course', tag='start-response', obj='ofdesire', status=1)
+    mon.send(topic='off-course', tag='start-response', obj='ofdesire', status=2)
     sleep(1)
-    mon.send(topic='off-course', tag='end-response', obj='ofdesire', status=2)
+    mon.send(topic='off-course', tag='end-response', content_size=1000, obj='ofdesire', status=3)
 
