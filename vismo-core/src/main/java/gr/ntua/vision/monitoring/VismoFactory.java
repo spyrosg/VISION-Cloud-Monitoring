@@ -18,6 +18,9 @@ import org.zeromq.ZContext;
  * This is used to configure and properly initialize the application graph.
  */
 public class VismoFactory {
+	private static final long EVERY_MIN = 60 * 1000;
+	/***/
+	private static final long AFTER_TEN_SECONDS = 10 * 1000;
 	/** the configuration object. */
 	private final VismoConfiguration conf;
 	private final List<AggregationRule> ruleList = new ArrayList<AggregationRule>();
@@ -63,7 +66,7 @@ public class VismoFactory {
 		final VismoAggregationController ruleTimer = new VismoAggregationController(ruleList, zmq.newBoundPubSocket(conf
 				.getConsumersPoint()));
 
-		timer.schedule(ruleTimer, 0, 60 * 1000);
+		timer.schedule(ruleTimer, AFTER_TEN_SECONDS, EVERY_MIN);
 
 		receiver.subscribe(ruleTimer);
 		vismo.addTask(new UDPFactory(conf.getUDPPort()).buildServer(vismo));

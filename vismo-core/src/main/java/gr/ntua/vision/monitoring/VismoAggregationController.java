@@ -75,9 +75,12 @@ public class VismoAggregationController extends TimerTask implements EventListen
 
 				final List<Event> eventList = eventBuckets.remove(rule);
 
-				log.trace("there are {} events to aggregate for rule", eventList.size());
+				if (eventList == null)
+					continue;
 
-				if (eventList == null || eventList.isEmpty())
+				log.trace("there are {} event(s) to aggregate for rule", eventList.size());
+
+				if (eventList.isEmpty())
 					continue;
 
 				// FIXME: do we need tstart, tend?

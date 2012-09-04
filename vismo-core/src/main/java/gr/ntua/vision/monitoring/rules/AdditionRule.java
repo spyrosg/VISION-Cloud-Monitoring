@@ -35,7 +35,7 @@ public class AdditionRule implements AggregationRule {
 		// TODO: can we have the events sorted by timestamp? What guarantees do we have?
 		// TODO: sort events by timestamp
 		for (final Event e : eventList) {
-			log.trace("aggregating event of class {}", e.getClass());
+			log.trace("aggregating event for {}", e.getClass());
 
 			final Object val = e.get(aggregationField);
 
