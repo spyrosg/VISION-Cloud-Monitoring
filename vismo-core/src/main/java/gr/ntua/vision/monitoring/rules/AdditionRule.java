@@ -40,7 +40,7 @@ public class AdditionRule implements AggregationRule {
 			final Object val = e.get(aggregationField);
 
 			if (val == null) {
-				log.trace("");
+				log.trace("event with no appropriate field '{}'; skipping", aggregationField);
 				continue;
 			}
 
@@ -55,6 +55,7 @@ public class AdditionRule implements AggregationRule {
 		dict.put("tStart", firstEvent.timestamp());
 		dict.put("tEnd", lastEvent.timestamp());
 		dict.put(resultField, sum);
+
 		return new VismoAggregationResultEvent(dict);
 	}
 
@@ -66,7 +67,7 @@ public class AdditionRule implements AggregationRule {
 	@Override
 	public boolean hasExpired() {
 		// TODO????
-		return false;
+		return true;
 	}
 
 	@Override
