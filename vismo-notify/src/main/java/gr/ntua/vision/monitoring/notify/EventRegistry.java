@@ -81,7 +81,11 @@ public class EventRegistry {
                 final Event e = factory.createEvent(msg.substring(topicIndex + 1));
 
                 if (e != null)
-                    handler.handle(e);
+                	try {
+                		handler.handle(e);
+                	} catch (Throwable x) {
+                		x.printStackTrace();
+                	}
             }
         }
     }
