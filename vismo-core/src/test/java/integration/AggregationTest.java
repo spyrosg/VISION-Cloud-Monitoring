@@ -12,10 +12,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class AggregationTest {
 	/***/
+	@Ignore("all aggregation result events should be based on previous events, these are not")
 	@Test
 	public void calculateNoOfReadBytesPerUserInLastPeriod() throws Exception {
 		final List<? extends Event> readList = Arrays.asList(new ReadRequestEvent(1000), new ReadRequestEvent(1000),
