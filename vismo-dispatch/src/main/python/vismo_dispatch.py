@@ -219,7 +219,11 @@ class VismoEventDispatcher(EventDispatcher):
 
             main_event['transaction-latency'] = self.calculate_latency()
             main_event['transaction-duration'] = self.calculate_transaction_duration()
-            main_event['transaction-throughput'] = self.calculate_throughput(main_event['content-size'], main_event['transaction-duration'])
+
+            if 'content-size' not in main_event or main_event['content-size'] is None:
+                main_event['transaction-throughput'] = 0
+            else:
+                main_event['transaction-throughput'] = self.calculate_throughput(main_event['content-size'], main_event['transaction-duration'])
             # TODO: Calculate availability and other Niki's required stuff
 
             # not needed
