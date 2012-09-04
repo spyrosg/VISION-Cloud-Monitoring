@@ -14,7 +14,6 @@ import java.util.Map;
 
 import org.junit.Test;
 
-
 public class AggregationTest {
 	/***/
 	@Test
@@ -27,11 +26,7 @@ public class AggregationTest {
 		assertEquals(result.get("size"), 3000.0);
 	}
 
-	@Test
-	public void performAggregationOnOneEventField() throws Exception {
-	}
-
-	public Event getEvent(final Map<String, Object> dict) {
+	private static Event getEvent(final Map<String, Object> dict) {
 		return new Event() {
 			@Override
 			public String topic() {

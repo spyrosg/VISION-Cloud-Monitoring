@@ -3,7 +3,6 @@ package gr.ntua.vision.monitoring;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.rules.AggregationResultEvent;
 import gr.ntua.vision.monitoring.rules.AggregationRule;
-import gr.ntua.vision.monitoring.zmq.VismoSocket;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
 
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,25 +22,23 @@ public class VismoAggregationController extends TimerTask implements EventListen
 	/***/
 	private final List<? extends AggregationRule> rulesList;
 	/***/
-	private final VismoSocket sock;
+	private final EventDistributor stuff;
 	/***/
 	private static final Logger log = LoggerFactory.getLogger(VismoAggregationController.class);
-	/** this is used to get a hold of the whole dict, for serialization reasons. */
-	private static final String DICT_KEY = "!dict";
 
 	/**
 	 * @param sock
 	 */
-	public VismoAggregationController(final List<? extends AggregationRule> rulesList, VismoSocket sock) {
+	public VismoAggregationController(final EventDistributor stuff, final List<? extends AggregationRule> rulesList) {
+		this.stuff = stuff;
 		this.rulesList = rulesList;
-		this.sock = sock;
 	}
 
 	@Override
 	public void notify(Event e) {
 		for (final AggregationRule rule : rulesList)
 			if (rule.matches(e)) {
-				log.trace("matching rule {} for event of class {}", rule, e.getClass());
+				log.trace("matching rule {} for event {}", rule, e.getClass());
 				appendToBucket(rule, e);
 			}
 	}
@@ -69,37 +65,25 @@ public class VismoAggregationController extends TimerTask implements EventListen
 	 * 
 	 */
 	private void performPendingOperations() {
-		for (final AggregationRule rule : rulesList)
-			if (rule.hasExpired()) {
-				log.trace("rule {} has expired", rule);
+		for (final AggregationRule rule : rulesList) {
+			log.trace("rule {} has expired", rule);
 
-				final List<Event> eventList = eventBuckets.remove(rule);
+			final List<Event> eventList = eventBuckets.remove(rule);
 
-				if (eventList == null)
-					continue;
+			if (eventList == null)
+				continue;
 
-				log.trace("there are {} event(s) to aggregate for rule", eventList.size());
+			log.trace("there are {} event(s) to aggregate for rule", eventList.size());
 
-				if (eventList.isEmpty())
-					continue;
+			if (eventList.isEmpty())
+				continue;
 
-				// FIXME: do we need tstart, tend?
-				final AggregationResultEvent aggregatedResult = rule.aggregate(eventList);
+			// FIXME: do we need tstart, tend?
+			final AggregationResultEvent aggregatedResult = rule.aggregate(eventList);
 
-				log.trace("aggregation successful for {}", aggregatedResult);
-				sendEventDownThePipeline(aggregatedResult);
-			}
-	}
-
-	/**
-	 * @param e
-	 */
-	private void sendEventDownThePipeline(Event e) {
-		log.trace("sending out aggregation result with event class: {}", e.getClass());
-		@SuppressWarnings("rawtypes")
-		final Map dict = (Map) e.get(DICT_KEY);
-
-		sock.send(JSONObject.toJSONString(dict));
+			log.trace("aggregation successful for {}", aggregatedResult);
+			stuff.serialize(aggregatedResult);
+		}
 	}
 
 	@Override

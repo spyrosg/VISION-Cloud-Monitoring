@@ -62,9 +62,8 @@ public class VismoFactory {
 
 		registerRule(new AdditionRule("content-size", "size"));
 
-		// receiver.subscribe(new EventDistributor(zmq.newBoundPubSocket(conf.getConsumersPoint())));
-		final VismoAggregationController ruleTimer = new VismoAggregationController(ruleList, zmq.newBoundPubSocket(conf
-				.getConsumersPoint()));
+		final EventDistributor stuff = new EventDistributor(zmq.newBoundPubSocket(conf.getConsumersPoint()));
+		final VismoAggregationController ruleTimer = new VismoAggregationController(stuff, ruleList);
 
 		timer.schedule(ruleTimer, AFTER_TEN_SECONDS, EVERY_MIN);
 

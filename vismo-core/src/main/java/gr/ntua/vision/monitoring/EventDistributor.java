@@ -1,7 +1,11 @@
 package gr.ntua.vision.monitoring;
 
+import java.util.Map;
+
+import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
 
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +14,7 @@ import org.slf4j.LoggerFactory;
  * event is sent according to its accompanying topic. NOTE: the running thread does not block, which means that for now, if there
  * is no receiving end (no connected consumers) the event is dropped.
  */
-public class EventDistributor {
+class EventDistributor {
 	/** the log target. */
 	private static final Logger log = LoggerFactory.getLogger(EventDistributor.class);
 	/** the socket. */
@@ -27,12 +31,11 @@ public class EventDistributor {
 		log.debug("using: {}", sock);
 	}
 
-	/**
-	 * @see gr.ntua.vision.monitoring.EventListener#notify(java.lang.String)
-	 * @Override public void notify(final Event e) { // FIXME: wtf? !dict? really?
-	 * @SuppressWarnings("rawtypes") final Map dict = (Map) e.get("!dict"); final boolean success =
-	 *                               sock.send(JSONObject.toJSONString(dict));
-	 * 
-	 *                               log.trace("sent: {}", success ? "ok" : "dropped"); }
-	 */
+	public void serialize(Event e) {
+		@SuppressWarnings("rawtypes")
+		final Map dict = (Map) e.get("!dict");
+
+		log.trace("sending event: {}", dict);
+		sock.send(e.topic() + " " + JSONObject.toJSONString(dict));
+	}
 }
