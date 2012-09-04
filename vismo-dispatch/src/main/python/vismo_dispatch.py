@@ -181,7 +181,7 @@ class VismoEventDispatcher(EventDispatcher):
 
 
     def _sock_send(self, event):
-        self.sock.send(event['topic'] + ' ' + json.dumps(event))
+        self.sock.send(json.dumps(event))
 
 
     def handle_event(self, event):
