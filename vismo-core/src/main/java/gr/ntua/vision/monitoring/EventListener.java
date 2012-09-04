@@ -1,5 +1,7 @@
 package gr.ntua.vision.monitoring;
 
+import gr.ntua.vision.monitoring.events.Event;
+
 /**
  * An event listener is used to pass around events to interested parties.
  */
@@ -10,5 +12,5 @@ public interface EventListener {
      * @param message
      *            the message received.
      */
-    void notify(String message);
+    void notify(Event e);
 }

@@ -1,7 +1,11 @@
 package gr.ntua.vision.monitoring;
 
+import java.util.Map;
+
+import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
 
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,8 +38,11 @@ public class EventDistributor implements EventListener {
      * @see gr.ntua.vision.monitoring.EventListener#notify(java.lang.String)
      */
     @Override
-    public void notify(final String message) {
-        final boolean success = sock.send(message);
+    public void notify(final Event e) {
+    	// FIXME: wtf? !dict? really?
+    	@SuppressWarnings("rawtypes")
+		final Map dict = (Map) e.get("!dict");
+        final boolean success = sock.send(JSONObject.toJSONString(dict));
 
         log.trace("sent: {}", success ? "ok" : "dropped");
     }

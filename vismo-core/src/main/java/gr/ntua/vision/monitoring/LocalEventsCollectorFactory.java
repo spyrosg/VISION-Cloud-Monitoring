@@ -1,5 +1,6 @@
 package gr.ntua.vision.monitoring;
 
+import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 
@@ -28,6 +29,6 @@ public class LocalEventsCollectorFactory {
      */
     public LocalEventsCollector build(final ZMQSockets zmq) {
         return new LocalEventsCollector(zmq.newBoundPullSocket(config.getProducersPoint()), zmq.newConnectedPushSocket(config
-                .getProducersPoint()));
+                .getProducersPoint()), new VismoEventFactory());
     }
 }

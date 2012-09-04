@@ -52,8 +52,8 @@ public class FakeEventProducer {
      * @param o
      */
     private void sendEvent(final JSONObject o) {
-        log.trace("sending {}", o);
-        sock.send((String) o.get("topic") + " " + o.toJSONString());
+        log.trace("sending: {}", o);
+        sock.send(o.toJSONString());
     }
 
 

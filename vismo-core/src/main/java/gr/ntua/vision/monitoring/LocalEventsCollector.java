@@ -1,5 +1,7 @@
 package gr.ntua.vision.monitoring;
 
+import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
 
 import java.util.ArrayList;
@@ -25,6 +27,8 @@ public class LocalEventsCollector extends StoppableTask {
     private final VismoSocket         sendMessagesSock;
     /** the message used to stop the task. */
     private final String              STOP_MESSAGE = "stop!";
+    /***/
+    private final EventFactory factory;
 
 
     /**
@@ -35,12 +39,13 @@ public class LocalEventsCollector extends StoppableTask {
      * @param sendMessagesSock
      *            the socket used to send messages.
      */
-    LocalEventsCollector(final VismoSocket receiveEventsSock, final VismoSocket sendMessagesSock) {
+    LocalEventsCollector(final VismoSocket receiveEventsSock, final VismoSocket sendMessagesSock, final EventFactory factory) {
         super("event-receiver");
         log.debug("using {}", receiveEventsSock.toString());
         log.debug("using {}", sendMessagesSock.toString());
         this.receiveEventsSock = receiveEventsSock;
         this.sendMessagesSock = sendMessagesSock;
+        this.factory = factory;
     }
 
 
@@ -62,7 +67,9 @@ public class LocalEventsCollector extends StoppableTask {
             if (message.equals(STOP_MESSAGE))
                 break;
 
-            notifyAllOf(message);
+            final Event e = factory.createEvent(message);
+            
+            notifyAllOf(e);
         }
 
         log.debug("shutting down");
@@ -97,9 +104,9 @@ public class LocalEventsCollector extends StoppableTask {
      * @param message
      *            the message.
      */
-    private void notifyAllOf(final String message) {
+    private void notifyAllOf(final Event e) {
         for (final EventListener listener : listeners)
-            listener.notify(message);
+            listener.notify(e);
     }
 
 
