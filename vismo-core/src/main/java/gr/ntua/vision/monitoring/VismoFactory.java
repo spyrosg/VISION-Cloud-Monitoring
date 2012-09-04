@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.rules.AdditionRule;
+import gr.ntua.vision.monitoring.rules.ReadAggregationOnContentSizeRule;
 import gr.ntua.vision.monitoring.rules.AggregationRule;
 import gr.ntua.vision.monitoring.udp.UDPFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
@@ -23,6 +23,7 @@ public class VismoFactory {
 	private static final long AFTER_TEN_SECONDS = 10 * 1000;
 	/** the configuration object. */
 	private final VismoConfiguration conf;
+	/***/
 	private final List<AggregationRule> ruleList = new ArrayList<AggregationRule>();
 	/***/
 	private static final Logger log = LoggerFactory.getLogger(VismoFactory.class);
@@ -60,7 +61,7 @@ public class VismoFactory {
 		for (final EventListener listener : listeners)
 			receiver.subscribe(listener);
 
-		registerRule(new AdditionRule("content-size", "size"));
+		registerRule(new ReadAggregationOnContentSizeRule("content-size", "size"));
 
 		final EventDistributor stuff = new EventDistributor(zmq.newBoundPubSocket(conf.getConsumersPoint()));
 		final VismoAggregationController ruleTimer = new VismoAggregationController(stuff, ruleList);

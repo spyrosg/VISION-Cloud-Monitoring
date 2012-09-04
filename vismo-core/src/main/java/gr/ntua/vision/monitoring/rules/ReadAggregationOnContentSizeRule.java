@@ -8,7 +8,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AdditionRule implements AggregationRule {
+public class ReadAggregationOnContentSizeRule implements AggregationRule {
 	/***/
 	private static final String DICT = "!dict";
 	/***/
@@ -16,13 +16,15 @@ public class AdditionRule implements AggregationRule {
 	/***/
 	private String resultField;
 	/***/
-	private static final Logger log = LoggerFactory.getLogger(AdditionRule.class);
+	private static final Logger log = LoggerFactory.getLogger(ReadAggregationOnContentSizeRule.class);
+	/***/
+	private static final String OPERATION = "GET";
 
 	/**
 	 * @param aggregationField
 	 * @param resultField
 	 */
-	public AdditionRule(String aggregationField, final String resultField) {
+	public ReadAggregationOnContentSizeRule(String aggregationField, final String resultField) {
 		this.aggregationField = aggregationField;
 		this.resultField = resultField;
 	}
@@ -61,7 +63,10 @@ public class AdditionRule implements AggregationRule {
 
 	@Override
 	public boolean matches(Event e) {
-		return true;
+		final String op = (String) e.get("operation");
+
+		// FIXME: add a field for events coming from vismo_dispatch
+		return op.equals(OPERATION) && e.get("transaction-duration") != null;
 	}
 
 	@Override
