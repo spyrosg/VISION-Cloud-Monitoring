@@ -3,7 +3,12 @@
 
 from __future__ import print_function
 
-import socket, struct, fcntl, sys
+import sys
+# this is used to bypass the broken zmq installation
+# in test-1 (10.0.1.101).
+sys.path.append('/usr/lib64/python2.6/site-packages')
+
+import socket, struct, fcntl
 from os import getpid
 from time import time
 from pyjavaproperties import Properties
