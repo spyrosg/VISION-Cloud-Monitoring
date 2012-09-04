@@ -164,6 +164,17 @@ class VismoEventDispatcher(EventDispatcher):
             For consistency reasons, use dashes and full nouns.
         """
 
+        def object_service_topic_to_http_op(topic):
+            if topic == 'reads':
+                return 'GET'
+            elif topic == 'writes':
+                return 'PUT'
+            elif topic == 'deletes':
+                return 'DELETE'
+            else:
+                log('got unknown topic: {0}'.format(topic))
+                return topic
+
         if 'content_size' in event:
             event['content-size'] = event['content_size']
             del event['content_size']
@@ -171,6 +182,7 @@ class VismoEventDispatcher(EventDispatcher):
             event['object'] = event['obj']
             del event['obj']
         if 'topic' in event:
+            event['operation'] = object_service_topic_to_http_op(event['topic'])
             del event['topic']
 
 
@@ -391,9 +403,9 @@ if __name__ == '__main__':
     unittest.main()
 
     mon = VismoEventDispatcher('foo')
-    mon.send(tag='start-request', obj='ofdesire', status=1)
+    mon.send(tag='start-request', obj='ofdesire', status=1, operation='GET')
     sleep(1)
-    mon.send(tag='start-response', obj='ofdesire', status=2)
+    mon.send(tag='start-response', obj='ofdesire', status=2, operation='GET')
     sleep(1)
-    mon.send(tag='end-response', content_size=1000, obj='ofdesire', status=3)
+    mon.send(tag='end-response', content_size=1000, obj='ofdesire', status=3, operation='GET')
 
