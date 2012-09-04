@@ -14,11 +14,13 @@ public class ReadAggregationOnContentSizeRule implements AggregationRule {
 	/***/
 	private final String aggregationField;
 	/***/
-	private String resultField;
+	private final String newField;
 	/***/
 	private static final Logger log = LoggerFactory.getLogger(ReadAggregationOnContentSizeRule.class);
 	/***/
 	private static final String OPERATION = "GET";
+	/***/
+	private static final String SPECIAL_FIELD = "transaction-duration";
 
 	/**
 	 * @param aggregationField
@@ -26,7 +28,7 @@ public class ReadAggregationOnContentSizeRule implements AggregationRule {
 	 */
 	public ReadAggregationOnContentSizeRule(String aggregationField, final String resultField) {
 		this.aggregationField = aggregationField;
-		this.resultField = resultField;
+		this.newField = resultField;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -49,16 +51,21 @@ public class ReadAggregationOnContentSizeRule implements AggregationRule {
 			sum += (Long) val;
 		}
 
+		return new VismoAggregationResultEvent(appendNewField(eventList, sum));
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private Map appendNewField(List<? extends Event> eventList, double sum) {
 		final Event firstEvent = eventList.get(0);
 		final Event lastEvent = eventList.get(eventList.size() - 1);
-		@SuppressWarnings("rawtypes")
 		final Map dict = (Map) lastEvent.get(DICT);
 
+		// FIXME: these should be gotten off the timer
 		dict.put("tStart", firstEvent.timestamp());
 		dict.put("tEnd", lastEvent.timestamp());
-		dict.put(resultField, sum);
+		dict.put(newField, sum);
 
-		return new VismoAggregationResultEvent(dict);
+		return dict;
 	}
 
 	@Override
@@ -66,7 +73,7 @@ public class ReadAggregationOnContentSizeRule implements AggregationRule {
 		final String op = (String) e.get("operation");
 
 		// FIXME: add a field for events coming from vismo_dispatch
-		return op.equals(OPERATION) && e.get("transaction-duration") != null;
+		return e.get(SPECIAL_FIELD) != null && op.equals(OPERATION);
 	}
 
 	@Override
@@ -77,6 +84,6 @@ public class ReadAggregationOnContentSizeRule implements AggregationRule {
 
 	@Override
 	public String toString() {
-		return "#<AdditionRule on field: " + aggregationField + ", result: " + resultField + ">";
+		return "#<ReadAggregationOnContentSizeRule on field: " + aggregationField + ", with new field '" + newField + "'>";
 	}
 }

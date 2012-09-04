@@ -26,6 +26,7 @@ public class AggregationTest {
 		assertEquals(result.get("size"), 3000.0);
 	}
 
+	/***/
 	private static Event getEvent(final Map<String, Object> dict) {
 		return new Event() {
 			@Override

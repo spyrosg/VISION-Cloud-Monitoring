@@ -73,7 +73,7 @@ public class VismoAggregationController extends TimerTask implements EventListen
 			if (eventList == null)
 				continue;
 
-			log.trace("there are {} event(s) to aggregate for rule", eventList.size());
+			log.trace("there are {} event(s) to aggregate", eventList.size());
 
 			if (eventList.isEmpty())
 				continue;
