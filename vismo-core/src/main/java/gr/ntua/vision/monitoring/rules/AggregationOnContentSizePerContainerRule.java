@@ -2,13 +2,14 @@ package gr.ntua.vision.monitoring.rules;
 
 import gr.ntua.vision.monitoring.events.Event;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AggregationOnContentSizeRule implements AggregationRule {
+public class AggregationOnContentSizePerContainerRule implements AggregationRule {
 	/***/
 	private static final String DICT = "!dict";
 	/***/
@@ -18,7 +19,7 @@ public class AggregationOnContentSizeRule implements AggregationRule {
 	/***/
 	private final String operation;
 	/***/
-	private static final Logger log = LoggerFactory.getLogger(AggregationOnContentSizeRule.class);
+	private static final Logger log = LoggerFactory.getLogger(AggregationOnContentSizePerContainerRule.class);
 	/***/
 	private static final String SPECIAL_FIELD = "transaction-duration";
 
@@ -26,7 +27,7 @@ public class AggregationOnContentSizeRule implements AggregationRule {
 	 * @param aggregationField
 	 * @param resultField
 	 */
-	public AggregationOnContentSizeRule(final String operation, String aggregationField, final String resultField) {
+	public AggregationOnContentSizePerContainerRule(final String operation, String aggregationField, final String resultField) {
 		this.operation = operation;
 		this.aggregationField = aggregationField;
 		this.newField = resultField;
@@ -49,7 +50,13 @@ public class AggregationOnContentSizeRule implements AggregationRule {
 				continue;
 			}
 
-			sum += (Long) val;
+			try {
+				sum += (Long) val;
+			} catch (ClassCastException x) {
+				log.trace("expecting field '{}' of type {} ...", aggregationField, Long.class);
+				log.trace("but got value {} of type {}", val, val.getClass());
+				log.trace("", x);
+			}
 		}
 
 		return new VismoAggregationResultEvent(appendNewField(eventList, sum));
@@ -65,8 +72,18 @@ public class AggregationOnContentSizeRule implements AggregationRule {
 		dict.put("tStart", firstEvent.timestamp());
 		dict.put("tEnd", lastEvent.timestamp());
 		dict.put(newField, sum);
+		dict.put("objects", getObjectList(eventList));
 
 		return dict;
+	}
+
+	private Object getObjectList(List<? extends Event> eventList) {
+		final List<String> l = new ArrayList<String>(eventList.size());
+
+		for (final Event e : eventList)
+			l.add((String) e.get("object"));
+
+		return l;
 	}
 
 	@Override
