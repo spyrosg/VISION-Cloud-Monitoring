@@ -2,7 +2,7 @@ package integration;
 
 import static org.junit.Assert.assertEquals;
 import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.rules.ReadAggregationOnContentSizeRule;
+import gr.ntua.vision.monitoring.rules.AggregationOnContentSizeRule;
 import gr.ntua.vision.monitoring.rules.AggregationResultEvent;
 import gr.ntua.vision.monitoring.rules.AggregationRule;
 
@@ -22,7 +22,7 @@ public class AggregationTest {
 	public void calculateNoOfReadBytesPerUserInLastPeriod() throws Exception {
 		final List<? extends Event> readList = Arrays.asList(new ReadRequestEvent(1000), new ReadRequestEvent(1000),
 				new ReadRequestEvent(1000));
-		final AggregationRule additionOnContentSize = new ReadAggregationOnContentSizeRule("content-size", "size");
+		final AggregationRule additionOnContentSize = new AggregationOnContentSizeRule("GET", "content-size", "size");
 		final AggregationResultEvent result = additionOnContentSize.aggregate(readList);
 
 		assertEquals(result.get("size"), 3000.0);

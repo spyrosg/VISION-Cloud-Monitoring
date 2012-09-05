@@ -8,7 +8,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReadAggregationOnContentSizeRule implements AggregationRule {
+public class AggregationOnContentSizeRule implements AggregationRule {
 	/***/
 	private static final String DICT = "!dict";
 	/***/
@@ -16,9 +16,9 @@ public class ReadAggregationOnContentSizeRule implements AggregationRule {
 	/***/
 	private final String newField;
 	/***/
-	private static final Logger log = LoggerFactory.getLogger(ReadAggregationOnContentSizeRule.class);
+	private final String operation;
 	/***/
-	private static final String OPERATION = "GET";
+	private static final Logger log = LoggerFactory.getLogger(AggregationOnContentSizeRule.class);
 	/***/
 	private static final String SPECIAL_FIELD = "transaction-duration";
 
@@ -26,7 +26,8 @@ public class ReadAggregationOnContentSizeRule implements AggregationRule {
 	 * @param aggregationField
 	 * @param resultField
 	 */
-	public ReadAggregationOnContentSizeRule(String aggregationField, final String resultField) {
+	public AggregationOnContentSizeRule(final String operation, String aggregationField, final String resultField) {
+		this.operation = operation;
 		this.aggregationField = aggregationField;
 		this.newField = resultField;
 	}
@@ -73,7 +74,7 @@ public class ReadAggregationOnContentSizeRule implements AggregationRule {
 		final String op = (String) e.get("operation");
 
 		// FIXME: add a field for events coming from vismo_dispatch
-		return e.get(SPECIAL_FIELD) != null && op.equals(OPERATION);
+		return e.get(SPECIAL_FIELD) != null && op.equals(operation);
 	}
 
 	@Override
@@ -84,6 +85,7 @@ public class ReadAggregationOnContentSizeRule implements AggregationRule {
 
 	@Override
 	public String toString() {
-		return "#<ReadAggregationOnContentSizeRule on field: " + aggregationField + ", with new field '" + newField + "'>";
+		return "#<AggregationOnContentSizeRule[" + operation + "] on field: " + aggregationField + ", with new field '"
+				+ newField + "'>";
 	}
 }

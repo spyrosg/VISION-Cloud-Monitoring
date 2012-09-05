@@ -17,9 +17,8 @@ public class AggregationOnNumberOfRequests implements AggregationRule {
 	private final String newField;
 	/***/
 	private final String operation;
-
 	/***/
-	private static final Logger log = LoggerFactory.getLogger(ReadAggregationOnContentSizeRule.class);
+	private static final Logger log = LoggerFactory.getLogger(AggregationOnNumberOfRequests.class);
 
 	/**
 	 * @param aggregationField
