@@ -129,7 +129,7 @@ public class AggregationPerContainerRule implements AggregationRule {
 			log.trace("but got value {} of type {}", val, val.getClass());
 			log.trace("", x);
 
-			return null;
+			return Long.valueOf((String) val);
 		}
 	}
 
