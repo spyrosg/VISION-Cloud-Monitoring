@@ -2,9 +2,9 @@ package integration;
 
 import static org.junit.Assert.assertEquals;
 import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.rules.AggregationPerContainerRule;
 import gr.ntua.vision.monitoring.rules.AggregationResultEvent;
 import gr.ntua.vision.monitoring.rules.AggregationRule;
+import gr.ntua.vision.monitoring.rules.CTORule;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -22,7 +22,7 @@ public class AggregationTest {
 	public void calculateNoOfReadBytesPerUserInLastPeriod() throws Exception {
 		final List<? extends Event> readList = Arrays.asList(new ReadRequestEvent(1000), new ReadRequestEvent(1000),
 				new ReadRequestEvent(1000));
-		final AggregationRule additionOnContentSize = new AggregationPerContainerRule("GET", "content-size", "size");
+		final AggregationRule additionOnContentSize = new CTORule("GET", "content-size", "size");
 		final AggregationResultEvent result = additionOnContentSize.aggregate(0, readList);
 
 		assertEquals(result.get("size"), 3000.0);

@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 // TODO: sum of content-size and # of accesses per tenant and container
 // TODO: sum and # of think-times per tenant and container
 // TODO: sum and # of rethink-times per tenant and container
-public class AggregationPerContainerRule implements AggregationRule {
+public class CTORule implements AggregationRule {
 	private static final String TOPIC = "CTO";
 	/***/
 	private static final String DICT = "!dict";
@@ -24,7 +24,7 @@ public class AggregationPerContainerRule implements AggregationRule {
 	/***/
 	private final String operation;
 	/***/
-	private static final Logger log = LoggerFactory.getLogger(AggregationPerContainerRule.class);
+	private static final Logger log = LoggerFactory.getLogger(CTORule.class);
 	/***/
 	private static final String SPECIAL_FIELD = "transaction-duration";
 	/***/
@@ -75,8 +75,8 @@ public class AggregationPerContainerRule implements AggregationRule {
 			return true;
 		}
 
-		private AggregationPerContainerRule getOuterType() {
-			return AggregationPerContainerRule.this;
+		private CTORule getOuterType() {
+			return CTORule.this;
 		}
 	}
 
@@ -84,7 +84,7 @@ public class AggregationPerContainerRule implements AggregationRule {
 	 * @param aggregationField
 	 * @param resultField
 	 */
-	public AggregationPerContainerRule(final String operation, String aggregationField, final String resultField) {
+	public CTORule(final String operation, String aggregationField, final String resultField) {
 		this.operation = operation;
 		this.aggregationField = aggregationField;
 		this.newField = resultField;
