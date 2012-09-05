@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AggregationPerContainerRule implements AggregationRule {
-	private static final String TOPIC = "SLA";
+	private static final String TOPIC = "CTO";
 	/***/
 	private static final String DICT = "!dict";
 	/***/
@@ -151,7 +151,6 @@ public class AggregationPerContainerRule implements AggregationRule {
 			final Map<ContainerRep, Long> containersSize) {
 		final Event lastEvent = eventList.get(eventList.size() - 1);
 		final Map dict = (Map) lastEvent.get(DICT);
-		final List<Object> containers = new ArrayList<Object>();
 
 		// FIXME: these should be gotten off the timer
 		dict.put("tStart", aggregationStartTime - MIN); // FIXME: bind this to the timer
