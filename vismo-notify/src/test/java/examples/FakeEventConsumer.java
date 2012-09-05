@@ -34,7 +34,7 @@ public class FakeEventConsumer {
 	 * @param args
 	 */
 	public static void main(final String... args) {
-		final EventRegistry registry = new EventRegistry("tcp://10.0.1.101:56430");
+		final EventRegistry registry = new EventRegistry("tcp://10.0.1.102:56430", true);
 
 		registry.registerToAll(new LoggingHandler());
 	}

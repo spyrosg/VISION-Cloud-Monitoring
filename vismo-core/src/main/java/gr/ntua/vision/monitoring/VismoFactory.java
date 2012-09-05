@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.rules.AggregationOnContentSizePerContainerRule;
 import gr.ntua.vision.monitoring.rules.AggregationOnNumberOfRequests;
+import gr.ntua.vision.monitoring.rules.AggregationPerContainerRule;
 import gr.ntua.vision.monitoring.rules.AggregationRule;
 import gr.ntua.vision.monitoring.udp.UDPFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
@@ -64,8 +64,8 @@ public class VismoFactory {
 		for (final EventListener listener : listeners)
 			receiver.subscribe(listener);
 
-		registerRule(new AggregationOnContentSizePerContainerRule("GET", "content-size", "size"));
-		registerRule(new AggregationOnContentSizePerContainerRule("PUT", "content-size", "size"));
+		registerRule(new AggregationPerContainerRule("GET", "content-size", "size"));
+		registerRule(new AggregationPerContainerRule("PUT", "content-size", "size"));
 
 		for (final String op : operations)
 			registerRule(new AggregationOnNumberOfRequests(op, "count"));

@@ -40,7 +40,8 @@ public class VismoAggregationController extends TimerTask implements EventListen
 			if (rule.matches(e)) {
 				log.trace("matching rule {} for event {}", rule, e.getClass());
 				appendToBucket(rule, e);
-			}
+			} else if (e.topic().equals("ResourceMap"))
+				stuff.serialize(e);
 	}
 
 	/**
