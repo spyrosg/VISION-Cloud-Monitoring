@@ -31,7 +31,7 @@ public class AggregationOnNumberOfRequests implements AggregationRule {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public AggregationResultEvent aggregate(List<? extends Event> eventList) {
+	public AggregationResultEvent aggregate(final long aggregationStartTime, List<? extends Event> eventList) {
 		return new VismoAggregationResultEvent(appendNewField(eventList, eventList.size()));
 	}
 
@@ -65,6 +65,6 @@ public class AggregationOnNumberOfRequests implements AggregationRule {
 
 	@Override
 	public String toString() {
-		return "#<AggregationOnNumberOfRequests[" + operation + "] with new field '" + newField + "'>";
+		return "#<" + this.getClass().getSimpleName() + "[" + operation + "] with new field '" + newField + "'>";
 	}
 }

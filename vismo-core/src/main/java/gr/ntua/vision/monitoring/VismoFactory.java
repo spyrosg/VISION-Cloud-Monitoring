@@ -64,11 +64,11 @@ public class VismoFactory {
 		for (final EventListener listener : listeners)
 			receiver.subscribe(listener);
 
-		registerRule(new AggregationPerContainerRule("GET", "content-size", "size"));
-		registerRule(new AggregationPerContainerRule("PUT", "content-size", "size"));
+		registerRule(new AggregationPerContainerRule("GET", "content-size", "containers"));
+		registerRule(new AggregationPerContainerRule("PUT", "content-size", "containers"));
 
-		for (final String op : operations)
-			registerRule(new AggregationOnNumberOfRequests(op, "count"));
+		//for (final String op : operations)
+			//registerRule(new AggregationOnNumberOfRequests(op, "count"));
 
 		final EventDistributor stuff = new EventDistributor(zmq.newBoundPubSocket(conf.getConsumersPoint()));
 		final VismoAggregationController ruleTimer = new VismoAggregationController(stuff, ruleList);

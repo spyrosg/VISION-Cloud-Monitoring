@@ -23,7 +23,7 @@ public class AggregationTest {
 		final List<? extends Event> readList = Arrays.asList(new ReadRequestEvent(1000), new ReadRequestEvent(1000),
 				new ReadRequestEvent(1000));
 		final AggregationRule additionOnContentSize = new AggregationPerContainerRule("GET", "content-size", "size");
-		final AggregationResultEvent result = additionOnContentSize.aggregate(readList);
+		final AggregationResultEvent result = additionOnContentSize.aggregate(0, readList);
 
 		assertEquals(result.get("size"), 3000.0);
 	}

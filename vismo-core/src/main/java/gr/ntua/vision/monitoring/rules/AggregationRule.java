@@ -1,20 +1,18 @@
 package gr.ntua.vision.monitoring.rules;
 
-import java.util.List;
-
-
 import gr.ntua.vision.monitoring.events.Event;
 
+import java.util.List;
+
 /**
- * This is used to represent an operation on a sequence of events, over a period
- * of time.
+ * This is used to represent an operation on a sequence of events, over a period of time.
  */
 public interface AggregationRule {
 	/**
 	 * @param eventList
 	 * @return
 	 */
-	AggregationResultEvent aggregate(List<? extends Event> eventList);
+	AggregationResultEvent aggregate(final long aggregationStartTime, List<? extends Event> eventList);
 
 	/**
 	 * @param e

@@ -22,6 +22,20 @@ public class VismoAggregationResultEvent implements AggregationResultEvent {
 	 */
 	public VismoAggregationResultEvent(final Map<String, Object> dict) {
 		this.dict = dict;
+		removeUnessecaryFields(dict);
+	}
+
+	@SuppressWarnings("unchecked")
+	private static void removeUnessecaryFields(@SuppressWarnings("rawtypes") final Map dict) {
+		dict.remove("transaction-throughput");
+		dict.remove("content-size");
+		dict.remove("object");
+		dict.remove("operation");
+		dict.remove("tenant");
+		dict.remove("container");
+		dict.remove("transaction-latency");
+		dict.remove("transaction-duration");
+		dict.put("timestamp", dict.get("tStart"));
 	}
 
 	/**

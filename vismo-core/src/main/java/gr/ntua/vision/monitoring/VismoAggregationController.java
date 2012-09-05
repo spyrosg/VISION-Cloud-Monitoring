@@ -36,12 +36,15 @@ public class VismoAggregationController extends TimerTask implements EventListen
 
 	@Override
 	public void notify(Event e) {
-		for (final AggregationRule rule : rulesList)
+		for (final AggregationRule rule : rulesList) {
+			final String topic = e.topic();
+			
 			if (rule.matches(e)) {
 				log.trace("matching rule {} for event {}", rule, e.getClass());
 				appendToBucket(rule, e);
-			} else if (e.topic().equals("ResourceMap"))
+			} else if (topic != null && e.topic().equals("ResourceMap"))
 				stuff.serialize(e);
+		}
 	}
 
 	/**
@@ -80,7 +83,7 @@ public class VismoAggregationController extends TimerTask implements EventListen
 				continue;
 
 			// FIXME: do we need tstart, tend?
-			final AggregationResultEvent aggregatedResult = rule.aggregate(eventList);
+			final AggregationResultEvent aggregatedResult = rule.aggregate(this.scheduledExecutionTime(), eventList);
 
 			log.trace("aggregation successful for {}", aggregatedResult);
 			stuff.serialize(aggregatedResult);

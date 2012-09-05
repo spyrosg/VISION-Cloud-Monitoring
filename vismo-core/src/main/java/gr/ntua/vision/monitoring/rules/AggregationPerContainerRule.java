@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AggregationPerContainerRule implements AggregationRule {
+	private static final String TOPIC = "SLA";
 	/***/
 	private static final String DICT = "!dict";
 	/***/
@@ -24,13 +25,13 @@ public class AggregationPerContainerRule implements AggregationRule {
 	/***/
 	private static final String SPECIAL_FIELD = "transaction-duration";
 	/***/
-	private final Map<ContainerRep, Long> containersSize = new HashMap<ContainerRep, Long>();
+	private static final long MIN = 60 * 1000;
 
 	public class ContainerRep {
 		/***/
-		private final String tenant;
+		public final String tenant;
 		/***/
-		private final String name;
+		public final String name;
 
 		public ContainerRep(String tenant, String name) {
 			this.tenant = tenant;
@@ -89,7 +90,7 @@ public class AggregationPerContainerRule implements AggregationRule {
 	/**
 	 * @param eventList
 	 */
-	private void aggregateContainerSize(List<? extends Event> eventList) {
+	private void aggregateContainerSize(final Map<ContainerRep, Long> containersSize, List<? extends Event> eventList) {
 		for (final Event e : eventList)
 			try {
 				final String tenant = (String) e.get("tenant");
@@ -134,55 +135,46 @@ public class AggregationPerContainerRule implements AggregationRule {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public AggregationResultEvent aggregate(List<? extends Event> eventList) {
-		double sum = 0;
+	public AggregationResultEvent aggregate(final long aggregationStartTime, List<? extends Event> eventList) {
+		final Map<ContainerRep, Long> containersSize = new HashMap<ContainerRep, Long>();
 
-		// TODO: can we have the events sorted by timestamp? What guarantees do we have?
-		// TODO: sort events by timestamp
-		for (final Event e : eventList) {
-			log.trace("aggregating event for {}", e.getClass());
+		aggregateContainerSize(containersSize, eventList);
 
-			final Object val = e.get(aggregationField);
+		@SuppressWarnings("rawtypes")
+		final Map dict = appendNewFields(eventList, aggregationStartTime, containersSize);
 
-			if (val == null) {
-				log.trace("event with no appropriate field '{}'; skipping", aggregationField);
-				continue;
-			}
-
-			try {
-				sum += (Long) val;
-			} catch (ClassCastException x) {
-				log.trace("expecting field '{}' of type {} ...", aggregationField, Long.class);
-				log.trace("but got value {} of type {}", val, val.getClass());
-				log.trace("", x);
-			}
-		}
-
-		return new VismoAggregationResultEvent(appendNewField(eventList, sum));
+		return new VismoAggregationResultEvent(dict);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private Map appendNewField(List<? extends Event> eventList, double sum) {
-		final Event firstEvent = eventList.get(0);
+	private Map appendNewFields(List<? extends Event> eventList, final long aggregationStartTime,
+			final Map<ContainerRep, Long> containersSize) {
 		final Event lastEvent = eventList.get(eventList.size() - 1);
 		final Map dict = (Map) lastEvent.get(DICT);
+		final List<Object> containers = new ArrayList<Object>();
 
 		// FIXME: these should be gotten off the timer
-		dict.put("tStart", firstEvent.timestamp());
-		dict.put("tEnd", lastEvent.timestamp());
-		dict.put(newField, sum);
-		dict.put("objects", getObjectList(eventList));
+		dict.put("tStart", aggregationStartTime - MIN); // FIXME: bind this to the timer
+		dict.put("tEnd", aggregationStartTime);
+		dict.put(newField, getContainersList(containersSize));
 
 		return dict;
 	}
 
-	private Object getObjectList(List<? extends Event> eventList) {
-		final List<String> l = new ArrayList<String>(eventList.size());
+	private List<Object> getContainersList(final Map<ContainerRep, Long> containersSize) {
+		final List<Object> containers = new ArrayList<Object>();
 
-		for (final Event e : eventList)
-			l.add((String) e.get("object"));
+		for (final ContainerRep c : containersSize.keySet()) {
+			final Map<String, Object> o = new HashMap<String, Object>();
 
-		return l;
+			o.put("tenant", c.tenant);
+			o.put("container", c.name);
+			o.put("size", containersSize.get(c));
+			o.put("topic", TOPIC);
+			containers.add(o);
+		}
+
+		return containers;
 	}
 
 	@Override
@@ -201,7 +193,7 @@ public class AggregationPerContainerRule implements AggregationRule {
 
 	@Override
 	public String toString() {
-		return "#<AggregationOnContentSizeRule[" + operation + "] on field: " + aggregationField + ", with new field '"
-				+ newField + "'>";
+		return "#<" + this.getClass().getSimpleName() + "[" + operation + "] on field: " + aggregationField
+				+ ", with new field '" + newField + "'>";
 	}
 }
