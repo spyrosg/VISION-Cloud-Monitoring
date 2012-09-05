@@ -10,6 +10,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// TODO: sum of content-size and # of accesses per tenant and container
+// TODO: sum and # of think-times per tenant and container
+// TODO: sum and # of rethink-times per tenant and container
 public class AggregationPerContainerRule implements AggregationRule {
 	private static final String TOPIC = "CTO";
 	/***/
@@ -95,7 +98,7 @@ public class AggregationPerContainerRule implements AggregationRule {
 			try {
 				final String tenant = (String) e.get("tenant");
 				final String name = (String) e.get("container");
-				final Long size = getValue(e, aggregationField);
+				final Long size = getLongValue(e, aggregationField);
 				final ContainerRep c = new ContainerRep(tenant, name);
 
 				if (size == null) {
@@ -116,11 +119,14 @@ public class AggregationPerContainerRule implements AggregationRule {
 			}
 	}
 
-	private static Long getValue(final Event e, final String field) {
+	private static Long getLongValue(final Event e, final String field) {
 		final Object val = e.get(field);
 
 		if (val == null)
 			return null;
+
+		if (val instanceof String)
+			return Long.valueOf((String) val);
 
 		try {
 			return (Long) val;
@@ -129,7 +135,7 @@ public class AggregationPerContainerRule implements AggregationRule {
 			log.trace("but got value {} of type {}", val, val.getClass());
 			log.trace("", x);
 
-			return Long.valueOf((String) val);
+			return null;
 		}
 	}
 
@@ -156,6 +162,7 @@ public class AggregationPerContainerRule implements AggregationRule {
 		dict.put("tStart", aggregationStartTime - MIN); // FIXME: bind this to the timer
 		dict.put("tEnd", aggregationStartTime);
 		dict.put(newField, getContainersList(containersSize));
+		dict.put("topic", TOPIC);
 
 		return dict;
 	}
@@ -169,7 +176,6 @@ public class AggregationPerContainerRule implements AggregationRule {
 			o.put("tenant", c.tenant);
 			o.put("container", c.name);
 			o.put("size", containersSize.get(c));
-			o.put("topic", TOPIC);
 			containers.add(o);
 		}
 

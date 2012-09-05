@@ -1,6 +1,5 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.rules.AggregationOnNumberOfRequests;
 import gr.ntua.vision.monitoring.rules.AggregationPerContainerRule;
 import gr.ntua.vision.monitoring.rules.AggregationRule;
 import gr.ntua.vision.monitoring.udp.UDPFactory;
