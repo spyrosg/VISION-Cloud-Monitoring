@@ -1,9 +1,10 @@
 package gr.ntua.vision.monitoring;
 
-import java.util.Map;
-
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
+
+import java.util.HashSet;
+import java.util.Map;
 
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -19,6 +20,8 @@ class EventDistributor {
 	private static final Logger log = LoggerFactory.getLogger(EventDistributor.class);
 	/** the socket. */
 	private final VismoSocket sock;
+	/***/
+	private final HashSet<String> eventIds = new HashSet<String>();
 
 	/**
 	 * Constructor.
@@ -35,7 +38,23 @@ class EventDistributor {
 		@SuppressWarnings("rawtypes")
 		final Map dict = (Map) e.get("!dict");
 
-		log.trace("sending event: {}", dict);
-		sock.send(e.topic() + " " + JSONObject.toJSONString(dict));
+		if (!eventAlreadySent(dict)) {
+			log.trace("sending event: {}", dict);
+			sock.send(e.topic() + " " + JSONObject.toJSONString(dict));
+		}
+	}
+
+	private boolean eventAlreadySent(Map map) {
+		final String id = (String) map.get("id");
+
+		if (eventIds.contains(id)) {
+			log.error("dropping already sent event: {}", map);
+
+			return true;
+		} else {
+			eventIds.add(id);
+
+			return false;
+		}
 	}
 }

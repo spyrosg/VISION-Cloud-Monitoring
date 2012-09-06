@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * TODO: somehow link with {@link VismoEvent}.
@@ -23,9 +24,14 @@ public class VismoAggregationResultEvent implements AggregationResultEvent {
 	public VismoAggregationResultEvent(final Map<String, Object> dict) {
 		this.dict = dict;
 		removeUnessecaryFields(dict);
+		addBasicFields(dict);
 	}
 
-	@SuppressWarnings("unchecked")
+	private void addBasicFields(final Map<String, Object> dict) {
+		dict.put("timestamp", dict.get("tStart"));
+		dict.put("id", UUID.randomUUID().toString());
+	}
+
 	private static void removeUnessecaryFields(@SuppressWarnings("rawtypes") final Map dict) {
 		dict.remove("transaction-throughput");
 		dict.remove("content-size");
@@ -35,7 +41,6 @@ public class VismoAggregationResultEvent implements AggregationResultEvent {
 		dict.remove("container");
 		dict.remove("transaction-latency");
 		dict.remove("transaction-duration");
-		dict.put("timestamp", dict.get("tStart"));
 	}
 
 	/**

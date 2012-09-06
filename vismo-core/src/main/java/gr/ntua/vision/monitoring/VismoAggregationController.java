@@ -6,7 +6,6 @@ import gr.ntua.vision.monitoring.rules.AggregationRule;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
@@ -38,17 +37,11 @@ public class VismoAggregationController extends TimerTask implements EventListen
 
 	@Override
 	public void notify(Event e) {
-		final HashSet<Event> notMatchedEvents = new HashSet<Event>();
-
 		for (final AggregationRule rule : rulesList)
-			if (rule.matches(e)) {
+			if (rule.matches(e))
 				appendToBucket(rule, e);
-			} else {
-				notMatchedEvents.add(e);
-			}
 
-		for (final Event ev : notMatchedEvents)
-			distributor.serialize(ev);
+		distributor.serialize(e);
 	}
 
 	/**
