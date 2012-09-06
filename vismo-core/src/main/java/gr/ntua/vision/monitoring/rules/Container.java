@@ -3,12 +3,30 @@ package gr.ntua.vision.monitoring.rules;
 public class Container {
 	public final String tenant;
 	public final String name;
-	public final long size;
+	private long size;
+	private long accessess;
 
 	public Container(String tenant, String name, long size) {
 		this.tenant = tenant;
 		this.name = name;
 		this.size = size;
+		this.accessess = 1;
+	}
+
+	public void addObjectSize(final long objectSize) {
+		size += objectSize;
+	}
+
+	public void incAccesses() {
+		++accessess;
+	}
+
+	public long getSize() {
+		return size;
+	}
+
+	public long getAccessess() {
+		return accessess;
 	}
 
 	@Override
@@ -40,5 +58,10 @@ public class Container {
 		} else if (!tenant.equals(other.tenant))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "#<Container [tenant=" + tenant + ", name=" + name + ", size=" + size + ", accessess=" + accessess + ">";
 	}
 }

@@ -37,10 +37,11 @@ class EventDistributor {
 	public void serialize(Event e) {
 		@SuppressWarnings("rawtypes")
 		final Map dict = (Map) e.get("!dict");
+		final String ser = JSONObject.toJSONString(dict);
 
 		if (!eventAlreadySent(dict)) {
-			log.trace("sending event: {}", dict);
-			sock.send(e.topic() + " " + JSONObject.toJSONString(dict));
+			log.trace("sending event: {}", ser);
+			sock.send(e.topic() + " " + ser);
 		}
 	}
 

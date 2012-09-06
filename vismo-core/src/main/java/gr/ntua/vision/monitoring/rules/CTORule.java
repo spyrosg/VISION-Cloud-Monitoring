@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -60,109 +61,75 @@ public class CTORule implements AggregationRule {
 		return "#<" + this.getClass().getSimpleName() + "[" + operation + "]>";
 	}
 
-	/**
-	 * First pass. Put all the different access sizes on a list.
-	 * 
-	 * @param eventList
-	 * @return
-	 */
-	private ArrayList<Container> getPerTenantPerContainerContentSize(List<? extends Event> eventList) {
-		final ArrayList<Container> containersList = new ArrayList<Container>();
+	private HashSet<Container> getContentSizePerContainer(final List<? extends Event> eventList) {
+		final HashSet<Container> containers = new HashSet<Container>();
 
 		for (final Event e : eventList) {
-			try {
-				final Long size = getFieldValueAsLong(e, AGGREGATION_FIELD);
+			final String tenant = (String) e.get("tenant");
+			final String containerName = (String) e.get("container");
+			final long size = getFieldValueAsLong(e, "content-size");
+			final Container c = new Container(tenant, containerName, size);
 
-				// no content-size field provided
-				if (size == null)
-					continue;
-
-				final String tenantName = (String) e.get("tenant");
-				final String containerName = (String) e.get("container");
-
-				containersList.add(new Container(tenantName, containerName, size));
-			} catch (final Throwable x) {
-				x.printStackTrace();
-				log.error("continuing aggregation", x);
-			}
-		}
-
-		return containersList;
-	}
-
-	/**
-	 * Second pass. Aggregate all container sizes per tenant. This removes duplicate containers, unifying them in just one, with
-	 * size, the total size of all containers with the same name and tenant.
-	 * 
-	 * @param containers
-	 * @return
-	 */
-	private ArrayList<Container> sumContentSizePerContainer(List<Container> containers) {
-		final HashMap<Container, Long> aggregatedContentSize = new HashMap<Container, Long>();
-
-		for (final Container c : containers) {
-			final Long oldSize = aggregatedContentSize.remove(c);
-
-			if (oldSize == null) // first time we see this container
-				aggregatedContentSize.put(c, c.size);
+			if (containers.contains(c))
+				for (final Container cc : containers) {
+					if (cc.name.equals(containerName) && cc.tenant.equals(tenant)) {
+						cc.addObjectSize(size);
+						cc.incAccesses();
+					}
+				}
 			else
-				aggregatedContentSize.put(c, oldSize + c.size);
+				containers.add(c);
 		}
 
-		return new ArrayList<Container>(aggregatedContentSize.keySet());
+		return containers;
 	}
 
 	private HashMap<String, Object> getFinalObject(List<? extends Event> eventList, final long aggregationStartTime) {
-		final ArrayList<Map<String, Object>> tenantList = prepareTenantsList(eventList);
-		final ArrayList<Container> firstPass = getPerTenantPerContainerContentSize(eventList);
-		final ArrayList<Container> secondpass = sumContentSizePerContainer(firstPass);
+		final HashSet<Container> containers = getContentSizePerContainer(eventList);
+		final HashMap<String, HashMap<String, Object>> tenants = new HashMap<String, HashMap<String, Object>>();
 
-		for (final Map<String, Object> tenant : tenantList) {
-			@SuppressWarnings("unchecked")
-			final ArrayList<Map<String, Object>> containers = (ArrayList<Map<String, Object>>) tenant.get("containers");
+		for (final Container c : containers) {
+			final HashMap<String, Object> tenant = tenants.get(c.tenant);
 
-			for (final Container c : secondpass) {
+			if (tenant == null) {
+				final HashMap<String, Object> newTenant = new HashMap<String, Object>();
+				final ArrayList<Map<String, Object>> containerList = new ArrayList<Map<String, Object>>();
 				final HashMap<String, Object> container = new HashMap<String, Object>();
 
 				container.put("name", c.name);
-				container.put("size-sum", c.size);
+				container.put("size-sum", c.getSize());
+				container.put("size-count", c.getAccessess());
 
-				containers.add(container);
+				containerList.add(container);
+
+				newTenant.put("name", c.tenant);
+				newTenant.put("containers", containerList);
+
+				tenants.put(c.tenant, newTenant);
+			} else {
+				@SuppressWarnings("unchecked")
+				final ArrayList<Map<String, Object>> containerList = (ArrayList<Map<String, Object>>) tenant.get("containers");
+
+				final HashMap<String, Object> container = new HashMap<String, Object>();
+
+				container.put("name", c.name);
+				container.put("size-sum", c.getSize());
+				container.put("size-count", c.getAccessess());
+
+				containerList.add(container);
 			}
-
-			final HashMap<String, Object> t = new HashMap<String, Object>();
-
-			t.put("name", tenant.get("name"));
-			t.put("containers", containers);
 		}
 
-		@SuppressWarnings("unchecked")
-		final HashMap<String, Object> dict = (HashMap<String, Object>) getBaseEvent(eventList).get(DICT);
+		System.err.println("containers: " + containers);
 
-		dict.put("tenants", tenantList);
+		final HashMap<String, Object> dict = new HashMap<String, Object>();
+
+		dict.put("tenants", tenants);
 		dict.put("topic", TOPIC);
 		dict.put("tStart", aggregationStartTime);
 		dict.put("tEnd", System.currentTimeMillis());
 
 		return dict;
-	}
-
-	private ArrayList<Map<String, Object>> prepareTenantsList(final List<? extends Event> eventList) {
-		final ArrayList<Map<String, Object>> tenantList = new ArrayList<Map<String, Object>>();
-
-		for (final Event e : eventList) {
-			final HashMap<String, Object> o = new HashMap<String, Object>();
-
-			o.put("name", e.get("tenant"));
-			o.put("containers", new ArrayList<Map<String, Object>>());
-			tenantList.add(o);
-		}
-
-		return tenantList;
-	}
-
-	private static Event getBaseEvent(List<? extends Event> eventList) {
-		return eventList.get(0);
 	}
 
 	private static Long getFieldValueAsLong(final Event e, final String field) {
@@ -192,6 +159,7 @@ public class CTORule implements AggregationRule {
 	/* SPYROS */
 
 	private void aggregateThinkTime(List<? extends Event> eventList) {
+
 		// sort list
 		Collections.sort(eventList, new TimestampComparator());
 
@@ -202,38 +170,90 @@ public class CTORule implements AggregationRule {
 			try {
 				// final String tenant = (String) e.get("tenant");
 				// final String name = (String) e.get("container");
-				// final Long size = getLongValue(e, aggregationField);
+				// final Double size = getDoubleValue(e, aggregationField);
 				final String tenant = (String) e.get("tenant");
 				final String user = (String) e.get("user");
 				// final String userTenant = userName+"@"+tenant;
 				final String userName = user + "@" + tenant;
-				final Long timestamp = (Long) e.get("timestamp");
+				final double transactionTime = ((Double) e.get("transaction-duration")) / 1000.0; // transactionTime turned to
+																									// millis
+				// final Double timestamp = ((Double) e.get("timestamp"))-transactionTime;
+				final double responseTime = (Long) e.get("timestamp");
+				final Double requestTime = ((Long) e.get("timestamp")) - transactionTime;
 				boolean foundUser = false;
+				final String status = (String) e.get("status");
+
+				// SUCCESS
+				// FAIL
+				// THROTTLING
+
+				/*
+				 * if (size == null) { log.trace("event with no appropriate field '{}'; skipping", aggregationField); continue; }
+				 */
 
 				if (userList.isEmpty()) {
-					userList.add(new User(userName, timestamp));
+					userList.add(new User(userName, responseTime, status, requestTime));
 				} else {
 
 					Iterator<User> iterator = userList.iterator();
 
 					while (iterator.hasNext()) {
 						User tmp = iterator.next();
-						if (tmp.name.equals(userName)) {
+						if (tmp.name.equals(userName)) {// found user
 
-							if (!tmp.timeList.isEmpty())
-								tmp.differences.add(timestamp - tmp.timeList.get(tmp.timeList.size() - 1));
+							if ((tmp.lastStatus.equalsIgnoreCase("SUCCESS")) || (tmp.lastStatus.equalsIgnoreCase("FAIL"))) { // last
+																																// was
+																																// a
+																																// success
+																																// or
+																																// a
+																																// failure
+																																// therefore
+																																// we
+																																// calculate
+																																// thinkTime
 
-							tmp.timeList.add(timestamp);
+								if (!tmp.responseList.isEmpty()) {
+									tmp.thinkTimeList.add(requestTime - tmp.responseList.get(tmp.responseList.size() - 1));
+									tmp.responseList.add(responseTime);
+									tmp.requestList.add(requestTime);
+								} else {
+									tmp.responseList.add(responseTime);
+									tmp.requestList.add(requestTime);
+								}
+								// tmp.thinkTimeList.add(responseTime);
+								// foundUser=true;
+								// break;
+								tmp.lastStatus = new String(status);
+							}
+
+							else if (tmp.lastStatus.equalsIgnoreCase("THROTTLING")) {
+								if (!tmp.responseList.isEmpty()) {
+									tmp.reThinkTimeList.add(requestTime - tmp.responseList.get(tmp.responseList.size() - 1));
+									tmp.responseList.add(responseTime);
+									tmp.requestList.add(requestTime);
+								} else {
+									tmp.responseList.add(responseTime);
+									tmp.requestList.add(requestTime);
+								}
+								// tmp.thinkTimeList.add(responseTime);
+								// foundUser=true;
+								tmp.lastStatus = new String(status);
+
+							}
+
 							foundUser = true;
 							break;
-
 						}
 
 					}
 
-					if (!foundUser)
-						userList.add(new User(userName, timestamp));
+					if (!foundUser) {// we do not have info on the user so we do not need to calculate think times
+						userList.add(new User(userName, responseTime, status, requestTime));
+					}
+
 				}
+
 			} catch (Throwable x) {
 				x.printStackTrace();
 				log.error("continuing aggregation (think time exploded", x);
@@ -241,12 +261,18 @@ public class CTORule implements AggregationRule {
 
 		Iterator<User> userIterator = userList.iterator();
 
+		// do the sums now
 		while (userIterator.hasNext()) {
 			User tmp = userIterator.next();
-			Iterator<Long> differencesIterator = tmp.differences.iterator();
-			while (differencesIterator.hasNext()) {
-				tmp.thinkTime = tmp.thinkTime + differencesIterator.next();
-				tmp.count++;
+			Iterator<Double> thinkTimeIterator = tmp.thinkTimeList.iterator();
+			Iterator<Double> reThinkTimeIterator = tmp.reThinkTimeList.iterator();
+			while (thinkTimeIterator.hasNext()) {
+				tmp.thinkTime = tmp.thinkTime + thinkTimeIterator.next();
+				tmp.thinkTimecount++;
+			}
+			while (reThinkTimeIterator.hasNext()) {
+				tmp.reThinkTime = tmp.reThinkTime + reThinkTimeIterator.next();
+				tmp.reThinkTimecount++;
 			}
 
 		}
@@ -258,33 +284,33 @@ public class CTORule implements AggregationRule {
 	}
 
 	private void printList(List<User> userList) {
+
 		Iterator<User> userIterator = userList.iterator();
 		while (userIterator.hasNext()) {
 			User tmp = userIterator.next();
-			System.out.println("Name= " + tmp.name + " Count= " + tmp.count + " Thinktime= " + tmp.thinkTime);
-
+			System.out.println("Name= " + tmp.name + " Think Count= " + tmp.thinkTimecount + " Thinktime= " + tmp.thinkTime
+					+ " ReThink Time Count " + tmp.reThinkTimecount + " ReThinkTime= " + tmp.reThinkTime);
 		}
 
 	}
 
 	private class User {
 		String name;
-		ArrayList<Long> timeList = new ArrayList();
-		ArrayList<Long> differences = new ArrayList();
-		Long thinkTime = 0L;
-		int count = 0;
+		ArrayList<Double> responseList = new ArrayList();
+		ArrayList<Double> requestList = new ArrayList();
+		ArrayList<Double> thinkTimeList = new ArrayList();
+		ArrayList<Double> reThinkTimeList = new ArrayList();
+		double thinkTime = 0;
+		int thinkTimecount = 0;
+		int reThinkTimecount = 0;
+		double reThinkTime = 0;
+		String lastStatus = "SUCCESS";
 
-		public User(String name, long timeStamp) {
+		public User(String name, Double responseTime, String status, double requestTime) {
 			this.name = name;
-			this.timeList.add(timeStamp);
-		}
-
-		public void setTimeList(ArrayList<Long> timeList) {
-			this.timeList = timeList;
-		}
-
-		public ArrayList<Long> getTimeList() {
-			return timeList;
+			this.responseList.add(responseTime);
+			this.lastStatus = status;
+			this.requestList.add(requestTime);
 		}
 
 		public String getName() {
@@ -295,23 +321,15 @@ public class CTORule implements AggregationRule {
 			this.name = name;
 		}
 
-		public ArrayList<Long> getDifferences() {
-			return differences;
-		}
-
-		public void setDifferences(ArrayList<Long> differences) {
-			this.differences = differences;
-		}
-
 	}
 
 	public class TimestampComparator implements Comparator<Event> {
 		@Override
 		public int compare(Event e1, Event e2) {
-			Long time1 = (Long) e1.get("timestamp");
-			Long time2 = (Long) e2.get("timestamp");
+			long time1 = (Long) e1.get("timestamp");
+			long time2 = (Long) e2.get("timestamp");
 
-			return time1.compareTo(time2);
+			return time1 > time2 ? 1 : time1 < time2 ? -1 : 0;
 		}
 	}
 }
