@@ -3,7 +3,10 @@ package gr.ntua.vision.monitoring.rules;
 import gr.ntua.vision.monitoring.events.Event;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +42,7 @@ public class CTORule implements AggregationRule {
 	public AggregationResultEvent aggregate(final long aggregationStartTime, List<? extends Event> eventList) {
 		@SuppressWarnings("rawtypes")
 		final Map dict = getFinalObject(eventList, aggregationStartTime);
+		aggregateThinkTime(eventList);
 
 		return new VismoAggregationResultEvent(dict);
 	}
@@ -110,13 +114,9 @@ public class CTORule implements AggregationRule {
 
 	private HashMap<String, Object> getFinalObject(List<? extends Event> eventList, final long aggregationStartTime) {
 		final ArrayList<Map<String, Object>> tenantList = prepareTenantsList(eventList);
-
-		System.err.println("preparing tenants " + tenantList);
-
 		final ArrayList<Container> firstPass = getPerTenantPerContainerContentSize(eventList);
 		final ArrayList<Container> secondpass = sumContentSizePerContainer(firstPass);
 
-		// FIXME: more calculations here
 		for (final Map<String, Object> tenant : tenantList) {
 			@SuppressWarnings("unchecked")
 			final ArrayList<Map<String, Object>> containers = (ArrayList<Map<String, Object>>) tenant.get("containers");
@@ -186,6 +186,132 @@ public class CTORule implements AggregationRule {
 			log.trace("", x);
 
 			return null;
+		}
+	}
+
+	/* SPYROS */
+
+	private void aggregateThinkTime(List<? extends Event> eventList) {
+		// sort list
+		Collections.sort(eventList, new TimestampComparator());
+
+		// create user list
+		List<User> userList = new ArrayList<User>();
+
+		for (final Event e : eventList)
+			try {
+				// final String tenant = (String) e.get("tenant");
+				// final String name = (String) e.get("container");
+				// final Long size = getLongValue(e, aggregationField);
+				final String tenant = (String) e.get("tenant");
+				final String user = (String) e.get("user");
+				// final String userTenant = userName+"@"+tenant;
+				final String userName = user + "@" + tenant;
+				final Long timestamp = (Long) e.get("timestamp");
+				boolean foundUser = false;
+
+				if (userList.isEmpty()) {
+					userList.add(new User(userName, timestamp));
+				} else {
+
+					Iterator<User> iterator = userList.iterator();
+
+					while (iterator.hasNext()) {
+						User tmp = iterator.next();
+						if (tmp.name.equals(userName)) {
+
+							if (!tmp.timeList.isEmpty())
+								tmp.differences.add(timestamp - tmp.timeList.get(tmp.timeList.size() - 1));
+
+							tmp.timeList.add(timestamp);
+							foundUser = true;
+							break;
+
+						}
+
+					}
+
+					if (!foundUser)
+						userList.add(new User(userName, timestamp));
+				}
+			} catch (Throwable x) {
+				x.printStackTrace();
+				log.error("continuing aggregation (think time exploded", x);
+			}
+
+		Iterator<User> userIterator = userList.iterator();
+
+		while (userIterator.hasNext()) {
+			User tmp = userIterator.next();
+			Iterator<Long> differencesIterator = tmp.differences.iterator();
+			while (differencesIterator.hasNext()) {
+				tmp.thinkTime = tmp.thinkTime + differencesIterator.next();
+				tmp.count++;
+			}
+
+		}
+
+		printList(userList);
+		// final ArrayList<Map<String, Object>>
+		// final HashMap<String, Object> u = new HashMap<String, Object>();
+
+	}
+
+	private void printList(List<User> userList) {
+		Iterator<User> userIterator = userList.iterator();
+		while (userIterator.hasNext()) {
+			User tmp = userIterator.next();
+			System.out.println("Name= " + tmp.name + " Count= " + tmp.count + " Thinktime= " + tmp.thinkTime);
+
+		}
+
+	}
+
+	private class User {
+		String name;
+		ArrayList<Long> timeList = new ArrayList();
+		ArrayList<Long> differences = new ArrayList();
+		Long thinkTime = 0L;
+		int count = 0;
+
+		public User(String name, long timeStamp) {
+			this.name = name;
+			this.timeList.add(timeStamp);
+		}
+
+		public void setTimeList(ArrayList<Long> timeList) {
+			this.timeList = timeList;
+		}
+
+		public ArrayList<Long> getTimeList() {
+			return timeList;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public ArrayList<Long> getDifferences() {
+			return differences;
+		}
+
+		public void setDifferences(ArrayList<Long> differences) {
+			this.differences = differences;
+		}
+
+	}
+
+	public class TimestampComparator implements Comparator<Event> {
+		@Override
+		public int compare(Event e1, Event e2) {
+			Long time1 = (Long) e1.get("timestamp");
+			Long time2 = (Long) e2.get("timestamp");
+
+			return time1.compareTo(time2);
 		}
 	}
 }

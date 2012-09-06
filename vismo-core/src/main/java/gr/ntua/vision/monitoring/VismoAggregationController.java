@@ -6,6 +6,7 @@ import gr.ntua.vision.monitoring.rules.AggregationRule;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
@@ -22,31 +23,32 @@ public class VismoAggregationController extends TimerTask implements EventListen
 	/***/
 	private final List<? extends AggregationRule> rulesList;
 	/***/
-	private final EventDistributor stuff;
+	private final EventDistributor distributor;
 	/***/
 	private static final Logger log = LoggerFactory.getLogger(VismoAggregationController.class);
 	/***/
 	private final long aggregationPeriod;
 
-	/**
-	 * @param sock
-	 */
-	public VismoAggregationController(final EventDistributor stuff, final List<? extends AggregationRule> rulesList,
+	public VismoAggregationController(final EventDistributor distributor, final List<? extends AggregationRule> rulesList,
 			final long aggregationPeriod) {
-		this.stuff = stuff;
+		this.distributor = distributor;
 		this.rulesList = rulesList;
 		this.aggregationPeriod = aggregationPeriod;
 	}
 
 	@Override
 	public void notify(Event e) {
-		for (final AggregationRule rule : rulesList) {
+		final HashSet<Event> notMatchedEvents = new HashSet<Event>();
+
+		for (final AggregationRule rule : rulesList)
 			if (rule.matches(e)) {
 				appendToBucket(rule, e);
 			} else {
-				stuff.serialize(e);
+				notMatchedEvents.add(e);
 			}
-		}
+
+		for (final Event ev : notMatchedEvents)
+			distributor.serialize(ev);
 	}
 
 	/**
@@ -87,7 +89,7 @@ public class VismoAggregationController extends TimerTask implements EventListen
 					eventList);
 
 			log.debug("aggregation successful for {}", aggregatedResult);
-			stuff.serialize(aggregatedResult);
+			distributor.serialize(aggregatedResult);
 		}
 	}
 
