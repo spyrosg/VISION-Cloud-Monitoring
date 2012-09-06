@@ -19,6 +19,4 @@ public interface AggregationRule {
 	 * @return
 	 */
 	boolean matches(Event e);
-
-	boolean hasExpired();
 }

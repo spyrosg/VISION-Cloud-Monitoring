@@ -58,12 +58,6 @@ public class AggregationOnNumberOfRequests implements AggregationRule {
 	}
 
 	@Override
-	public boolean hasExpired() {
-		// TODO????
-		return true;
-	}
-
-	@Override
 	public String toString() {
 		return "#<" + this.getClass().getSimpleName() + "[" + operation + "] with new field '" + newField + "'>";
 	}

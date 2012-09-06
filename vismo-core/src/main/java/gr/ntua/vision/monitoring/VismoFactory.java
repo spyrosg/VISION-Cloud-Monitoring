@@ -18,7 +18,7 @@ import org.zeromq.ZContext;
  * This is used to configure and properly initialize the application graph.
  */
 public class VismoFactory {
-	private static final long EVERY_MIN = 60 * 1000;
+	private static final long EVERY_THIRTY_SECONDS = 30 * 1000;
 	/***/
 	private static final long AFTER_TEN_SECONDS = 10 * 1000;
 	/** the configuration object. */
@@ -63,16 +63,16 @@ public class VismoFactory {
 		for (final EventListener listener : listeners)
 			receiver.subscribe(listener);
 
-		registerRule(new CTORule("GET", "content-size", "containers"));
-		registerRule(new CTORule("PUT", "content-size", "containers"));
+		registerRule(new CTORule("GET"));
+		registerRule(new CTORule("PUT"));
 
 		// for (final String op : operations)
 		// registerRule(new AggregationOnNumberOfRequests(op, "count"));
 
 		final EventDistributor stuff = new EventDistributor(zmq.newBoundPubSocket(conf.getConsumersPoint()));
-		final VismoAggregationController ruleTimer = new VismoAggregationController(stuff, ruleList);
+		final VismoAggregationController ruleTimer = new VismoAggregationController(stuff, ruleList, EVERY_THIRTY_SECONDS);
 
-		timer.schedule(ruleTimer, AFTER_TEN_SECONDS, EVERY_MIN);
+		timer.schedule(ruleTimer, AFTER_TEN_SECONDS, EVERY_THIRTY_SECONDS);
 
 		receiver.subscribe(ruleTimer);
 		vismo.addTask(new UDPFactory(conf.getUDPPort()).buildServer(vismo));

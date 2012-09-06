@@ -25,25 +25,27 @@ public class VismoAggregationController extends TimerTask implements EventListen
 	private final EventDistributor stuff;
 	/***/
 	private static final Logger log = LoggerFactory.getLogger(VismoAggregationController.class);
+	/***/
+	private final long aggregationPeriod;
 
 	/**
 	 * @param sock
 	 */
-	public VismoAggregationController(final EventDistributor stuff, final List<? extends AggregationRule> rulesList) {
+	public VismoAggregationController(final EventDistributor stuff, final List<? extends AggregationRule> rulesList,
+			final long aggregationPeriod) {
 		this.stuff = stuff;
 		this.rulesList = rulesList;
+		this.aggregationPeriod = aggregationPeriod;
 	}
 
 	@Override
 	public void notify(Event e) {
 		for (final AggregationRule rule : rulesList) {
-			final String topic = e.topic();
-			
 			if (rule.matches(e)) {
-				log.trace("matching rule {} for event {}", rule, e.getClass());
 				appendToBucket(rule, e);
-			} else if (topic != null && e.topic().equals("ResourceMap"))
+			} else {
 				stuff.serialize(e);
+			}
 		}
 	}
 
@@ -70,33 +72,37 @@ public class VismoAggregationController extends TimerTask implements EventListen
 	 */
 	private void performPendingOperations() {
 		for (final AggregationRule rule : rulesList) {
-			log.trace("rule {} has expired", rule);
-
 			final List<Event> eventList = eventBuckets.remove(rule);
 
 			if (eventList == null)
 				continue;
 
-			log.trace("there are {} event(s) to aggregate", eventList.size());
+			log.debug("there are {} event(s) to aggregate for rule {}", eventList.size(), rule);
 
 			if (eventList.isEmpty())
 				continue;
 
 			// FIXME: do we need tstart, tend?
-			final AggregationResultEvent aggregatedResult = rule.aggregate(this.scheduledExecutionTime(), eventList);
+			final AggregationResultEvent aggregatedResult = rule.aggregate(this.scheduledExecutionTime() - aggregationPeriod,
+					eventList);
 
-			log.trace("aggregation successful for {}", aggregatedResult);
+			log.debug("aggregation successful for {}", aggregatedResult);
 			stuff.serialize(aggregatedResult);
 		}
 	}
 
 	@Override
 	public void run() {
+		log.trace("starting aggregation");
+
+		final long start = System.currentTimeMillis();
+
 		try {
 			performPendingOperations();
 		} catch (Throwable x) {
 			log.trace("performPendingOperations exception: ", x);
-			x.printStackTrace();
 		}
+
+		log.trace("ending aggregation in {} seconds", (System.currentTimeMillis() - start) / 1000.0);
 	}
 }

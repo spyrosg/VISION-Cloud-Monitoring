@@ -18,168 +18,29 @@ public class CTORule implements AggregationRule {
 	/***/
 	private static final String DICT = "!dict";
 	/***/
-	private final String aggregationField;
-	/***/
-	private final String newField;
-	/***/
 	private final String operation;
 	/***/
 	private static final Logger log = LoggerFactory.getLogger(CTORule.class);
 	/***/
 	private static final String SPECIAL_FIELD = "transaction-duration";
 	/***/
-	private static final long MIN = 60 * 1000;
-
-	public class ContainerRep {
-		/***/
-		public final String tenant;
-		/***/
-		public final String name;
-
-		public ContainerRep(String tenant, String name) {
-			this.tenant = tenant;
-			this.name = name;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result + ((name == null) ? 0 : name.hashCode());
-			result = prime * result + ((tenant == null) ? 0 : tenant.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			ContainerRep other = (ContainerRep) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
-			if (name == null) {
-				if (other.name != null)
-					return false;
-			} else if (!name.equals(other.name))
-				return false;
-			if (tenant == null) {
-				if (other.tenant != null)
-					return false;
-			} else if (!tenant.equals(other.tenant))
-				return false;
-			return true;
-		}
-
-		private CTORule getOuterType() {
-			return CTORule.this;
-		}
-	}
+	private static final String AGGREGATION_FIELD = "content-size";
 
 	/**
 	 * @param aggregationField
 	 * @param resultField
 	 */
-	public CTORule(final String operation, String aggregationField, final String resultField) {
+	public CTORule(final String operation) {
 		this.operation = operation;
-		this.aggregationField = aggregationField;
-		this.newField = resultField;
-	}
-
-	/**
-	 * @param eventList
-	 */
-	private void aggregateContainerSize(final Map<ContainerRep, Long> containersSize, List<? extends Event> eventList) {
-		for (final Event e : eventList)
-			try {
-				final String tenant = (String) e.get("tenant");
-				final String name = (String) e.get("container");
-				final Long size = getLongValue(e, aggregationField);
-				final ContainerRep c = new ContainerRep(tenant, name);
-
-				if (size == null) {
-					log.trace("event with no appropriate field '{}'; skipping", aggregationField);
-					continue;
-				}
-
-				if (containersSize.containsKey(c)) {
-					final long oldSize = containersSize.get(c);
-
-					containersSize.put(c, oldSize + size);
-				} else {
-					containersSize.put(c, size);
-				}
-			} catch (Throwable x) {
-				x.printStackTrace();
-				log.error("continuing aggregation", x);
-			}
-	}
-
-	private static Long getLongValue(final Event e, final String field) {
-		final Object val = e.get(field);
-
-		if (val == null)
-			return null;
-
-		if (val instanceof String)
-			return Long.valueOf((String) val);
-
-		try {
-			return (Long) val;
-		} catch (ClassCastException x) {
-			log.trace("expecting field '{}' of type {} ...", field, Long.class);
-			log.trace("but got value {} of type {}", val, val.getClass());
-			log.trace("", x);
-
-			return null;
-		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public AggregationResultEvent aggregate(final long aggregationStartTime, List<? extends Event> eventList) {
-		final Map<ContainerRep, Long> containersSize = new HashMap<ContainerRep, Long>();
-
-		aggregateContainerSize(containersSize, eventList);
-
 		@SuppressWarnings("rawtypes")
-		final Map dict = appendNewFields(eventList, aggregationStartTime, containersSize);
+		final Map dict = getFinalObject(eventList, aggregationStartTime);
 
 		return new VismoAggregationResultEvent(dict);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private Map appendNewFields(List<? extends Event> eventList, final long aggregationStartTime,
-			final Map<ContainerRep, Long> containersSize) {
-		final Event lastEvent = eventList.get(eventList.size() - 1);
-		final Map dict = (Map) lastEvent.get(DICT);
-
-		// FIXME: these should be gotten off the timer
-		dict.put("tStart", aggregationStartTime - MIN); // FIXME: bind this to the timer
-		dict.put("tEnd", aggregationStartTime);
-		dict.put(newField, getContainersList(containersSize));
-		dict.put("topic", TOPIC);
-
-		return dict;
-	}
-
-	private List<Object> getContainersList(final Map<ContainerRep, Long> containersSize) {
-		final List<Object> containers = new ArrayList<Object>();
-
-		for (final ContainerRep c : containersSize.keySet()) {
-			final Map<String, Object> o = new HashMap<String, Object>();
-
-			o.put("tenant", c.tenant);
-			o.put("container", c.name);
-			o.put("size", containersSize.get(c));
-			containers.add(o);
-		}
-
-		return containers;
 	}
 
 	@Override
@@ -191,14 +52,140 @@ public class CTORule implements AggregationRule {
 	}
 
 	@Override
-	public boolean hasExpired() {
-		// TODO????
-		return true;
+	public String toString() {
+		return "#<" + this.getClass().getSimpleName() + "[" + operation + "]>";
 	}
 
-	@Override
-	public String toString() {
-		return "#<" + this.getClass().getSimpleName() + "[" + operation + "] on field: " + aggregationField
-				+ ", with new field '" + newField + "'>";
+	/**
+	 * First pass. Put all the different access sizes on a list.
+	 * 
+	 * @param eventList
+	 * @return
+	 */
+	private ArrayList<Container> getPerTenantPerContainerContentSize(List<? extends Event> eventList) {
+		final ArrayList<Container> containersList = new ArrayList<Container>();
+
+		for (final Event e : eventList) {
+			try {
+				final Long size = getFieldValueAsLong(e, AGGREGATION_FIELD);
+
+				// no content-size field provided
+				if (size == null)
+					continue;
+
+				final String tenantName = (String) e.get("tenant");
+				final String containerName = (String) e.get("container");
+
+				containersList.add(new Container(tenantName, containerName, size));
+			} catch (final Throwable x) {
+				x.printStackTrace();
+				log.error("continuing aggregation", x);
+			}
+		}
+
+		return containersList;
+	}
+
+	/**
+	 * Second pass. Aggregate all container sizes per tenant. This removes duplicate containers, unifying them in just one, with
+	 * size, the total size of all containers with the same name and tenant.
+	 * 
+	 * @param containers
+	 * @return
+	 */
+	private ArrayList<Container> sumContentSizePerContainer(List<Container> containers) {
+		final HashMap<Container, Long> aggregatedContentSize = new HashMap<Container, Long>();
+
+		for (final Container c : containers) {
+			final Long oldSize = aggregatedContentSize.remove(c);
+
+			if (oldSize == null) // first time we see this container
+				aggregatedContentSize.put(c, c.size);
+			else
+				aggregatedContentSize.put(c, oldSize + c.size);
+		}
+
+		return new ArrayList<Container>(aggregatedContentSize.keySet());
+	}
+
+	private HashMap<String, Object> getFinalObject(List<? extends Event> eventList, final long aggregationStartTime) {
+		final ArrayList<Map<String, Object>> tenantList = prepareTenantsList(eventList);
+
+		System.err.println("preparing tenants " + tenantList);
+
+		final ArrayList<Container> firstPass = getPerTenantPerContainerContentSize(eventList);
+		final ArrayList<Container> secondpass = sumContentSizePerContainer(firstPass);
+
+		// FIXME: more calculations here
+		for (final Map<String, Object> tenant : tenantList) {
+			@SuppressWarnings("unchecked")
+			final ArrayList<Map<String, Object>> containers = (ArrayList<Map<String, Object>>) tenant.get("containers");
+
+			for (final Container c : secondpass) {
+				final HashMap<String, Object> container = new HashMap<String, Object>();
+
+				container.put("name", c.name);
+				container.put("size-sum", c.size);
+
+				containers.add(container);
+			}
+
+			final HashMap<String, Object> t = new HashMap<String, Object>();
+
+			t.put("name", tenant.get("name"));
+			t.put("containers", containers);
+		}
+
+		@SuppressWarnings("unchecked")
+		final HashMap<String, Object> dict = (HashMap<String, Object>) getBaseEvent(eventList).get(DICT);
+
+		dict.put("tenants", tenantList);
+		dict.put("topic", TOPIC);
+		dict.put("tStart", aggregationStartTime);
+		dict.put("tEnd", System.currentTimeMillis());
+
+		return dict;
+	}
+
+	private ArrayList<Map<String, Object>> prepareTenantsList(final List<? extends Event> eventList) {
+		final ArrayList<Map<String, Object>> tenantList = new ArrayList<Map<String, Object>>();
+
+		for (final Event e : eventList) {
+			final HashMap<String, Object> o = new HashMap<String, Object>();
+
+			o.put("name", e.get("tenant"));
+			o.put("containers", new ArrayList<Map<String, Object>>());
+			tenantList.add(o);
+		}
+
+		return tenantList;
+	}
+
+	private static Event getBaseEvent(List<? extends Event> eventList) {
+		return eventList.get(0);
+	}
+
+	private static Long getFieldValueAsLong(final Event e, final String field) {
+		final Object val = e.get(field);
+
+		if (val == null) {
+			log.trace("event missing required field '{}'; skipping", AGGREGATION_FIELD);
+			log.trace("event: {}", e);
+
+			return null;
+		}
+
+		if (val instanceof String)
+			return Long.valueOf((String) val);
+
+		try {
+			return (Long) val;
+		} catch (final ClassCastException x) {
+			log.trace("expecting field '{}' of type {} ...", field, Long.class);
+			log.trace("but got value {} of type {}", val, val.getClass());
+			log.trace("", x);
+
+			return null;
+		}
 	}
 }
