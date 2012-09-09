@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.zeromq.ZContext;
 
 import examples.FakeEventConsumer;
+import gr.ntua.vision.monitoring.Vismo;
 import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.notify.EventRegistry;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
@@ -26,6 +27,13 @@ import gr.ntua.vision.monitoring.zmq.ZMQSockets;
  * </ol>
  */
 public class VismoOneNodeEndToEndTest {
+    /** the object service producer instance */
+    private FakeObjectService        obs;
+    /** the vismo instance. */
+    private Vismo                    vismo;
+    /** the event consumer instance. */
+    private FakeEventConsumer        consumer;
+
     /** the maximum number of events to sent for the test. */
     private static final int         NO_EVENTS_TO_SENT    = 10;
     /***/
@@ -40,8 +48,6 @@ public class VismoOneNodeEndToEndTest {
     /***/
     private final VismoConfiguration conf                 = new VismoConfiguration(props);
     /***/
-    private VismoDriver              driver;
-    /***/
     private final EventCountHandler  eventConsumerCounter = new EventCountHandler(NO_EVENTS_TO_SENT);
     /***/
     private FakeEventProducer        eventProducer;
@@ -54,12 +60,8 @@ public class VismoOneNodeEndToEndTest {
      */
     @Test
     public void monitoringReceivesEventsFromEventProducer() throws Exception {
-        driver.start();
-        driver.reportsMonitoringStatus(conf.getUDPPort());
         eventProducer.sendEvents();
         waitForAllEventsToBeReceived();
-        driver.reportsMonitoringStatus(conf.getUDPPort());
-        driver.shutdown();
     }
 
 
@@ -73,9 +75,6 @@ public class VismoOneNodeEndToEndTest {
         setupRegistry();
         setupConsumer();
         setupProducer(zmq);
-
-        driver = new VismoDriver(conf);
-        driver.setup();
     }
 
 
