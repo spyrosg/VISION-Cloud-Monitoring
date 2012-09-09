@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
  * notified.
  */
 public class LocalEventsCollector extends StoppableTask {
+    /***/
+    private final EventFactory        factory;
     /** the listeners lists. */
     private final List<EventListener> listeners    = new ArrayList<EventListener>();
     /** the log target. */
@@ -27,8 +29,6 @@ public class LocalEventsCollector extends StoppableTask {
     private final VismoSocket         sendMessagesSock;
     /** the message used to stop the task. */
     private final String              STOP_MESSAGE = "stop!";
-    /***/
-    private final EventFactory factory;
 
 
     /**
@@ -38,6 +38,8 @@ public class LocalEventsCollector extends StoppableTask {
      *            the socket used to receive events.
      * @param sendMessagesSock
      *            the socket used to send messages.
+     * @param factory
+     *            the event factory.
      */
     LocalEventsCollector(final VismoSocket receiveEventsSock, final VismoSocket sendMessagesSock, final EventFactory factory) {
         super("event-receiver");
@@ -68,7 +70,7 @@ public class LocalEventsCollector extends StoppableTask {
                 break;
 
             final Event e = factory.createEvent(message);
-            
+
             notifyAllOf(e);
         }
 
@@ -101,8 +103,8 @@ public class LocalEventsCollector extends StoppableTask {
     /**
      * Notify any listeners of the incoming message.
      * 
-     * @param message
-     *            the message.
+     * @param e
+     *            the event received.
      */
     private void notifyAllOf(final Event e) {
         for (final EventListener listener : listeners)
