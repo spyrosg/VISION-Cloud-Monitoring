@@ -3,12 +3,7 @@
 
 from __future__ import print_function
 
-import sys
-# this is used to bypass the broken zmq installation
-# in test-1 (10.0.1.101).
-sys.path.append('/usr/lib64/python2.6/site-packages')
-
-import socket, struct, fcntl
+import socket, struct, fcntl, sys
 from os import getpid
 from time import time
 from pyjavaproperties import Properties
@@ -108,7 +103,7 @@ class EventDispatcher(object):
         if is_effectively_zero(time_diff):
             return 0.0
 
-        return val / time_diff
+        return float(val) / float(time_diff)
 
 
 class VismoEventDispatcher(EventDispatcher):
@@ -139,7 +134,7 @@ class VismoEventDispatcher(EventDispatcher):
         p.load(open(CONFIGURATION_PROPERTIES))
         self.producers_point = p['producers.point']
         # FIXME: auto acquire the name according to the machine's ip
-        self.cluster_name = p['cluster1Name']
+        self.cluster_name = 'test'
         self.iface = 'eth0'
         self.ip = get_public_ip(self.iface)
 
@@ -169,12 +164,26 @@ class VismoEventDispatcher(EventDispatcher):
             For consistency reasons, use dashes and full nouns.
         """
 
+        def object_service_topic_to_http_op(topic):
+            if topic == 'reads':
+                return 'GET'
+            elif topic == 'writes':
+                return 'PUT'
+            elif topic == 'deletes':
+                return 'DELETE'
+            else:
+                log('got unknown topic: {0}'.format(topic))
+                return topic
+
         if 'content_size' in event:
             event['content-size'] = event['content_size']
             del event['content_size']
         if 'obj' in event:
             event['object'] = event['obj']
             del event['obj']
+        if 'topic' in event:
+            event['operation'] = object_service_topic_to_http_op(event['topic'])
+            del event['topic']
 
 
     def add_basic_fields(self, event):
@@ -327,7 +336,6 @@ if __name__ == '__main__':
 
     class EventDispatcherTest(MyTestCase):
         def setUp(self):
-            self.topic = 'off-course'
             self.content_size = 1000 # in bytes
             self.obj = 'ofdesire'
             self.success_status = 'SUCCESS'
@@ -343,16 +351,18 @@ if __name__ == '__main__':
 
         def send_event(self, **args):
             args['timestamp'] = int(1000 * time())
+            args['content-size'] = args['content_size']
+            del args['content_size']
             self.dispatcher.send(**args)
 
         def send_start_request(self):
-            self.send_event(tag='start-request', topic=self.topic, content_size=self.content_size, obj=self.obj, status=self.success_status)
+            self.send_event(tag='start-request', content_size=self.content_size, obj=self.obj, status=self.success_status)
 
         def send_start_response(self):
-            self.send_event(tag='start-response', topic=self.topic, content_size=self.content_size, obj=self.obj, status=self.success_status)
+            self.send_event(tag='start-response', content_size=self.content_size, obj=self.obj, status=self.success_status)
 
         def send_end_response(self):
-            self.send_event(tag='end-response', topic=self.topic, content_size=self.content_size, obj=self.obj, status=self.success_status)
+            self.send_event(tag='end-response', content_size=self.content_size, obj=self.obj, status=self.success_status)
 
         def perform_full_request_response_event_generation(self):
             self.send_start_request()
@@ -363,8 +373,8 @@ if __name__ == '__main__':
 
 
         def test_that_event_was_sent(self):
-            self.send_event(topic=self.topic, tag='start-request', content_size=1000, obj='ofdesire', status=1)
-            self.assertEquals(self.topic, self.sent_events[0]['topic'])
+            self.send_event(tag='start-request', content_size=1000, obj='ofdesire', status=1)
+            self.assertEquals(self.content_size, self.sent_events[0]['content-size'])
 
 
         def test_event_latency(self):
@@ -378,7 +388,7 @@ if __name__ == '__main__':
         def test_event_throughput(self):
             self.perform_full_request_response_event_generation()
 
-            throughput = self.dispatcher.calculate_mean_value_per_time_unit(self.sent_events[0]['content_size'], self.time_till_start_of_response + self.time_till_end_of_response)
+            throughput = self.dispatcher.calculate_mean_value_per_time_unit(self.sent_events[0]['content-size'], self.time_till_start_of_response + self.time_till_end_of_response)
             self.assertAlmostEqual(self.content_size / (self.time_till_start_of_response + self.time_till_end_of_response), throughput, delta=self.delta)
 
 
@@ -393,9 +403,9 @@ if __name__ == '__main__':
     unittest.main()
 
     mon = VismoEventDispatcher('foo')
-    mon.send(topic='off-course', tag='start-request', obj='ofdesire', status=1)
+    mon.send(tag='start-request', obj='ofdesire', status=1, operation='GET')
     sleep(1)
-    mon.send(topic='off-course', tag='start-response', obj='ofdesire', status=2)
+    mon.send(tag='start-response', obj='ofdesire', status=2, operation='GET')
     sleep(1)
-    mon.send(topic='off-course', tag='end-response', content_size=1000, obj='ofdesire', status=3)
+    mon.send(tag='end-response', content_size=1000, obj='ofdesire', status=3, operation='GET')
 
