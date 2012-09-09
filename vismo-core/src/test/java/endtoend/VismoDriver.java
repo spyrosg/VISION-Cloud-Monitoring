@@ -16,7 +16,7 @@ import java.net.SocketTimeoutException;
 /**
  * This object is used to drive/direct the execution of the top level monitoring objects.
  */
-public class MonitoringDriver {
+public class VismoDriver {
     /***/
     private final VismoConfiguration   conf;
     /***/
@@ -30,7 +30,7 @@ public class MonitoringDriver {
      * 
      * @param conf
      */
-    public MonitoringDriver(final VismoConfiguration conf) {
+    public VismoDriver(final VismoConfiguration conf) {
         this.conf = conf;
     }
 

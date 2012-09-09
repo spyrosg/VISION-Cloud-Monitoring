@@ -31,7 +31,7 @@ public class VismoEndToEndTest {
     /***/
     private final VismoConfiguration conf                 = new VismoConfiguration(props);
     /***/
-    private MonitoringDriver         driver;
+    private VismoDriver              driver;
     /***/
     private final EventCountHandler  eventConsumerCounter = new EventCountHandler(NO_EVENTS_TO_SENT);
     /***/
@@ -65,7 +65,7 @@ public class VismoEndToEndTest {
         setupConsumer();
         setupProducer(zmq);
 
-        driver = new MonitoringDriver(conf);
+        driver = new VismoDriver(conf);
         driver.setup();
     }
 
