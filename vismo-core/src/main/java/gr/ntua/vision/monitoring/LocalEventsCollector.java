@@ -102,8 +102,8 @@ public class LocalEventsCollector extends StoppableTask {
     /**
      * Notify any listeners of the incoming message.
      * 
-     * @param message
-     *            the message.
+     * @param e
+     *            the event received.
      */
     private void notifyAllOf(final Event e) {
         for (final EventListener listener : listeners)

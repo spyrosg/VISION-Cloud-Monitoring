@@ -30,6 +30,13 @@ public class VismoAggregationController extends TimerTask implements EventListen
     private final List< ? extends AggregationRule>  rulesList;
 
 
+    /**
+     * Constructor.
+     * 
+     * @param distributor
+     * @param rulesList
+     * @param aggregationPeriod
+     */
     public VismoAggregationController(final EventDistributor distributor, final List< ? extends AggregationRule> rulesList,
             final long aggregationPeriod) {
         this.distributor = distributor;
@@ -38,6 +45,9 @@ public class VismoAggregationController extends TimerTask implements EventListen
     }
 
 
+    /**
+     * @see gr.ntua.vision.monitoring.EventListener#notify(gr.ntua.vision.monitoring.events.Event)
+     */
     @Override
     public void notify(final Event e) {
         for (final AggregationRule rule : rulesList)
@@ -48,6 +58,9 @@ public class VismoAggregationController extends TimerTask implements EventListen
     }
 
 
+    /**
+     * @see java.util.TimerTask#run()
+     */
     @Override
     public void run() {
         log.trace("starting aggregation");

@@ -61,6 +61,9 @@ public class VismoAggregationResultEvent implements AggregationResultEvent {
     }
 
 
+    /**
+     * @see gr.ntua.vision.monitoring.rules.AggregationResultEvent#tEnd()
+     */
     @Override
     public long tEnd() {
         return (Long) get1("tEnd");
@@ -85,29 +88,45 @@ public class VismoAggregationResultEvent implements AggregationResultEvent {
     }
 
 
+    /**
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return "#<VismoAggregationResultEvent: for period[" + toDate(tStart()) + ", " + toDate(tEnd()) + "]>";
     }
 
 
+    /**
+     * @see gr.ntua.vision.monitoring.rules.AggregationResultEvent#tStart()
+     */
     @Override
     public long tStart() {
         return (Long) get1("tStart");
     }
 
 
-    private void addBasicFields(final Map<String, Object> dict) {
+    /**
+     * @param dict
+     */
+    private static void addBasicFields(final Map<String, Object> dict) {
         dict.put("timestamp", dict.get("tStart"));
         dict.put("id", UUID.randomUUID().toString());
     }
 
 
+    /**
+     * @param key
+     * @return
+     */
     private Object get1(final String key) {
         return dict.get(key);
     }
 
 
+    /**
+     * @param dict
+     */
     private static void removeUnessecaryFields(@SuppressWarnings("rawtypes") final Map dict) {
         dict.remove("transaction-throughput");
         dict.remove("content-size");
@@ -120,6 +139,10 @@ public class VismoAggregationResultEvent implements AggregationResultEvent {
     }
 
 
+    /**
+     * @param t
+     * @return
+     */
     private static String toDate(final long t) {
         return new Date(t).toString();
     }
