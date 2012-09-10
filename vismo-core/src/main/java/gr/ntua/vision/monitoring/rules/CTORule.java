@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,16 +42,16 @@ public class CTORule implements AggregationRule {
      * 
      */
     private class User {
-        String                          lastStatus       = "SUCCESS";
-        String                          name;
-        private final ArrayList<Double> requestList      = new ArrayList<Double>();
-        private final ArrayList<Double> responseList     = new ArrayList<Double>();
-        double                          reThinkTime      = 0;
-        int                             reThinkTimecount = 0;
-        private final ArrayList<Double> reThinkTimeList  = new ArrayList<Double>();
-        double                          thinkTime        = 0;
-        int                             thinkTimecount   = 0;
-        private final ArrayList<Double> thinkTimeList    = new ArrayList<Double>();
+        String                  lastStatus       = "SUCCESS";
+        String                  name;
+        final ArrayList<Double> requestList      = new ArrayList<Double>();
+        final ArrayList<Double> responseList     = new ArrayList<Double>();
+        double                  reThinkTime      = 0;
+        int                     reThinkTimecount = 0;
+        final ArrayList<Double> reThinkTimeList  = new ArrayList<Double>();
+        double                  thinkTime        = 0;
+        int                     thinkTimecount   = 0;
+        final ArrayList<Double> thinkTimeList    = new ArrayList<Double>();
 
 
         /**
@@ -67,16 +68,41 @@ public class CTORule implements AggregationRule {
             this.lastStatus = status;
             this.requestList.add(requestTime);
         }
+
+
+        /**
+         * @see java.lang.Object#toString()
+         */
+        @Override
+        public String toString() {
+            return toJSONString();
+        }
+
+
+        /**
+         * @return
+         */
+        @SuppressWarnings("unchecked")
+        public String toJSONString() {
+            final JSONObject o = new JSONObject();
+
+            o.put("name", name);
+            o.put("sum-think-time", this.thinkTime);
+            o.put("count-think-time", this.thinkTimecount);
+            o.put("sum-rethink-time", this.reThinkTime);
+            o.put("count-rethink-time", this.reThinkTimecount);
+
+            return o.toString();
+        }
     }
 
     /***/
     private static final String AGGREGATION_FIELD = "content-size";
     /***/
-    private static final String DICT              = "!dict";
-    /***/
     private static final Logger log               = LoggerFactory.getLogger(CTORule.class);
     /***/
     private static final String SPECIAL_FIELD     = "transaction-duration";
+    /***/
     private static final String TOPIC             = "CTO";
     /***/
     private final String        operation;
@@ -99,8 +125,7 @@ public class CTORule implements AggregationRule {
     @Override
     public AggregationResultEvent aggregate(final long aggregationStartTime, final List< ? extends Event> eventList) {
         @SuppressWarnings("rawtypes")
-        final Map dict = getFinalObject(eventList, aggregationStartTime);
-        aggregateThinkTime(eventList);
+        final Map dict = getCTOEvent(eventList, aggregationStartTime);
 
         return new VismoAggregationResultEvent(dict);
     }
@@ -129,13 +154,14 @@ public class CTORule implements AggregationRule {
 
     /**
      * @param eventList
+     * @return
      */
-    private void aggregateThinkTime(final List< ? extends Event> eventList) {
+    private ArrayList<User> aggregateThinkTime(final List< ? extends Event> eventList) {
         // sort list
         Collections.sort(eventList, new TimestampComparator());
 
         // create user list
-        final List<User> userList = new ArrayList<User>();
+        final ArrayList<User> userList = new ArrayList<User>();
 
         for (final Event e : eventList)
             try {
@@ -247,10 +273,7 @@ public class CTORule implements AggregationRule {
 
         }
 
-        printList(userList);
-        // final ArrayList<Map<String, Object>>
-        // final HashMap<String, Object> u = new HashMap<String, Object>();
-
+        return userList;
     }
 
 
@@ -258,17 +281,17 @@ public class CTORule implements AggregationRule {
      * @param eventList
      * @return
      */
-    private static HashSet<Container> getContentSizePerContainer(final List< ? extends Event> eventList) {
-        final HashSet<Container> containers = new HashSet<Container>();
+    private static HashSet<CTOContainerObject> getContentSizePerContainer(final List< ? extends Event> eventList) {
+        final HashSet<CTOContainerObject> containers = new HashSet<CTOContainerObject>();
 
         for (final Event e : eventList) {
             final String tenant = (String) e.get("tenant");
             final String containerName = (String) e.get("container");
             final long size = getFieldValueAsLong(e, "content-size");
-            final Container c = new Container(tenant, containerName, size);
+            final CTOContainerObject c = new CTOContainerObject(tenant, containerName, size);
 
             if (containers.contains(c))
-                for (final Container cc : containers) {
+                for (final CTOContainerObject cc : containers) {
                     if (cc.name.equals(containerName) && cc.tenant.equals(tenant)) {
                         cc.addObjectSize(size);
                         cc.incAccesses();
@@ -292,14 +315,12 @@ public class CTORule implements AggregationRule {
 
         if (val == null) {
             log.warn("missing required field '{}' or is null; returning 0", AGGREGATION_FIELD);
-            log.warn("event: {}", e);
 
             return 0l;
         }
 
         if (val instanceof String) {
             log.warn("required field '{}' should be {}; try to parse it", AGGREGATION_FIELD, Long.class);
-            log.warn("event: {}", e);
 
             return Long.valueOf((String) val);
         }
@@ -309,7 +330,7 @@ public class CTORule implements AggregationRule {
         } catch (final ClassCastException x) {
             log.trace("expecting field '{}' of type {} ...", field, Long.class);
             log.trace("but got value {} of type {}", val, val.getClass());
-            log.trace("", x);
+            log.trace("exception: ", x);
 
             return null;
         }
@@ -321,47 +342,27 @@ public class CTORule implements AggregationRule {
      * @param aggregationStartTime
      * @return
      */
-    private static HashMap<String, Object> getFinalObject(final List< ? extends Event> eventList, final long aggregationStartTime) {
-        final HashSet<Container> containers = getContentSizePerContainer(eventList);
-        final HashMap<String, HashMap<String, Object>> tenants = new HashMap<String, HashMap<String, Object>>();
+    private HashMap<String, Object> getCTOEvent(final List< ? extends Event> eventList, final long aggregationStartTime) {
+        final HashSet<CTOContainerObject> containers = getContentSizePerContainer(eventList);
+        final ArrayList<CTOTenantObject> tenantsList = new ArrayList<CTOTenantObject>();
 
-        for (final Container c : containers) {
-            final HashMap<String, Object> tenant = tenants.get(c.tenant);
+        for (final String tenant : getTenantList(eventList)) {
+            final CTOTenantObject ctot = new CTOTenantObject(tenant);
 
-            if (tenant == null) {
-                final HashMap<String, Object> newTenant = new HashMap<String, Object>();
-                final ArrayList<Map<String, Object>> containerList = new ArrayList<Map<String, Object>>();
-                final HashMap<String, Object> container = new HashMap<String, Object>();
-
-                container.put("name", c.name);
-                container.put("size-sum", c.getSize());
-                container.put("size-count", c.getAccessess());
-
-                containerList.add(container);
-
-                newTenant.put("name", c.tenant);
-                newTenant.put("containers", containerList);
-
-                tenants.put(c.tenant, newTenant);
-            } else {
-                @SuppressWarnings("unchecked")
-                final ArrayList<Map<String, Object>> containerList = (ArrayList<Map<String, Object>>) tenant.get("containers");
-
-                final HashMap<String, Object> container = new HashMap<String, Object>();
-
-                container.put("name", c.name);
-                container.put("size-sum", c.getSize());
-                container.put("size-count", c.getAccessess());
-
-                containerList.add(container);
+            for (final CTOContainerObject cont : containers) {
+                if (cont.tenant.equals(tenant))
+                    ctot.addContainer(cont);
             }
+
+            tenantsList.add(ctot);
         }
 
-        System.err.println("containers: " + containers);
+        final ArrayList<User> userList = aggregateThinkTime(eventList);
 
         final HashMap<String, Object> dict = new HashMap<String, Object>();
 
-        dict.put("tenants", tenants);
+        dict.put("tenants", tenantsList);
+        dict.put("users", userList);
         dict.put("topic", TOPIC);
         dict.put("tStart", aggregationStartTime);
         dict.put("tEnd", System.currentTimeMillis());
@@ -371,14 +372,18 @@ public class CTORule implements AggregationRule {
 
 
     /**
-     * @param userList
+     * @param eventList
+     * @return
      */
-    private static void printList(final List<User> userList) {
-        final Iterator<User> userIterator = userList.iterator();
-        while (userIterator.hasNext()) {
-            final User tmp = userIterator.next();
-            System.out.println("Name= " + tmp.name + " Think Count= " + tmp.thinkTimecount + " Thinktime= " + tmp.thinkTime
-                    + " ReThink Time Count " + tmp.reThinkTimecount + " ReThinkTime= " + tmp.reThinkTime);
+    private static ArrayList<String> getTenantList(final List< ? extends Event> eventList) {
+        final HashSet<String> set = new HashSet<String>();
+
+        for (final Event e : eventList) {
+            final String tenant = (String) e.get("tenant");
+
+            set.add(tenant);
         }
+
+        return new ArrayList<String>(set);
     }
 }

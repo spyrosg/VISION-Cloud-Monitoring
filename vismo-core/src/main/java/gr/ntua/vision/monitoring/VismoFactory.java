@@ -80,6 +80,9 @@ public class VismoFactory {
     }
 
 
+    /**
+     * @param rule
+     */
     private void registerRule(final AggregationRule rule) {
         log.trace("registering rule: {}", rule);
         ruleList.add(rule);
