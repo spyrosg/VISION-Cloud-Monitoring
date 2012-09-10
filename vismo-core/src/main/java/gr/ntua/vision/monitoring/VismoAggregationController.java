@@ -63,7 +63,9 @@ public class VismoAggregationController extends TimerTask implements EventListen
      */
     @Override
     public void run() {
-        log.trace("starting aggregation");
+        final long periodInSeconds = this.aggregationPeriod / 1000;
+
+        log.trace("timer of {} seconds expired, starting aggregation", periodInSeconds);
 
         final long start = System.currentTimeMillis();
 
@@ -73,7 +75,8 @@ public class VismoAggregationController extends TimerTask implements EventListen
             log.trace("performPendingOperations exception: ", x);
         }
 
-        log.trace("ending aggregation in {} seconds", (System.currentTimeMillis() - start) / 1000.0);
+        log.trace("aggregation end for {} seconds timer, in {} seconds", periodInSeconds,
+                  (System.currentTimeMillis() - start) / 1000.0);
     }
 
 
