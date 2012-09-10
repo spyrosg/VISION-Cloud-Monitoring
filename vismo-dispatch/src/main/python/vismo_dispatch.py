@@ -176,8 +176,15 @@ class VismoEventDispatcher(EventDispatcher):
                 return topic
 
         if 'content_size' in event:
-            event['content-size'] = event['content_size']
+            content_size = event['content_size']
             del event['content_size']
+
+            if content_size is None:
+                content_size = 0
+            if isinstance(content_size, basestring):
+                content_size = long(content_size)
+
+            event['content-size'] = content_size
         if 'obj' in event:
             event['object'] = event['obj']
             del event['obj']
