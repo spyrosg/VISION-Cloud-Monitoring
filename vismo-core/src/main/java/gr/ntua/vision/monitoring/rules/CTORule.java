@@ -15,11 +15,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-// TODO: sum of content-size and # of accesses per tenant and container
-// TODO: sum and # of think-times per tenant and container
-// TODO: sum and # of rethink-times per tenant and container
+/**
+ * TODO: sum of content-size and # of accesses per tenant and container TODO: sum and # of think-times per tenant and container
+ * TODO: sum and # of rethink-times per tenant and container
+ */
 public class CTORule implements AggregationRule {
+    /**
+     * 
+     */
     public class TimestampComparator implements Comparator<Event> {
+        /**
+         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+         */
         @Override
         public int compare(final Event e1, final Event e2) {
             final long time1 = (Long) e1.get("timestamp");
@@ -30,37 +37,38 @@ public class CTORule implements AggregationRule {
     }
 
 
+    /**
+     * 
+     */
     private class User {
-        String            lastStatus       = "SUCCESS";
-        String            name;
-        ArrayList<Double> requestList      = new ArrayList();
-        ArrayList<Double> responseList     = new ArrayList();
-        double            reThinkTime      = 0;
-        int               reThinkTimecount = 0;
-        ArrayList<Double> reThinkTimeList  = new ArrayList();
-        double            thinkTime        = 0;
-        int               thinkTimecount   = 0;
-        ArrayList<Double> thinkTimeList    = new ArrayList();
+        String                          lastStatus       = "SUCCESS";
+        String                          name;
+        private final ArrayList<Double> requestList      = new ArrayList<Double>();
+        private final ArrayList<Double> responseList     = new ArrayList<Double>();
+        double                          reThinkTime      = 0;
+        int                             reThinkTimecount = 0;
+        private final ArrayList<Double> reThinkTimeList  = new ArrayList<Double>();
+        double                          thinkTime        = 0;
+        int                             thinkTimecount   = 0;
+        private final ArrayList<Double> thinkTimeList    = new ArrayList<Double>();
 
 
+        /**
+         * Constructor.
+         * 
+         * @param name
+         * @param responseTime
+         * @param status
+         * @param requestTime
+         */
         public User(final String name, final Double responseTime, final String status, final double requestTime) {
             this.name = name;
             this.responseList.add(responseTime);
             this.lastStatus = status;
             this.requestList.add(requestTime);
         }
-
-
-        public String getName() {
-            return name;
-        }
-
-
-        public void setName(final String name) {
-            this.name = name;
-        }
-
     }
+
     /***/
     private static final String AGGREGATION_FIELD = "content-size";
     /***/
@@ -69,22 +77,24 @@ public class CTORule implements AggregationRule {
     private static final Logger log               = LoggerFactory.getLogger(CTORule.class);
     /***/
     private static final String SPECIAL_FIELD     = "transaction-duration";
-
     private static final String TOPIC             = "CTO";
-
     /***/
     private final String        operation;
 
 
     /**
-     * @param aggregationField
-     * @param resultField
+     * Constructor.
+     * 
+     * @param operation
      */
     public CTORule(final String operation) {
         this.operation = operation;
     }
 
 
+    /**
+     * @see gr.ntua.vision.monitoring.rules.AggregationRule#aggregate(long, java.util.List)
+     */
     @SuppressWarnings("unchecked")
     @Override
     public AggregationResultEvent aggregate(final long aggregationStartTime, final List< ? extends Event> eventList) {
@@ -96,6 +106,9 @@ public class CTORule implements AggregationRule {
     }
 
 
+    /**
+     * @see gr.ntua.vision.monitoring.rules.AggregationRule#matches(gr.ntua.vision.monitoring.events.Event)
+     */
     @Override
     public boolean matches(final Event e) {
         final String op = (String) e.get("operation");
@@ -105,14 +118,19 @@ public class CTORule implements AggregationRule {
     }
 
 
+    /**
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return "#<" + this.getClass().getSimpleName() + "[" + operation + "]>";
     }
 
 
+    /**
+     * @param eventList
+     */
     private void aggregateThinkTime(final List< ? extends Event> eventList) {
-
         // sort list
         Collections.sort(eventList, new TimestampComparator());
 
@@ -236,9 +254,11 @@ public class CTORule implements AggregationRule {
     }
 
 
-    /* SPYROS */
-
-    private HashSet<Container> getContentSizePerContainer(final List< ? extends Event> eventList) {
+    /**
+     * @param eventList
+     * @return
+     */
+    private static HashSet<Container> getContentSizePerContainer(final List< ? extends Event> eventList) {
         final HashSet<Container> containers = new HashSet<Container>();
 
         for (final Event e : eventList) {
@@ -262,7 +282,46 @@ public class CTORule implements AggregationRule {
     }
 
 
-    private HashMap<String, Object> getFinalObject(final List< ? extends Event> eventList, final long aggregationStartTime) {
+    /**
+     * @param e
+     * @param field
+     * @return
+     */
+    private static Long getFieldValueAsLong(final Event e, final String field) {
+        final Object val = e.get(field);
+
+        if (val == null) {
+            log.warn("missing required field '{}' or is null; returning 0", AGGREGATION_FIELD);
+            log.warn("event: {}", e);
+
+            return 0l;
+        }
+
+        if (val instanceof String) {
+            log.warn("required field '{}' should be {}; try to parse it", AGGREGATION_FIELD, Long.class);
+            log.warn("event: {}", e);
+
+            return Long.valueOf((String) val);
+        }
+
+        try {
+            return (Long) val;
+        } catch (final ClassCastException x) {
+            log.trace("expecting field '{}' of type {} ...", field, Long.class);
+            log.trace("but got value {} of type {}", val, val.getClass());
+            log.trace("", x);
+
+            return null;
+        }
+    }
+
+
+    /**
+     * @param eventList
+     * @param aggregationStartTime
+     * @return
+     */
+    private static HashMap<String, Object> getFinalObject(final List< ? extends Event> eventList, final long aggregationStartTime) {
         final HashSet<Container> containers = getContentSizePerContainer(eventList);
         final HashMap<String, HashMap<String, Object>> tenants = new HashMap<String, HashMap<String, Object>>();
 
@@ -311,39 +370,15 @@ public class CTORule implements AggregationRule {
     }
 
 
-    private void printList(final List<User> userList) {
-
+    /**
+     * @param userList
+     */
+    private static void printList(final List<User> userList) {
         final Iterator<User> userIterator = userList.iterator();
         while (userIterator.hasNext()) {
             final User tmp = userIterator.next();
             System.out.println("Name= " + tmp.name + " Think Count= " + tmp.thinkTimecount + " Thinktime= " + tmp.thinkTime
                     + " ReThink Time Count " + tmp.reThinkTimecount + " ReThinkTime= " + tmp.reThinkTime);
-        }
-
-    }
-
-
-    private static Long getFieldValueAsLong(final Event e, final String field) {
-        final Object val = e.get(field);
-
-        if (val == null) {
-            log.trace("event missing required field '{}'; skipping", AGGREGATION_FIELD);
-            log.trace("event: {}", e);
-
-            return null;
-        }
-
-        if (val instanceof String)
-            return Long.valueOf((String) val);
-
-        try {
-            return (Long) val;
-        } catch (final ClassCastException x) {
-            log.trace("expecting field '{}' of type {} ...", field, Long.class);
-            log.trace("but got value {} of type {}", val, val.getClass());
-            log.trace("", x);
-
-            return null;
         }
     }
 }
