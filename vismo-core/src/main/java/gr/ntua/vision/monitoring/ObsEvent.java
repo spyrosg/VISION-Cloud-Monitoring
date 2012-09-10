@@ -4,12 +4,28 @@ import gr.ntua.vision.monitoring.events.Event;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.UUID;
 
 
 /**
  * This is an event generated only by Vision Cloud's Object Service.
  */
 public class ObsEvent implements Event {
+    /***/
+    private final long   timestamp;
+    /***/
+    private final String id;
+
+
+    /**
+     * Constructor.
+     */
+    private ObsEvent() {
+        this.id = UUID.randomUUID().toString();
+        this.timestamp = System.currentTimeMillis();
+    }
+
+
     /**
      * @see gr.ntua.vision.monitoring.events.Event#get(java.lang.String)
      */
@@ -24,8 +40,7 @@ public class ObsEvent implements Event {
      */
     @Override
     public InetAddress originatingIP() throws UnknownHostException {
-        // TODO Auto-generated method stub
-        return null;
+        return InetAddress.getLocalHost();
     }
 
 
@@ -34,8 +49,7 @@ public class ObsEvent implements Event {
      */
     @Override
     public String originatingService() {
-        // TODO Auto-generated method stub
-        return null;
+        return "object-service";
     }
 
 
@@ -44,8 +58,7 @@ public class ObsEvent implements Event {
      */
     @Override
     public long timestamp() {
-        // TODO Auto-generated method stub
-        return 0;
+        return timestamp;
     }
 
 
@@ -54,8 +67,14 @@ public class ObsEvent implements Event {
      */
     @Override
     public String topic() {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("niy");
     }
 
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
 }
