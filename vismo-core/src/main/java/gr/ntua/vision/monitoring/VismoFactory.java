@@ -20,21 +20,21 @@ import org.zeromq.ZContext;
  */
 public class VismoFactory {
     /***/
-    private static final long           AFTER_TEN_SECONDS    = 10 * 1000;
+    private static final long           AFTER_TEN_SECONDS   = 10 * 1000;
     /***/
-    private static final long           EVERY_THIRTY_SECONDS = 30 * 1000;
+    private static final long           EVERY_MINUTE        = 60 * 1000;
     /***/
-    private static final long           EVERY_THREE_SECONDS  = 3 * 1000;
+    private static final long           EVERY_THREE_SECONDS = 3 * 1000;
     /***/
-    private static final Logger         log                  = LoggerFactory.getLogger(VismoFactory.class);
+    private static final Logger         log                 = LoggerFactory.getLogger(VismoFactory.class);
     /***/
-    private static final String[]       operations           = { "GET", "PUT", "DELETE" };
+    private static final String[]       operations          = { "GET", "PUT", "DELETE" };
     /***/
-    private static final Timer          timer                = new Timer();
+    private static final Timer          timer               = new Timer();
     /** the configuration object. */
     private final VismoConfiguration    conf;
     /***/
-    private final List<AggregationRule> ruleList             = new ArrayList<AggregationRule>();
+    private final List<AggregationRule> ruleList            = new ArrayList<AggregationRule>();
 
 
     /**
@@ -64,17 +64,14 @@ public class VismoFactory {
         for (final EventListener listener : listeners)
             receiver.subscribe(listener);
 
-        registerRule(new CTORule("GET"));
-        registerRule(new CTORule("PUT"));
-
-        // for (final String op : operations)
-        // registerRule(new AggregationOnNumberOfRequests(op, "count"));
+        // TODO: move rules registration and timers to a file
+        registerRule(new CTORule());
 
         final EventDistributor stuff = new EventDistributor(zmq.newBoundPubSocket(conf.getConsumersPoint()));
-        final VismoAggregationController ruleTimer1 = new VismoAggregationController(stuff, ruleList, EVERY_THIRTY_SECONDS);
+        final VismoAggregationController ruleTimer1 = new VismoAggregationController(stuff, ruleList, EVERY_MINUTE);
         final VismoAggregationController ruleTimer2 = new VismoAggregationController(stuff, ruleList, EVERY_THREE_SECONDS);
 
-        registerRuleTimer(receiver, ruleTimer1, EVERY_THIRTY_SECONDS);
+        registerRuleTimer(receiver, ruleTimer1, EVERY_MINUTE);
         registerRuleTimer(receiver, ruleTimer2, EVERY_THREE_SECONDS);
 
         vismo.addTask(new UDPFactory(conf.getUDPPort()).buildServer(vismo));
@@ -87,7 +84,7 @@ public class VismoFactory {
     /**
      * @param receiver
      * @param ruleTimer
-     * @param period 
+     * @param period
      */
     private static void registerRuleTimer(final LocalEventsCollector receiver, final VismoAggregationController ruleTimer,
             final long period) {
