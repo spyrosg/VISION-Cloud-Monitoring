@@ -9,6 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+/**
+ * 
+ */
 public class AggregationOnNumberOfRequests implements AggregationRule {
     /***/
     private static final String DICT          = "!dict";
@@ -23,7 +26,7 @@ public class AggregationOnNumberOfRequests implements AggregationRule {
 
 
     /**
-     * @param aggregationField
+     * @param operation
      * @param resultField
      */
     public AggregationOnNumberOfRequests(final String operation, final String resultField) {
@@ -32,6 +35,9 @@ public class AggregationOnNumberOfRequests implements AggregationRule {
     }
 
 
+    /**
+     * @see gr.ntua.vision.monitoring.rules.AggregationRule#aggregate(long, java.util.List)
+     */
     @SuppressWarnings("unchecked")
     @Override
     public AggregationResultEvent aggregate(final long aggregationStartTime, final List< ? extends Event> eventList) {
@@ -39,6 +45,9 @@ public class AggregationOnNumberOfRequests implements AggregationRule {
     }
 
 
+    /**
+     * @see gr.ntua.vision.monitoring.rules.AggregationRule#matches(gr.ntua.vision.monitoring.events.Event)
+     */
     @Override
     public boolean matches(final Event e) {
         final String op = (String) e.get("operation");
@@ -48,12 +57,20 @@ public class AggregationOnNumberOfRequests implements AggregationRule {
     }
 
 
+    /**
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return "#<" + this.getClass().getSimpleName() + "[" + operation + "] with new field '" + newField + "'>";
     }
 
 
+    /**
+     * @param eventList
+     * @param count
+     * @return
+     */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private Map appendNewField(final List< ? extends Event> eventList, final int count) {
         final Event firstEvent = eventList.get(0);

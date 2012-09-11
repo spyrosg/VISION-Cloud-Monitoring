@@ -1,4 +1,5 @@
 
+- send cancel to timertask
 - todo for python vismo-dispatch
 - fix configuration
 - add event producers api
