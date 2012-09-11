@@ -77,6 +77,8 @@ public class VismoFactory {
         vismo.addTask(new UDPFactory(conf.getUDPPort()).buildServer(vismo));
         vismo.addTask(receiver);
 
+        timer.schedule(new JVMStatusReportTask(), AFTER_TEN_SECONDS, 10 * 1000);
+
         return vismo;
     }
 
