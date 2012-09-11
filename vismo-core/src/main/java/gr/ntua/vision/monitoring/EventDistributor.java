@@ -17,8 +17,10 @@ import org.slf4j.LoggerFactory;
  * is no receiving end (no connected consumers) the event is dropped.
  */
 class EventDistributor {
+
     /** the log target. */
     private static final Logger   log      = LoggerFactory.getLogger(EventDistributor.class);
+    // TODO: eventually remove eventIds or else vismo will blow with {@link OutOfMemoryError}.
     /***/
     private final HashSet<String> eventIds = new HashSet<String>();
     /** the socket. */
@@ -37,6 +39,9 @@ class EventDistributor {
     }
 
 
+    /**
+     * @param e
+     */
     public void serialize(final Event e) {
         @SuppressWarnings("rawtypes")
         final Map dict = (Map) e.get("!dict");
@@ -49,17 +54,20 @@ class EventDistributor {
     }
 
 
-    private boolean eventAlreadySent(final Map map) {
+    /**
+     * @param map
+     * @return
+     */
+    private boolean eventAlreadySent(@SuppressWarnings("rawtypes") final Map map) {
         final String id = (String) map.get("id");
 
         if (eventIds.contains(id)) {
             log.error("dropping already sent event: {}", map);
-
             return true;
-        } else {
-            eventIds.add(id);
-
-            return false;
         }
+
+        eventIds.add(id);
+
+        return false;
     }
 }

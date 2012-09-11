@@ -107,20 +107,20 @@ public class VismoAggregationResultEvent implements AggregationResultEvent {
 
 
     /**
-     * @param dict
-     */
-    private static void addBasicFields(final Map<String, Object> dict) {
-        dict.put("timestamp", dict.get("tStart"));
-        dict.put("id", UUID.randomUUID().toString());
-    }
-
-
-    /**
      * @param key
      * @return
      */
     private Object get1(final String key) {
         return dict.get(key);
+    }
+
+
+    /**
+     * @param dict
+     */
+    private static void addBasicFields(final Map<String, Object> dict) {
+        dict.put("timestamp", dict.get("tStart"));
+        dict.put("id", UUID.randomUUID().toString());
     }
 
 

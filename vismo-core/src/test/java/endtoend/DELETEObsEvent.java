@@ -13,7 +13,7 @@ public class DELETEObsEvent extends ObsEvent {
      * @param object
      * @param size
      */
-    public DELETEObsEvent(String tenant, String user, String container, String object, long size) {
+    public DELETEObsEvent(final String tenant, final String user, final String container, final String object, final long size) {
         super("DELETE", tenant, user, container, object, size);
     }
 }

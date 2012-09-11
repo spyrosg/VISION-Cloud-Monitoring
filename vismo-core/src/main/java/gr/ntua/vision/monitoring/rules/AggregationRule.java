@@ -10,10 +10,13 @@ import java.util.List;
  */
 public interface AggregationRule {
     /**
+     * @param aggregationPeriodTimestamp
+     *            this is the time instance the aggregation commenced.
      * @param eventList
-     * @return
+     *            the list of events to aggregate.
+     * @return the result.
      */
-    AggregationResultEvent aggregate(final long aggregationStartTime, List< ? extends Event> eventList);
+    AggregationResultEvent aggregate(final long aggregationPeriodTimestamp, List< ? extends Event> eventList);
 
 
     /**

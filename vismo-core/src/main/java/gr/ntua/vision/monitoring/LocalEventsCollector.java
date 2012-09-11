@@ -38,6 +38,7 @@ public class LocalEventsCollector extends StoppableTask {
      *            the socket used to receive events.
      * @param sendMessagesSock
      *            the socket used to send messages.
+     * @param factory
      */
     LocalEventsCollector(final VismoSocket receiveEventsSock, final VismoSocket sendMessagesSock, final EventFactory factory) {
         super("event-receiver");

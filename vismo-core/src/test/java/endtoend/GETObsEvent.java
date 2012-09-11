@@ -13,7 +13,7 @@ public class GETObsEvent extends ObsEvent {
      * @param object
      * @param size
      */
-    public GETObsEvent(String tenant, String user, String container, String object, long size) {
+    public GETObsEvent(final String tenant, final String user, final String container, final String object, final long size) {
         super("GET", tenant, user, container, object, size);
     }
 }

@@ -8,7 +8,6 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -21,9 +20,9 @@ import org.zeromq.ZContext;
  */
 public class FakeObs {
     /***/
-    private final VismoSocket sock;
-    /***/
     private final Logger      log = LoggerFactory.getLogger(FakeObs.class);
+    /***/
+    private final VismoSocket sock;
 
 
     /**
@@ -47,19 +46,19 @@ public class FakeObs {
 
 
     /**
-     * @param args
-     * @throws IOException
-     * @throws FileNotFoundException
+     * @param e
      */
-    public static void main(String... args) throws FileNotFoundException, IOException {
-        new FakeObs(args[0]).start();
+    private void sendEvent(final ObsEvent e) {
+        final String msg = e.toJSON().toString();
+
+        log.trace("sending => {}", msg);
+        sock.send(msg);
     }
 
 
     /**
-     * @throws UnknownHostException
      */
-    private void start() throws UnknownHostException {
+    private void start() {
         final String tenant = "ntua";
         final String user = "vassilis";
         final String container1 = "test-container";
@@ -73,6 +72,16 @@ public class FakeObs {
         sendEvent(getReadEvent(tenant, user, container2, object, 500));
         sendEvent(getReadEvent(tenant, user, container2, object, 500));
         sendEvent(getReadEvent(tenant, user, container2, object, 500));
+    }
+
+
+    /**
+     * @param args
+     * @throws IOException
+     * @throws FileNotFoundException
+     */
+    public static void main(final String... args) throws FileNotFoundException, IOException {
+        new FakeObs(args[0]).start();
     }
 
 
@@ -101,17 +110,5 @@ public class FakeObs {
     private static ObsEvent getWriteEvent(final String tenant, final String user, final String container, final String object,
             final long size) {
         return new PUTObsEvent(tenant, user, container, object, size);
-    }
-
-
-    /**
-     * @param e
-     * @throws UnknownHostException
-     */
-    private void sendEvent(final ObsEvent e) throws UnknownHostException {
-        final String msg = e.toJSON().toString();
-
-        log.trace("sending => {}", msg);
-        sock.send(msg);
     }
 }

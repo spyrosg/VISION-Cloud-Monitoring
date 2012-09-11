@@ -115,8 +115,8 @@ public class VismoAggregationController extends TimerTask implements EventListen
                 continue;
 
             // FIXME: do we need tstart, tend?
-            final AggregationResultEvent aggregatedResult = rule.aggregate(this.scheduledExecutionTime() - aggregationPeriod,
-                                                                           eventList);
+            final long aggregationPeriodTimestamp = this.scheduledExecutionTime() - aggregationPeriod;
+            final AggregationResultEvent aggregatedResult = rule.aggregate(aggregationPeriodTimestamp, eventList);
 
             log.debug("aggregation successful for {}", aggregatedResult);
             distributor.serialize(aggregatedResult);

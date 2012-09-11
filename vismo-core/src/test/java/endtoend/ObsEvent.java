@@ -15,23 +15,13 @@ import org.json.simple.JSONObject;
  */
 public class ObsEvent implements Event {
     /***/
-    private long                timestamp;
+    private static final Random rng = new Random();
     /***/
-    private final String        id;
-    /***/
-    private final double        transactionLatency;
-    /***/
-    private final double        transactionThroughput;
-    /***/
-    private final double        transactionDuration;
+    private final String        container;
     /***/
     private final long          contentSize;
     /***/
-    private final String        tenant;
-    /***/
-    private final String        user;
-    /***/
-    private final String        container;
+    private final String        id;
     /***/
     private final String        object;
     /***/
@@ -39,7 +29,17 @@ public class ObsEvent implements Event {
     /***/
     private final String        status;
     /***/
-    private static final Random rng = new Random();
+    private final String        tenant;
+    /***/
+    private final long          timestamp;
+    /***/
+    private final double        transactionDuration;
+    /***/
+    private final double        transactionLatency;
+    /***/
+    private final double        transactionThroughput;
+    /***/
+    private final String        user;
 
 
     /**
@@ -73,8 +73,80 @@ public class ObsEvent implements Event {
      * @see gr.ntua.vision.monitoring.events.Event#get(java.lang.String)
      */
     @Override
-    public Object get(String key) {
+    public Object get(@SuppressWarnings("unused") final String key) {
         throw new UnsupportedOperationException("niy");
+    }
+
+
+    /**
+     * @return the container
+     */
+    public String getContainer() {
+        return container;
+    }
+
+
+    /**
+     * @return the contentSize
+     */
+    public long getContentSize() {
+        return contentSize;
+    }
+
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+
+    /**
+     * @return the object
+     */
+    public String getObject() {
+        return object;
+    }
+
+
+    /**
+     * @return the status
+     */
+    public String getStatus() {
+        return status;
+    }
+
+
+    /**
+     * @return the tenant
+     */
+    public String getTenant() {
+        return tenant;
+    }
+
+
+    /**
+     * @return the transactionLatency
+     */
+    public double getTransactionLatency() {
+        return transactionLatency;
+    }
+
+
+    /**
+     * @return the transactionThroughput
+     */
+    public double getTransactionThroughput() {
+        return transactionThroughput;
+    }
+
+
+    /**
+     * @return the user
+     */
+    public String getUser() {
+        return user;
     }
 
 
@@ -106,20 +178,10 @@ public class ObsEvent implements Event {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.events.Event#topic()
-     */
-    @Override
-    public String topic() {
-        throw new UnsupportedOperationException("niy");
-    }
-
-
-    /**
      * @return
-     * @throws UnknownHostException
      */
     @SuppressWarnings("unchecked")
-    public JSONObject toJSON() throws UnknownHostException {
+    public JSONObject toJSON() {
         final JSONObject o = new JSONObject();
 
         o.put("id", id);
@@ -143,73 +205,10 @@ public class ObsEvent implements Event {
 
 
     /**
-     * @return the id
+     * @see gr.ntua.vision.monitoring.events.Event#topic()
      */
-    public String getId() {
-        return id;
-    }
-
-
-    /**
-     * @return the contentSize
-     */
-    public long getContentSize() {
-        return contentSize;
-    }
-
-
-    /**
-     * @return the tenant
-     */
-    public String getTenant() {
-        return tenant;
-    }
-
-
-    /**
-     * @return the user
-     */
-    public String getUser() {
-        return user;
-    }
-
-
-    /**
-     * @return the object
-     */
-    public String getObject() {
-        return object;
-    }
-
-
-    /**
-     * @return the container
-     */
-    public String getContainer() {
-        return container;
-    }
-
-
-    /**
-     * @return the transactionLatency
-     */
-    public double getTransactionLatency() {
-        return transactionLatency;
-    }
-
-
-    /**
-     * @return the transactionThroughput
-     */
-    public double getTransactionThroughput() {
-        return transactionThroughput;
-    }
-
-
-    /**
-     * @return the status
-     */
-    public String getStatus() {
-        return status;
+    @Override
+    public String topic() {
+        throw new UnsupportedOperationException("niy");
     }
 }

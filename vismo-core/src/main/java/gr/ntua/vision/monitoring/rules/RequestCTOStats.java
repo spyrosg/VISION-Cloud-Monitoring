@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring.rules;
 
 import java.util.ArrayList;
 
+
 /**
  * An object used to hold all the CTO necessary stats per request.
  */
@@ -111,7 +112,7 @@ public class RequestCTOStats {
      * @param l
      * @return the no of elements in the list.
      */
-    private int getCounts(final ArrayList<Double> l) {
+    private static int getCounts(final ArrayList<Double> l) {
         return l.size();
     }
 
@@ -120,7 +121,7 @@ public class RequestCTOStats {
      * @param list
      * @return the sum of the elements in the list.
      */
-    private double sumList(final ArrayList<Double> list) {
+    private static double sumList(final ArrayList<Double> list) {
         double sum = 0;
 
         for (final double d : list)

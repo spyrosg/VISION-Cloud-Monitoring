@@ -82,6 +82,15 @@ public class VismoFactory {
 
 
     /**
+     * @param rule
+     */
+    private void registerRule(final AggregationRule rule) {
+        log.trace("registering rule: {}", rule);
+        ruleList.add(rule);
+    }
+
+
+    /**
      * @param receiver
      * @param ruleTimer
      * @param period
@@ -90,14 +99,5 @@ public class VismoFactory {
             final long period) {
         receiver.subscribe(ruleTimer);
         timer.schedule(ruleTimer, AFTER_TEN_SECONDS, period);
-    }
-
-
-    /**
-     * @param rule
-     */
-    private void registerRule(final AggregationRule rule) {
-        log.trace("registering rule: {}", rule);
-        ruleList.add(rule);
     }
 }
