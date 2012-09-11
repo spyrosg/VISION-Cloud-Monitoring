@@ -243,7 +243,6 @@ class VismoEventDispatcher(EventDispatcher):
             # TODO: Calculate availability and other Niki's required stuff
 
             # not needed
-            del main_event['status']
             del main_event['tag']
 
             self._sock_send(event)
