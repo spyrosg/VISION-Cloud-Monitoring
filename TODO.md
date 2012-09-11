@@ -1,4 +1,5 @@
 
+- read rules from a file
 - send cancel to timertask
 - todo for python vismo-dispatch
 - fix configuration
