@@ -63,11 +63,10 @@ public class VismoFactory {
 
         registerRuleTimerTask(vismo, receiver, getTimerFor(distributor, everyThreeSeconds));
         registerRuleTimerTask(vismo, receiver, getTimerFor(distributor, everyMinute));
+        vismo.addTimerTask(new JVMStatusReportTask(ONE_MINUTE));
 
         vismo.addTask(new UDPFactory(conf.getUDPPort()).buildServer(vismo));
         vismo.addTask(receiver);
-
-        timer.schedule(new JVMStatusReportTask(), AFTER_TEN_SECONDS, 10 * 1000);
 
         return vismo;
     }

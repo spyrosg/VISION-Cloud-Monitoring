@@ -1,11 +1,11 @@
 package gr.ntua.vision.monitoring;
 
+import gr.ntua.vision.monitoring.scheduling.VismoRepeatedTask;
+import gr.ntua.vision.monitoring.scheduling.VismoTimer;
 import gr.ntua.vision.monitoring.udp.UDPListener;
 
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,21 +17,17 @@ import org.zeromq.ZMQ;
  */
 public class Vismo implements UDPListener {
     /***/
-    private static final long                          DELAY      = TimeUnit.SECONDS.toMillis(10);
-    /***/
-    private static final String                        KILL       = "stop!";
+    private static final String            KILL   = "stop!";
     /** the log target. */
-    private static final Logger                        log        = LoggerFactory.getLogger(Vismo.class);
+    private static final Logger            log    = LoggerFactory.getLogger(Vismo.class);
     /***/
-    private static final String                        STATUS     = "status?";
+    private static final String            STATUS = "status?";
     /** the list of supporting tasks. */
-    private final ArrayList<StoppableTask>             tasks      = new ArrayList<StoppableTask>();
+    private final ArrayList<StoppableTask> tasks  = new ArrayList<StoppableTask>();
     /***/
-    private final Timer                                timer      = new Timer();
+    private final VismoTimer               timer  = new VismoTimer();
     /***/
-    private final ArrayList<VismoAggregationTimerTask> timerTasks = new ArrayList<VismoAggregationTimerTask>();
-    /***/
-    private final VMInfo                               vminfo;
+    private final VMInfo                   vminfo;
 
 
     /**
@@ -66,9 +62,9 @@ public class Vismo implements UDPListener {
      * @param t
      *            the task.
      */
-    public void addTimerTask(final VismoAggregationTimerTask t) {
+    public void addTimerTask(final VismoRepeatedTask t) {
         log.debug("adding new vismo timer task {}", t);
-        timerTasks.add(t);
+        timer.schedule(t);
     }
 
 
@@ -95,9 +91,7 @@ public class Vismo implements UDPListener {
             t.start();
 
         log.debug("vismo scheduling {} timer tasks", tasks.size());
-
-        for (final VismoAggregationTimerTask t : timerTasks)
-            timer.schedule(t, DELAY, t.getPeriod());
+        timer.start();
     }
 
 

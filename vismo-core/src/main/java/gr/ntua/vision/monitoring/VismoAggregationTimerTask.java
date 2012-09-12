@@ -1,8 +1,7 @@
 package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.events.Event;
-
-import java.util.TimerTask;
+import gr.ntua.vision.monitoring.scheduling.VismoRepeatedTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +10,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class is SO GONNA DIE after the f2f.
  */
-public class VismoAggregationTimerTask extends TimerTask implements EventListener {
+public class VismoAggregationTimerTask extends VismoRepeatedTask implements EventListener {
     /***/
     private static final Logger    log = LoggerFactory.getLogger(VismoAggregationTimerTask.class);
     /***/
@@ -35,6 +34,7 @@ public class VismoAggregationTimerTask extends TimerTask implements EventListene
     /**
      * @return the period.
      */
+    @Override
     public long getPeriod() {
         return rules.getPeriod();
     }

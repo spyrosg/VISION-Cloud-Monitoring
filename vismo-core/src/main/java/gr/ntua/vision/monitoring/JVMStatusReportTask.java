@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring;
 
-import java.util.TimerTask;
+import gr.ntua.vision.monitoring.scheduling.VismoRepeatedTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,11 +9,32 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  */
-public class JVMStatusReportTask extends TimerTask {
+public class JVMStatusReportTask extends VismoRepeatedTask {
     /***/
     private static final Logger log = LoggerFactory.getLogger(JVMStatusReportTask.class);
     /***/
     private static final int    MB  = 1024 * 1024;
+    /***/
+    private final long          period;
+
+
+    /**
+     * Constructor.
+     * 
+     * @param period
+     */
+    public JVMStatusReportTask(final long period) {
+        this.period = period;
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.scheduling.VismoRepeatedTask#getPeriod()
+     */
+    @Override
+    public long getPeriod() {
+        return period;
+    }
 
 
     /**
