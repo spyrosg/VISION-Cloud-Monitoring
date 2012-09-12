@@ -12,9 +12,11 @@ public class RequestCTOStats {
     /***/
     private long                    contentSizeSum;
     /***/
-    private final ArrayList<Double> reThinkTimes = new ArrayList<Double>();
+    private final ArrayList<Double> reThinkTimes     = new ArrayList<Double>();
     /***/
-    private final ArrayList<Double> thinkTimes   = new ArrayList<Double>();
+    private final ArrayList<Double> thinkTimes       = new ArrayList<Double>();
+    /***/
+    private final ArrayList<Double> transactionTimes = new ArrayList<Double>();
 
 
     /**
@@ -41,6 +43,15 @@ public class RequestCTOStats {
      */
     public void addThinkTime(final double tt) {
         thinkTimes.add(tt);
+    }
+
+
+    /**
+     * @param tt
+     */
+    public void addTransactionTime(final Double tt) {
+        if (tt != null)
+            transactionTimes.add(tt);
     }
 
 
@@ -105,6 +116,14 @@ public class RequestCTOStats {
      */
     public double sumThinkTimes() {
         return sumList(thinkTimes);
+    }
+
+
+    /**
+     * @return
+     */
+    public double sumTransactionTimes() {
+        return sumList(transactionTimes);
     }
 
 

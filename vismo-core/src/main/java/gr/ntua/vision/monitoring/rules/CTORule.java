@@ -42,21 +42,23 @@ public class CTORule implements AggregationRule {
     }
 
     /***/
-    private static final String AGGREGATION_FIELD = "content-size";
+    private static final String CONTENT_SIZE_FIELD         = "content-size";
     /***/
-    private static final String GET_OPERATION     = "GET";
+    private static final String GET_OPERATION              = "GET";
     /***/
-    private static final Logger log               = LoggerFactory.getLogger(CTORule.class);
+    private static final Logger log                        = LoggerFactory.getLogger(CTORule.class);
     /***/
-    private static final String OPERATION_FIELD   = "operation";
+    private static final String OPERATION_FIELD            = "operation";
     /***/
-    private static final String PUT_OPERATION     = "PUT";
+    private static final String PUT_OPERATION              = "PUT";
     /***/
-    private static final String SEP               = "/#@$!/";
+    private static final String SEP                        = "/#@$!/";
     /***/
-    private static final String SPECIAL_FIELD     = "transaction-duration";
+    private static final String SPECIAL_FIELD              = "transaction-duration";
     /***/
-    private static final String THROTTLING        = "THROTTLING";
+    private static final String THROTTLING                 = "THROTTLING";
+    /***/
+    private static final String TRANSACTION_DURATION_FIELD = "transaction-duration";
     /***/
     private final long          period;
     /***/
@@ -139,7 +141,8 @@ public class CTORule implements AggregationRule {
      */
     @Override
     public String toString() {
-        return "#<" + this.getClass().getSimpleName() + ", topic: " + topic + ", running every " + (period / 1000) + " second(s)>";
+        return "#<" + this.getClass().getSimpleName() + ", topic: " + topic + ", running every " + (period / 1000)
+                + " second(s)>";
     }
 
 
@@ -248,7 +251,8 @@ public class CTORule implements AggregationRule {
         for (final Event e : eventList) {
             final ContainerRequest cu = new ContainerRequest((String) e.get("tenant"), (String) e.get("container"),
                     (String) e.get("user"));
-            final Long contentSize = getFieldValueAsLong(e, AGGREGATION_FIELD);
+            final Long contentSize = getFieldValueAsLong(e, CONTENT_SIZE_FIELD);
+            final Double transactionDuration = getFieldValueAsDouble(e, TRANSACTION_DURATION_FIELD);
 
             if (requests.containsKey(cu)) {
                 final RequestCTOStats rs = requests.get(cu);
@@ -256,10 +260,12 @@ public class CTORule implements AggregationRule {
                 rs.sumContentSize(contentSize);
                 rs.incAccesses();
                 calculateUserProcessingTime(prev, e, rs);
+                rs.addTransactionTime(transactionDuration);
             } else {
                 final RequestCTOStats rs = new RequestCTOStats(contentSize);
 
                 calculateUserProcessingTime(prev, e, rs);
+                rs.addTransactionTime(transactionDuration);
                 requests.put(cu, rs);
             }
 
@@ -342,17 +348,49 @@ public class CTORule implements AggregationRule {
      * @param field
      * @return
      */
+    private static Double getFieldValueAsDouble(final Event e, final String field) {
+        final Object val = e.get(field);
+
+        if (val == null) {
+            log.warn("missing required field '{}' or is null; returning 0", field);
+
+            return 0d;
+        }
+
+        if (val instanceof String) {
+            log.warn("required field '{}' should be {}; try to parse it", field, Long.class);
+
+            return Double.valueOf((String) val);
+        }
+
+        try {
+            return (Double) val;
+        } catch (final ClassCastException x) {
+            log.trace("expecting field '{}' of type {} ...", field, Long.class);
+            log.trace("but got value {} of type {}", val, val.getClass());
+            log.trace("exception: ", x);
+
+            return null;
+        }
+    }
+
+
+    /**
+     * @param e
+     * @param field
+     * @return
+     */
     private static Long getFieldValueAsLong(final Event e, final String field) {
         final Object val = e.get(field);
 
         if (val == null) {
-            log.warn("missing required field '{}' or is null; returning 0", AGGREGATION_FIELD);
+            log.warn("missing required field '{}' or is null; returning 0", field);
 
             return 0l;
         }
 
         if (val instanceof String) {
-            log.warn("required field '{}' should be {}; try to parse it", AGGREGATION_FIELD, Long.class);
+            log.warn("required field '{}' should be {}; try to parse it", field, Long.class);
 
             return Long.valueOf((String) val);
         }
