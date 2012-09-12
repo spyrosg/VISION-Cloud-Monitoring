@@ -38,6 +38,15 @@ public class RuleList {
 
 
     /**
+     * @param rule
+     */
+    public void add(final AggregationRule rule) {
+        log.debug("registering rule {}", rule);
+        list.add(rule);
+    }
+
+
+    /**
      * @return the period
      */
     public long getPeriod() {
@@ -52,15 +61,6 @@ public class RuleList {
         for (final AggregationRule rule : list)
             if (rule.matches(e))
                 appendToBucket(rule, e);
-    }
-
-
-    /**
-     * @param rule
-     */
-    public void registerRule(final AggregationRule rule) {
-        log.debug("registering rule {}", rule);
-        list.add(rule);
     }
 
 
