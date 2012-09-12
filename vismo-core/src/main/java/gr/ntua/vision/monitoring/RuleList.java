@@ -70,7 +70,7 @@ public class RuleList {
      */
     public void runRules(final long aggregationPeriodTimestamp, final EventDistributor distributor) {
         for (final AggregationRule rule : list) {
-            final List<Event> eventList = eventBuckets.get(rule);
+            final List<Event> eventList = eventBuckets.remove(rule);
 
             if (eventList == null)
                 continue;
@@ -87,6 +87,8 @@ public class RuleList {
             log.debug("aggregation successful for rule {} => {}", rule, result);
             distributor.serialize(result);
         }
+
+        eventBuckets.clear();
     }
 
 
