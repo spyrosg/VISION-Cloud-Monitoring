@@ -1,6 +1,4 @@
-package gr.ntua.vision.monitoring;
-
-import gr.ntua.vision.monitoring.scheduling.VismoRepeatedTask;
+package gr.ntua.vision.monitoring.scheduling;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
