@@ -80,12 +80,14 @@ public class RuleList {
             if (eventList.isEmpty())
                 continue;
 
-            final AggregationResultEvent result = rule.aggregate(aggregationPeriodTimestamp, eventList);
+            try {
+                final AggregationResultEvent result = rule.aggregate(aggregationPeriodTimestamp, eventList);
 
-            // FIXME: do we need tstart, tend?
-
-            log.debug("aggregation successful for rule {} => {}", rule, result);
-            distributor.serialize(result);
+                log.debug("aggregation successful for rule {} => {}", rule, result);
+                distributor.serialize(result);
+            } catch (final Throwable x) {
+                log.error("aggregation error", x);
+            }
         }
 
         eventBuckets.clear();
