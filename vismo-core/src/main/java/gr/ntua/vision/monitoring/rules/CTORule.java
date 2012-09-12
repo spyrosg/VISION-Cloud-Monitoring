@@ -42,23 +42,39 @@ public class CTORule implements AggregationRule {
     }
 
     /***/
-    private static final String AGGREGATION_FIELD = "content-size";
+    private static final String CONTENT_SIZE_FIELD         = "content-size";
     /***/
-    private static final String GET_OPERATION     = "GET";
+    private static final String GET_OPERATION              = "GET";
     /***/
-    private static final Logger log               = LoggerFactory.getLogger(CTORule.class);
+    private static final Logger log                        = LoggerFactory.getLogger(CTORule.class);
     /***/
-    private static final String OPERATION_FIELD   = "operation";
+    private static final String OPERATION_FIELD            = "operation";
     /***/
-    private static final String PUT_OPERATION     = "PUT";
+    private static final String PUT_OPERATION              = "PUT";
     /***/
-    private static final String SEP               = "/#@$!/";
+    private static final String SEP                        = "/#@$!/";
     /***/
-    private static final String SPECIAL_FIELD     = "transaction-duration";
+    private static final String SPECIAL_FIELD              = "transaction-duration";
     /***/
-    private static final String THROTTLING        = "THROTTLING";
+    private static final String THROTTLING                 = "THROTTLING";
     /***/
-    private static final String TOPIC             = "CTO";
+    private static final String TRANSACTION_DURATION_FIELD = "transaction-duration";
+    /***/
+    private final long          period;
+    /***/
+    private final String        topic;
+
+
+    /**
+     * Constructor.
+     * 
+     * @param topic
+     * @param period
+     */
+    public CTORule(final String topic, final long period) {
+        this.topic = topic;
+        this.period = period;
+    }
 
 
     /**
@@ -68,9 +84,45 @@ public class CTORule implements AggregationRule {
     @Override
     public AggregationResultEvent aggregate(final long aggregationStartTime, final List< ? extends Event> eventList) {
         @SuppressWarnings("rawtypes")
-        final Map dict = getCTOEvent(eventList, aggregationStartTime);
+        final Map dict = getCTOEvent(eventList, topic, aggregationStartTime);
 
         return new VismoAggregationResultEvent(dict);
+    }
+
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final CTORule other = (CTORule) obj;
+        if (period != other.period)
+            return false;
+        if (topic == null) {
+            if (other.topic != null)
+                return false;
+        } else if (!topic.equals(other.topic))
+            return false;
+        return true;
+    }
+
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (period ^ (period >>> 32));
+        result = prime * result + ((topic == null) ? 0 : topic.hashCode());
+        return result;
     }
 
 
@@ -89,7 +141,8 @@ public class CTORule implements AggregationRule {
      */
     @Override
     public String toString() {
-        return "#<" + this.getClass().getSimpleName() + ">";
+        return "#<" + this.getClass().getSimpleName() + ", topic: " + topic + ", running every " + (period / 1000)
+                + " second(s)>";
     }
 
 
@@ -198,7 +251,8 @@ public class CTORule implements AggregationRule {
         for (final Event e : eventList) {
             final ContainerRequest cu = new ContainerRequest((String) e.get("tenant"), (String) e.get("container"),
                     (String) e.get("user"));
-            final Long contentSize = getFieldValueAsLong(e, AGGREGATION_FIELD);
+            final Long contentSize = getFieldValueAsLong(e, CONTENT_SIZE_FIELD);
+            final Double transactionDuration = getFieldValueAsDouble(e, TRANSACTION_DURATION_FIELD);
 
             if (requests.containsKey(cu)) {
                 final RequestCTOStats rs = requests.get(cu);
@@ -206,10 +260,12 @@ public class CTORule implements AggregationRule {
                 rs.sumContentSize(contentSize);
                 rs.incAccesses();
                 calculateUserProcessingTime(prev, e, rs);
+                rs.addTransactionTime(transactionDuration);
             } else {
                 final RequestCTOStats rs = new RequestCTOStats(contentSize);
 
                 calculateUserProcessingTime(prev, e, rs);
+                rs.addTransactionTime(transactionDuration);
                 requests.put(cu, rs);
             }
 
@@ -261,10 +317,12 @@ public class CTORule implements AggregationRule {
 
     /**
      * @param eventList
+     * @param topic
      * @param aggregationStartTime
      * @return
      */
-    private static HashMap<String, Object> getCTOEvent(final List< ? extends Event> eventList, final long aggregationStartTime) {
+    private static HashMap<String, Object> getCTOEvent(final List< ? extends Event> eventList, final String topic,
+            final long aggregationStartTime) {
         final List<Event> readEventList = getReadEventsList(eventList);
         final List<Event> writeEventList = getWriteEventsList(eventList);
         final HashMap<String, Object> reads = new HashMap<String, Object>();
@@ -277,7 +335,7 @@ public class CTORule implements AggregationRule {
         dict.put("reads", reads);
         dict.put("writes", writes);
 
-        dict.put("topic", TOPIC);
+        dict.put("topic", topic);
         dict.put("tStart", aggregationStartTime);
         dict.put("tEnd", System.currentTimeMillis());
 
@@ -290,17 +348,49 @@ public class CTORule implements AggregationRule {
      * @param field
      * @return
      */
+    private static Double getFieldValueAsDouble(final Event e, final String field) {
+        final Object val = e.get(field);
+
+        if (val == null) {
+            log.warn("missing required field '{}' or is null; returning 0", field);
+
+            return 0d;
+        }
+
+        if (val instanceof String) {
+            log.warn("required field '{}' should be {}; try to parse it", field, Long.class);
+
+            return Double.valueOf((String) val);
+        }
+
+        try {
+            return (Double) val;
+        } catch (final ClassCastException x) {
+            log.trace("expecting field '{}' of type {} ...", field, Long.class);
+            log.trace("but got value {} of type {}", val, val.getClass());
+            log.trace("exception: ", x);
+
+            return null;
+        }
+    }
+
+
+    /**
+     * @param e
+     * @param field
+     * @return
+     */
     private static Long getFieldValueAsLong(final Event e, final String field) {
         final Object val = e.get(field);
 
         if (val == null) {
-            log.warn("missing required field '{}' or is null; returning 0", AGGREGATION_FIELD);
+            log.warn("missing required field '{}' or is null; returning 0", field);
 
             return 0l;
         }
 
         if (val instanceof String) {
-            log.warn("required field '{}' should be {}; try to parse it", AGGREGATION_FIELD, Long.class);
+            log.warn("required field '{}' should be {}; try to parse it", field, Long.class);
 
             return Long.valueOf((String) val);
         }
@@ -345,11 +435,13 @@ public class CTORule implements AggregationRule {
         user.put("sum-size", stats.getContentSizeSum());
         user.put("count-size", stats.getNoOfContainerAccesses());
 
-        user.put("sum-think-time", stats.sumThinkTimes());
+        user.put("sum-think-time", stats.sumThinkTimes() / 1000.0);
         user.put("count-think-time", stats.getThinkTimesCount());
 
-        user.put("sum-rethink-time", stats.sumReThinkTimes());
+        user.put("sum-rethink-time", stats.sumReThinkTimes() / 1000.0);
         user.put("count-rethink-time", stats.getReThinkTimesCount());
+
+        user.put("sum-transaction-time", stats.sumTransactionTimes() / 1000.0);
 
         return user;
     }
