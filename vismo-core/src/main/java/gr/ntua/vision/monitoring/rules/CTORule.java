@@ -58,7 +58,21 @@ public class CTORule implements AggregationRule {
     /***/
     private static final String THROTTLING        = "THROTTLING";
     /***/
-    private static final String TOPIC             = "CTO";
+    private final long          period;
+    /***/
+    private final String        topic;
+
+
+    /**
+     * Constructor.
+     * 
+     * @param topic
+     * @param period
+     */
+    public CTORule(final String topic, final long period) {
+        this.topic = topic;
+        this.period = period;
+    }
 
 
     /**
@@ -68,9 +82,45 @@ public class CTORule implements AggregationRule {
     @Override
     public AggregationResultEvent aggregate(final long aggregationStartTime, final List< ? extends Event> eventList) {
         @SuppressWarnings("rawtypes")
-        final Map dict = getCTOEvent(eventList, aggregationStartTime);
+        final Map dict = getCTOEvent(eventList, topic, aggregationStartTime);
 
         return new VismoAggregationResultEvent(dict);
+    }
+
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final CTORule other = (CTORule) obj;
+        if (period != other.period)
+            return false;
+        if (topic == null) {
+            if (other.topic != null)
+                return false;
+        } else if (!topic.equals(other.topic))
+            return false;
+        return true;
+    }
+
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (period ^ (period >>> 32));
+        result = prime * result + ((topic == null) ? 0 : topic.hashCode());
+        return result;
     }
 
 
@@ -89,7 +139,7 @@ public class CTORule implements AggregationRule {
      */
     @Override
     public String toString() {
-        return "#<" + this.getClass().getSimpleName() + ">";
+        return "#<" + this.getClass().getSimpleName() + ", topic: " + topic + ", running every " + (period / 1000) + " second(s)>";
     }
 
 
@@ -261,10 +311,12 @@ public class CTORule implements AggregationRule {
 
     /**
      * @param eventList
+     * @param topic
      * @param aggregationStartTime
      * @return
      */
-    private static HashMap<String, Object> getCTOEvent(final List< ? extends Event> eventList, final long aggregationStartTime) {
+    private static HashMap<String, Object> getCTOEvent(final List< ? extends Event> eventList, final String topic,
+            final long aggregationStartTime) {
         final List<Event> readEventList = getReadEventsList(eventList);
         final List<Event> writeEventList = getWriteEventsList(eventList);
         final HashMap<String, Object> reads = new HashMap<String, Object>();
@@ -277,7 +329,7 @@ public class CTORule implements AggregationRule {
         dict.put("reads", reads);
         dict.put("writes", writes);
 
-        dict.put("topic", TOPIC);
+        dict.put("topic", topic);
         dict.put("tStart", aggregationStartTime);
         dict.put("tEnd", System.currentTimeMillis());
 
