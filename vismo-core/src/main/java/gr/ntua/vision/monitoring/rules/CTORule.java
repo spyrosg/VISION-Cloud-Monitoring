@@ -397,11 +397,13 @@ public class CTORule implements AggregationRule {
         user.put("sum-size", stats.getContentSizeSum());
         user.put("count-size", stats.getNoOfContainerAccesses());
 
-        user.put("sum-think-time", stats.sumThinkTimes());
+        user.put("sum-think-time", stats.sumThinkTimes() / 1000.0);
         user.put("count-think-time", stats.getThinkTimesCount());
 
-        user.put("sum-rethink-time", stats.sumReThinkTimes());
+        user.put("sum-rethink-time", stats.sumReThinkTimes() / 1000.0);
         user.put("count-rethink-time", stats.getReThinkTimesCount());
+
+        user.put("sum-transaction-time", stats.sumTransactionTimes() / 1000.0);
 
         return user;
     }
