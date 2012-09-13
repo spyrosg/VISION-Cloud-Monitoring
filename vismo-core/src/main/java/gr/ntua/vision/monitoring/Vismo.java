@@ -51,7 +51,7 @@ public class Vismo implements UDPListener {
      *            the task.
      */
     public void addTask(final StoppableTask t) {
-        log.debug("adding new vismo slave task {}", t);
+        log.debug("adding vismo slave task {}", t);
         tasks.add(t);
     }
 
@@ -63,7 +63,7 @@ public class Vismo implements UDPListener {
      *            the task.
      */
     public void addTimerTask(final VismoRepeatedTask t) {
-        log.debug("adding new vismo timer task {}", t);
+        log.debug("adding vismo timer task {}", t);
         timer.schedule(t);
     }
 
@@ -108,14 +108,6 @@ public class Vismo implements UDPListener {
      * Stop any supporting tasks.
      */
     private void shutdownTasks() {
-        log.debug("canceling timer");
-
-        try {
-            timer.cancel();
-        } catch (final Throwable x) {
-            log.error("exception while canceling timer", x);
-        }
-
         for (final StoppableTask t : tasks) {
             log.debug("shutting down vismo slave task {}", t);
 
@@ -124,6 +116,14 @@ public class Vismo implements UDPListener {
             } catch (final Throwable x) {
                 log.error("exception while shutting down", x);
             }
+        }
+
+        log.debug("canceling timer");
+
+        try {
+            timer.cancel();
+        } catch (final Throwable x) {
+            log.error("exception while canceling timer", x);
         }
 
         log.debug("shutdown completed normally.");

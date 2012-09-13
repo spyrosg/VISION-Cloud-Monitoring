@@ -59,9 +59,9 @@ public class Main {
             }
 
         if (resp == null)
-            System.out.println(PROG + ": service is stopped.");
+            System.err.println(PROG + ": service is stopped.");
         else
-            System.out.println(PROG + ": running, pid: " + Integer.parseInt(resp));
+            System.err.println(PROG + ": running, pid: " + Integer.parseInt(resp));
     }
 
 
@@ -83,10 +83,10 @@ public class Main {
      */
     private static void shutdownVismo(final UDPClient client) throws IOException {
         try {
-            System.out.println(PROG + ": stopping.");
+            System.err.println(PROG + ": stopping.");
             client.shutdownVismo();
         } catch (final SocketTimeoutException e) {
-            System.out.println(PROG + " is stopped.");
+            System.err.println(PROG + " is stopped.");
         }
     }
 }

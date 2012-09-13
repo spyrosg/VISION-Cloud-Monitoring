@@ -11,7 +11,7 @@ VISMO_CONFIG=/srv/vismo/config.properties
 
 
 is_vismo_running() {
-	java -jar "$VISMO_JAR" "$VISMO_CONFIG" status | grep -q '[0-9]$' 2>/dev/null
+	java -jar "$VISMO_JAR" "$VISMO_CONFIG" status 2>&1 | grep -q '[0-9]$' 2>/dev/null
 }
 
 
@@ -23,30 +23,30 @@ vismo_start() {
 	if `is_vismo_running`; then
 		echo started
 		logger -t vision-vismo "Starting vismo service: ok"
-                return 0
+		return 0
 	else
 		echo failed
 		logger -t vision-vismo "Starting vismo service: failed"
-                return 1
+		return 1
 	fi
 }
 
 
 vismo_stop() {
-	java -jar "$VISMO_JAR" "$VISMO_CONFIG" stop
+	java -jar "$VISMO_JAR" "$VISMO_CONFIG" stop >/dev/null
 
 	if ! `is_vismo_running`; then
 		logger -t vision-vismo "Stopping vismo service: ok"
-                return 0
+		return 0
 	else
 		logger -t vision-vismo "Stopping vismo service: failed"
-                return 1
+		return 1
 	fi
 }
 
 
 vismo_status() {
-	java -jar "$VISMO_JAR" "$VISMO_CONFIG" status
+	java -jar "$VISMO_JAR" "$VISMO_CONFIG" status >/dev/null
 	return 0
 }
 
