@@ -15,11 +15,11 @@ import org.zeromq.ZMQ;
 /**
  *
  */
-public class Vismo implements UDPListener {
+public class VismoNode implements UDPListener, VismoElement {
     /***/
     private static final String            KILL   = "stop!";
     /** the log target. */
-    private static final Logger            log    = LoggerFactory.getLogger(Vismo.class);
+    private static final Logger            log    = LoggerFactory.getLogger(VismoNode.class);
     /***/
     private static final String            STATUS = "status?";
     /** the list of supporting tasks. */
@@ -37,7 +37,7 @@ public class Vismo implements UDPListener {
      *            the vm info object.
      * @throws SocketException
      */
-    Vismo(final VMInfo vminfo) throws SocketException {
+    VismoNode(final VMInfo vminfo) throws SocketException {
         this.vminfo = vminfo;
         log.info("Starting up, pid={}, ip={}", vminfo.getPID(), vminfo.getInterface().getDisplayName() + vminfo.getAddress());
         log.info("running zmq version={}", ZMQ.getVersionString());
@@ -51,7 +51,7 @@ public class Vismo implements UDPListener {
      *            the task.
      */
     public void addTask(final StoppableTask t) {
-        log.debug("adding vismo slave task {}", t);
+        log.debug("adding slave task {}", t);
         tasks.add(t);
     }
 
@@ -63,7 +63,7 @@ public class Vismo implements UDPListener {
      *            the task.
      */
     public void addTimerTask(final VismoRepeatedTask t) {
-        log.debug("adding vismo timer task {}", t);
+        log.debug("adding timer task {}", t);
         timer.schedule(t);
     }
 
@@ -84,13 +84,14 @@ public class Vismo implements UDPListener {
     /**
      * Start running any supporting tasks.
      */
+    @Override
     public void start() {
-        log.debug("vismo starting {} tasks", tasks.size());
+        log.debug("starting {} tasks", tasks.size());
 
         for (final Thread t : tasks)
             t.start();
 
-        log.debug("vismo scheduling {} timer tasks", tasks.size());
+        log.debug("scheduling {} timer tasks", tasks.size());
         timer.start();
     }
 
@@ -109,7 +110,7 @@ public class Vismo implements UDPListener {
      */
     private void shutdownTasks() {
         for (final StoppableTask t : tasks) {
-            log.debug("shutting down vismo slave task {}", t);
+            log.debug("shutting down slave task {}", t);
 
             try {
                 t.shutDown();

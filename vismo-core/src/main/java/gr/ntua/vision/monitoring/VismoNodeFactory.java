@@ -16,7 +16,7 @@ import org.zeromq.ZContext;
 /**
  * This is used to configure and properly initialize the application graph.
  */
-public class VismoFactory {
+public class VismoNodeFactory {
     /***/
     private static final long        ONE_MINUTE    = TimeUnit.MINUTES.toMillis(1);
     /***/
@@ -33,21 +33,21 @@ public class VismoFactory {
      * @param conf
      *            the configuration object.
      */
-    public VismoFactory(final VismoConfiguration conf) {
+    public VismoNodeFactory(final VismoConfiguration conf) {
         this.conf = conf;
     }
 
 
     /**
-     * Configure and return a {@link Vismo} instance.
+     * Configure and return a {@link VismoNode} instance.
      * 
      * @param listeners
      * @return a new vismo instance.
      * @throws SocketException
      */
-    public Vismo build(final EventListener... listeners) throws SocketException {
+    public VismoNode build(final EventListener... listeners) throws SocketException {
         final ZMQSockets zmq = new ZMQSockets(new ZContext());
-        final Vismo vismo = new Vismo(new VismoVMInfo());
+        final VismoNode vismo = new VismoNode(new VismoVMInfo());
 
         final LocalEventsCollector receiver = new LocalEventsCollectorFactory(conf).build(zmq);
         final EventDistributor distributor = new EventDistributor(zmq.newBoundPubSocket(conf.getConsumersPoint()));
@@ -64,8 +64,8 @@ public class VismoFactory {
 
         registerRuleTimerTask(vismo, receiver, getTimerFor(distributor, everyThreeSeconds));
         registerRuleTimerTask(vismo, receiver, getTimerFor(distributor, everyMinute));
-        vismo.addTimerTask(new JVMStatusReportTask(ONE_MINUTE));
 
+        vismo.addTimerTask(new JVMStatusReportTask(ONE_MINUTE));
         vismo.addTask(new UDPFactory(conf.getUDPPort()).buildServer(vismo));
         vismo.addTask(receiver);
 
@@ -110,7 +110,7 @@ public class VismoFactory {
      * @param receiver
      * @param ruleTimer
      */
-    private static void registerRuleTimerTask(final Vismo vismo, final LocalEventsCollector receiver,
+    private static void registerRuleTimerTask(final VismoNode vismo, final LocalEventsCollector receiver,
             final VismoAggregationTimerTask ruleTimer) {
         receiver.subscribe(ruleTimer);
         vismo.addTimerTask(ruleTimer);

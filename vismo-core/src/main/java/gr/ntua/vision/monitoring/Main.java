@@ -29,7 +29,7 @@ public class Main {
         final String command = args[1];
 
         if (command.equals("start")) {
-            final Vismo vismo = new VismoFactory(config).build();
+            final VismoNode vismo = new VismoNodeFactory(config).build();
 
             vismo.start();
         } else {

@@ -41,7 +41,7 @@ public class RuleList {
      * @param rule
      */
     public void add(final AggregationRule rule) {
-        log.debug("registering rule {}", rule);
+        log.debug("adding rule {}", rule);
         list.add(rule);
     }
 

@@ -2,9 +2,9 @@ package endtoend;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import gr.ntua.vision.monitoring.Vismo;
 import gr.ntua.vision.monitoring.VismoConfiguration;
-import gr.ntua.vision.monitoring.VismoFactory;
+import gr.ntua.vision.monitoring.VismoNode;
+import gr.ntua.vision.monitoring.VismoNodeFactory;
 import gr.ntua.vision.monitoring.udp.UDPClient;
 import gr.ntua.vision.monitoring.udp.UDPFactory;
 
@@ -22,7 +22,7 @@ public class MonitoringDriver {
     /***/
     private final EventCounterListener counter = new EventCounterListener(10);
     /***/
-    private Vismo                      vismo   = null;
+    private VismoNode                  vismo   = null;
 
 
     /**
@@ -67,7 +67,7 @@ public class MonitoringDriver {
      * @throws SocketException
      */
     public void setup() throws SocketException {
-        vismo = new VismoFactory(conf).build(counter);
+        vismo = new VismoNodeFactory(conf).build(counter);
     }
 
 
