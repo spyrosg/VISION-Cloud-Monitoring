@@ -5,6 +5,7 @@ import gr.ntua.vision.monitoring.events.Event;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -193,26 +194,24 @@ public class CTORule implements AggregationRule {
      */
     private static ArrayList<HashMap<String, Object>> aggregateOverTenants(final ArrayList<HashMap<String, Object>> containerList) {
         final ArrayList<HashMap<String, Object>> tenantList = new ArrayList<HashMap<String, Object>>();
+        final HashSet<String> uniqueTenantNames = new HashSet<String>();
 
         // first pass, put in there all different tenants
         for (final HashMap<String, Object> container : containerList) {
             final String tenantContainerName = (String) container.get("name");
             final int index = tenantContainerName.indexOf(SEP);
             final String tenantName = tenantContainerName.substring(0, index);
-            final HashMap<String, Object> tenant = new HashMap<String, Object>();
 
-            tenant.put("name", tenantName);
-            tenant.put("containers", new ArrayList<HashMap<String, Object>>());
+            if (!uniqueTenantNames.contains(tenantName)) {
+                uniqueTenantNames.add(tenantName);
 
-            if (tenantList.isEmpty())
+                final HashMap<String, Object> tenant = new HashMap<String, Object>();
+
+                tenant.put("name", tenantName);
+                tenant.put("containers", new ArrayList<HashMap<String, Object>>());
+
                 tenantList.add(tenant);
-            else
-                for (final HashMap<String, Object> t : tenantList) {
-                    final String tName = (String) t.get("name");
-
-                    if (!tName.equals(tenantName))
-                        tenantList.add(tenant);
-                }
+            }
         }
 
         // second pass, assign containers to tenants.
