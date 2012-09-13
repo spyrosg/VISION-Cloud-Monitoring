@@ -6,7 +6,7 @@ import java.net.SocketException;
 /**
  * 
  */
-public class VismoElementFactory {
+public class VismoClusterPolicy {
     /***/
     private final VismoConfiguration conf;
     /***/
@@ -19,7 +19,7 @@ public class VismoElementFactory {
      * @param conf
      * @param vminfo
      */
-    public VismoElementFactory(final VismoConfiguration conf, final VMInfo vminfo) {
+    public VismoClusterPolicy(final VismoConfiguration conf, final VMInfo vminfo) {
         this.conf = conf;
         this.vminfo = vminfo;
     }
