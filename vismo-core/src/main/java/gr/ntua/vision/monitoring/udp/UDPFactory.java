@@ -15,9 +15,6 @@ public class UDPFactory {
     private final int        port;
 
 
-    // FIXME: remove udp port from config
-    // FIXME: the stop/status reporting
-
     /**
      * Constructor.
      * 
