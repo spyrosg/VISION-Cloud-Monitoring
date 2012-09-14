@@ -14,15 +14,16 @@ import org.slf4j.LoggerFactory;
 /**
  * An event collector is the main entry point of the various events happening in localhost, that we care to monitor. This is used
  * to collect these events and pass them around to the rest of the system. Upon event receipt, the interested parties we'll be
- * notified.
+ * notified. This is the main, "official" way events are entered into <em>Vismo</em>. In general, the system can have any number
+ * of inputs ( {@link EventSource}'s) and any number of outputs ({@link EventSink}'s)
  */
-public class LocalEventsCollector extends StoppableTask {
+public class VismoEventSource extends StoppableTask implements EventSource {
     /***/
     private final EventFactory        factory;
     /** the listeners lists. */
     private final List<EventListener> listeners    = new ArrayList<EventListener>();
     /** the log target. */
-    private final Logger              log          = LoggerFactory.getLogger(LocalEventsCollector.class);
+    private final Logger              log          = LoggerFactory.getLogger(VismoEventSource.class);
     /** the socket used to receive events. */
     private final VismoSocket         receiveEventsSock;
     /** the socket used to send messages. */
@@ -40,7 +41,7 @@ public class LocalEventsCollector extends StoppableTask {
      *            the socket used to send messages.
      * @param factory
      */
-    LocalEventsCollector(final VismoSocket receiveEventsSock, final VismoSocket sendMessagesSock, final EventFactory factory) {
+    VismoEventSource(final VismoSocket receiveEventsSock, final VismoSocket sendMessagesSock, final EventFactory factory) {
         super("event-receiver");
         log.debug("using {}", receiveEventsSock.toString());
         log.debug("using {}", sendMessagesSock.toString());
@@ -60,10 +61,10 @@ public class LocalEventsCollector extends StoppableTask {
         while (true) {
             final String message = receiveEventsSock.receive();
 
+            log.trace("received: {}", message);
+
             if (message == null)
                 continue;
-
-            log.trace("received: {}", message);
 
             if (message.equals(STOP_MESSAGE))
                 break;
@@ -94,6 +95,7 @@ public class LocalEventsCollector extends StoppableTask {
      * @param listener
      *            the listener to subscribe.
      */
+    @Override
     public void subscribe(final EventListener listener) {
         log.trace("subscribing listener {}", listener);
         listeners.add(listener);
@@ -108,7 +110,7 @@ public class LocalEventsCollector extends StoppableTask {
      */
     private void notifyAllOf(final Event e) {
         for (final EventListener listener : listeners)
-            listener.notify(e);
+            listener.receive(e);
     }
 
 

@@ -49,7 +49,7 @@ public class VismoNodeFactory {
         final ZMQSockets zmq = new ZMQSockets(new ZContext());
         final VismoNode vismo = new VismoNode(new VismoVMInfo());
 
-        final LocalEventsCollector receiver = new LocalEventsCollectorFactory(conf).build(zmq);
+        final VismoEventSource receiver = new VismoEventSourceFactory(conf).build(zmq);
         final EventDistributor distributor = new EventDistributor(zmq.newBoundPubSocket(conf.getConsumersPoint()));
 
         for (final EventListener listener : listeners)
@@ -79,10 +79,10 @@ public class VismoNodeFactory {
      * @param receiver
      * @param distributor
      */
-    private static void addPassThroughListener(final LocalEventsCollector receiver, final EventDistributor distributor) {
+    private static void addPassThroughListener(final EventSource receiver, final EventDistributor distributor) {
         receiver.subscribe(new EventListener() {
             @Override
-            public void notify(final Event e) {
+            public void receive(final Event e) {
                 distributor.serialize(e);
             }
 
@@ -110,7 +110,7 @@ public class VismoNodeFactory {
      * @param receiver
      * @param ruleTimer
      */
-    private static void registerRuleTimerTask(final VismoNode vismo, final LocalEventsCollector receiver,
+    private static void registerRuleTimerTask(final VismoNode vismo, final EventSource receiver,
             final VismoAggregationTimerTask ruleTimer) {
         receiver.subscribe(ruleTimer);
         vismo.addTimerTask(ruleTimer);

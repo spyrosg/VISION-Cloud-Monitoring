@@ -41,10 +41,10 @@ public class VismoAggregationTimerTask extends VismoRepeatedTask implements Even
 
 
     /**
-     * @see gr.ntua.vision.monitoring.EventListener#notify(gr.ntua.vision.monitoring.events.Event)
+     * @see gr.ntua.vision.monitoring.EventListener#receive(gr.ntua.vision.monitoring.events.Event)
      */
     @Override
-    public void notify(final Event e) {
+    public void receive(final Event e) {
         rules.matchToEvent(e);
     }
 

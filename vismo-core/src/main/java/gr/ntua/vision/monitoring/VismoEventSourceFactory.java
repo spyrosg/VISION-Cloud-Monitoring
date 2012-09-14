@@ -7,7 +7,7 @@ import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 /**
  *
  */
-public class LocalEventsCollectorFactory {
+public class VismoEventSourceFactory {
     /** the configuration object. */
     private final VismoConfiguration config;
 
@@ -18,17 +18,17 @@ public class LocalEventsCollectorFactory {
      * @param config
      *            the configuration object.
      */
-    public LocalEventsCollectorFactory(final VismoConfiguration config) {
+    public VismoEventSourceFactory(final VismoConfiguration config) {
         this.config = config;
     }
 
 
     /**
      * @param zmq
-     * @return a setup {@link LocalEventsCollector}.
+     * @return
      */
-    public LocalEventsCollector build(final ZMQSockets zmq) {
-        return new LocalEventsCollector(zmq.newBoundPullSocket(config.getProducersPoint()), zmq.newConnectedPushSocket(config
+    public VismoEventSource build(final ZMQSockets zmq) {
+        return new VismoEventSource(zmq.newBoundPullSocket(config.getProducersPoint()), zmq.newConnectedPushSocket(config
                 .getProducersPoint()), new VismoEventFactory());
     }
 }

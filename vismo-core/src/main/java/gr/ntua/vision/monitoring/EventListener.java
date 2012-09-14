@@ -4,14 +4,14 @@ import gr.ntua.vision.monitoring.events.Event;
 
 
 /**
- * An event listener is used to pass around events to interested parties.
+ * A client wishing to receive events from {@link EventSource}s should implement this interface.
  */
 public interface EventListener {
     /**
-     * Notify the listener of the event.
+     * Notify the listener of the event received by the source.
      * 
      * @param e
      *            the event received.
      */
-    void notify(Event e);
+    void receive(Event e);
 }

@@ -31,10 +31,10 @@ class EventCounterListener implements EventListener {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.EventListener#notify(gr.ntua.vision.monitoring.events.Event)
+     * @see gr.ntua.vision.monitoring.EventListener#receive(gr.ntua.vision.monitoring.events.Event)
      */
     @Override
-    public void notify(@SuppressWarnings("unused") final Event e) {
+    public void receive(final Event e) {
         ++noReceivedEvents;
     }
 }
