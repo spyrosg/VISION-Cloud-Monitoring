@@ -31,7 +31,7 @@ public class VismoClusterPolicy {
      * @return
      * @throws SocketException
      */
-    public VismoElement createElementForCluster() throws SocketException {
-        return new VismoNode(vminfo);
+    public VismoCloudElement createElementForCluster() throws SocketException {
+        return new OldVismoNode(vminfo);
     }
 }

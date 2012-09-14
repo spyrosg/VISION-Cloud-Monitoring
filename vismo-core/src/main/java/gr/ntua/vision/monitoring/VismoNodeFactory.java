@@ -39,15 +39,15 @@ public class VismoNodeFactory {
 
 
     /**
-     * Configure and return a {@link VismoNode} instance.
+     * Configure and return a {@link OldVismoNode} instance.
      * 
      * @param listeners
      * @return a new vismo instance.
      * @throws SocketException
      */
-    public VismoNode build(final EventListener... listeners) throws SocketException {
+    public OldVismoNode build(final EventListener... listeners) throws SocketException {
         final ZMQSockets zmq = new ZMQSockets(new ZContext());
-        final VismoNode vismo = new VismoNode(new VismoVMInfo());
+        final OldVismoNode vismo = new OldVismoNode(new VismoVMInfo());
 
         final VismoEventSource receiver = new VismoEventSourceFactory(conf).build(zmq);
         final EventDistributor distributor = new EventDistributor(zmq.newBoundPubSocket(conf.getConsumersPoint()));
@@ -110,7 +110,7 @@ public class VismoNodeFactory {
      * @param receiver
      * @param ruleTimer
      */
-    private static void registerRuleTimerTask(final VismoNode vismo, final EventSource receiver,
+    private static void registerRuleTimerTask(final OldVismoNode vismo, final EventSource receiver,
             final VismoAggregationTimerTask ruleTimer) {
         receiver.subscribe(ruleTimer);
         vismo.addTimerTask(ruleTimer);

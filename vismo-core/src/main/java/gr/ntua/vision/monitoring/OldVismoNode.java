@@ -15,11 +15,11 @@ import org.zeromq.ZMQ;
 /**
  *
  */
-public class VismoNode implements UDPListener, VismoElement {
+public class OldVismoNode implements UDPListener, VismoCloudElement {
     /***/
     private static final String            KILL   = "stop!";
     /** the log target. */
-    private static final Logger            log    = LoggerFactory.getLogger(VismoNode.class);
+    private static final Logger            log    = LoggerFactory.getLogger(OldVismoNode.class);
     /***/
     private static final String            STATUS = "status?";
     /** the list of supporting tasks. */
@@ -37,7 +37,7 @@ public class VismoNode implements UDPListener, VismoElement {
      *            the vm info object.
      * @throws SocketException
      */
-    VismoNode(final VMInfo vminfo) throws SocketException {
+    OldVismoNode(final VMInfo vminfo) throws SocketException {
         this.vminfo = vminfo;
         log.info("Starting up, pid={}, ip={}", vminfo.getPID(), vminfo.getInterface().getDisplayName() + vminfo.getAddress());
         log.info("running zmq version={}", ZMQ.getVersionString());
