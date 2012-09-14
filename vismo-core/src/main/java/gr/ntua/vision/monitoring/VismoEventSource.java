@@ -5,49 +5,46 @@ import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 /**
- * An event collector is the main entry point of the various events happening in localhost, that we care to monitor. This is used
- * to collect these events and pass them around to the rest of the system. Upon event receipt, the interested parties we'll be
- * notified. This is the main, "official" way events are entered into <em>Vismo</em>. In general, the system can have any number
- * of inputs ( {@link EventSource}'s) and any number of outputs ({@link EventSink}'s)
+ * This is the main, "official" way events are entered into <em>Vismo</em>. In general, the system can have any number of inputs (
+ * {@link EventSource}'s) and any number of outputs ({@link EventSink}'s).
  */
 public class VismoEventSource extends StoppableTask implements EventSource {
+    /** the socket used to receive events from outside the system. */
+    private final VismoSocket              eventsSock;
     /***/
-    private final EventFactory        factory;
+    private final EventFactory             factory;
+    /** this socket is for internal use (now used by the system to shutdown the source). */
+    private final VismoSocket              internalSock;
     /** the listeners lists. */
-    private final List<EventListener> listeners    = new ArrayList<EventListener>();
+    private final ArrayList<EventListener> listeners    = new ArrayList<EventListener>();
     /** the log target. */
-    private final Logger              log          = LoggerFactory.getLogger(VismoEventSource.class);
-    /** the socket used to receive events. */
-    private final VismoSocket         receiveEventsSock;
-    /** the socket used to send messages. */
-    private final VismoSocket         sendMessagesSock;
+    private final Logger                   log          = LoggerFactory.getLogger(VismoEventSource.class);
     /** the message used to stop the task. */
-    private final String              STOP_MESSAGE = "stop!";
+    private final String                   STOP_MESSAGE = "stop!";
 
 
     /**
      * Constructor.
      * 
-     * @param receiveEventsSock
-     *            the socket used to receive events.
-     * @param sendMessagesSock
-     *            the socket used to send messages.
+     * @param eventsSock
+     *            the socket used to receive events from outside the system.
+     * @param internalSock
+     *            this socket is for internal use (now used by the system to shutdown the source).
      * @param factory
      */
-    VismoEventSource(final VismoSocket receiveEventsSock, final VismoSocket sendMessagesSock, final EventFactory factory) {
+    VismoEventSource(final EventFactory factory, final VismoSocket eventsSock, final VismoSocket internalSock) {
         super("event-receiver");
-        log.debug("using {}", receiveEventsSock.toString());
-        log.debug("using {}", sendMessagesSock.toString());
-        this.receiveEventsSock = receiveEventsSock;
-        this.sendMessagesSock = sendMessagesSock;
         this.factory = factory;
+        this.eventsSock = eventsSock;
+        this.internalSock = internalSock;
+        log.debug("using {} for receiving external events", eventsSock);
+        log.debug("using {} for internal coordination", internalSock);
     }
 
 
@@ -59,7 +56,7 @@ public class VismoEventSource extends StoppableTask implements EventSource {
         log.debug("ready - awaiting events");
 
         while (true) {
-            final String message = receiveEventsSock.receive();
+            final String message = eventsSock.receive();
 
             log.trace("received: {}", message);
 
@@ -71,7 +68,7 @@ public class VismoEventSource extends StoppableTask implements EventSource {
 
             final Event e = factory.createEvent(message);
 
-            notifyAllOf(e);
+            notifyAll(e);
         }
 
         log.debug("shutting down");
@@ -108,7 +105,7 @@ public class VismoEventSource extends StoppableTask implements EventSource {
      * @param e
      *            the event received.
      */
-    private void notifyAllOf(final Event e) {
+    private void notifyAll(final Event e) {
         for (final EventListener listener : listeners)
             listener.receive(e);
     }
@@ -118,7 +115,7 @@ public class VismoEventSource extends StoppableTask implements EventSource {
      * Ask the thread to stop receiving messages.
      */
     private void sendStopMessage() {
-        sendMessagesSock.send(STOP_MESSAGE);
-        sendMessagesSock.close();
+        internalSock.send(STOP_MESSAGE);
+        internalSock.close();
     }
 }
