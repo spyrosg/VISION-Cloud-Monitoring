@@ -11,7 +11,7 @@ public interface MonitoringSocket {
 
 
     /**
-     * @return
+     * @return the message received.
      */
     String receive();
 

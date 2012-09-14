@@ -55,8 +55,10 @@ class EventDistributor {
 
 
     /**
+     * Check whether the event has already passed.
+     * 
      * @param map
-     * @return
+     * @return <code>true</code> iff the event has already been seen, according to its id, <code>false</code> otherwise.
      */
     private boolean eventAlreadySent(@SuppressWarnings("rawtypes") final Map map) {
         final String id = (String) map.get("id");

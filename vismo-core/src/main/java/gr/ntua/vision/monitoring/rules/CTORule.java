@@ -148,8 +148,10 @@ public class CTORule implements AggregationRule {
 
 
     /**
+     * Calculate the aggregation of the requests, broken down to tenants.
+     * 
      * @param eventList
-     * @return
+     * @return the result.
      */
     private static ArrayList<HashMap<String, Object>> aggregate(final List< ? extends Event> eventList) {
         final HashMap<ContainerRequest, RequestCTOStats> requestsByUser = aggregateOverUsers(eventList);
@@ -160,8 +162,11 @@ public class CTORule implements AggregationRule {
 
 
     /**
+     * Calculate the aggregation of the requests, broken down to containers.
+     * 
      * @param requestsByUser
-     * @return
+     *            the users' requests.
+     * @return the result.
      */
     @SuppressWarnings("unchecked")
     private static ArrayList<HashMap<String, Object>> aggregateOverContainers(
@@ -240,8 +245,10 @@ public class CTORule implements AggregationRule {
 
 
     /**
+     * Calculate the aggregation of the requests, broken down to users.
+     * 
      * @param eventList
-     * @return
+     * @return the result.
      */
     private static HashMap<ContainerRequest, RequestCTOStats> aggregateOverUsers(final List< ? extends Event> eventList) {
         final HashMap<ContainerRequest, RequestCTOStats> requests = new HashMap<ContainerRequest, RequestCTOStats>();
@@ -301,8 +308,11 @@ public class CTORule implements AggregationRule {
 
 
     /**
+     * Prepare a container object, ready to be send to the consumer.
+     * 
      * @param containerName
-     * @return
+     *            the name of the container.
+     * @return the container object.
      */
     private static HashMap<String, Object> getContainerObject(final String containerName) {
         final HashMap<String, Object> container = new HashMap<String, Object>();
@@ -315,13 +325,18 @@ public class CTORule implements AggregationRule {
 
 
     /**
+     * Calculate the cto event aggregations.
+     * 
      * @param eventList
+     *            the list of events.
      * @param topic
-     * @param aggregationStartTime
-     * @return
+     *            the topic.
+     * @param collectionStartTime
+     *            the time instance the collection of events started
+     * @return the full cto event.
      */
     private static HashMap<String, Object> getCTOEvent(final List< ? extends Event> eventList, final String topic,
-            final long aggregationStartTime) {
+            final long collectionStartTime) {
         final List<Event> readEventList = getReadEventsList(eventList);
         final List<Event> writeEventList = getWriteEventsList(eventList);
         final HashMap<String, Object> reads = new HashMap<String, Object>();
@@ -335,7 +350,7 @@ public class CTORule implements AggregationRule {
         dict.put("writes", writes);
 
         dict.put("topic", topic);
-        dict.put("tStart", aggregationStartTime);
+        dict.put("tStart", collectionStartTime);
         dict.put("tEnd", System.currentTimeMillis());
 
         return dict;
@@ -369,7 +384,7 @@ public class CTORule implements AggregationRule {
             log.trace("but got value {} of type {}", val, val.getClass());
             log.trace("exception: ", x);
 
-            return null;
+            return 0d;
         }
     }
 
@@ -401,14 +416,16 @@ public class CTORule implements AggregationRule {
             log.trace("but got value {} of type {}", val, val.getClass());
             log.trace("exception: ", x);
 
-            return null;
+            return 0l;
         }
     }
 
 
     /**
+     * Extract all read events from the list.
+     * 
      * @param eventList
-     * @return
+     * @return the read events list.
      */
     private static ArrayList<Event> getReadEventsList(final List< ? extends Event> eventList) {
         final ArrayList<Event> newList = new ArrayList<Event>();
@@ -447,8 +464,10 @@ public class CTORule implements AggregationRule {
 
 
     /**
+     * Extract all write events from the list.
+     * 
      * @param eventList
-     * @return
+     * @return the write events list.
      */
     private static ArrayList<Event> getWriteEventsList(final List< ? extends Event> eventList) {
         final ArrayList<Event> newList = new ArrayList<Event>();

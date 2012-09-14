@@ -21,7 +21,7 @@ public class RuleList {
     private static final Logger                     log          = LoggerFactory.getLogger(RuleList.class);
     /***/
     private final Map<AggregationRule, List<Event>> eventBuckets = new HashMap<AggregationRule, List<Event>>();
-    /***/
+    /** the actual rule list. */
     private final ArrayList<AggregationRule>        list         = new ArrayList<AggregationRule>();
     /***/
     private final long                              period;
@@ -99,10 +99,10 @@ public class RuleList {
      * @param e
      */
     private void appendToBucket(final AggregationRule rule, final Event e) {
-        final List<Event> list = eventBuckets.get(rule);
+        final List<Event> bucketList = eventBuckets.get(rule);
 
-        if (list != null) {
-            list.add(e);
+        if (bucketList != null) {
+            bucketList.add(e);
             return;
         }
 
