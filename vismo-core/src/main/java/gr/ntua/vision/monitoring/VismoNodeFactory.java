@@ -49,7 +49,7 @@ public class VismoNodeFactory {
         final ZMQSockets zmq = new ZMQSockets(new ZContext());
         final OldVismoNode vismo = new OldVismoNode(new VismoVMInfo());
 
-        final VismoEventSource receiver = new VismoEventSourceFactory(conf).build(zmq);
+        final VismoEventSource receiver = new VismoEventSourceFactory(conf).create(zmq);
         final EventDistributor distributor = new EventDistributor(zmq.newBoundPubSocket(conf.getConsumersPoint()));
 
         for (final EventListener listener : listeners)

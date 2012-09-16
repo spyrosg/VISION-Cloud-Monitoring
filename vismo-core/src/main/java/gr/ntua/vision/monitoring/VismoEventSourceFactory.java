@@ -27,7 +27,7 @@ public class VismoEventSourceFactory {
      * @param zmq
      * @return
      */
-    public VismoEventSource build(final ZMQSockets zmq) {
+    public VismoEventSource create(final ZMQSockets zmq) {
         return new VismoEventSource(new VismoEventFactory(), zmq.newBoundPullSocket(config.getProducersPoint()),
                 zmq.newConnectedPushSocket(config.getProducersPoint()));
     }

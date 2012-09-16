@@ -1,18 +1,30 @@
 package gr.ntua.vision.monitoring;
 
+import gr.ntua.vision.monitoring.zmq.ZMQSockets;
+
+
 /**
  *
  */
 public class VismoCloudElementFactory {
     /***/
-    private final VismoConfiguration conf;
+    private final VismoConfiguration      conf;
+    /***/
+    private final VismoEventSourceFactory eventFactory;
+    /***/
+    private final ZMQSockets              zmq;
 
 
     /**
+     * @param eventFactory
+     * @param zmq
      * @param conf
      */
-    private VismoCloudElementFactory(final VismoConfiguration conf) {
+    private VismoCloudElementFactory(VismoEventSourceFactory eventFactory, final ZMQSockets zmq, final VismoConfiguration conf) {
+        this.zmq = zmq;
         this.conf = conf;
+        this.eventFactory = eventFactory;
+
     }
 
 
@@ -28,7 +40,9 @@ public class VismoCloudElementFactory {
     /**
      * @return
      */
-    public OldVismoNode createVismoNode() {
-        return null;
+    public VismoNode createVismoNode() {
+        VismoEventSource source = eventFactory.create(zmq);
+
+        return new VismoNode(source, sink);
     }
 }
