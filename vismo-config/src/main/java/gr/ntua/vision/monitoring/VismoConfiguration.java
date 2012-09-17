@@ -14,13 +14,15 @@ public class VismoConfiguration extends PropertiesConfiguration {
     /***/
     private static final String CONSUMERS_POINT_PROPERTY       = "consumers.point";
     /***/
+    private static final String NODE_HEAD_PORT                 = "node.head.port";
+    /***/
     private static final String PRODUCERS_POINT_PROPERTY       = "producers.point";
     /***/
-    private static final String UDP_PORT_PROPERTY              = "udp.port";
+    private static final String TEST_CLUSTER_MACHINES_PROPERTY = "testClusterMachines";
     /***/
     private static final String TEST_CLUSTER_NAME_PROPERTY     = "testClusterName";
     /***/
-    private static final String TEST_CLUSTER_MACHINES_PROPERTY = "testClusterMachines";
+    private static final String UDP_PORT_PROPERTY              = "udp.port";
 
 
     /**
@@ -55,6 +57,14 @@ public class VismoConfiguration extends PropertiesConfiguration {
 
 
     /**
+     * @return
+     */
+    public String getNodeHeadPort() {
+        return get(NODE_HEAD_PORT);
+    }
+
+
+    /**
      * @return the producers port.
      */
     public String getProducersPoint() {
@@ -63,10 +73,12 @@ public class VismoConfiguration extends PropertiesConfiguration {
 
 
     /**
-     * @return the udp server port.
+     * @return the list of the ips of machines running in the cluster.
      */
-    public int getUDPPort() {
-        return Integer.valueOf(get(UDP_PORT_PROPERTY));
+    public List<String> getTestClusterMachines() {
+        final String value = get(TEST_CLUSTER_MACHINES_PROPERTY);
+
+        return Arrays.asList(value.split(", "));
     }
 
 
@@ -79,12 +91,10 @@ public class VismoConfiguration extends PropertiesConfiguration {
 
 
     /**
-     * @return the list of the ips of machines running in the cluster.
+     * @return the udp server port.
      */
-    public List<String> getTestClusterMachines() {
-        final String value = get(TEST_CLUSTER_MACHINES_PROPERTY);
-
-        return Arrays.asList(value.split(", "));
+    public int getUDPPort() {
+        return Integer.valueOf(get(UDP_PORT_PROPERTY));
     }
 
 

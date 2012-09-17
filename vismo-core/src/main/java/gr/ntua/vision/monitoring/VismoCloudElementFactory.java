@@ -1,6 +1,7 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.zmq.ZMQSockets;
+import java.net.SocketException;
+import java.util.List;
 
 
 /**
@@ -8,41 +9,37 @@ import gr.ntua.vision.monitoring.zmq.ZMQSockets;
  */
 public class VismoCloudElementFactory {
     /***/
-    private final VismoConfiguration      conf;
-    /***/
-    private final VismoEventSourceFactory eventFactory;
-    /***/
-    private final ZMQSockets              zmq;
+    private final VMInfo vminfo;
 
 
     /**
-     * @param eventFactory
-     * @param zmq
-     * @param conf
+     * Constructor.
+     * 
+     * @param vminfo
      */
-    private VismoCloudElementFactory(VismoEventSourceFactory eventFactory, final ZMQSockets zmq, final VismoConfiguration conf) {
-        this.zmq = zmq;
-        this.conf = conf;
-        this.eventFactory = eventFactory;
-
+    public VismoCloudElementFactory(final VMInfo vminfo) {
+        this.vminfo = vminfo;
     }
 
 
     /**
+     * @param sink
+     * @param sources
      * @return
      */
-    public VismoClusterNode createVismoClusterNode() {
-        // TODO
-        return null;
+    @SuppressWarnings("static-method")
+    public VismoClusterHead createVismoClusterHeadNode(final EventSink sink, final List<EventSource> sources) {
+        return new VismoClusterHead(sink, sources);
     }
 
 
     /**
+     * @param source
+     * @param sink
      * @return
+     * @throws SocketException
      */
-    public VismoNode createVismoNode() {
-        VismoEventSource source = eventFactory.create(zmq);
-
-        return new VismoNode(source, sink);
+    public VismoWorkerNode createVismoWorkerNode(final EventSource source, final EventSink sink) throws SocketException {
+        return new VismoWorkerNode(vminfo, source, sink);
     }
 }

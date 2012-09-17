@@ -1,7 +1,6 @@
 package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.udp.UDPClient;
-import gr.ntua.vision.monitoring.udp.UDPFactory;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -27,8 +26,12 @@ public class Main {
 
         final VismoConfiguration config = new VismoConfiguration(args[0]);
         final String command = args[1];
+        final ClusterController controller = new ClusterController(new VismoVMInfo(), config);
+        final VismoCloudElement elem = controller.setup();
 
-        if (command.equals("start")) {
+        elem.start();
+
+        /*if (command.equals("start")) {
             final OldVismoNode vismo = new VismoNodeFactory(config).build();
 
             vismo.start();
@@ -39,7 +42,7 @@ public class Main {
                 reportVismoStatus(client);
             else
                 shutdownVismo(client);
-        }
+        }*/
     }
 
 

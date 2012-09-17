@@ -12,17 +12,15 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * The event distributor (TODO: better name) is used to pass events received in localhost to all <em>Vismo</em> consumers. Each
- * event is sent according to its accompanying topic. NOTE: the running thread does not block, which means that for now, if there
- * is no receiving end (no connected consumers) the event is dropped.
+ * 
  */
-class EventDistributor {
-    /** the log target. */
-    private static final Logger   log      = LoggerFactory.getLogger(EventDistributor.class);
+public class BasicEventSink implements EventSink {
+    /***/
+    private static final Logger   log      = LoggerFactory.getLogger(BasicEventSink.class);
     // TODO: eventually remove eventIds or else vismo will blow with {@link OutOfMemoryError}.
     /***/
     private final HashSet<String> eventIds = new HashSet<String>();
-    /** the socket. */
+    /***/
     private final VismoSocket     sock;
 
 
@@ -30,18 +28,17 @@ class EventDistributor {
      * Constructor.
      * 
      * @param sock
-     *            the socket to use.
      */
-    EventDistributor(final VismoSocket sock) {
+    public BasicEventSink(final VismoSocket sock) {
         this.sock = sock;
-        log.debug("using: {}", sock);
     }
 
 
     /**
-     * @param e
+     * @see gr.ntua.vision.monitoring.EventSink#send(gr.ntua.vision.monitoring.events.Event)
      */
-    public void serialize(final Event e) {
+    @Override
+    public void send(final Event e) {
         @SuppressWarnings("rawtypes")
         final Map dict = (Map) e.get("!dict");
         final String ser = JSONObject.toJSONString(dict);
@@ -50,6 +47,15 @@ class EventDistributor {
             log.trace("sending event: {}", ser);
             sock.send(e.topic() + " " + ser);
         }
+    }
+
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "#<BasicEventSink using " + sock + ">";
     }
 
 

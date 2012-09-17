@@ -46,10 +46,11 @@ public class VismoNodeFactory {
      * @throws SocketException
      */
     public OldVismoNode build(final EventListener... listeners) throws SocketException {
-        final ZMQSockets zmq = new ZMQSockets(new ZContext());
+        // FIXME:
+        /*final ZMQSockets zmq = new ZMQSockets(new ZContext());
         final OldVismoNode vismo = new OldVismoNode(new VismoVMInfo());
 
-        final VismoEventSource receiver = new VismoEventSourceFactory(conf).create(zmq);
+        final VismoEventSource receiver = new VismoEventSourceFactory(conf).createLocalAddress(zmq);
         final EventDistributor distributor = new EventDistributor(zmq.newBoundPubSocket(conf.getConsumersPoint()));
 
         for (final EventListener listener : listeners)
@@ -69,7 +70,8 @@ public class VismoNodeFactory {
         vismo.addTask(new UDPFactory(conf.getUDPPort()).buildServer(vismo));
         vismo.addTask(receiver);
 
-        return vismo;
+        return vismo;*/
+        return null;
     }
 
 
