@@ -39,6 +39,15 @@ public class VismoWorkerNode extends AbstractVismoCloudElement {
 
 
     /**
+     * @see gr.ntua.vision.monitoring.AbstractVismoCloudElement#log()
+     */
+    @Override
+    protected Logger log() {
+        return log;
+    }
+
+
+    /**
      * @param e
      */
     private void doYourThing(final Event e) {

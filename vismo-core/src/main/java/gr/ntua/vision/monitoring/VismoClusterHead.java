@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
  */
 public class VismoClusterHead extends AbstractVismoCloudElement {
     /***/
-    private static final Logger log      = LoggerFactory.getLogger(VismoClusterHead.class);
-    /***/
     private static final String DICT_KEY = "!dict";
+    /***/
+    private static final Logger log      = LoggerFactory.getLogger(VismoClusterHead.class);
 
 
     /**
@@ -42,8 +42,17 @@ public class VismoClusterHead extends AbstractVismoCloudElement {
 
         try {
             log.trace("received event from {}: {}", e.originatingIP(), map);
-        } catch (UnknownHostException e1) {
+        } catch (final UnknownHostException e1) {
             log.error("error", e1);
         }
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.AbstractVismoCloudElement#log()
+     */
+    @Override
+    protected Logger log() {
+        return log;
     }
 }

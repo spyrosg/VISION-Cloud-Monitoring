@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.zeromq.ZMQ;
 
 
@@ -15,8 +14,6 @@ import org.zeromq.ZMQ;
  * 
  */
 abstract class AbstractVismoCloudElement implements VismoCloudElement, EventListener {
-    /***/
-    private static final Logger     log = LoggerFactory.getLogger(AbstractVismoCloudElement.class);
     /***/
     private final EventSink         sink;
     /***/
@@ -67,6 +64,12 @@ abstract class AbstractVismoCloudElement implements VismoCloudElement, EventList
 
 
     /**
+     * @return
+     */
+    protected abstract Logger log();
+
+
+    /**
      * @param e
      */
     protected void send(final Event e) {
@@ -78,11 +81,11 @@ abstract class AbstractVismoCloudElement implements VismoCloudElement, EventList
      * @throws SocketException
      */
     private void logStartup() throws SocketException {
-        log.info("Starting up, pid={}, ip={}", vminfo.getPID(), vminfo.getInterface().getDisplayName() + vminfo.getAddress());
-        log.info("running zmq version={}", ZMQ.getVersionString());
-        log.debug("\twith sink: {}", sink);
+        log().info("Starting up, pid={}, ip={}", vminfo.getPID(), vminfo.getInterface().getDisplayName() + vminfo.getAddress());
+        log().info("running zmq version={}", ZMQ.getVersionString());
+        log().debug("\twith sink: {}", sink);
 
         for (final EventSource source : sources)
-            log.debug("\twith source: {}", source);
+            log().debug("\twith source: {}", source);
     }
 }

@@ -102,10 +102,10 @@ public class ClusterController {
      * 
      */
     private void logConfig() {
-        log.debug("*** cluster configuration");
-        log.debug("cluster name is '{}'", conf.getTestClusterName());
-        log.debug("cluster machine's ips: {}", conf.getTestClusterMachines());
-        log.debug("cluster head is at {}", getClusterHeadIP());
+        log.trace("*** cluster configuration");
+        log.trace("cluster name is '{}'", conf.getTestClusterName());
+        log.trace("cluster machine's ips: {}", conf.getTestClusterMachines());
+        log.trace("cluster head is at {}", getClusterHeadIP());
     }
 
 
@@ -120,7 +120,7 @@ public class ClusterController {
     private VismoCloudElement setupVismoClusterHeadNode(final EventSource local) throws SocketException {
         final VismoSocket sock = zmq.newBoundPubSocket(conf.getConsumersPoint());
         final BasicEventSink sink = new BasicEventSink(sock);
-        final VismoSocket other = zmq.newBoundPullSocket(toZSocket("localhost", conf.getNodeHeadPort()));
+        final VismoSocket other = zmq.newBoundPullSocket(toZSocket("127.0.0.1", conf.getNodeHeadPort()));
         final BasicEventSource source = new BasicEventSource(new VismoEventFactory(), other);
 
         return factory.createVismoClusterHeadNode(sink, Arrays.asList(local, source));
