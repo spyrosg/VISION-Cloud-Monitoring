@@ -26,10 +26,11 @@ public class VismoCloudElementFactory {
      * @param sink
      * @param sources
      * @return
+     * @throws SocketException
      */
-    @SuppressWarnings("static-method")
-    public VismoClusterHead createVismoClusterHeadNode(final EventSink sink, final List<EventSource> sources) {
-        return new VismoClusterHead(sink, sources);
+    public VismoClusterHead createVismoClusterHeadNode(final EventSink sink, final List<EventSource> sources)
+            throws SocketException {
+        return new VismoClusterHead(vminfo, sink, sources);
     }
 
 
@@ -40,6 +41,6 @@ public class VismoCloudElementFactory {
      * @throws SocketException
      */
     public VismoWorkerNode createVismoWorkerNode(final EventSource source, final EventSink sink) throws SocketException {
-        return new VismoWorkerNode(vminfo, source, sink);
+        return new VismoWorkerNode(vminfo, sink, source);
     }
 }
