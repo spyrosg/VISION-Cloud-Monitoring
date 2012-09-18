@@ -14,8 +14,6 @@ public class VismoConfiguration extends PropertiesConfiguration {
     /***/
     private static final String CONSUMERS_POINT_PROPERTY       = "consumers.point";
     /***/
-    private static final String NODE_HEAD_PORT                 = "node.head.port";
-    /***/
     private static final String PRODUCERS_POINT_PROPERTY       = "producers.point";
     /***/
     private static final String TEST_CLUSTER_MACHINES_PROPERTY = "testClusterMachines";
@@ -23,6 +21,8 @@ public class VismoConfiguration extends PropertiesConfiguration {
     private static final String TEST_CLUSTER_NAME_PROPERTY     = "testClusterName";
     /***/
     private static final String UDP_PORT_PROPERTY              = "udp.port";
+    /***/
+    private static final String WORKERS_HEAD_PORT              = "workers.head.port";
 
 
     /**
@@ -57,10 +57,10 @@ public class VismoConfiguration extends PropertiesConfiguration {
 
 
     /**
-     * @return
+     * @return the port used by the cluster workers to talk to the head.
      */
     public String getNodeHeadPort() {
-        return get(NODE_HEAD_PORT);
+        return get(WORKERS_HEAD_PORT);
     }
 
 

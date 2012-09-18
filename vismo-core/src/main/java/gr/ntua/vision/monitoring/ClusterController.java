@@ -5,7 +5,7 @@ import gr.ntua.vision.monitoring.zmq.VismoSocket;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.net.SocketException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -21,12 +21,13 @@ public class ClusterController {
     /***/
     private static final Logger            log = LoggerFactory.getLogger(ClusterController.class);
     // TODO: obviously remove this. Find a better, more oo way to implement this responsibilities.
-    /***/
+    /** the configuration object. */
     private final VismoConfiguration       conf;
+    /** the factory. */
     private final VismoCloudElementFactory factory;
-    /***/
+    /** the vminfo object. */
     private final VMInfo                   vminfo;
-    /***/
+    /** the zmq object. */
     private final ZMQSockets               zmq = new ZMQSockets(new ZContext());
 
 
@@ -34,23 +35,27 @@ public class ClusterController {
      * Constructor.
      * 
      * @param vminfo
+     *            the vminfo object.
      * @param conf
+     *            the configuration object.
      */
     public ClusterController(final VMInfo vminfo, final VismoConfiguration conf) {
         this.vminfo = vminfo;
         this.conf = conf;
         this.factory = new VismoCloudElementFactory(vminfo);
-        logSetup();
     }
 
 
     /**
-     * @return
+     * Setup and return the proper cloud element.
+     * 
+     * @return either a {@link VismoWorkerNode} or a {@link VismoClusterHead} instance.
      * @throws SocketException
      */
     public VismoCloudElement setup() throws SocketException {
-        final BasicEventSource local = new BasicEventSource(new VismoEventFactory(),
-                getLocalProducerSocket(conf.getProducersPoint()));
+        logConfig();
+
+        final EventSource local = getLocalHostEventSource();
 
         if (hostIsClusterHead())
             return setupVismoClusterHeadNode(local);
@@ -60,16 +65,7 @@ public class ClusterController {
 
 
     /**
-     * @param address
-     * @return
-     */
-    private VismoSocket getClusterConsumersSocket(final String address) {
-        return zmq.newBoundPubSocket(address);
-    }
-
-
-    /**
-     * @return
+     * @return the ip of the machine running the cluster head.
      */
     private String getClusterHeadIP() {
         final List<String> machines = conf.getTestClusterMachines();
@@ -82,100 +78,100 @@ public class ClusterController {
 
 
     /**
-     * @return
+     * @return the event source for local host events.
      */
-    private String getClusterHeadPoint() {
-        return "tcp://" + getClusterHeadIP() + ":" + conf.getNodeHeadPort();
+    private EventSource getLocalHostEventSource() {
+        final VismoSocket sock = zmq.newBoundPullSocket(conf.getProducersPoint());
+
+        return new BasicEventSource(new VismoEventFactory(), sock);
     }
 
 
     /**
-     * @param address
-     * @return
+     * Check whether localhost is the cluster head (according to the configuration).
+     * 
+     * @return <code>true</code> when localhost is the cluster head, <code>false</code> otherwise.
+     * @throws SocketException
      */
-    private VismoSocket getClusterHeadSocket(final String address) {
-        return zmq.newConnectedPushSocket(address);
-    }
-
-
-    /**
-     * @param address
-     * @return
-     */
-    private VismoSocket getLocalProducerSocket(final String address) {
-        return zmq.newBoundPullSocket(address);
-    }
-
-
-    /**
-     * @return
-     */
-    private ArrayList<EventSource> getNodePoints() {
-        final ArrayList<EventSource> sources = new ArrayList<EventSource>();
-
-        for (final String ip : conf.getTestClusterMachines())
-            if (!ip.equals(getClusterHeadIP())) {
-                // FIXME:
-                final BasicEventSource source = new BasicEventSource(new VismoEventFactory(), null);
-
-                sources.add(source);
-            }
-
-        return sources;
-    }
-
-
-    /**
-     * @return
-     */
-    private boolean hostIsClusterHead() {
-        // return getClusterHeadIP().equals(vminfo.getAddress().getHostAddress());
-        return true;
+    private boolean hostIsClusterHead() throws SocketException {
+        return getClusterHeadIP().equals(vminfo.getAddress().getHostAddress());
     }
 
 
     /**
      * 
      */
-    private void logSetup() {
-        log.debug("*** showing cluster configuration");
+    private void logConfig() {
+        log.debug("*** cluster configuration");
         log.debug("cluster name is '{}'", conf.getTestClusterName());
         log.debug("cluster machine's ips: {}", conf.getTestClusterMachines());
-        log.debug("cluster head is {}", getClusterHeadIP());
+        log.debug("cluster head is at {}", getClusterHeadIP());
     }
 
 
     /**
-     * @param localHostSource
-     * @return
+     * Setup and return the cluster head instance.
+     * 
+     * @param local
+     *            the local events source.
+     * @return a {@link VismoClusterHead} object.
      */
-    private VismoCloudElement setupVismoClusterHeadNode(final BasicEventSource localHostSource) {
-        final BasicEventSink sink = new BasicEventSink(getClusterConsumersSocket(conf.getConsumersPoint()));
-        final ArrayList<EventSource> otherNodes = getNodePoints();
+    private VismoCloudElement setupVismoClusterHeadNode(final EventSource local) {
+        final VismoSocket sock = zmq.newBoundPubSocket(conf.getConsumersPoint());
+        final BasicEventSink sink = new BasicEventSink(sock);
+        final VismoSocket other = zmq.newBoundPullSocket(toZSocket("localhost", conf.getNodeHeadPort()));
+        final BasicEventSource source = new BasicEventSource(new VismoEventFactory(), other);
 
-        otherNodes.add(localHostSource);
-
-        return factory.createVismoClusterHeadNode(sink, otherNodes);
+        return factory.createVismoClusterHeadNode(sink, Arrays.asList(local, source));
     }
 
 
     /**
-     * @param localHostSource
-     * @return
+     * Setup and return the cluster worker instance.
+     * 
+     * @param local
+     *            the local events source.
+     * @return a {@link VismoWorkerNode} object.
      * @throws SocketException
      */
-    private VismoCloudElement setupVismoWorkerNode(final BasicEventSource localHostSource) throws SocketException {
-        final BasicEventSink sink = new BasicEventSink(getClusterHeadSocket(getClusterHeadPoint()));
+    private VismoCloudElement setupVismoWorkerNode(final EventSource local) throws SocketException {
+        final VismoSocket sock = zmq.newConnectedPushSocket(workerToHeadSocket());
+        final BasicEventSink sink = new BasicEventSink(sock);
 
-        return factory.createVismoWorkerNode(localHostSource, sink);
+        return factory.createVismoWorkerNode(local, sink);
     }
 
 
     /**
+     * @return the full ip address that is used by the cluster workers to talk to the head.
+     */
+    private String workerToHeadSocket() {
+        return toZSocket(getClusterHeadIP(), conf.getNodeHeadPort());
+    }
+
+
+    /**
+     * Return the ip of the machine that is the head of the cluster.
+     * 
      * @param machines
-     * @return
+     *            the list of machines in the cluster.
+     * @return the ip of the machine that is the head of the cluster.
      */
     private static String selectClusterHead(final List<String> machines) {
         return machines.get(machines.size() / 2);
+    }
+
+
+    /**
+     * Turn an ip address and port to a zmq device.
+     * 
+     * @param ip
+     *            the ip address.
+     * @param port
+     *            the ip port.
+     * @return the string representation of a zmq device.
+     */
+    private static String toZSocket(final String ip, final String port) {
+        return "tcp://" + ip + ":" + port;
     }
 }
