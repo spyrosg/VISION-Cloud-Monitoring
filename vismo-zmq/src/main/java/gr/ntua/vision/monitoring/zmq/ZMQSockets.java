@@ -78,8 +78,8 @@ public class ZMQSockets {
      *            the address to connect to.
      * @return a connected to the address push socket.
      */
-    public VismoSocket newConnectedPushSocket(final String addr) {
-        final Socket sock = ctx.createSocket(ZMQ.PUSH);
+    public VismoSocket newConnectedPullSocket(final String addr) {
+        final Socket sock = ctx.createSocket(ZMQ.PULL);
 
         sock.setLinger(0);
         sock.connect(addr);
@@ -93,8 +93,8 @@ public class ZMQSockets {
      *            the address to connect to.
      * @return a connected to the address push socket.
      */
-    public VismoSocket newConnectedPullSocket(final String addr) {
-        final Socket sock = ctx.createSocket(ZMQ.PULL);
+    public VismoSocket newConnectedPushSocket(final String addr) {
+        final Socket sock = ctx.createSocket(ZMQ.PUSH);
 
         sock.setLinger(0);
         sock.connect(addr);
