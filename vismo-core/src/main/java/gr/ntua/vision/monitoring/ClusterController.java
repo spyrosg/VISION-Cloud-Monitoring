@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.zeromq.ZContext;
 
 
+//TODO: obviously remove this. Find a better, more oo way to implement this responsibilities.
+
 /**
  * This object is responsible for setting up the cluster. More accurately, it knows how to setup either a simple node or a cluster
  * leader node.
@@ -20,7 +22,6 @@ import org.zeromq.ZContext;
 public class ClusterController {
     /***/
     private static final Logger            log = LoggerFactory.getLogger(ClusterController.class);
-    // TODO: obviously remove this. Find a better, more oo way to implement this responsibilities.
     /** the configuration object. */
     private final VismoConfiguration       conf;
     /** the factory. */
@@ -55,7 +56,7 @@ public class ClusterController {
     public VismoCloudElement setup() throws SocketException {
         logConfig();
 
-        final EventSource local = getLocalHostEventSource();
+        final BasicEventSource local = getLocalHostEventSource();
 
         if (hostIsClusterHead())
             return setupVismoClusterHeadNode(local);
@@ -80,7 +81,7 @@ public class ClusterController {
     /**
      * @return the event source for local host events.
      */
-    private EventSource getLocalHostEventSource() {
+    private BasicEventSource getLocalHostEventSource() {
         final VismoSocket sock = zmq.newBoundPullSocket(conf.getProducersPoint());
 
         return new BasicEventSource(new VismoEventFactory(), sock);
@@ -117,7 +118,7 @@ public class ClusterController {
      * @return a {@link VismoClusterHead} object.
      * @throws SocketException
      */
-    private VismoCloudElement setupVismoClusterHeadNode(final EventSource local) throws SocketException {
+    private VismoCloudElement setupVismoClusterHeadNode(final BasicEventSource local) throws SocketException {
         final VismoSocket sock = zmq.newBoundPubSocket(conf.getConsumersPoint());
         final BasicEventSink sink = new BasicEventSink(sock);
         final VismoSocket other = zmq.newBoundPullSocket(toZSocket("127.0.0.1", conf.getNodeHeadPort()));
@@ -135,7 +136,7 @@ public class ClusterController {
      * @return a {@link VismoWorkerNode} object.
      * @throws SocketException
      */
-    private VismoCloudElement setupVismoWorkerNode(final EventSource local) throws SocketException {
+    private VismoCloudElement setupVismoWorkerNode(final BasicEventSource local) throws SocketException {
         final VismoSocket sock = zmq.newConnectedPushSocket(workerToHeadSocket());
         final BasicEventSink sink = new BasicEventSink(sock);
 

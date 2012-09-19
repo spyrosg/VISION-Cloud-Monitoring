@@ -2,15 +2,9 @@ package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.rules.AggregationRule;
-import gr.ntua.vision.monitoring.rules.CTORule;
-import gr.ntua.vision.monitoring.scheduling.JVMStatusReportTask;
-import gr.ntua.vision.monitoring.udp.UDPFactory;
-import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.net.SocketException;
 import java.util.concurrent.TimeUnit;
-
-import org.zeromq.ZContext;
 
 
 /**

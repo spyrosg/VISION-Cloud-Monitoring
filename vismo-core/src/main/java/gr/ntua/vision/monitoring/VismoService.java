@@ -4,43 +4,36 @@ import gr.ntua.vision.monitoring.scheduling.VismoRepeatedTask;
 import gr.ntua.vision.monitoring.scheduling.VismoTimer;
 import gr.ntua.vision.monitoring.udp.UDPListener;
 
-import java.net.SocketException;
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeromq.ZMQ;
 
 
 /**
- *
+ * 
  */
-public class OldVismoNode implements UDPListener, VismoCloudElement {
+public class VismoService extends Thread implements UDPListener {
     /***/
     private static final String            KILL   = "stop!";
     /** the log target. */
-    private static final Logger            log    = LoggerFactory.getLogger(OldVismoNode.class);
+    private static final Logger            log    = LoggerFactory.getLogger(VismoService.class);
     /***/
     private static final String            STATUS = "status?";
     /** the list of supporting tasks. */
     private final ArrayList<StoppableTask> tasks  = new ArrayList<StoppableTask>();
     /***/
     private final VismoTimer               timer  = new VismoTimer();
-    /***/
-    private final VMInfo                   vminfo;
 
 
     /**
      * Constructor.
      * 
-     * @param vminfo
-     *            the vm info object.
-     * @throws SocketException
+     * @param elem
      */
-    OldVismoNode(final VMInfo vminfo) throws SocketException {
-        this.vminfo = vminfo;
-        log.info("Starting up, pid={}, ip={}", vminfo.getPID(), vminfo.getInterface().getDisplayName() + vminfo.getAddress());
-        log.info("running zmq version={}", ZMQ.getVersionString());
+    public VismoService(final VismoCloudElement elem) {
+        elem.start();
+        elem.startTasks(this);
     }
 
 
@@ -76,7 +69,7 @@ public class OldVismoNode implements UDPListener, VismoCloudElement {
         if (msg.equals(STATUS))
             return status();
 
-        stop();
+        shutDown();
         return KILL;
     }
 
@@ -85,31 +78,21 @@ public class OldVismoNode implements UDPListener, VismoCloudElement {
      * Start running any supporting tasks.
      */
     @Override
-    public void start() {
-        log.debug("starting {} tasks", tasks.size());
+    public void run() {
+        log.debug("starting {} task{}", tasks.size(), tasks.size() != 1 ? "s" : "");
 
         for (final Thread t : tasks)
             t.start();
 
-        log.debug("scheduling {} timer tasks", tasks.size());
+        log.debug("scheduling {} timer task{}", tasks.size(), tasks.size() != 1 ? "s" : "");
         timer.start();
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.VismoCloudElement#startTasks(gr.ntua.vision.monitoring.VismoService)
-     */
-    @Override
-    public void startTasks(final VismoService vismoService) {
-        // TODO Auto-generated method stub
-
     }
 
 
     /**
      * Stop the application. Wait for the supporting tasks to stop.
      */
-    public void stop() {
+    private void shutDown() {
         log.info("shutting down");
         shutdownTasks();
     }
@@ -144,7 +127,8 @@ public class OldVismoNode implements UDPListener, VismoCloudElement {
     /**
      * @return the pid of the running jvm, as a string.
      */
+    @SuppressWarnings("static-method")
     private String status() {
-        return String.valueOf(vminfo.getPID());
+        return String.valueOf(new VismoVMInfo().getPID());
     }
 }

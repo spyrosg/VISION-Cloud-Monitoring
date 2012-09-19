@@ -27,7 +27,8 @@ public class VismoClusterHead extends AbstractVismoCloudElement {
      * @param sources
      * @throws SocketException
      */
-    public VismoClusterHead(final VMInfo vminfo, final EventSink sink, final List<EventSource> sources) throws SocketException {
+    public VismoClusterHead(final VMInfo vminfo, final EventSink sink, final List<BasicEventSource> sources)
+            throws SocketException {
         super(vminfo, sink, sources);
     }
 

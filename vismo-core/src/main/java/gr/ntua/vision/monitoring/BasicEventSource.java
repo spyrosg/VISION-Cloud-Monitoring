@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  */
-public class BasicEventSource implements EventSource, Runnable {
+public class BasicEventSource extends StoppableTask implements EventSource {
     /***/
     private final EventFactory             factory;
     /** the listeners lists. */
@@ -32,6 +32,7 @@ public class BasicEventSource implements EventSource, Runnable {
      * @param factory
      */
     BasicEventSource(final EventFactory factory, final VismoSocket sock) {
+        super("basic-event-source");
         this.factory = factory;
         this.sock = sock;
     }
@@ -62,6 +63,20 @@ public class BasicEventSource implements EventSource, Runnable {
                 log.error("deserializing error", x);
                 log.debug("skipping");
             }
+        }
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.StoppableTask#shutDown()
+     */
+    @Override
+    public void shutDown() {
+        try {
+            interrupt();
+            sock.close();
+        } catch (Throwable x) {
+            // ignored
         }
     }
 

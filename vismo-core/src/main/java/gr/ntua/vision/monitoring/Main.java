@@ -1,17 +1,22 @@
 package gr.ntua.vision.monitoring;
 
+import gr.ntua.vision.monitoring.scheduling.JVMStatusReportTask;
 import gr.ntua.vision.monitoring.udp.UDPClient;
+import gr.ntua.vision.monitoring.udp.UDPFactory;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.util.concurrent.TimeUnit;
 
 
 /**
  * The entry point to the monitoring instance.
  */
 public class Main {
+    /***/
+    private static final long   ONE_MINUTE = TimeUnit.MINUTES.toMillis(1);
     /** the program name. */
-    private static final String PROG = "vismo";
+    private static final String PROG       = "vismo";
 
 
     /**
@@ -26,15 +31,18 @@ public class Main {
 
         final VismoConfiguration config = new VismoConfiguration(args[0]);
         final String command = args[1];
-        final ClusterController controller = new ClusterController(new VismoVMInfo(), config);
-        final VismoCloudElement elem = controller.setup();
 
-        elem.start();
+        if (command.equals("start")) {
+            // final OldVismoNode vismo = new VismoNodeFactory(config).build();
 
-        /*if (command.equals("start")) {
-            final OldVismoNode vismo = new VismoNodeFactory(config).build();
+            // vismo.start();
+            final ClusterController controller = new ClusterController(new VismoVMInfo(), config);
+            final VismoCloudElement elem = controller.setup();
+            final VismoService service = new VismoService(elem);
 
-            vismo.start();
+            service.addTimerTask(new JVMStatusReportTask(ONE_MINUTE));
+            service.addTask(new UDPFactory(config.getUDPPort()).buildServer(service));
+            service.start();
         } else {
             final UDPClient client = new UDPFactory(config.getUDPPort()).buildClient();
 
@@ -42,7 +50,7 @@ public class Main {
                 reportVismoStatus(client);
             else
                 shutdownVismo(client);
-        }*/
+        }
     }
 
 

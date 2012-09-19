@@ -8,4 +8,10 @@ public interface VismoCloudElement {
      * 
      */
     void start();
+
+
+    /**
+     * @param vismoService
+     */
+    void startTasks(VismoService vismoService);
 }

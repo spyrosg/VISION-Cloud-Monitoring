@@ -15,11 +15,11 @@ import org.zeromq.ZMQ;
  */
 abstract class AbstractVismoCloudElement implements VismoCloudElement, EventListener {
     /***/
-    private final EventSink         sink;
+    private final EventSink              sink;
     /***/
-    private final List<EventSource> sources;
+    private final List<BasicEventSource> sources;
     /***/
-    private final VMInfo            vminfo;
+    private final VMInfo                 vminfo;
 
 
     /**
@@ -30,7 +30,7 @@ abstract class AbstractVismoCloudElement implements VismoCloudElement, EventList
      * @param sources
      * @throws SocketException
      */
-    public AbstractVismoCloudElement(final VMInfo vminfo, final EventSink sink, final EventSource... sources)
+    public AbstractVismoCloudElement(final VMInfo vminfo, final EventSink sink, final BasicEventSource... sources)
             throws SocketException {
         this(vminfo, sink, Arrays.asList(sources));
     }
@@ -44,7 +44,7 @@ abstract class AbstractVismoCloudElement implements VismoCloudElement, EventList
      * @param sources
      * @throws SocketException
      */
-    public AbstractVismoCloudElement(final VMInfo vminfo, final EventSink sink, final List<EventSource> sources)
+    public AbstractVismoCloudElement(final VMInfo vminfo, final EventSink sink, final List<BasicEventSource> sources)
             throws SocketException {
         this.vminfo = vminfo;
         this.sink = sink;
@@ -64,7 +64,17 @@ abstract class AbstractVismoCloudElement implements VismoCloudElement, EventList
 
 
     /**
-     * @return
+     * @see gr.ntua.vision.monitoring.VismoCloudElement#startTasks(gr.ntua.vision.monitoring.VismoService)
+     */
+    @Override
+    public void startTasks(final VismoService vismoService) {
+        for (final BasicEventSource source : sources)
+            vismoService.addTask(source);
+    }
+
+
+    /**
+     * @return the logger object.
      */
     protected abstract Logger log();
 

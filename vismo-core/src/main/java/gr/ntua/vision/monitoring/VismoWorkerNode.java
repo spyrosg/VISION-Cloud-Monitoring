@@ -24,7 +24,7 @@ public class VismoWorkerNode extends AbstractVismoCloudElement {
      * @param sources
      * @throws SocketException
      */
-    public VismoWorkerNode(final VMInfo vminfo, final EventSink sink, final EventSource... sources) throws SocketException {
+    public VismoWorkerNode(final VMInfo vminfo, final EventSink sink, final BasicEventSource... sources) throws SocketException {
         super(vminfo, sink, sources);
     }
 
