@@ -3,7 +3,6 @@ package gr.ntua.vision.monitoring;
 import gr.ntua.vision.monitoring.events.Event;
 
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 
@@ -41,11 +40,9 @@ public class VismoClusterHead extends AbstractVismoCloudElement {
         @SuppressWarnings("rawtypes")
         final Map map = (Map) e.get(DICT_KEY);
 
-        try {
-            log.trace("received event from {}: {}", e.originatingIP(), map);
-        } catch (final UnknownHostException e1) {
-            log.error("error", e1);
-        }
+        log.trace("received event from {}: {}", map.get("originating-machine"), map);
+        aggregate();
+        send(e);
     }
 
 
@@ -55,5 +52,14 @@ public class VismoClusterHead extends AbstractVismoCloudElement {
     @Override
     protected Logger log() {
         return log;
+    }
+
+
+    /**
+     * 
+     */
+    private void aggregate() {
+        // TODO Auto-generated method stub
+
     }
 }

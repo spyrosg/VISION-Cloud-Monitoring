@@ -75,7 +75,7 @@ public class BasicEventSource extends StoppableTask implements EventSource {
         try {
             interrupt();
             sock.close();
-        } catch (Throwable x) {
+        } catch (final Throwable x) {
             // ignored
         }
     }
