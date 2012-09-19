@@ -120,7 +120,7 @@ public class ClusterController {
      */
     private VismoCloudElement setupVismoClusterHeadNode(final BasicEventSource local) throws SocketException {
         final VismoSocket sock = zmq.newBoundPubSocket(conf.getConsumersPoint());
-        final BasicEventSink sink = new BasicEventSink(sock);
+        final BasicEventSink sink = new PubSubEventSink(sock);
         final VismoSocket other = zmq.newBoundPullSocket(toZSocket("*", conf.getNodeHeadPort()));
         final BasicEventSource source = new BasicEventSource(new VismoEventFactory(), other);
 

@@ -17,11 +17,11 @@ import org.slf4j.LoggerFactory;
 public class BasicEventSink implements EventSink {
     /***/
     private static final Logger   log      = LoggerFactory.getLogger(BasicEventSink.class);
+    /***/
+    protected final VismoSocket   sock;
     // TODO: eventually remove eventIds or else vismo will blow with {@link OutOfMemoryError}.
     /***/
     private final HashSet<String> eventIds = new HashSet<String>();
-    /***/
-    private final VismoSocket     sock;
 
 
     /**
@@ -45,7 +45,7 @@ public class BasicEventSink implements EventSink {
 
         if (!eventAlreadySent(dict)) {
             log.trace("sending event: {}", ser);
-            sock.send(e.topic() + " " + ser);
+            send(ser);
         }
     }
 
@@ -65,7 +65,7 @@ public class BasicEventSink implements EventSink {
      * @param map
      * @return <code>true</code> iff the event has already been seen, according to its id, <code>false</code> otherwise.
      */
-    private boolean eventAlreadySent(@SuppressWarnings("rawtypes") final Map map) {
+    protected boolean eventAlreadySent(@SuppressWarnings("rawtypes") final Map map) {
         final String id = (String) map.get("id");
 
         if (eventIds.contains(id)) {
@@ -76,5 +76,13 @@ public class BasicEventSink implements EventSink {
         eventIds.add(id);
 
         return false;
+    }
+
+
+    /**
+     * @param message
+     */
+    protected void send(final String message) {
+        sock.send(message);
     }
 }
