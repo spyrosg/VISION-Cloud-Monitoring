@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision.monitoring.sinks;
 
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
@@ -35,7 +35,7 @@ public class BasicEventSink implements EventSink {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.EventSink#send(gr.ntua.vision.monitoring.events.Event)
+     * @see gr.ntua.vision.monitoring.sinks.EventSink#send(gr.ntua.vision.monitoring.events.Event)
      */
     @Override
     public void send(final Event e) {

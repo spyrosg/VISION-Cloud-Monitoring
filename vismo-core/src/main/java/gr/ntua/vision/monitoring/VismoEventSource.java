@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventFactory;
+import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
 
 import java.util.ArrayList;

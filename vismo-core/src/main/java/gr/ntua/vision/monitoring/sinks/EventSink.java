@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision.monitoring.sinks;
 
 import gr.ntua.vision.monitoring.events.Event;
 
