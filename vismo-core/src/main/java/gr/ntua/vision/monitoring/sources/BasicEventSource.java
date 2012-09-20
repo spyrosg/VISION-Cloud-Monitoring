@@ -1,5 +1,7 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision.monitoring.sources;
 
+import gr.ntua.vision.monitoring.EventListener;
+import gr.ntua.vision.monitoring.StoppableTask;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
@@ -31,7 +33,7 @@ public class BasicEventSource extends StoppableTask implements EventSource {
      *            the socket used to receive events from outside the system.
      * @param factory
      */
-    BasicEventSource(final EventFactory factory, final VismoSocket sock) {
+    public BasicEventSource(final EventFactory factory, final VismoSocket sock) {
         super("basic-event-source");
         this.factory = factory;
         this.sock = sock;

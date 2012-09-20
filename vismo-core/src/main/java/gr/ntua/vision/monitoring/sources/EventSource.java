@@ -1,4 +1,7 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision.monitoring.sources;
+
+import gr.ntua.vision.monitoring.EventListener;
+
 
 /**
  * A source of events is responsible for receiving events, that then distributes to the various in-system consumers. Consumers

@@ -1,5 +1,7 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision.monitoring.sources;
 
+import gr.ntua.vision.monitoring.EventListener;
+import gr.ntua.vision.monitoring.StoppableTask;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.sinks.EventSink;
