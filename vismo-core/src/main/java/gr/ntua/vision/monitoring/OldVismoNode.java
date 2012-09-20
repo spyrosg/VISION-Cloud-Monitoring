@@ -97,16 +97,6 @@ public class OldVismoNode implements UDPListener, VismoCloudElement {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.VismoCloudElement#startTasks(gr.ntua.vision.monitoring.VismoService)
-     */
-    @Override
-    public void startTasks(final VismoService vismoService) {
-        // TODO Auto-generated method stub
-
-    }
-
-
-    /**
      * Stop the application. Wait for the supporting tasks to stop.
      */
     public void stop() {
