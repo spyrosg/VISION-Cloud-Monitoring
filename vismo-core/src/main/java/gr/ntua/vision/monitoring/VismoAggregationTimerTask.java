@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.scheduling.VismoRepeatedTask;
+import gr.ntua.vision.monitoring.sinks.EventSink;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,22 +13,22 @@ import org.slf4j.LoggerFactory;
  */
 public class VismoAggregationTimerTask extends VismoRepeatedTask implements EventListener {
     /***/
-    private static final Logger    log = LoggerFactory.getLogger(VismoAggregationTimerTask.class);
+    private static final Logger log = LoggerFactory.getLogger(VismoAggregationTimerTask.class);
     /***/
-    private final EventDistributor distributor;
+    private final RuleList      rules;
     /***/
-    private final RuleList         rules;
+    private final EventSink     sink;
 
 
     /**
      * Constructor.
      * 
-     * @param distributor
      * @param rules
+     * @param sink
      */
-    public VismoAggregationTimerTask(final EventDistributor distributor, final RuleList rules) {
-        this.distributor = distributor;
+    public VismoAggregationTimerTask(final RuleList rules, final EventSink sink) {
         this.rules = rules;
+        this.sink = sink;
     }
 
 
@@ -63,7 +64,7 @@ public class VismoAggregationTimerTask extends VismoRepeatedTask implements Even
         try {
             final long aggregationPeriodTimestamp = scheduledExecutionTime() - rules.getPeriod();
 
-            rules.runRules(aggregationPeriodTimestamp, distributor);
+            rules.runRules(aggregationPeriodTimestamp, sink);
         } catch (final Throwable x) {
             log.trace("performPendingOperations exception: ", x);
         }

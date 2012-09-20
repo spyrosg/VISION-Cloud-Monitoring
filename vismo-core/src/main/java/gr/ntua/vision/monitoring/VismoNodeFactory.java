@@ -98,7 +98,8 @@ public class VismoNodeFactory {
      * @return
      */
     private static VismoAggregationTimerTask getTimerFor(final EventDistributor distributor, final RuleList list) {
-        return new VismoAggregationTimerTask(distributor, list);
+        // return new VismoAggregationTimerTask(distributor, list);
+        return null;
     }
 
 

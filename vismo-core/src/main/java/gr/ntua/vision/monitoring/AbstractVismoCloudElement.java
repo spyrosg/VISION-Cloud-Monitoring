@@ -24,9 +24,9 @@ abstract class AbstractVismoCloudElement implements VismoCloudElement, EventList
     /***/
     private static final String            STATUS = "status?";
     /***/
-    private final EventSink                sink;
+    protected final EventSink              sink;
     /***/
-    private final List<BasicEventSource>   sources;
+    protected final List<BasicEventSource> sources;
     /** the list of supporting tasks. */
     private final ArrayList<StoppableTask> tasks  = new ArrayList<StoppableTask>();
     /***/

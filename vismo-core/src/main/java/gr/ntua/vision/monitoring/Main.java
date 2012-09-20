@@ -49,6 +49,7 @@ public class Main {
 
             server.start();
             ((AbstractVismoCloudElement) elem).addTask(server);
+            // ((AbstractVismoCloudElement) elem).addTimerTask(new JVMStatusReportTask(ONE_MINUTE));
         } else {
             final UDPClient client = new UDPFactory(config.getUDPPort()).buildClient();
 

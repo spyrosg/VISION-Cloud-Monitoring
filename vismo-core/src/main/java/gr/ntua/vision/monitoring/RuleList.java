@@ -3,6 +3,7 @@ package gr.ntua.vision.monitoring;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.rules.AggregationResultEvent;
 import gr.ntua.vision.monitoring.rules.AggregationRule;
+import gr.ntua.vision.monitoring.sinks.EventSink;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,7 +69,7 @@ public class RuleList {
      * @param aggregationPeriodTimestamp
      * @param distributor
      */
-    public void runRules(final long aggregationPeriodTimestamp, final EventDistributor distributor) {
+    public void runRules(final long aggregationPeriodTimestamp, final EventSink sink) {
         for (final AggregationRule rule : list) {
             final List<Event> eventList = eventBuckets.remove(rule);
 
@@ -84,7 +85,7 @@ public class RuleList {
                 final AggregationResultEvent result = rule.aggregate(aggregationPeriodTimestamp, eventList);
 
                 log.debug("aggregation successful for rule {} => {}", rule, result);
-                distributor.serialize(result);
+                sink.send(result);
             } catch (final Throwable x) {
                 log.error("aggregation error", x);
             }
