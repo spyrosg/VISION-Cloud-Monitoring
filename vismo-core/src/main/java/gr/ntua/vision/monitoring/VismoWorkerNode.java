@@ -1,10 +1,10 @@
 package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.sinks.EventSink;
+import gr.ntua.vision.monitoring.events.VismoEventFactory;
+import gr.ntua.vision.monitoring.sinks.BasicEventSink;
 import gr.ntua.vision.monitoring.sources.BasicEventSource;
-
-import java.net.SocketException;
+import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,13 +21,10 @@ public class VismoWorkerNode extends AbstractVismoCloudElement {
     /**
      * Constructor.
      * 
-     * @param vminfo
-     * @param sink
-     * @param sources
-     * @throws SocketException
+     * @param service
      */
-    public VismoWorkerNode(final VMInfo vminfo, final EventSink sink, final BasicEventSource... sources) throws SocketException {
-        super(vminfo, sink, sources);
+    public VismoWorkerNode(final VismoService service) {
+        super(service);
     }
 
 
@@ -55,5 +52,29 @@ public class VismoWorkerNode extends AbstractVismoCloudElement {
     private void doYourThing(final Event e) {
         // TODO: maybe in another thread?
         send(e);
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.VismoCloudElement#setup(gr.ntua.vision.monitoring.VismoConfiguration,
+     *      gr.ntua.vision.monitoring.zmq.ZMQSockets)
+     */
+    @Override
+    public void setup(VismoConfiguration conf, ZMQSockets zmq) {
+        final BasicEventSource source = getSource(zmq, conf.getProducersPoint());
+
+        attach(source);
+        
+        final BasicEventSink sink = new BasicEventSink(zmq.newConnectedPushSocket(conf.get));
+    }
+
+
+    /**
+     * @param zmq
+     * @param addr
+     * @return
+     */
+    private static BasicEventSource getSource(final ZMQSockets zmq, final String addr) {
+        return new BasicEventSource(new VismoEventFactory(), zmq.newBoundPubSocket(addr));
     }
 }

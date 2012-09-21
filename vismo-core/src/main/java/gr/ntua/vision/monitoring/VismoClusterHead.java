@@ -3,14 +3,8 @@ package gr.ntua.vision.monitoring;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.rules.AggregationRule;
 import gr.ntua.vision.monitoring.rules.CTORule;
-import gr.ntua.vision.monitoring.scheduling.VismoRepeatedTask;
-import gr.ntua.vision.monitoring.scheduling.VismoTimer;
-import gr.ntua.vision.monitoring.sinks.EventSink;
-import gr.ntua.vision.monitoring.sources.BasicEventSource;
 import gr.ntua.vision.monitoring.sources.EventSource;
 
-import java.net.SocketException;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -30,31 +24,15 @@ public class VismoClusterHead extends AbstractVismoCloudElement {
     private static final long   ONE_MINUTE    = TimeUnit.MINUTES.toMillis(1);
     /***/
     private static final long   THREE_SECONDS = TimeUnit.SECONDS.toMillis(3);
-    /***/
-    private final VismoTimer    timer         = new VismoTimer();
 
 
     /**
-     * @param vminfo
-     * @param sink
-     * @param sources
-     * @throws SocketException
-     */
-    public VismoClusterHead(final VMInfo vminfo, final EventSink sink, final List<BasicEventSource> sources)
-            throws SocketException {
-        super(vminfo, sink, sources);
-    }
-
-
-    /**
-     * Prepare the task to run.
+     * Constructor.
      * 
-     * @param t
-     *            the task.
+     * @param service
      */
-    public void addTimerTask(final VismoRepeatedTask t) {
-        log.debug("adding timer task {}", t);
-        timer.schedule(t);
+    public VismoClusterHead(final VismoService service) {
+        super(service);
     }
 
 
@@ -68,7 +46,6 @@ public class VismoClusterHead extends AbstractVismoCloudElement {
 
         log.trace("received event from {}: {}", map.get("originating-machine"), map);
         aggregate();
-
         send(e);
     }
 
@@ -84,8 +61,8 @@ public class VismoClusterHead extends AbstractVismoCloudElement {
         final RuleList everyMinute = ruleListForPeriodOf(ONE_MINUTE, new CTORule("cto-1-min", ONE_MINUTE));
 
         for (final EventSource source : sources) {
-            registerRuleTimerTask(source, new VismoAggregationTimerTask(everyThreeSeconds, sink));
-            registerRuleTimerTask(source, new VismoAggregationTimerTask(everyMinute, sink));
+            source.subscribe(new VismoAggregationTimerTask(everyThreeSeconds, sink));
+            source.subscribe(new VismoAggregationTimerTask(everyMinute, sink));
         }
     }
 
@@ -105,17 +82,6 @@ public class VismoClusterHead extends AbstractVismoCloudElement {
     private void aggregate() {
         // TODO Auto-generated method stub
 
-    }
-
-
-    /**
-     * @param vismo
-     * @param receiver
-     * @param ruleTimer
-     */
-    private void registerRuleTimerTask(final EventSource receiver, final VismoAggregationTimerTask ruleTimer) {
-        receiver.subscribe(ruleTimer);
-        addTimerTask(ruleTimer);
     }
 
 

@@ -5,7 +5,6 @@ import gr.ntua.vision.monitoring.sinks.BasicEventSink;
 import gr.ntua.vision.monitoring.sinks.PubSubEventSink;
 import gr.ntua.vision.monitoring.sources.BasicEventSource;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
-import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.net.SocketException;
 import java.util.Arrays;
@@ -13,7 +12,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeromq.ZContext;
 
 
 //TODO: obviously remove this. Find a better, more oo way to implement this responsibilities.
@@ -24,15 +22,11 @@ import org.zeromq.ZContext;
  */
 public class ClusterController {
     /***/
-    private static final Logger            log = LoggerFactory.getLogger(ClusterController.class);
+    private static final Logger      log = LoggerFactory.getLogger(ClusterController.class);
     /** the configuration object. */
-    private final VismoConfiguration       conf;
-    /** the factory. */
-    private final VismoCloudElementFactory factory;
+    private final VismoConfiguration conf;
     /** the vminfo object. */
-    private final VMInfo                   vminfo;
-    /** the zmq object. */
-    private final ZMQSockets               zmq = new ZMQSockets(new ZContext());
+    private final VMInfo             vminfo;
 
 
     /**
@@ -46,25 +40,23 @@ public class ClusterController {
     public ClusterController(final VMInfo vminfo, final VismoConfiguration conf) {
         this.vminfo = vminfo;
         this.conf = conf;
-        this.factory = new VismoCloudElementFactory(vminfo);
     }
 
 
     /**
      * Setup and return the proper cloud element.
      * 
+     * @param service
      * @return either a {@link VismoWorkerNode} or a {@link VismoClusterHead} instance.
      * @throws SocketException
      */
-    public VismoCloudElement setup() throws SocketException {
+    public VismoCloudElement selectElement(final VismoService service) throws SocketException {
         logConfig();
 
-        final BasicEventSource local = getLocalHostEventSource();
-
         if (hostIsClusterHead())
-            return setupVismoClusterHeadNode(local);
+            return new VismoClusterHead(service);
 
-        return setupVismoWorkerNode(local);
+        return new VismoWorkerNode(service);
     }
 
 
@@ -132,7 +124,7 @@ public class ClusterController {
 
 
     /**
-     * Setup and return the cluster worker instance.
+     * new Setup and return the cluster worker instance.
      * 
      * @param local
      *            the local events source.
