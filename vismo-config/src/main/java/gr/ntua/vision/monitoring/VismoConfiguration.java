@@ -12,7 +12,7 @@ import java.util.Properties;
  */
 public class VismoConfiguration extends PropertiesConfiguration {
     /***/
-    private static final String CLUSTER_HEAD_PORT_PROPERTY = "workers.head.port";
+    private static final String CLUSTER_HEAD_PORT_PROPERTY = "cluster.head.port";
     /***/
     private static final String CLUSTER_HEAD_PROPERTY      = "testClusterHead";
     /***/
