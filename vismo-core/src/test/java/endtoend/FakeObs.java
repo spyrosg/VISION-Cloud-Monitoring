@@ -40,7 +40,7 @@ public class FakeObs {
         final VismoConfiguration conf = new VismoConfiguration(p);
         final ZMQSockets zmq = new ZMQSockets(new ZContext());
 
-        this.sock = zmq.newConnectedPushSocket(conf.getProducersPoint());
+        this.sock = zmq.newConnectedPushSocket("tcp://127.0.0.1:" + conf.getProducersPort());
         log.debug("sending events to {}", this.sock);
     }
 

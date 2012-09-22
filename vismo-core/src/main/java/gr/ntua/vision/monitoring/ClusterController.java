@@ -77,7 +77,7 @@ public class ClusterController {
      * @return the event source for local host events.
      */
     private BasicEventSource getLocalHostEventSource() {
-        final VismoSocket sock = zmq.newBoundPullSocket(conf.getProducersPoint());
+        final VismoSocket sock = zmq.newBoundPullSocket(conf.getProducersPort());
 
         return new BasicEventSource(new VismoEventFactory(), sock);
     }
@@ -114,9 +114,9 @@ public class ClusterController {
      * @throws SocketException
      */
     private VismoCloudElement setupVismoClusterHeadNode(final BasicEventSource local) throws SocketException {
-        final VismoSocket sock = zmq.newBoundPubSocket(conf.getConsumersPoint());
+        final VismoSocket sock = zmq.newBoundPubSocket(conf.getConsumersPort());
         final BasicEventSink sink = new PubSubEventSink(sock);
-        final VismoSocket other = zmq.newBoundPullSocket(toZSocket("*", conf.getNodeHeadPort()));
+        final VismoSocket other = zmq.newBoundPullSocket(toZSocket("*", conf.getClusterHeadPort()));
         final BasicEventSource source = new BasicEventSource(new VismoEventFactory(), other);
 
         return factory.createVismoClusterHeadNode(sink, Arrays.asList(local, source));
@@ -143,7 +143,7 @@ public class ClusterController {
      * @return the full ip address that is used by the cluster workers to talk to the head.
      */
     private String workerToHeadSocket() {
-        return toZSocket(getClusterHeadIP(), conf.getNodeHeadPort());
+        return toZSocket(getClusterHeadIP(), conf.getClusterHeadPort());
     }
 
 
@@ -168,7 +168,7 @@ public class ClusterController {
      *            the ip port.
      * @return the string representation of a zmq device.
      */
-    private static String toZSocket(final String ip, final String port) {
+    private static String toZSocket(final String ip, final int port) {
         return "tcp://" + ip + ":" + port;
     }
 }

@@ -90,13 +90,14 @@ public class VismoEndToEndTest {
      * @param zmq
      */
     private void setupProducer(final ZMQSockets zmq) {
-        eventProducer = new FakeEventProducer(zmq.newConnectedPushSocket(conf.getProducersPoint()), NO_EVENTS_TO_SENT);
+        eventProducer = new FakeEventProducer(zmq.newConnectedPushSocket("tcp://127.0.0.1:" + conf.getProducersPort()),
+                NO_EVENTS_TO_SENT);
     }
 
 
     /***/
     private void setupRegistry() {
-        registry = new EventRegistry(conf.getConsumersPoint());
+        registry = new EventRegistry("tcp://*:" + conf.getConsumersPort());
     }
 
 

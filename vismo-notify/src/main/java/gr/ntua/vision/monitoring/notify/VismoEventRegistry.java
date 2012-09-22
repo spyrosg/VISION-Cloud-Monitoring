@@ -29,7 +29,7 @@ public class VismoEventRegistry extends EventRegistry {
      * Constructor.
      */
     public VismoEventRegistry() {
-        super(conf.getConsumersPoint());
+        super("tcp://127.0.0.1:" + conf.getConsumersPort());
     }
 
 
@@ -40,7 +40,7 @@ public class VismoEventRegistry extends EventRegistry {
      *            when <code>true</code>, it activates the console logger for this package.
      */
     public VismoEventRegistry(final boolean debug) {
-        super(conf.getConsumersPoint(), debug);
+        super("tcp://127.0.0.1:" + conf.getConsumersPort(), debug);
     }
 
 

@@ -38,6 +38,20 @@ public class VismoWorkerNode extends AbstractVismoCloudElement {
 
 
     /**
+     * @see gr.ntua.vision.monitoring.VismoCloudElement#setup(gr.ntua.vision.monitoring.VismoConfiguration,
+     *      gr.ntua.vision.monitoring.zmq.ZMQSockets)
+     */
+    @Override
+    public void setup(final VismoConfiguration conf, final ZMQSockets zmq) {
+        final BasicEventSource source = getSource(zmq, conf.getProducersPort());
+
+        attach(source);
+
+        final BasicEventSink sink = new BasicEventSink(zmq.newConnectedPushSocket(conf.get));
+    }
+
+
+    /**
      * @see gr.ntua.vision.monitoring.AbstractVismoCloudElement#log()
      */
     @Override
@@ -52,20 +66,6 @@ public class VismoWorkerNode extends AbstractVismoCloudElement {
     private void doYourThing(final Event e) {
         // TODO: maybe in another thread?
         send(e);
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.VismoCloudElement#setup(gr.ntua.vision.monitoring.VismoConfiguration,
-     *      gr.ntua.vision.monitoring.zmq.ZMQSockets)
-     */
-    @Override
-    public void setup(VismoConfiguration conf, ZMQSockets zmq) {
-        final BasicEventSource source = getSource(zmq, conf.getProducersPoint());
-
-        attach(source);
-        
-        final BasicEventSink sink = new BasicEventSink(zmq.newConnectedPushSocket(conf.get));
     }
 
 

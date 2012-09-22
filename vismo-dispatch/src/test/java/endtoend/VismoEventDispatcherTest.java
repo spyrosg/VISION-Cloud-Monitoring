@@ -43,10 +43,10 @@ public class VismoEventDispatcherTest {
      */
     @Before
     public void setUp() throws SocketException {
-        vismo = new FakeVismoInstance(zmq.newBoundPullSocket(conf.getProducersPoint()), NO_EXPECTED_EVENTS);
+        vismo = new FakeVismoInstance(zmq.newBoundPullSocket("tcp://127.0.0.1:" + conf.getProducersPort()), NO_EXPECTED_EVENTS);
         vismo.start();
         final VismoEventDispatcher d = new VismoEventDispatcher(VismoEventDispatcherTest.class.getName(),
-                zmq.newConnectedPushSocket(conf.getProducersPoint()));
+                zmq.newConnectedPushSocket("tcp://*" + conf.getProducersPort()));
         producer = new FakeEventProducer(d, NO_EXPECTED_EVENTS);
     }
 
