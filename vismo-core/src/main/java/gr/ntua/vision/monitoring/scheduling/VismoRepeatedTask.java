@@ -8,7 +8,7 @@ import java.util.TimerTask;
  */
 public abstract class VismoRepeatedTask extends TimerTask {
     /**
-     * @return the execution period of the task.
+     * @return the execution period of the task in milliseconds.
      */
     public abstract long getPeriod();
 }

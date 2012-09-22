@@ -46,6 +46,7 @@ public class VismoFactory {
         elem.setup(conf, zmq);
         service.addTask(udpServer);
         service.addTask(new JVMStatusReportTask(ONE_MINUTE));
+        elem.start();
 
         return service;
     }

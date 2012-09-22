@@ -4,6 +4,7 @@ import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.rules.AggregationRule;
 import gr.ntua.vision.monitoring.rules.CTORule;
 import gr.ntua.vision.monitoring.sources.EventSource;
+import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -47,6 +48,17 @@ public class VismoClusterHead extends AbstractVismoCloudElement {
         log.trace("received event from {}: {}", map.get("originating-machine"), map);
         aggregate();
         send(e);
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.VismoCloudElement#setup(gr.ntua.vision.monitoring.VismoConfiguration,
+     *      gr.ntua.vision.monitoring.zmq.ZMQSockets)
+     */
+    @Override
+    public void setup(final VismoConfiguration conf, final ZMQSockets zmq) {
+        // TODO Auto-generated method stub
+
     }
 
 

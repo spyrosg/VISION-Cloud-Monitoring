@@ -19,7 +19,7 @@ public class JVMStatusReportTask extends VismoRepeatedTask {
     /** the number of bytes in a megabyte. */
     private static final int                   MB          = 1024 * 1024;
     /** a millisecond in nanoseconds. */
-    private static final double                MILLI       = 1e6;
+    private static final int                   MILLI       = 1000000;
     /** the system's number of cpus. */
     private static final int                   nCPUs;
     /***/
@@ -88,11 +88,12 @@ public class JVMStatusReportTask extends VismoRepeatedTask {
      */
     private double getVMCPULoad() {
         final long currUpTime = runbean.getUptime();
-        final double currProcessTime = osBean.getProcessCpuTime() / MILLI;
+        final long currProcessTime = osBean.getProcessCpuTime() / MILLI;
 
         if (upTime <= 0 || processTime <= 0) {
+            // swap out the old values
             upTime = currUpTime;
-            processTime = (long) currProcessTime;
+            processTime = currProcessTime;
 
             return 0.0;
         }
@@ -103,7 +104,7 @@ public class JVMStatusReportTask extends VismoRepeatedTask {
 
         // swap out the old values
         upTime = currUpTime;
-        processTime = (long) currProcessTime;
+        processTime = currProcessTime;
 
         return load;
     }

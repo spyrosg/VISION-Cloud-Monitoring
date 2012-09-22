@@ -43,10 +43,12 @@ public class VismoTimer {
      * 
      */
     public void start() {
-        log.debug("scheduling {} tasks", tasks.size());
+        log.debug("scheduling {} task{}", tasks.size(), tasks.size() != 1 ? "s" : "");
 
-        for (final VismoRepeatedTask t : tasks)
+        for (final VismoRepeatedTask t : tasks) {
+            log.debug("\t{}", t);
             timer.schedule(t, DELAY, t.getPeriod());
+        }
 
         tasks.clear();
     }

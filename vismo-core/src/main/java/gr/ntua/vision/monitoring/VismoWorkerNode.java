@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- *
+ * A worker's responsibility is to pass events received from localhost to the cluster head.
  */
 public class VismoWorkerNode extends AbstractVismoCloudElement {
     /***/
@@ -33,21 +33,27 @@ public class VismoWorkerNode extends AbstractVismoCloudElement {
      */
     @Override
     public void receive(final Event e) {
-        doYourThing(e);
+        send(e);
     }
 
 
     /**
+     * Setup a source from localhost, and a sink to the cluster head.
+     * 
      * @see gr.ntua.vision.monitoring.VismoCloudElement#setup(gr.ntua.vision.monitoring.VismoConfiguration,
      *      gr.ntua.vision.monitoring.zmq.ZMQSockets)
      */
     @Override
     public void setup(final VismoConfiguration conf, final ZMQSockets zmq) {
-        final BasicEventSource source = getSource(zmq, conf.getProducersPort());
+        final BasicEventSource source = new BasicEventSource(new VismoEventFactory(), zmq.newBoundPullSocket("tcp://127.0.0.1:"
+                + conf.getProducersPort()));
 
         attach(source);
 
-        final BasicEventSink sink = new BasicEventSink(zmq.newConnectedPushSocket(conf.get));
+        final BasicEventSink sink = new BasicEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getClusterHead() + ":"
+                + conf.getClusterHeadPort()));
+
+        attach(sink);
     }
 
 
@@ -57,24 +63,5 @@ public class VismoWorkerNode extends AbstractVismoCloudElement {
     @Override
     protected Logger log() {
         return log;
-    }
-
-
-    /**
-     * @param e
-     */
-    private void doYourThing(final Event e) {
-        // TODO: maybe in another thread?
-        send(e);
-    }
-
-
-    /**
-     * @param zmq
-     * @param addr
-     * @return
-     */
-    private static BasicEventSource getSource(final ZMQSockets zmq, final String addr) {
-        return new BasicEventSource(new VismoEventFactory(), zmq.newBoundPubSocket(addr));
     }
 }

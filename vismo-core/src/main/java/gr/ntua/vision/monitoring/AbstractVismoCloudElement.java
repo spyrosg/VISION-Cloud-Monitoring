@@ -36,6 +36,7 @@ abstract class AbstractVismoCloudElement implements VismoCloudElement, EventList
      * @param sink
      */
     public void attach(final EventSink sink) {
+        log().debug("attaching {}", sink);
         sinks.add(sink);
     }
 
@@ -44,6 +45,7 @@ abstract class AbstractVismoCloudElement implements VismoCloudElement, EventList
      * @param source
      */
     public void attach(final EventSource source) {
+        log().debug("attaching {}", source);
         sources.add(source);
     }
 
@@ -54,8 +56,6 @@ abstract class AbstractVismoCloudElement implements VismoCloudElement, EventList
     @Override
     public void start() {
         for (final EventSource source : sources) {
-            log().debug("\twith source: {}", source);
-
             source.subscribe(this);
             service.addTask((BasicEventSource) source);
         }

@@ -76,10 +76,12 @@ public class VismoService implements UDPListener {
      * 
      */
     public void start() {
-        log.debug("starting {} tasks", tasks.size());
+        log.debug("starting {} task{}", tasks.size(), tasks.size() != 1 ? "s" : "");
 
-        for (final StoppableTask task : tasks)
+        for (final StoppableTask task : tasks) {
+            log.debug("\t{}", task);
             task.start();
+        }
 
         timer.start();
     }

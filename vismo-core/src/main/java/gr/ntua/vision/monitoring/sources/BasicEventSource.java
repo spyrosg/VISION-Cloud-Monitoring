@@ -91,7 +91,7 @@ public class BasicEventSource extends StoppableTask implements EventSource {
      */
     @Override
     public void subscribe(final EventListener listener) {
-        log.trace("subscribing listener {}", listener);
+        log.debug("subscribing listener {}", listener);
         listeners.add(listener);
     }
 
