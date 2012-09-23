@@ -1,9 +1,9 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.sinks.BasicEventSink;
 import gr.ntua.vision.monitoring.sources.BasicEventSource;
+import gr.ntua.vision.monitoring.sources.EventSource;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import org.slf4j.Logger;
@@ -15,7 +15,10 @@ import org.slf4j.LoggerFactory;
  */
 public class VismoWorkerNode extends AbstractVismoCloudElement {
     /***/
-    private static final Logger log = LoggerFactory.getLogger(VismoWorkerNode.class);
+    private static final Logger      log = LoggerFactory.getLogger(VismoWorkerNode.class);
+    /***/
+    @SuppressWarnings("unused")
+    private PassThroughEventListener listener;
 
 
     /**
@@ -25,15 +28,6 @@ public class VismoWorkerNode extends AbstractVismoCloudElement {
      */
     public VismoWorkerNode(final VismoService service) {
         super(service);
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.EventListener#receive(gr.ntua.vision.monitoring.events.Event)
-     */
-    @Override
-    public void receive(final Event e) {
-        send(e);
     }
 
 
@@ -54,6 +48,8 @@ public class VismoWorkerNode extends AbstractVismoCloudElement {
                 + conf.getClusterHeadPort()));
 
         attach(sink);
+
+        listener = new PassThroughEventListener(source, sink);
     }
 
 
@@ -63,5 +59,15 @@ public class VismoWorkerNode extends AbstractVismoCloudElement {
     @Override
     protected Logger log() {
         return log;
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.VismoCloudElement#start()
+     */
+    @Override
+    public void start() {
+        for (final EventSource source : sources)
+            service.addTask((BasicEventSource) source);
     }
 }

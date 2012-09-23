@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class is SO GONNA DIE after the f2f.
  */
-public class VismoAggregationTimerTask extends VismoRepeatedTask implements EventListener {
+public class VismoAggregationTimerTask extends VismoRepeatedTask {
     /***/
     private static final Logger log = LoggerFactory.getLogger(VismoAggregationTimerTask.class);
     /***/
@@ -42,15 +42,6 @@ public class VismoAggregationTimerTask extends VismoRepeatedTask implements Even
 
 
     /**
-     * @see gr.ntua.vision.monitoring.EventListener#receive(gr.ntua.vision.monitoring.events.Event)
-     */
-    @Override
-    public void receive(final Event e) {
-        rules.matchToEvent(e);
-    }
-
-
-    /**
      * @see java.util.TimerTask#run()
      */
     @Override
@@ -66,7 +57,7 @@ public class VismoAggregationTimerTask extends VismoRepeatedTask implements Even
 
             rules.runRules(aggregationPeriodTimestamp, sink);
         } catch (final Throwable x) {
-            log.trace("performPendingOperations exception: ", x);
+            log.error("performPendingOperations exception: ", x);
         }
 
         log.trace("aggregation end for {} seconds timer, in {} seconds", periodInSeconds,
@@ -80,5 +71,13 @@ public class VismoAggregationTimerTask extends VismoRepeatedTask implements Even
     @Override
     public String toString() {
         return "#<VismoAggregationTimerTask: expiring every " + (getPeriod() / 1000) + " second(s)>";
+    }
+
+
+    /**
+     * @param e
+     */
+    public void pass(Event e) {
+        rules.matchToEvent(e);
     }
 }

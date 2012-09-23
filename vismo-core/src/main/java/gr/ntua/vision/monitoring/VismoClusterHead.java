@@ -1,11 +1,15 @@
 package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.rules.AggregationRule;
 import gr.ntua.vision.monitoring.rules.CTORule;
+import gr.ntua.vision.monitoring.sinks.BasicEventSink;
+import gr.ntua.vision.monitoring.sources.BasicEventSource;
 import gr.ntua.vision.monitoring.sources.EventSource;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -18,13 +22,15 @@ import org.slf4j.LoggerFactory;
  */
 public class VismoClusterHead extends AbstractVismoCloudElement {
     /***/
-    private static final String DICT_KEY      = "!dict";
+    private static final String                        DICT_KEY      = "!dict";
     /***/
-    private static final Logger log           = LoggerFactory.getLogger(VismoClusterHead.class);
+    private static final Logger                        log           = LoggerFactory.getLogger(VismoClusterHead.class);
     /***/
-    private static final long   ONE_MINUTE    = TimeUnit.MINUTES.toMillis(1);
+    private static final long                          ONE_MINUTE    = TimeUnit.MINUTES.toMillis(1);
     /***/
-    private static final long   THREE_SECONDS = TimeUnit.SECONDS.toMillis(3);
+    private static final long                          THREE_SECONDS = TimeUnit.SECONDS.toMillis(3);
+    /***/
+    private final ArrayList<VismoAggregationTimerTask> ruleTasks     = new ArrayList<VismoAggregationTimerTask>();
 
 
     /**
@@ -45,9 +51,10 @@ public class VismoClusterHead extends AbstractVismoCloudElement {
         @SuppressWarnings("rawtypes")
         final Map map = (Map) e.get(DICT_KEY);
 
-        log.trace("received event from {}: {}", map.get("originating-machine"), map);
-        aggregate();
-        send(e);
+        log.debug("received event from {}: {}", map.get("originating-machine"), map);
+
+        for (final VismoAggregationTimerTask ruleTask : ruleTasks)
+            ruleTask.pass(e);
     }
 
 
@@ -57,25 +64,30 @@ public class VismoClusterHead extends AbstractVismoCloudElement {
      */
     @Override
     public void setup(final VismoConfiguration conf, final ZMQSockets zmq) {
-        // TODO Auto-generated method stub
+        final BasicEventSource local = new BasicEventSource(new VismoEventFactory(), zmq.newBoundPullSocket("tcp://127.0.0.1:"
+                + conf.getProducersPort()));
 
-    }
+        attach(local);
 
+        final BasicEventSource workers = new BasicEventSource(new VismoEventFactory(), zmq.newBoundPullSocket("tcp://*:"
+                + conf.getClusterHeadPort()));
 
-    /**
-     * @see gr.ntua.vision.monitoring.AbstractVismoCloudElement#start()
-     */
-    @Override
-    public void start() {
-        super.start();
+        attach(workers);
+
+        final BasicEventSink sink = new BasicEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
+
+        attach(sink);
 
         final RuleList everyThreeSeconds = ruleListForPeriodOf(THREE_SECONDS, new CTORule("cto-3-sec", THREE_SECONDS));
         final RuleList everyMinute = ruleListForPeriodOf(ONE_MINUTE, new CTORule("cto-1-min", ONE_MINUTE));
 
-        for (final EventSource source : sources) {
-            source.subscribe(new VismoAggregationTimerTask(everyThreeSeconds, sink));
-            source.subscribe(new VismoAggregationTimerTask(everyMinute, sink));
-        }
+        final VismoAggregationTimerTask three = new VismoAggregationTimerTask(everyThreeSeconds, sink);
+        final VismoAggregationTimerTask one = new VismoAggregationTimerTask(everyMinute, sink);
+
+        ruleTasks.add(three);
+        ruleTasks.add(one);
+        addTask(three);
+        addTask(one);
     }
 
 
@@ -85,15 +97,6 @@ public class VismoClusterHead extends AbstractVismoCloudElement {
     @Override
     protected Logger log() {
         return log;
-    }
-
-
-    /**
-     * 
-     */
-    private void aggregate() {
-        // TODO Auto-generated method stub
-
     }
 
 
@@ -109,5 +112,15 @@ public class VismoClusterHead extends AbstractVismoCloudElement {
             list.add(rule);
 
         return list;
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.VismoCloudElement#start()
+     */
+    @Override
+    public void start() {
+        for (final EventSource source : sources)
+            service.addTask((BasicEventSource) source);
     }
 }

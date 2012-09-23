@@ -90,7 +90,8 @@ public class ClusterController {
      * @throws SocketException
      */
     private boolean hostIsClusterHead() throws SocketException {
-        return getClusterHeadIP().equals(vminfo.getAddress().getHostAddress());
+        // return getClusterHeadIP().equals(vminfo.getAddress().getHostAddress());
+        return true;
     }
 
 

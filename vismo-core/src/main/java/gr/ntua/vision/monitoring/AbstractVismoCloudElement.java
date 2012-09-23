@@ -1,8 +1,8 @@
 package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.scheduling.VismoRepeatedTask;
 import gr.ntua.vision.monitoring.sinks.EventSink;
-import gr.ntua.vision.monitoring.sources.BasicEventSource;
 import gr.ntua.vision.monitoring.sources.EventSource;
 
 import java.util.ArrayList;
@@ -13,13 +13,13 @@ import org.slf4j.Logger;
 /**
  * 
  */
-abstract class AbstractVismoCloudElement implements VismoCloudElement, EventListener {
+abstract class AbstractVismoCloudElement implements VismoCloudElement {
     /***/
     protected final ArrayList<EventSink>   sinks   = new ArrayList<EventSink>();
     /***/
     protected final ArrayList<EventSource> sources = new ArrayList<EventSource>();
     /***/
-    private final VismoService             service;
+    protected final VismoService           service;
 
 
     /**
@@ -51,14 +51,10 @@ abstract class AbstractVismoCloudElement implements VismoCloudElement, EventList
 
 
     /**
-     * @see gr.ntua.vision.monitoring.VismoCloudElement#start()
+     * @param task
      */
-    @Override
-    public void start() {
-        for (final EventSource source : sources) {
-            source.subscribe(this);
-            service.addTask((BasicEventSource) source);
-        }
+    protected void addTask(final VismoRepeatedTask task) {
+        service.addTask(task);
     }
 
 
