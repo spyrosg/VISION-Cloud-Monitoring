@@ -42,6 +42,14 @@ public class VismoAggregationTimerTask extends VismoRepeatedTask {
 
 
     /**
+     * @param e
+     */
+    public void pass(final Event e) {
+        rules.matchToEvent(e);
+    }
+
+
+    /**
      * @see java.util.TimerTask#run()
      */
     @Override
@@ -71,13 +79,5 @@ public class VismoAggregationTimerTask extends VismoRepeatedTask {
     @Override
     public String toString() {
         return "#<VismoAggregationTimerTask: expiring every " + (getPeriod() / 1000) + " second(s)>";
-    }
-
-
-    /**
-     * @param e
-     */
-    public void pass(Event e) {
-        rules.matchToEvent(e);
     }
 }

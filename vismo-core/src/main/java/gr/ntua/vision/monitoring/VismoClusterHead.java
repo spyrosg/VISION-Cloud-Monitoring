@@ -44,21 +44,6 @@ public class VismoClusterHead extends AbstractVismoCloudElement {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.EventListener#receive(gr.ntua.vision.monitoring.events.Event)
-     */
-    @Override
-    public void receive(final Event e) {
-        @SuppressWarnings("rawtypes")
-        final Map map = (Map) e.get(DICT_KEY);
-
-        log.debug("received event from {}: {}", map.get("originating-machine"), map);
-
-        for (final VismoAggregationTimerTask ruleTask : ruleTasks)
-            ruleTask.pass(e);
-    }
-
-
-    /**
      * @see gr.ntua.vision.monitoring.VismoCloudElement#setup(gr.ntua.vision.monitoring.VismoConfiguration,
      *      gr.ntua.vision.monitoring.zmq.ZMQSockets)
      */
@@ -90,7 +75,6 @@ public class VismoClusterHead extends AbstractVismoCloudElement {
         addTask(one);
     }
 
-
     /**
      * @see gr.ntua.vision.monitoring.AbstractVismoCloudElement#log()
      */
@@ -112,15 +96,5 @@ public class VismoClusterHead extends AbstractVismoCloudElement {
             list.add(rule);
 
         return list;
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.VismoCloudElement#start()
-     */
-    @Override
-    public void start() {
-        for (final EventSource source : sources)
-            service.addTask((BasicEventSource) source);
     }
 }

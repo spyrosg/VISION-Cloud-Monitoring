@@ -15,10 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 public class VismoWorkerNode extends AbstractVismoCloudElement {
     /***/
-    private static final Logger      log = LoggerFactory.getLogger(VismoWorkerNode.class);
-    /***/
-    @SuppressWarnings("unused")
-    private PassThroughEventListener listener;
+    private static final Logger log = LoggerFactory.getLogger(VismoWorkerNode.class);
 
 
     /**
@@ -48,8 +45,6 @@ public class VismoWorkerNode extends AbstractVismoCloudElement {
                 + conf.getClusterHeadPort()));
 
         attach(sink);
-
-        listener = new PassThroughEventListener(source, sink);
     }
 
 
@@ -59,15 +54,5 @@ public class VismoWorkerNode extends AbstractVismoCloudElement {
     @Override
     protected Logger log() {
         return log;
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.VismoCloudElement#start()
-     */
-    @Override
-    public void start() {
-        for (final EventSource source : sources)
-            service.addTask((BasicEventSource) source);
     }
 }

@@ -2,9 +2,10 @@ package endtoend;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import gr.ntua.vision.monitoring.OldVismoNode;
+import gr.ntua.vision.monitoring.VismoCloudElement;
 import gr.ntua.vision.monitoring.VismoConfiguration;
-import gr.ntua.vision.monitoring.VismoNodeFactory;
+import gr.ntua.vision.monitoring.VismoFactory;
+import gr.ntua.vision.monitoring.VismoService;
 import gr.ntua.vision.monitoring.udp.UDPClient;
 import gr.ntua.vision.monitoring.udp.UDPFactory;
 
@@ -12,17 +13,20 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
+import org.junit.Ignore;
+
 
 /**
  * This object is used to drive/direct the execution of the top level monitoring objects.
  */
+@Ignore("REWRITE ME")
 public class MonitoringDriver {
     /***/
     private final VismoConfiguration   conf;
     /***/
     private final EventCounterListener counter = new EventCounterListener(10);
     /***/
-    private OldVismoNode               vismo   = null;
+    private VismoCloudElement          vismo   = null;
 
 
     /**
@@ -67,7 +71,7 @@ public class MonitoringDriver {
      * @throws SocketException
      */
     public void setup() throws SocketException {
-        vismo = new VismoNodeFactory(conf).build(counter);
+        final VismoService service = new VismoFactory(conf).build();
     }
 
 
@@ -76,9 +80,6 @@ public class MonitoringDriver {
      */
     public void shutdown() {
         counter.haveReceivedEnoughMessages();
-
-        if (vismo != null)
-            vismo.stop();
     }
 
 
