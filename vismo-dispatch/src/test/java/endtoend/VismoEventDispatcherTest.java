@@ -21,8 +21,8 @@ public class VismoEventDispatcherTest {
     @SuppressWarnings("serial")
     private static final Properties  props              = new Properties() {
                                                             {
-                                                                setProperty("producers.point", "tcp://127.0.0.1:34890");
-                                                                setProperty("consumers.point", "tcp://127.0.0.1:34891");
+                                                                setProperty("producers.port", "34890");
+                                                                setProperty("consumers.port", "34891");
                                                                 setProperty("udp.port", "34892");
                                                             }
                                                         };
@@ -46,7 +46,7 @@ public class VismoEventDispatcherTest {
         vismo = new FakeVismoInstance(zmq.newBoundPullSocket("tcp://127.0.0.1:" + conf.getProducersPort()), NO_EXPECTED_EVENTS);
         vismo.start();
         final VismoEventDispatcher d = new VismoEventDispatcher(VismoEventDispatcherTest.class.getName(),
-                zmq.newConnectedPushSocket("tcp://*" + conf.getProducersPort()));
+                zmq.newConnectedPushSocket("tcp://*:" + conf.getProducersPort()));
         producer = new FakeEventProducer(d, NO_EXPECTED_EVENTS);
     }
 
