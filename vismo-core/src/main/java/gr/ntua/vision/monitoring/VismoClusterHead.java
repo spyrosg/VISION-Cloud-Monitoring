@@ -51,6 +51,8 @@ public class VismoClusterHead implements VismoCloudElement {
      */
     @Override
     public void setup() {
+        log.debug("setting up");
+
         final BasicEventSource local = new BasicEventSource(new VismoEventFactory(), zmq.newBoundPullSocket("tcp://127.0.0.1:"
                 + conf.getProducersPort()));
 

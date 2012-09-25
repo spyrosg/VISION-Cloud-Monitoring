@@ -43,6 +43,8 @@ public class VismoWorkerNode implements VismoCloudElement {
      */
     @Override
     public void setup() {
+        log.debug("setting up");
+
         final BasicEventSource source = new BasicEventSource(new VismoEventFactory(), zmq.newBoundPullSocket("tcp://127.0.0.1:"
                 + conf.getProducersPort()));
         final BasicEventSink sink = new BasicEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getClusterHead() + ":"
