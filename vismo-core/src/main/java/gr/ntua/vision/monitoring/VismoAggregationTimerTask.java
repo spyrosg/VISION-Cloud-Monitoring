@@ -9,14 +9,13 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * This class is SO GONNA DIE after the f2f.
+ * 
  */
-public class VismoAggregationTimerTask extends VismoRepeatedTask {
+public class VismoAggregationTimerTask extends VismoRepeatedTask implements EventListener {
     /***/
     private static final Logger log = LoggerFactory.getLogger(VismoAggregationTimerTask.class);
     /***/
     private final RuleList      rules;
-    /***/
     private final EventSink     sink;
 
 
@@ -44,7 +43,8 @@ public class VismoAggregationTimerTask extends VismoRepeatedTask {
     /**
      * @param e
      */
-    public void pass(final Event e) {
+    @Override
+    public void receive(final Event e) {
         rules.matchToEvent(e);
     }
 

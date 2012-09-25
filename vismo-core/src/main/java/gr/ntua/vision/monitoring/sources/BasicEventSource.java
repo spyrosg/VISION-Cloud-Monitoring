@@ -7,6 +7,8 @@ import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +18,17 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class BasicEventSource extends StoppableTask implements EventSource {
+    /** this is used to get a hold of the whole dict, for serialization reasons. */
+    private static final String            DICT_KEY  = "!dict";
+    /***/
+    private static final Pattern           patt      = Pattern.compile("\"originating-machine\": ?\"([^\"]*)\"");
     /***/
     private final EventFactory             factory;
     /** the listeners lists. */
     private final ArrayList<EventListener> listeners = new ArrayList<EventListener>();
     /** the log target. */
     private final Logger                   log       = LoggerFactory.getLogger(BasicEventSource.class);
+
     /***/
     private final VismoSocket              sock;
 
@@ -52,7 +59,7 @@ public class BasicEventSource extends StoppableTask implements EventSource {
         while (true) {
             final String message = sock.receive();
 
-            log.trace("received: {}", message);
+            log.trace("from {}, received {}", getEventSource(message), message);
 
             if (message == null)
                 continue;
@@ -114,5 +121,19 @@ public class BasicEventSource extends StoppableTask implements EventSource {
     private void notifyAll(final Event e) {
         for (final EventListener listener : listeners)
             listener.receive(e);
+    }
+
+
+    /**
+     * @param eventStr
+     * @return
+     */
+    private static String getEventSource(final String eventStr) {
+        final Matcher m = patt.matcher(eventStr);
+
+        if (m.find())
+            return m.group(1);
+
+        return null;
     }
 }

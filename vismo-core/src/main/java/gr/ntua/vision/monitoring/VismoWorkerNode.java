@@ -1,9 +1,9 @@
 package gr.ntua.vision.monitoring;
 
+import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.sinks.BasicEventSink;
 import gr.ntua.vision.monitoring.sources.BasicEventSource;
-import gr.ntua.vision.monitoring.sources.EventSource;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import org.slf4j.Logger;
@@ -13,46 +13,47 @@ import org.slf4j.LoggerFactory;
 /**
  * A worker's responsibility is to pass events received from localhost to the cluster head.
  */
-public class VismoWorkerNode extends AbstractVismoCloudElement {
+public class VismoWorkerNode implements VismoCloudElement {
     /***/
-    private static final Logger log = LoggerFactory.getLogger(VismoWorkerNode.class);
+    private static final Logger      log = LoggerFactory.getLogger(VismoWorkerNode.class);
+    /***/
+    private final VismoConfiguration conf;
+    /***/
+    private final VismoService       service;
+    /***/
+    private final ZMQSockets         zmq;
 
 
     /**
      * Constructor.
      * 
      * @param service
+     * @param conf
+     * @param zmq
      */
-    public VismoWorkerNode(final VismoService service) {
-        super(service);
+    public VismoWorkerNode(final VismoService service, final VismoConfiguration conf, final ZMQSockets zmq) {
+        this.service = service;
+        this.conf = conf;
+        this.zmq = zmq;
     }
 
 
     /**
-     * Setup a source from localhost, and a sink to the cluster head.
-     * 
-     * @see gr.ntua.vision.monitoring.VismoCloudElement#setup(gr.ntua.vision.monitoring.VismoConfiguration,
-     *      gr.ntua.vision.monitoring.zmq.ZMQSockets)
+     * @see gr.ntua.vision.monitoring.VismoCloudElement#setup()
      */
     @Override
-    public void setup(final VismoConfiguration conf, final ZMQSockets zmq) {
+    public void setup() {
         final BasicEventSource source = new BasicEventSource(new VismoEventFactory(), zmq.newBoundPullSocket("tcp://127.0.0.1:"
                 + conf.getProducersPort()));
-
-        attach(source);
-
         final BasicEventSink sink = new BasicEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getClusterHead() + ":"
                 + conf.getClusterHeadPort()));
 
-        attach(sink);
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.AbstractVismoCloudElement#log()
-     */
-    @Override
-    protected Logger log() {
-        return log;
+        source.subscribe(new EventListener() {
+            @Override
+            public void receive(final Event e) {
+                sink.send(e);
+            }
+        });
+        service.addTask(source);
     }
 }

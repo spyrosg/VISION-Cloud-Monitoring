@@ -47,13 +47,11 @@ public class VismoFactory {
         final VismoVMInfo vminfo = new VismoVMInfo();
         final VismoService service = new VismoService(vminfo);
         final UDPServer udpServer = new UDPFactory(conf.getUDPPort()).buildServer(service);
-        final VismoCloudElement elem = selectElement(vminfo, service);
-        final ZMQSockets zmq = new ZMQSockets(new ZContext());
+        final VismoCloudElement elem = selectElement(vminfo, service, new ZMQSockets(new ZContext()));
 
-        elem.setup(conf, zmq);
+        elem.setup();
         service.addTask(udpServer);
         service.addTask(new JVMStatusReportTask(ONE_MINUTE));
-        elem.start();
 
         return service;
     }
@@ -66,7 +64,8 @@ public class VismoFactory {
      * @return <code>true</code> when localhost is the cluster head, <code>false</code> otherwise.
      */
     private boolean hostIsClusterHead(final String hostIP) {
-        return conf.getClusterHead().equals(hostIP);
+        return true;
+        // return conf.getClusterHead().equals(hostIP);
     }
 
 
@@ -87,8 +86,9 @@ public class VismoFactory {
      * @return the proper {@link VismoCloudElement}.
      * @throws SocketException
      */
-    private VismoCloudElement selectElement(final VMInfo vminfo, final VismoService service) throws SocketException {
-        return hostIsClusterHead(vminfo.getAddress().getHostAddress()) ? new VismoClusterHead(service) : new VismoWorkerNode(
-                service);
+    private VismoCloudElement selectElement(final VMInfo vminfo, final VismoService service, final ZMQSockets zmq)
+            throws SocketException {
+        return hostIsClusterHead(vminfo.getAddress().getHostAddress()) ? new VismoClusterHead(service, conf, zmq)
+                                                                      : new VismoWorkerNode(service, conf, zmq);
     }
 }

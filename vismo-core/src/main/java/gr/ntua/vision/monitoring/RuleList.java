@@ -67,7 +67,7 @@ public class RuleList {
 
     /**
      * @param aggregationPeriodTimestamp
-     * @param distributor
+     * @param sink
      */
     public void runRules(final long aggregationPeriodTimestamp, final EventSink sink) {
         for (final AggregationRule rule : list) {
@@ -85,6 +85,7 @@ public class RuleList {
                 final AggregationResultEvent result = rule.aggregate(aggregationPeriodTimestamp, eventList);
 
                 log.debug("aggregation successful for rule {} => {}", rule, result);
+
                 sink.send(result);
             } catch (final Throwable x) {
                 log.error("aggregation error", x);
