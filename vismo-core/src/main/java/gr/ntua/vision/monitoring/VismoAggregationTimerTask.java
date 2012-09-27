@@ -16,6 +16,7 @@ public class VismoAggregationTimerTask extends VismoRepeatedTask implements Even
     private static final Logger log = LoggerFactory.getLogger(VismoAggregationTimerTask.class);
     /***/
     private final RuleList      rules;
+    /***/
     private final EventSink     sink;
 
 
