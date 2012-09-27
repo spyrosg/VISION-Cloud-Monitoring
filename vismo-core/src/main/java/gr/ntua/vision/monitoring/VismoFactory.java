@@ -1,8 +1,10 @@
 package gr.ntua.vision.monitoring;
 
+import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.scheduling.JVMStatusReportTask;
+import gr.ntua.vision.monitoring.sinks.BasicEventSink;
+import gr.ntua.vision.monitoring.sources.BasicEventSource;
 import gr.ntua.vision.monitoring.udp.UDPFactory;
-import gr.ntua.vision.monitoring.udp.UDPServer;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.net.SocketException;
@@ -46,14 +48,31 @@ public class VismoFactory {
 
         final VismoVMInfo vminfo = new VismoVMInfo();
         final VismoService service = new VismoService(vminfo);
-        final UDPServer udpServer = new UDPFactory(conf.getUDPPort()).buildServer(service);
-        final VismoCloudElement elem = selectElement(vminfo, service, new ZMQSockets(new ZContext()));
+        final ZMQSockets zmq = new ZMQSockets(new ZContext());
 
-        elem.setup();
-        service.addTask(udpServer);
+        if (hostIsClusterHead(vminfo.getAddress().getHostAddress())) {
+
+        } else {
+            final BasicEventSource localSource = getLocalSource(zmq);
+            final BasicEventSink clusterHead = new BasicEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getClusterHead()
+                    + ":" + conf.getClusterHeadPort()));
+
+            localSource.subscribe(new PassThroughChannel(clusterHead));
+            service.addTask(localSource);
+        }
+
+        service.addTask(new UDPFactory(conf.getUDPPort()).buildServer(service));
         service.addTask(new JVMStatusReportTask(ONE_MINUTE));
 
         return service;
+    }
+
+
+    /**
+     * @return
+     */
+    private BasicEventSource getLocalSource(final ZMQSockets zmq) {
+        return new BasicEventSource(new VismoEventFactory(), zmq.newBoundPullSocket(conf.getProducersPoint()));
     }
 
 
@@ -64,8 +83,7 @@ public class VismoFactory {
      * @return <code>true</code> when localhost is the cluster head, <code>false</code> otherwise.
      */
     private boolean hostIsClusterHead(final String hostIP) {
-        return true;
-        // return conf.getClusterHead().equals(hostIP);
+        return conf.getClusterHead().equals(hostIP);
     }
 
 
@@ -77,18 +95,5 @@ public class VismoFactory {
         log.trace("*** name is '{}'", conf.getTestClusterName());
         log.trace("*** machines: {}", conf.getTestClusterMachines());
         log.trace("*** head is at {}", conf.getClusterHead());
-    }
-
-
-    /**
-     * @param vminfo
-     * @param service
-     * @return the proper {@link VismoCloudElement}.
-     * @throws SocketException
-     */
-    private VismoCloudElement selectElement(final VMInfo vminfo, final VismoService service, final ZMQSockets zmq)
-            throws SocketException {
-        return hostIsClusterHead(vminfo.getAddress().getHostAddress()) ? new VismoClusterHead(service, conf, zmq)
-                                                                      : new VismoWorkerNode(service, conf, zmq);
     }
 }

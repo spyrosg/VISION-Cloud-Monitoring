@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 /**
  *
  */
-public class VismoClusterHead implements VismoCloudElement {
+public class VismoClusterHead {
     /***/
     private static final Logger      log           = LoggerFactory.getLogger(VismoClusterHead.class);
     /***/
@@ -48,9 +48,8 @@ public class VismoClusterHead implements VismoCloudElement {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.VismoCloudElement#setup()
+     * 
      */
-    @Override
     public void setup() {
         log.debug("setting up");
 
