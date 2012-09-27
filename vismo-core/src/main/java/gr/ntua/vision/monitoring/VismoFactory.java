@@ -64,7 +64,8 @@ public class VismoFactory {
      * @return <code>true</code> when localhost is the cluster head, <code>false</code> otherwise.
      */
     private boolean hostIsClusterHead(final String hostIP) {
-        return conf.getClusterHead().equals(hostIP);
+        return true;
+        // return conf.getClusterHead().equals(hostIP);
     }
 
 

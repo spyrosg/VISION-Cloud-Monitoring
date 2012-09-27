@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
+import gr.ntua.vision.monitoring.rules.AccountingRule;
 import gr.ntua.vision.monitoring.rules.AggregationRule;
 import gr.ntua.vision.monitoring.rules.CTORule;
 import gr.ntua.vision.monitoring.sinks.BasicEventSink;
@@ -66,7 +67,8 @@ public class VismoClusterHead implements VismoCloudElement {
         final BasicEventSink sink = new BasicEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
 
         final RuleList everyThreeSeconds = ruleListForPeriodOf(THREE_SECONDS, new CTORule("cto-3-sec", THREE_SECONDS));
-        final RuleList everyMinute = ruleListForPeriodOf(ONE_MINUTE, new CTORule("cto-1-min", ONE_MINUTE));
+        final RuleList everyMinute = ruleListForPeriodOf(ONE_MINUTE, new CTORule("cto-1-min", ONE_MINUTE), new AccountingRule(
+                ONE_MINUTE));
 
         final VismoAggregationTimerTask three = new VismoAggregationTimerTask(everyThreeSeconds, sink);
         final VismoAggregationTimerTask one = new VismoAggregationTimerTask(everyMinute, sink);

@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * <li>the # of in between <strong>DIFFERENT</strong> responses per user (field: count-rethink-time)</li>
  * </ol>
  */
-public class CTORule implements AggregationRule {
+public class CTORule extends AbstractAggregationRule {
     /**
      * 
      */
@@ -43,27 +43,15 @@ public class CTORule implements AggregationRule {
     }
 
     /***/
+    static final Logger         log                        = LoggerFactory.getLogger(CTORule.class);
+    /***/
     private static final String CONTENT_SIZE_FIELD         = "content-size";
     /***/
-    private static final String GET_OPERATION              = "GET";
-    /***/
-    private static final Logger log                        = LoggerFactory.getLogger(CTORule.class);
-    /***/
-    private static final String OPERATION_FIELD            = "operation";
-    /***/
-    private static final String PUT_OPERATION              = "PUT";
-    /***/
     private static final String SEP                        = "/#@$!/";
-    /***/
-    private static final String SPECIAL_FIELD              = "transaction-duration";
     /***/
     private static final String THROTTLING                 = "THROTTLING";
     /***/
     private static final String TRANSACTION_DURATION_FIELD = "transaction-duration";
-    /***/
-    private final long          period;
-    /***/
-    private final String        topic;
 
 
     /**
@@ -73,8 +61,7 @@ public class CTORule implements AggregationRule {
      * @param period
      */
     public CTORule(final String topic, final long period) {
-        this.topic = topic;
-        this.period = period;
+        super(topic, period);
     }
 
 
@@ -88,42 +75,6 @@ public class CTORule implements AggregationRule {
         final Map dict = getCTOEvent(eventList, topic, aggregationStartTime);
 
         return new VismoAggregationResultEvent(dict);
-    }
-
-
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        final CTORule other = (CTORule) obj;
-        if (period != other.period)
-            return false;
-        if (topic == null) {
-            if (other.topic != null)
-                return false;
-        } else if (!topic.equals(other.topic))
-            return false;
-        return true;
-    }
-
-
-    /**
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (period ^ (period >>> 32));
-        result = prime * result + ((topic == null) ? 0 : topic.hashCode());
-        return result;
     }
 
 
@@ -148,10 +99,8 @@ public class CTORule implements AggregationRule {
 
 
     /**
-     * Calculate the aggregation of the requests, broken down to tenants.
-     * 
      * @param eventList
-     * @return the result.
+     * @return
      */
     private static ArrayList<HashMap<String, Object>> aggregate(final List< ? extends Event> eventList) {
         final HashMap<ContainerRequest, RequestCTOStats> requestsByUser = aggregateOverUsers(eventList);
@@ -162,11 +111,8 @@ public class CTORule implements AggregationRule {
 
 
     /**
-     * Calculate the aggregation of the requests, broken down to containers.
-     * 
      * @param requestsByUser
-     *            the users' requests.
-     * @return the result.
+     * @return
      */
     @SuppressWarnings("unchecked")
     private static ArrayList<HashMap<String, Object>> aggregateOverContainers(
@@ -245,10 +191,8 @@ public class CTORule implements AggregationRule {
 
 
     /**
-     * Calculate the aggregation of the requests, broken down to users.
-     * 
      * @param eventList
-     * @return the result.
+     * @return
      */
     private static HashMap<ContainerRequest, RequestCTOStats> aggregateOverUsers(final List< ? extends Event> eventList) {
         final HashMap<ContainerRequest, RequestCTOStats> requests = new HashMap<ContainerRequest, RequestCTOStats>();
@@ -308,11 +252,8 @@ public class CTORule implements AggregationRule {
 
 
     /**
-     * Prepare a container object, ready to be send to the consumer.
-     * 
      * @param containerName
-     *            the name of the container.
-     * @return the container object.
+     * @return
      */
     private static HashMap<String, Object> getContainerObject(final String containerName) {
         final HashMap<String, Object> container = new HashMap<String, Object>();
@@ -325,20 +266,15 @@ public class CTORule implements AggregationRule {
 
 
     /**
-     * Calculate the cto event aggregations.
-     * 
      * @param eventList
-     *            the list of events.
      * @param topic
-     *            the topic.
-     * @param collectionStartTime
-     *            the time instance the collection of events started
-     * @return the full cto event.
+     * @param aggregationStartTime
+     * @return
      */
     private static HashMap<String, Object> getCTOEvent(final List< ? extends Event> eventList, final String topic,
-            final long collectionStartTime) {
-        final List<Event> readEventList = getReadEventsList(eventList);
-        final List<Event> writeEventList = getWriteEventsList(eventList);
+            final long aggregationStartTime) {
+        final List<Event> readEventList = selectReadEvents(eventList);
+        final List<Event> writeEventList = selectWriteEvents(eventList);
         final HashMap<String, Object> reads = new HashMap<String, Object>();
         final HashMap<String, Object> writes = new HashMap<String, Object>();
         final HashMap<String, Object> dict = new HashMap<String, Object>();
@@ -350,91 +286,10 @@ public class CTORule implements AggregationRule {
         dict.put("writes", writes);
 
         dict.put("topic", topic);
-        dict.put("tStart", collectionStartTime);
+        dict.put("tStart", aggregationStartTime);
         dict.put("tEnd", System.currentTimeMillis());
 
         return dict;
-    }
-
-
-    /**
-     * @param e
-     * @param field
-     * @return
-     */
-    private static Double getFieldValueAsDouble(final Event e, final String field) {
-        final Object val = e.get(field);
-
-        if (val == null) {
-            log.warn("missing required field '{}' or is null; returning 0", field);
-
-            return 0d;
-        }
-
-        if (val instanceof String) {
-            log.warn("required field '{}' should be {}; try to parse it", field, Long.class);
-
-            return Double.valueOf((String) val);
-        }
-
-        try {
-            return (Double) val;
-        } catch (final ClassCastException x) {
-            log.trace("expecting field '{}' of type {} ...", field, Long.class);
-            log.trace("but got value {} of type {}", val, val.getClass());
-            log.trace("exception: ", x);
-
-            return 0d;
-        }
-    }
-
-
-    /**
-     * @param e
-     * @param field
-     * @return
-     */
-    private static Long getFieldValueAsLong(final Event e, final String field) {
-        final Object val = e.get(field);
-
-        if (val == null) {
-            log.warn("missing required field '{}' or is null; returning 0", field);
-
-            return 0l;
-        }
-
-        if (val instanceof String) {
-            log.warn("required field '{}' should be {}; try to parse it", field, Long.class);
-
-            return Long.valueOf((String) val);
-        }
-
-        try {
-            return (Long) val;
-        } catch (final ClassCastException x) {
-            log.trace("expecting field '{}' of type {} ...", field, Long.class);
-            log.trace("but got value {} of type {}", val, val.getClass());
-            log.trace("exception: ", x);
-
-            return 0l;
-        }
-    }
-
-
-    /**
-     * Extract all read events from the list.
-     * 
-     * @param eventList
-     * @return the read events list.
-     */
-    private static ArrayList<Event> getReadEventsList(final List< ? extends Event> eventList) {
-        final ArrayList<Event> newList = new ArrayList<Event>();
-
-        for (final Event e : eventList)
-            if (((String) e.get(OPERATION_FIELD)).equalsIgnoreCase(GET_OPERATION))
-                newList.add(e);
-
-        return newList;
     }
 
 
@@ -460,22 +315,5 @@ public class CTORule implements AggregationRule {
         user.put("sum-transaction-time", stats.sumTransactionTimes() / 1000.0);
 
         return user;
-    }
-
-
-    /**
-     * Extract all write events from the list.
-     * 
-     * @param eventList
-     * @return the write events list.
-     */
-    private static ArrayList<Event> getWriteEventsList(final List< ? extends Event> eventList) {
-        final ArrayList<Event> newList = new ArrayList<Event>();
-
-        for (final Event e : eventList)
-            if (((String) e.get(OPERATION_FIELD)).equalsIgnoreCase(PUT_OPERATION))
-                newList.add(e);
-
-        return newList;
     }
 }
