@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.sources;
 
-import gr.ntua.vision.monitoring.EventListener;
+import gr.ntua.vision.monitoring.EventSourceListener;
 
 
 /**
@@ -15,5 +15,5 @@ public interface EventSource {
      * @param listener
      *            the listener.
      */
-    void subscribe(EventListener listener);
+    void subscribe(EventSourceListener listener);
 }

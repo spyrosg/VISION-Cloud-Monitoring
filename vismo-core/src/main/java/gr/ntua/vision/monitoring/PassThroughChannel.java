@@ -7,7 +7,7 @@ import gr.ntua.vision.monitoring.sinks.EventSink;
 /**
  * 
  */
-public class PassThroughChannel implements EventListener {
+public class PassThroughChannel implements EventSourceListener {
     /***/
     private final EventSink sink;
 
@@ -23,7 +23,7 @@ public class PassThroughChannel implements EventListener {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.EventListener#receive(gr.ntua.vision.monitoring.events.Event)
+     * @see gr.ntua.vision.monitoring.EventSourceListener#receive(gr.ntua.vision.monitoring.events.Event)
      */
     @Override
     public void receive(final Event e) {

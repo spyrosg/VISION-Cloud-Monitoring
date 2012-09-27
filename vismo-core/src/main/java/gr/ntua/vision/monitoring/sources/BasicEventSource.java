@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.sources;
 
-import gr.ntua.vision.monitoring.EventListener;
+import gr.ntua.vision.monitoring.EventSourceListener;
 import gr.ntua.vision.monitoring.StoppableTask;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventFactory;
@@ -19,18 +19,18 @@ import org.slf4j.LoggerFactory;
  */
 public class BasicEventSource extends StoppableTask implements EventSource {
     /** this is used to get a hold of the whole dict, for serialization reasons. */
-    private static final String            DICT_KEY  = "!dict";
+    private static final String                  DICT_KEY  = "!dict";
     /***/
-    private static final Pattern           patt      = Pattern.compile("\"originating-machine\": ?\"([^\"]*)\"");
+    private static final Pattern                 patt      = Pattern.compile("\"originating-machine\": ?\"([^\"]*)\"");
     /***/
-    private final EventFactory             factory;
+    private final EventFactory                   factory;
     /** the listeners lists. */
-    private final ArrayList<EventListener> listeners = new ArrayList<EventListener>();
+    private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
     /** the log target. */
-    private final Logger                   log       = LoggerFactory.getLogger(BasicEventSource.class);
+    private final Logger                         log       = LoggerFactory.getLogger(BasicEventSource.class);
 
     /***/
-    private final VismoSocket              sock;
+    private final VismoSocket                    sock;
 
 
     /**
@@ -91,13 +91,10 @@ public class BasicEventSource extends StoppableTask implements EventSource {
 
 
     /**
-     * Subscribe a new listener. There is no guarantee in the order the listeners will be notified.
-     * 
-     * @param listener
-     *            the listener to subscribe.
+     * @see gr.ntua.vision.monitoring.sources.EventSource#subscribe(gr.ntua.vision.monitoring.EventSourceListener)
      */
     @Override
-    public void subscribe(final EventListener listener) {
+    public void subscribe(final EventSourceListener listener) {
         log.debug("subscribing listener {}", listener);
         listeners.add(listener);
     }
@@ -119,7 +116,7 @@ public class BasicEventSource extends StoppableTask implements EventSource {
      *            the event received.
      */
     private void notifyAll(final Event e) {
-        for (final EventListener listener : listeners)
+        for (final EventSourceListener listener : listeners)
             listener.receive(e);
     }
 

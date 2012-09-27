@@ -7,7 +7,7 @@ import gr.ntua.vision.monitoring.sources.EventSource;
 /**
  * A client wishing to receive events from {@link EventSource}s should implement this interface.
  */
-public interface EventListener {
+public interface EventSourceListener {
     /**
      * Notify the listener of the event received by the source.
      * 

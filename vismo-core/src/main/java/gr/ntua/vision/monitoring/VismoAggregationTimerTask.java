@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  */
-public class VismoAggregationTimerTask extends VismoRepeatedTask implements EventListener {
+public class VismoAggregationTimerTask extends VismoRepeatedTask implements EventSourceListener {
     /***/
     private static final Logger log = LoggerFactory.getLogger(VismoAggregationTimerTask.class);
     /***/
