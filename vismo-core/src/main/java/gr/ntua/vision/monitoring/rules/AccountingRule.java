@@ -73,9 +73,6 @@ public class AccountingRule extends AbstractAggregationRule {
             final long aggregationStartTime) {
         final HashMap<String, Object> dict = new HashMap<String, Object>();
 
-        for (final Event e : eventList)
-            log.trace("event.operation={}", e.get(OPERATION_FIELD));
-
         dict.put("reads", transformReadList(selectReadEvents(eventList)));
         dict.put("writes", transformWriteList(selectWriteEvents(eventList)));
         dict.put("deletes", transformDeleteList(selectDeleteEvents(eventList)));
