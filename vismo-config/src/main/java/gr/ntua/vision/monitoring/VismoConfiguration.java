@@ -22,7 +22,7 @@ public class VismoConfiguration extends PropertiesConfiguration {
     /***/
     private static final String CONSUMERS_PORT_PROPERTY    = "consumers.port";
     /***/
-    private static final String PRODUCERS_PORT_PROPERTY    = "producers.port";
+    private static final String PRODUCERS_POINT_PROPERTY   = "producers.point";
     /***/
     private static final String UDP_PORT_PROPERTY          = "udp.port";
 
@@ -75,10 +75,10 @@ public class VismoConfiguration extends PropertiesConfiguration {
 
 
     /**
-     * @return the producers port.
+     * @return the producers address.
      */
-    public int getProducersPort() {
-        return Integer.valueOf(get(PRODUCERS_PORT_PROPERTY));
+    public String getProducersPoint() {
+        return get(PRODUCERS_POINT_PROPERTY);
     }
 
 

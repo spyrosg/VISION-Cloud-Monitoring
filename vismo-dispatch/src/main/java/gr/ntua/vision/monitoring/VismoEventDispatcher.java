@@ -51,7 +51,7 @@ public class VismoEventDispatcher implements EventDispatcher {
      * @throws SocketException
      */
     public VismoEventDispatcher(final String serviceName) throws SocketException {
-        this(serviceName, zmq.newConnectedPushSocket("tcp://127.0.0.1:" + conf.getProducersPort()));
+        this(serviceName, zmq.newConnectedPushSocket(conf.getProducersPoint()));
     }
 
 
