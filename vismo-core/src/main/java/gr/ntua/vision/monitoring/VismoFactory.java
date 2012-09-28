@@ -64,9 +64,11 @@ public class VismoFactory {
             service.addTask(workersSource);
 
             final BasicEventSink sink = new BasicEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
+
             final RuleList everyThreeSeconds = ruleListForPeriodOf(THREE_SECONDS, new CTORule("cto-3-sec", THREE_SECONDS));
             final RuleList everyMinute = ruleListForPeriodOf(ONE_MINUTE, new CTORule("cto-1-min", ONE_MINUTE),
                                                              new AccountingRule(ONE_MINUTE));
+
             final VismoAggregationTimerTask threeSecTimer = new VismoAggregationTimerTask(everyThreeSeconds, sink);
             final VismoAggregationTimerTask oneMinTimer = new VismoAggregationTimerTask(everyMinute, sink);
 

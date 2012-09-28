@@ -44,6 +44,15 @@ abstract class AbstractAggregationRule implements AggregationRule {
 
 
     /**
+     * @see gr.ntua.vision.monitoring.rules.AggregationRule#aggregationPeriod()
+     */
+    @Override
+    public long aggregationPeriod() {
+        return period;
+    }
+
+
+    /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -82,7 +91,7 @@ abstract class AbstractAggregationRule implements AggregationRule {
     /**
      * @param e
      * @param field
-     * @return
+     * @return the value of the given field as a double number.
      */
     protected static Double getFieldValueAsDouble(final Event e, final String field) {
         final Object val = e.get(field);
@@ -106,7 +115,7 @@ abstract class AbstractAggregationRule implements AggregationRule {
             log.trace("but got value {} of type {}", val, val.getClass());
             log.trace("exception: ", x);
 
-            return null;
+            return 0d;
         }
     }
 
@@ -114,7 +123,7 @@ abstract class AbstractAggregationRule implements AggregationRule {
     /**
      * @param e
      * @param field
-     * @return
+     * @return the value of the given field as a long number.
      */
     protected static Long getFieldValueAsLong(final Event e, final String field) {
         final Object val = e.get(field);
@@ -138,14 +147,14 @@ abstract class AbstractAggregationRule implements AggregationRule {
             log.trace("but got value {} of type {}", val, val.getClass());
             log.trace("exception: ", x);
 
-            return null;
+            return 0l;
         }
     }
 
 
     /**
      * @param eventList
-     * @return
+     * @return the list of delete events.
      */
     protected static ArrayList<Event> selectDeleteEvents(final List< ? extends Event> eventList) {
         return selectEventsByOperation(eventList, DELETE_OPERATION);
@@ -154,7 +163,7 @@ abstract class AbstractAggregationRule implements AggregationRule {
 
     /**
      * @param eventList
-     * @return
+     * @return the list of read events.
      */
     protected static ArrayList<Event> selectReadEvents(final List< ? extends Event> eventList) {
         return selectEventsByOperation(eventList, GET_OPERATION);
@@ -163,7 +172,7 @@ abstract class AbstractAggregationRule implements AggregationRule {
 
     /**
      * @param eventList
-     * @return
+     * @return the list of write events.
      */
     protected static ArrayList<Event> selectWriteEvents(final List< ? extends Event> eventList) {
         return selectEventsByOperation(eventList, PUT_OPERATION);
@@ -173,7 +182,7 @@ abstract class AbstractAggregationRule implements AggregationRule {
     /**
      * @param eventList
      * @param operation
-     * @return
+     * @return the list of events that match onyl the given operation.
      */
     private static ArrayList<Event> selectEventsByOperation(final List< ? extends Event> eventList, final String operation) {
         final ArrayList<Event> newList = new ArrayList<Event>(eventList.size());

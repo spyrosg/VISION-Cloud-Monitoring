@@ -10,7 +10,7 @@ import java.util.UUID;
 /**
  * TODO: somehow link with {@link VismoEvent}.
  */
-public class VismoAggregationResultEvent implements AggregationResultEvent {
+public class VismoAggregationResult implements AggregationResult {
     /** this is used to get a hold of the whole dict, for serialization reasons. */
     private static final String       DICT_KEY = "!dict";
     /** the dictionary of key/values. */
@@ -23,10 +23,10 @@ public class VismoAggregationResultEvent implements AggregationResultEvent {
      * @param dict
      *            a dictionary of key/values.
      */
-    public VismoAggregationResultEvent(final Map<String, Object> dict) {
-        this.dict = dict;
+    public VismoAggregationResult(final Map<String, Object> dict) {
         removeUnessecaryFields(dict);
         addBasicFields(dict);
+        this.dict = dict;
     }
 
 
@@ -62,7 +62,25 @@ public class VismoAggregationResultEvent implements AggregationResultEvent {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.rules.AggregationResultEvent#tEnd()
+     * @see gr.ntua.vision.monitoring.rules.AggregationResult#puttEnd(long)
+     */
+    @Override
+    public void puttEnd(final long t) {
+        dict.put("tEnd", t);
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.rules.AggregationResult#puttStart(long)
+     */
+    @Override
+    public void puttStart(final long t) {
+        dict.put("tStart", t);
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.rules.AggregationResult#tEnd()
      */
     @Override
     public long tEnd() {
@@ -98,7 +116,7 @@ public class VismoAggregationResultEvent implements AggregationResultEvent {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.rules.AggregationResultEvent#tStart()
+     * @see gr.ntua.vision.monitoring.rules.AggregationResult#tStart()
      */
     @Override
     public long tStart() {
@@ -119,7 +137,7 @@ public class VismoAggregationResultEvent implements AggregationResultEvent {
      * @param dict
      */
     private static void addBasicFields(final Map<String, Object> dict) {
-        dict.put("timestamp", dict.get("tStart"));
+        dict.put("timestamp", System.currentTimeMillis());
         dict.put("id", UUID.randomUUID().toString());
     }
 
@@ -141,7 +159,7 @@ public class VismoAggregationResultEvent implements AggregationResultEvent {
 
     /**
      * @param t
-     * @return
+     * @return a human readable representation of the given date.
      */
     private static String toDate(final long t) {
         return new Date(t).toString();

@@ -1,6 +1,7 @@
 package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.rules.VismoRuleAggregationListener;
 import gr.ntua.vision.monitoring.scheduling.VismoRepeatedTask;
 import gr.ntua.vision.monitoring.sinks.EventSink;
 
@@ -9,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * 
+ * This is responsible for executing the rules at the end of each period.
  */
 public class VismoAggregationTimerTask extends VismoRepeatedTask implements EventSourceListener {
     /***/
@@ -55,22 +56,16 @@ public class VismoAggregationTimerTask extends VismoRepeatedTask implements Even
      */
     @Override
     public void run() {
-        final long periodInSeconds = rules.getPeriod() / 1000;
-
-        log.trace("timer of {} seconds expired, starting aggregation", periodInSeconds);
+        log.trace("starting aggregation");
 
         final long start = System.currentTimeMillis();
+        final VismoRuleAggregationListener aggregationListener = new VismoRuleAggregationListener(sink, start);
 
-        try {
-            final long aggregationPeriodTimestamp = scheduledExecutionTime() - rules.getPeriod();
+        rules.runRules(aggregationListener);
 
-            rules.runRules(aggregationPeriodTimestamp, sink);
-        } catch (final Throwable x) {
-            log.error("performPendingOperations exception: ", x);
-        }
+        final long end = System.currentTimeMillis();
 
-        log.trace("aggregation end for {} seconds timer, in {} seconds", periodInSeconds,
-                  (System.currentTimeMillis() - start) / 1000.0);
+        log.trace("ending aggregation in {} seconds", (end - start) / 1000.0);
     }
 
 
@@ -79,6 +74,6 @@ public class VismoAggregationTimerTask extends VismoRepeatedTask implements Even
      */
     @Override
     public String toString() {
-        return "#<VismoAggregationTimerTask: expiring every " + (getPeriod() / 1000) + " second(s)>";
+        return "#<VismoAggregationTimerTask: running every " + (getPeriod() / 1000) + " second(s)>";
     }
 }

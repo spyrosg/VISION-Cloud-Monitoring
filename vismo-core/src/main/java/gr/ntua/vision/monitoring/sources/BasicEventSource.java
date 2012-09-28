@@ -18,8 +18,6 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class BasicEventSource extends StoppableTask implements EventSource {
-    /** this is used to get a hold of the whole dict, for serialization reasons. */
-    private static final String                  DICT_KEY  = "!dict";
     /***/
     private static final Pattern                 patt      = Pattern.compile("\"originating-machine\": ?\"([^\"]*)\"");
     /***/
@@ -28,7 +26,6 @@ public class BasicEventSource extends StoppableTask implements EventSource {
     private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
     /** the log target. */
     private final Logger                         log       = LoggerFactory.getLogger(BasicEventSource.class);
-
     /***/
     private final VismoSocket                    sock;
 
@@ -123,7 +120,7 @@ public class BasicEventSource extends StoppableTask implements EventSource {
 
     /**
      * @param eventStr
-     * @return
+     * @return the originating machine ip of the event.
      */
     private static String getEventSource(final String eventStr) {
         final Matcher m = patt.matcher(eventStr);

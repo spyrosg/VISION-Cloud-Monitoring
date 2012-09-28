@@ -1,9 +1,9 @@
 package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.rules.AggregationResultEvent;
+import gr.ntua.vision.monitoring.rules.AggregationResult;
 import gr.ntua.vision.monitoring.rules.AggregationRule;
-import gr.ntua.vision.monitoring.sinks.EventSink;
+import gr.ntua.vision.monitoring.rules.RuleAggregationListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,29 +66,27 @@ public class RuleList {
 
 
     /**
-     * @param aggregationPeriodTimestamp
-     * @param sink
+     * @param listener
      */
-    public void runRules(final long aggregationPeriodTimestamp, final EventSink sink) {
+    public void runRules(final RuleAggregationListener listener) {
         for (final AggregationRule rule : list) {
             final List<Event> eventList = eventBuckets.remove(rule);
 
-            if (eventList == null)
+            if (eventList == null || eventList.isEmpty())
                 continue;
 
             log.debug("there are {} event(s) to aggregate for rule {}", eventList.size(), rule);
 
-            if (eventList.isEmpty())
-                continue;
+            AggregationResult result = null;
+
+            listener.startAggregation(rule);
 
             try {
-                final AggregationResultEvent result = rule.aggregate(aggregationPeriodTimestamp, eventList);
-
-                log.debug("aggregation successful for rule {} => {}", rule, result);
-
-                sink.send(result);
+                result = rule.aggregate(eventList);
             } catch (final Throwable x) {
                 log.error("aggregation error", x);
+            } finally {
+                listener.endAggregation(rule, result);
             }
         }
 

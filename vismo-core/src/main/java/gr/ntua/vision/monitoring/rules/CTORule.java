@@ -66,15 +66,15 @@ public class CTORule extends AbstractAggregationRule {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.rules.AggregationRule#aggregate(long, java.util.List)
+     * @see gr.ntua.vision.monitoring.rules.AggregationRule#aggregate(java.util.List)
      */
     @SuppressWarnings("unchecked")
     @Override
-    public AggregationResultEvent aggregate(final long aggregationStartTime, final List< ? extends Event> eventList) {
+    public AggregationResult aggregate(final List< ? extends Event> eventList) {
         @SuppressWarnings("rawtypes")
-        final Map dict = getCTOEvent(eventList, topic, aggregationStartTime);
+        final Map dict = getCTOEvent(eventList, topic);
 
-        return new VismoAggregationResultEvent(dict);
+        return new VismoAggregationResult(dict);
     }
 
 
@@ -102,7 +102,7 @@ public class CTORule extends AbstractAggregationRule {
      * @param eventList
      * @return
      */
-    private static ArrayList<HashMap<String, Object>> aggregate(final List< ? extends Event> eventList) {
+    private static ArrayList<HashMap<String, Object>> aggregate1(final List< ? extends Event> eventList) {
         final HashMap<ContainerRequest, RequestCTOStats> requestsByUser = aggregateOverUsers(eventList);
         final ArrayList<HashMap<String, Object>> containerList = aggregateOverContainers(requestsByUser);
 
@@ -268,26 +268,22 @@ public class CTORule extends AbstractAggregationRule {
     /**
      * @param eventList
      * @param topic
-     * @param aggregationStartTime
      * @return
      */
-    private static HashMap<String, Object> getCTOEvent(final List< ? extends Event> eventList, final String topic,
-            final long aggregationStartTime) {
+    private static HashMap<String, Object> getCTOEvent(final List< ? extends Event> eventList, final String topic) {
         final List<Event> readEventList = selectReadEvents(eventList);
         final List<Event> writeEventList = selectWriteEvents(eventList);
         final HashMap<String, Object> reads = new HashMap<String, Object>();
         final HashMap<String, Object> writes = new HashMap<String, Object>();
         final HashMap<String, Object> dict = new HashMap<String, Object>();
 
-        reads.put("tenants", aggregate(readEventList));
-        writes.put("tenants", aggregate(writeEventList));
+        reads.put("tenants", aggregate1(readEventList));
+        writes.put("tenants", aggregate1(writeEventList));
 
         dict.put("reads", reads);
         dict.put("writes", writes);
 
         dict.put("topic", topic);
-        dict.put("tStart", aggregationStartTime);
-        dict.put("tEnd", System.currentTimeMillis());
 
         return dict;
     }

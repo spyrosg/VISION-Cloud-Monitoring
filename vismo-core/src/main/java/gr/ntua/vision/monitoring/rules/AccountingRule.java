@@ -33,15 +33,15 @@ public class AccountingRule extends AbstractAggregationRule {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.rules.AggregationRule#aggregate(long, java.util.List)
+     * @see gr.ntua.vision.monitoring.rules.AggregationRule#aggregate(java.util.List)
      */
     @SuppressWarnings("unchecked")
     @Override
-    public AggregationResultEvent aggregate(final long aggregationStartTime, final List< ? extends Event> eventList) {
+    public AggregationResult aggregate(final List< ? extends Event> eventList) {
         @SuppressWarnings("rawtypes")
-        final HashMap dict = getAccountingEventObject(eventList, aggregationStartTime);
+        final HashMap dict = getAccountingEventObject(eventList);
 
-        return new VismoAggregationResultEvent(dict);
+        return new VismoAggregationResult(dict);
     }
 
 
@@ -66,11 +66,9 @@ public class AccountingRule extends AbstractAggregationRule {
 
     /**
      * @param eventList
-     * @param aggregationStartTime
      * @return
      */
-    private static HashMap<String, Object> getAccountingEventObject(final List< ? extends Event> eventList,
-            final long aggregationStartTime) {
+    private static HashMap<String, Object> getAccountingEventObject(final List< ? extends Event> eventList) {
         final HashMap<String, Object> dict = new HashMap<String, Object>();
 
         dict.put("reads", transformReadList(selectReadEvents(eventList)));
@@ -78,8 +76,6 @@ public class AccountingRule extends AbstractAggregationRule {
         dict.put("deletes", transformDeleteList(selectDeleteEvents(eventList)));
         // TODO: dict.put("storlets", );
         dict.put("topic", TOPIC);
-        dict.put("tStart", aggregationStartTime);
-        dict.put("tEnd", System.currentTimeMillis());
 
         return dict;
     }
