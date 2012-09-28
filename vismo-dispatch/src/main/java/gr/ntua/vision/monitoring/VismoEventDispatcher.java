@@ -117,21 +117,18 @@ public class VismoEventDispatcher implements EventDispatcher {
 
 
     /**
-     * FIXME: get cluster from configuration
-     * 
-     * @return the name of the cluster this machines belongs to.
-     */
-    @SuppressWarnings("static-method")
-    private String getOriginatingCluster() {
-        return "test-1";
-    }
-
-
-    /**
      * @return an id for the event.
      */
     private static String getEventId() {
         return UUID.randomUUID().toString();
+    }
+
+
+    /**
+     * @return the name of the cluster this machines belongs to.
+     */
+    private static String getOriginatingCluster() {
+        return conf.getTestClusterName();
     }
 
 

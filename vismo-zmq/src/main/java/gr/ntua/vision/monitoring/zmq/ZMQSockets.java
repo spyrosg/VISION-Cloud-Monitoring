@@ -14,8 +14,6 @@ public class ZMQSockets {
     private final ZContext ctx;
 
 
-    // TODO: maybe use a builder?
-
     /**
      * Constructor.
      * 
@@ -36,7 +34,7 @@ public class ZMQSockets {
         final Socket sock = ctx.createSocket(ZMQ.PUB);
 
         sock.setLinger(0);
-        sock.setSendTimeOut(0); // FIXME: non-blocking for now
+        sock.setSendTimeOut(0);
         sock.bind(addr);
 
         return new VismoSocket(sock, addr);
