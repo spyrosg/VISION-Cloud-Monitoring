@@ -83,8 +83,8 @@ public class CTORule extends AbstractAggregationRule {
      */
     @Override
     public boolean matches(final Event e) {
-        // FIXME: add a field for events coming from vismo_dispatch
-        return e.get(SPECIAL_FIELD) != null;
+        // FIXME: add a field to events coming from vismo_dispatch
+        return isCompleteObsEvent(e);
     }
 
 

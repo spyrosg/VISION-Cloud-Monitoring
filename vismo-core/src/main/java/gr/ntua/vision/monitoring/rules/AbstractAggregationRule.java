@@ -16,8 +16,6 @@ abstract class AbstractAggregationRule implements AggregationRule {
     /***/
     protected static final String OPERATION_FIELD  = "operation";
     /***/
-    protected static final String SPECIAL_FIELD    = "transaction-duration";
-    /***/
     private static final String   DELETE_OPERATION = "DELETE";
     /***/
     private static final String   GET_OPERATION    = "GET";
@@ -25,6 +23,8 @@ abstract class AbstractAggregationRule implements AggregationRule {
     private static final Logger   log              = LoggerFactory.getLogger(AbstractAggregationRule.class);
     /***/
     private static final String   PUT_OPERATION    = "PUT";
+    /***/
+    private static final String   SPECIAL_FIELD    = "transaction-duration";
     /***/
     protected final long          period;
     /***/
@@ -149,6 +149,19 @@ abstract class AbstractAggregationRule implements AggregationRule {
 
             return 0l;
         }
+    }
+
+
+    /**
+     * Is this a complete object service event? Since we receive all events from object service, some of them are incomplete, in
+     * the sense that contain parts of the request/response cycle.
+     * 
+     * @param e
+     *            the event.
+     * @return <code>true</code> iff the
+     */
+    protected static boolean isCompleteObsEvent(final Event e) {
+        return e.get(SPECIAL_FIELD) != null;
     }
 
 

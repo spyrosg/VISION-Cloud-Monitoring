@@ -78,16 +78,19 @@ public class VismoFactory {
             localSource.subscribe(threeSecTimer);
             localSource.subscribe(oneMinTimer);
             localSource.subscribe(new PassThroughChannel(sink));
+            localSource.subscribe(new SLAPerRequestChannel(sink));
 
             workersSource.subscribe(threeSecTimer);
             workersSource.subscribe(oneMinTimer);
             workersSource.subscribe(new PassThroughChannel(sink));
+            workersSource.subscribe(new SLAPerRequestChannel(sink));
         } else {
             final BasicEventSource localSource = getLocalSource(zmq);
             final BasicEventSink clusterHead = new BasicEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getClusterHead()
                     + ":" + conf.getClusterHeadPort()));
 
             localSource.subscribe(new PassThroughChannel(clusterHead));
+            localSource.subscribe(new SLAPerRequestChannel(clusterHead));
             service.addTask(localSource);
         }
 
