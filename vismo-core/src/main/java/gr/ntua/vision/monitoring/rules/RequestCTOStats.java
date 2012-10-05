@@ -6,7 +6,7 @@ import java.util.ArrayList;
 /**
  * An object used to hold all the CTO necessary stats per request.
  */
-public class RequestCTOStats {
+class RequestCTOStats {
     /***/
     private long                    containerAccesses;
     /***/

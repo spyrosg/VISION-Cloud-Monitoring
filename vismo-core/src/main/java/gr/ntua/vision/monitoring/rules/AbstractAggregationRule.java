@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  */
 abstract class AbstractAggregationRule implements AggregationRule {
     /***/
-    protected static final String OPERATION_FIELD  = "operation";
+    protected static final String OBS_FIELD        = "transaction-duration";
     /***/
     private static final String   DELETE_OPERATION = "DELETE";
     /***/
@@ -22,9 +22,9 @@ abstract class AbstractAggregationRule implements AggregationRule {
     /***/
     private static final Logger   log              = LoggerFactory.getLogger(AbstractAggregationRule.class);
     /***/
-    private static final String   PUT_OPERATION    = "PUT";
+    private static final String   OPERATION_FIELD  = "operation";
     /***/
-    private static final String   SPECIAL_FIELD    = "transaction-duration";
+    private static final String   PUT_OPERATION    = "PUT";
     /***/
     protected final long          period;
     /***/
@@ -161,7 +161,7 @@ abstract class AbstractAggregationRule implements AggregationRule {
      * @return <code>true</code> iff the
      */
     protected static boolean isCompleteObsEvent(final Event e) {
-        return e.get(SPECIAL_FIELD) != null;
+        return e.get(OBS_FIELD) != null;
     }
 
 
@@ -171,6 +171,22 @@ abstract class AbstractAggregationRule implements AggregationRule {
      */
     protected static ArrayList<Event> selectDeleteEvents(final List< ? extends Event> eventList) {
         return selectEventsByOperation(eventList, DELETE_OPERATION);
+    }
+
+
+    /**
+     * @param eventList
+     * @param field
+     * @return the list of events that contain the given field.
+     */
+    protected static ArrayList<Event> selectEventsByField(final List< ? extends Event> eventList, final String field) {
+        final ArrayList<Event> list = new ArrayList<Event>();
+
+        for (final Event e : eventList)
+            if (e.get(field) != null)
+                list.add(e);
+
+        return list;
     }
 
 
@@ -195,7 +211,7 @@ abstract class AbstractAggregationRule implements AggregationRule {
     /**
      * @param eventList
      * @param operation
-     * @return the list of events that match onyl the given operation.
+     * @return the list of events that match only the given operation.
      */
     private static ArrayList<Event> selectEventsByOperation(final List< ? extends Event> eventList, final String operation) {
         final ArrayList<Event> newList = new ArrayList<Event>(eventList.size());
