@@ -216,10 +216,16 @@ abstract class AbstractAggregationRule implements AggregationRule {
     private static ArrayList<Event> selectEventsByOperation(final List< ? extends Event> eventList, final String operation) {
         final ArrayList<Event> newList = new ArrayList<Event>(eventList.size());
 
-        for (final Event e : eventList)
+        for (final Event e : eventList) {
+        	if (e.get(OPERATION_FIELD) == null)
+        		throw new Error("null field");
+        	
             if (operation.equalsIgnoreCase((String) e.get(OPERATION_FIELD)))
                 newList.add(e);
+        }
 
+        log.trace("have {} events for '{}'", newList.size(), operation);
+        
         return newList;
     }
 }

@@ -105,7 +105,6 @@ public class AccountingRule extends AbstractAggregationRule {
      * @return the list of delete events as prescribed by accounting.
      */
     private static ArrayList<HashMap<String, Object>> transformDeleteList(final ArrayList<Event> eventList) {
-        log.trace("got {} delete events", eventList.size());
         return transformByOperation(eventList, "delete");
     }
 
@@ -144,7 +143,6 @@ public class AccountingRule extends AbstractAggregationRule {
      * @return the list of read events as prescribed by accounting.
      */
     private static ArrayList<HashMap<String, Object>> transformReadList(final ArrayList<Event> eventList) {
-        log.trace("got {} read events", eventList.size());
         return transformByOperation(eventList, "read");
     }
 
@@ -154,7 +152,6 @@ public class AccountingRule extends AbstractAggregationRule {
      * @return the list of write events as prescribed by accounting.
      */
     private static ArrayList<HashMap<String, Object>> transformWriteList(final ArrayList<Event> eventList) {
-        log.trace("got {} write events", eventList.size());
         return transformByOperation(eventList, "write");
     }
 }
