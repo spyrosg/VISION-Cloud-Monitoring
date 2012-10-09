@@ -3,6 +3,7 @@ package gr.ntua.vision.monitoring.rules;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,9 +25,9 @@ public class VismoAggregationResult implements AggregationResult {
      *            a dictionary of key/values.
      */
     public VismoAggregationResult(final Map<String, Object> dict) {
-        removeUnessecaryFields(dict);
-        addBasicFields(dict);
-        this.dict = dict;
+        this.dict = new HashMap<String, Object>(dict);
+        removeUnessecaryFields(this.dict);
+        addBasicFields(this.dict);
     }
 
 

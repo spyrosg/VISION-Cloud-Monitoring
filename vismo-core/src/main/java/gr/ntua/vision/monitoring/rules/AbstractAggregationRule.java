@@ -219,7 +219,7 @@ abstract class AbstractAggregationRule implements AggregationRule {
         for (final Event e : eventList) {
         	final String val = (String) e.get(OPERATION_FIELD);
         	
-        	log.trace("event operation {}", val);
+        	log.trace("event op={}", val);
         	
             if (operation.equalsIgnoreCase(val))
                 newList.add(e);
