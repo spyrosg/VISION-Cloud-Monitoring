@@ -5,6 +5,7 @@ import gr.ntua.vision.monitoring.sinks.EventSink;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.UUID;
 
 /**
  * 
@@ -31,6 +32,8 @@ public class SLAPerRequestChannel implements EventSourceListener {
 		private final Event e;
 		/***/
 		private static final String topic = "sla-per-request";
+		/***/
+		private static final String id = UUID.randomUUID().toString();
 
 		/**
 		 * Constructor.
@@ -43,6 +46,9 @@ public class SLAPerRequestChannel implements EventSourceListener {
 
 		@Override
 		public Object get(String key) {
+			if (key.equals("id"))
+				return id;
+
 			return e.get(key);
 		}
 

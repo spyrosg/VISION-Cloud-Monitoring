@@ -36,8 +36,8 @@ public class FakeEventConsumer {
      * @param args
      */
     public static void main(final String... args) {
-        final EventRegistry registry = new EventRegistry("tcp://10.0.1.101:56430", true);
+        final EventRegistry registry = new EventRegistry("tcp://10.0.1.103:56430");
 
-        registry.register("ResourceMap", new LoggingHandler());
+        registry.register("sla-per-request", new LoggingHandler());
     }
 }
