@@ -33,7 +33,7 @@ public class SLAPerRequestChannel implements EventSourceListener {
 		/***/
 		private static final String topic = "sla-per-request";
 		/***/
-		private static final String id = UUID.randomUUID().toString();
+		private final String id = UUID.randomUUID().toString();
 
 		/**
 		 * Constructor.
