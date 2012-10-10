@@ -4,6 +4,7 @@ import gr.ntua.vision.monitoring.events.Event;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -51,7 +52,7 @@ public class AccountingRule extends AbstractAggregationRule {
     @Override
     public boolean matches(final Event e) {
         // FIXME: add a field to events coming from vismo_dispatch
-        return isCompleteObsEvent(e);
+        return isCompleteObsEvent(e) || isStorletEngineEvent(e);
     }
 
 
@@ -74,14 +75,162 @@ public class AccountingRule extends AbstractAggregationRule {
         dict.put("reads", transformReadList(selectReadEvents(eventList)));
         dict.put("writes", transformWriteList(selectWriteEvents(eventList)));
         dict.put("deletes", transformDeleteList(selectDeleteEvents(eventList)));
-        // TODO: dict.put("storlets", );
+        dict.put("storlet", transformStorletEvents(selectStorletEngineEvents(eventList)));
         dict.put("topic", TOPIC);
 
         return dict;
     }
+    
+    private static class Storlet {
+    	private final String storletCodeType;
+    	private final String storletType;
+    	private long noTriggers = 0;
+    	private long sumExecutionTime = 0;
 
+    	/**
+    	 * @param storletCodeType
+    	 * @param storletType
+    	 */
+    	public Storlet(String storletCodeType, String storletType) {
+			this.storletCodeType = storletCodeType;
+			this.storletType = storletType;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime
+					* result
+					+ ((storletCodeType == null) ? 0 : storletCodeType
+							.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Storlet other = (Storlet) obj;
+			if (storletCodeType == null) {
+				if (other.storletCodeType != null)
+					return false;
+			} else if (!storletCodeType.equals(other.storletCodeType))
+				return false;
+			return true;
+		}
+    }
+    
+    /**
+     * 
+     */
+    private static class TenantStorlets {
+    	private final String tenant;
+    	private final ArrayList<Storlet> storlets = new ArrayList<AccountingRule.Storlet>();
+
+    	/**
+    	 * 
+    	 * @param tenant
+    	 */
+    	public TenantStorlets(String tenant) {
+			this.tenant = tenant;
+		}
+    	
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result
+					+ ((tenant == null) ? 0 : tenant.hashCode());
+			return result;
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			TenantStorlets other = (TenantStorlets) obj;
+			if (tenant == null) {
+				if (other.tenant != null)
+					return false;
+			} else if (!tenant.equals(other.tenant))
+				return false;
+			return true;
+		}
+    }
+
+    // {"storletType":"telefonica.container3.Text2SpeechStorletAGDefinition","tenantID":"telefonica","count":1,"originating-service":"SRE","storletCodeType":"inet.hi.telefonica.vision.storlet.textToSpeech.Text2SpeechStorlet","id":"8e332a5b-85f9-4f5d-8da7-2f182ec930d6","timestamp":1349786239648,"objectID":"Text2SpeechStorletAG","end_time":1349786235551,"start_time":1349786197483,"originating-cluster":"test","originating-machine":"10.0.1.101","containerID":"container3"}
 
     /**
+     * @param list
+     * @return
+     */
+    private static ArrayList<HashMap<String, Object>> transformStorletEvents(final ArrayList<Event> list) {
+    	final HashMap<String, TenantStorlets> tenants = new HashMap<String, AccountingRule.TenantStorlets>();
+    	
+    	for (final Event e : list) {
+    		final String tenantName = (String) e.get("tenantID");
+    		final TenantStorlets entry = tenants.get(tenantName);
+			final Storlet s = new Storlet((String)e.get("storletCodeType"), (String)e.get("storletType"));
+
+    		if (entry == null) {
+    			final TenantStorlets tenant = new TenantStorlets(tenantName);
+    			
+    			s.noTriggers = 1;
+    			s.sumExecutionTime = (Long)e.get("end_time") - (Long)e.get("start_time");
+    			tenant.storlets.add(s);
+    			tenants.put(tenantName, tenant);
+    		} else {
+    			final int ind = entry.storlets.indexOf(s);
+    			
+    			if (ind < 0) {
+    				s.noTriggers = 1;
+        			s.sumExecutionTime = (Long)e.get("end_time") - (Long)e.get("start_time");
+        			entry.storlets.add(s);
+    			} else {
+    				++s.noTriggers;
+    				s.sumExecutionTime += (Long)e.get("end_time") - (Long)e.get("start_time");
+    			}
+    		}
+    	}
+    		
+    	// - Tenant
+    	// - Total time for the all storlets of this tenant (we SUM ALL the execution times for all the storlets in the whole period)
+    	// - For each storlet, the number of executions
+    	
+    	final ArrayList<HashMap<String, Object>> tenantList = new ArrayList<HashMap<String,Object>>();
+    	
+    	for (String tenantName : tenants.keySet()) {
+    		final HashMap<String, Object> o = new HashMap<String, Object>();
+    		final ArrayList<HashMap<String, Object>> storlets = new ArrayList<HashMap<String,Object>>();
+    		
+    		o.put("tenantID", tenantName);
+    		o.put("storlets",storlets);
+    		
+    		for (final Storlet s : tenants.get(tenantName).storlets) {
+    			final HashMap<String, Object> ss = new HashMap<String, Object>();
+    			
+    			ss.put("storletCodeType", s.storletCodeType);
+    			ss.put("storletType", s.storletType);
+    			ss.put("executionTime", s.sumExecutionTime);
+    			ss.put("count", s.noTriggers);
+
+    			storlets.add(ss);
+    		}
+    	}
+    	
+    	return tenantList;
+	}
+    
+
+	/**
      * @param list
      * @param operation
      * @return

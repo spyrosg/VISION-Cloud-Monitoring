@@ -26,6 +26,8 @@ abstract class AbstractAggregationRule implements AggregationRule {
     /***/
     private static final String   PUT_OPERATION    = "PUT";
     /***/
+	private static final String SRE_SERVICE = "SRE";
+    /***/
     protected final long          period;
     /***/
     protected final String        topic;
@@ -163,6 +165,17 @@ abstract class AbstractAggregationRule implements AggregationRule {
     protected static boolean isCompleteObsEvent(final Event e) {
         return e.get(OBS_FIELD) != null;
     }
+    
+    /**
+     * Is this an SRE event?
+     * 
+     * @param e
+     *            the event.
+     * @return <code>true</code> iff the
+     */
+    protected static boolean isStorletEngineEvent(final Event e) {
+        return e.originatingService().equals(SRE_SERVICE);
+    }
 
 
     /**
@@ -207,6 +220,23 @@ abstract class AbstractAggregationRule implements AggregationRule {
         return selectEventsByOperation(eventList, PUT_OPERATION);
     }
 
+    /**
+     * @param eventList
+     * @param operation
+     * @return the list of events that match only the given operation.
+     */
+    protected static ArrayList<Event> selectStorletEngineEvents(final List< ? extends Event> eventList) {
+        final ArrayList<Event> newList = new ArrayList<Event>(eventList.size());
+
+        for (final Event e : eventList) {
+            if (isStorletEngineEvent(e))
+                newList.add(e);
+        }
+
+        log.trace("have {} events for '{}'", newList.size(), SRE_SERVICE);
+        
+        return newList;
+    }
 
     /**
      * @param eventList
