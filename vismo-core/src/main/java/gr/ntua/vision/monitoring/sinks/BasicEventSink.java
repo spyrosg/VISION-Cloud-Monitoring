@@ -34,7 +34,7 @@ public class BasicEventSink extends AbstractSink {
 		final Map dict = (Map) e.get("!dict");
 		final String ser = JSONObject.toJSONString(dict);
 
-		if (!eventAlreadySent(dict)) {
+		if (!eventAlreadySent((String) e.get("id"))) {
 			log.trace("sending event: {}", ser);
 			send(ser);
 		}

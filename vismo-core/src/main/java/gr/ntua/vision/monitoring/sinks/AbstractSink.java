@@ -32,11 +32,9 @@ abstract class AbstractSink implements EventSink {
 	 * @return <code>true</code> iff the event has already been seen, according
 	 *         to its id, <code>false</code> otherwise.
 	 */
-	protected boolean eventAlreadySent(@SuppressWarnings("rawtypes") final Map map) {
-		final String id = (String) map.get("id");
-
+	protected boolean eventAlreadySent(final String id) {
 		if (eventIds.contains(id)) {
-			log.error("dropping already sent event: {}", map);
+			log.error("dropping already sent event with id: {}", id);
 			return true;
 		}
 
