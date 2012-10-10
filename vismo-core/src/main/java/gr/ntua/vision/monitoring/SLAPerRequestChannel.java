@@ -1,65 +1,94 @@
 package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.rules.VismoAggregationResult;
 import gr.ntua.vision.monitoring.sinks.EventSink;
 
-import java.util.Map;
-
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * 
  */
 public class SLAPerRequestChannel implements EventSourceListener {
-    /** this is used to get a hold of the whole dict, for serialization reasons. */
-    private static final String DICT_KEY      = "!dict";
-    /***/
-    private static final String SPECIAL_FIELD = "transaction-duration";
-    /***/
-    private static final String topic         = "sla-per-request";
-    /***/
-    private final EventSink     sink;
+	/***/
+	private static final String SPECIAL_FIELD = "transaction-duration";
+	/***/
+	private final EventSink sink;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param sink
+	 */
+	public SLAPerRequestChannel(final EventSink sink) {
+		this.sink = sink;
+	}
 
-    /**
-     * Constructor.
-     * 
-     * @param sink
-     */
-    public SLAPerRequestChannel(final EventSink sink) {
-        this.sink = sink;
-    }
+	/**
+	 *
+	 */
+	private static class SLAEvent implements Event {
+		private final Event e;
+		/***/
+		private static final String topic = "sla-per-request";
 
+		/**
+		 * Constructor.
+		 * 
+		 * @param e
+		 */
+		public SLAEvent(Event e) {
+			this.e = e;
+		}
 
-    /**
-     * @see gr.ntua.vision.monitoring.EventSourceListener#receive(gr.ntua.vision.monitoring.events.Event)
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public void receive(final Event e) {
-        if (!isCompleteObsEvent(e))
-            return;
+		@Override
+		public Object get(String key) {
+			return e.get(key);
+		}
 
-        @SuppressWarnings("rawtypes")
-        final Map dict = (Map) e.get(DICT_KEY);
+		@Override
+		public InetAddress originatingIP() throws UnknownHostException {
+			return e.originatingIP();
+		}
 
-        dict.put("topic", topic);
+		@Override
+		public String originatingService() {
+			return e.originatingService();
+		}
 
-        final VismoAggregationResult r = new VismoAggregationResult(dict);
+		@Override
+		public long timestamp() {
+			return e.timestamp();
+		}
 
-        sink.send(r);
-    }
+		@Override
+		public String topic() {
+			return topic;
+		}
 
+	}
 
-    /**
-     * Is this a complete object service event? Since we receive all events from object service, some of them are incomplete, in
-     * the sense that contain parts of the request/response cycle.
-     * 
-     * @param e
-     *            the event.
-     * @return <code>true</code> iff the
-     */
-    private static boolean isCompleteObsEvent(final Event e) {
-        return e.get(SPECIAL_FIELD) != null;
-    }
+	/**
+	 * @see gr.ntua.vision.monitoring.EventSourceListener#receive(gr.ntua.vision.monitoring.events.Event)
+	 */
+	@Override
+	public void receive(final Event e) {
+		if (!isCompleteObsEvent(e))
+			return;
+
+		sink.send(new SLAEvent(e));
+	}
+
+	/**
+	 * Is this a complete object service event? Since we receive all events from
+	 * object service, some of them are incomplete, in the sense that contain
+	 * parts of the request/response cycle.
+	 * 
+	 * @param e
+	 *            the event.
+	 * @return <code>true</code> iff the
+	 */
+	private static boolean isCompleteObsEvent(final Event e) {
+		return e.get(SPECIAL_FIELD) != null;
+	}
 }
