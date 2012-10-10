@@ -224,6 +224,8 @@ public class AccountingRule extends AbstractAggregationRule {
 
     			storlets.add(ss);
     		}
+    		
+    		tenantList.add(o);
     	}
     	
     	return tenantList;
