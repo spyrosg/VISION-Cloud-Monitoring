@@ -9,35 +9,30 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Serialize the event as is.
- */
-public class BasicEventSink extends AbstractSink {
+public class PubSubEventSink extends AbstractSink {
 	/***/
-	private static final Logger log = LoggerFactory.getLogger(BasicEventSink.class);
+	private static final Logger log = LoggerFactory.getLogger(PubSubEventSink.class);
 
 	/**
 	 * Constructor.
 	 * 
 	 * @param sock
 	 */
-	public BasicEventSink(final VismoSocket sock) {
+	public PubSubEventSink(VismoSocket sock) {
 		super(sock);
 	}
 
-	/**
-	 * @see gr.ntua.vision.monitoring.sinks.EventSink#send(gr.ntua.vision.monitoring.events.Event)
-	 */
 	@Override
-	public void send(final Event e) {
+	public void send(Event e) {
 		@SuppressWarnings("rawtypes")
 		final Map dict = (Map) e.get("!dict");
 		final String ser = JSONObject.toJSONString(dict);
 
 		if (!eventAlreadySent(dict)) {
 			log.trace("sending event: {}", ser);
-			send(ser);
+			send(e.topic() + " " + ser);
 		}
+
 	}
 
 	/**
@@ -45,6 +40,6 @@ public class BasicEventSink extends AbstractSink {
 	 */
 	@Override
 	public String toString() {
-		return "#<BasicEventSink using " + sock + ">";
+		return "#<PubSubEventSink using " + sock + ">";
 	}
 }
