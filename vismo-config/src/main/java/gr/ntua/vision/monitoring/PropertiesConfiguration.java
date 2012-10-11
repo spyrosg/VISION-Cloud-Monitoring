@@ -47,7 +47,11 @@ public abstract class PropertiesConfiguration {
      * @return the value of the property name.
      */
     protected String get(final String name) {
-        return props.getProperty(name);
+        final String v = props.getProperty(name);
+
+        requireNonNullValue(v, name);
+
+        return v;
     }
 
 
@@ -93,5 +97,15 @@ public abstract class PropertiesConfiguration {
      */
     private static void loadFromFile(final Properties props, final String filename) throws IOException {
         loadFromStream(props, new BufferedInputStream(new FileInputStream(filename)));
+    }
+
+
+    /**
+     * @param val
+     * @param name
+     */
+    private static void requireNonNullValue(final String val, final String name) {
+        if (val == null)
+            throw new Error("undefined configuration property: '" + name + "'");
     }
 }
