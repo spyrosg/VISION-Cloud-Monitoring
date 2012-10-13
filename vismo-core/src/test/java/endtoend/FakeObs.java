@@ -91,7 +91,7 @@ public class FakeObs {
      * @param container
      * @param object
      * @param size
-     * @return
+     * @return a read event.
      */
     private static ObsEvent getReadEvent(final String tenant, final String user, final String container, final String object,
             final long size) {
@@ -105,7 +105,7 @@ public class FakeObs {
      * @param container
      * @param object
      * @param size
-     * @return
+     * @return a write event.
      */
     private static ObsEvent getWriteEvent(final String tenant, final String user, final String container, final String object,
             final long size) {

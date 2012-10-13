@@ -73,7 +73,7 @@ public class ObsEvent implements Event {
      * @see gr.ntua.vision.monitoring.events.Event#get(java.lang.String)
      */
     @Override
-    public Object get(@SuppressWarnings("unused") final String key) {
+    public Object get(final String key) {
         throw new UnsupportedOperationException("niy");
     }
 

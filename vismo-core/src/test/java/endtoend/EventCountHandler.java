@@ -29,7 +29,7 @@ class EventCountHandler implements EventHandler {
      * @see gr.ntua.vision.monitoring.notify.EventHandler#handle(gr.ntua.vision.monitoring.events.Event)
      */
     @Override
-    public void handle(@SuppressWarnings("unused") final Event e) {
+    public void handle(final Event e) {
         ++noReceivedEvents;
     }
 
