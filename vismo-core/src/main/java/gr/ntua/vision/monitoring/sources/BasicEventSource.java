@@ -4,6 +4,7 @@ import gr.ntua.vision.monitoring.EventSourceListener;
 import gr.ntua.vision.monitoring.StoppableTask;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventFactory;
+import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
 
 import java.util.ArrayList;
@@ -21,26 +22,31 @@ public class BasicEventSource extends StoppableTask implements EventSource {
     /***/
     private static final Pattern                 patt      = Pattern.compile("\"originating-machine\": ?\"([^\"]*)\"");
     /***/
-    private final EventFactory                   factory;
+    private static final String                  SHUTDOWN  = "shutdown!";
+    /** the socket used to receive events from outside the system. */
+    private final VismoSocket                    eventSock;
+    /***/
+    private final EventFactory                   factory   = new VismoEventFactory();
     /** the listeners lists. */
     private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
     /** the log target. */
     private final Logger                         log       = LoggerFactory.getLogger(BasicEventSource.class);
-    /***/
-    private final VismoSocket                    sock;
+    /** this is used to shutdown the thread. */
+    private final VismoSocket                    shutdownSocket;
 
 
     /**
      * Constructor.
      * 
-     * @param sock
+     * @param eventSock
      *            the socket used to receive events from outside the system.
-     * @param factory
+     * @param shutdownSocket
+     *            this is used to shutdown the thread.
      */
-    public BasicEventSource(final EventFactory factory, final VismoSocket sock) {
+    public BasicEventSource(final VismoSocket eventSock, final VismoSocket shutdownSocket) {
         super("basic-event-source");
-        this.factory = factory;
-        this.sock = sock;
+        this.eventSock = eventSock;
+        this.shutdownSocket = shutdownSocket;
     }
 
 
@@ -53,13 +59,15 @@ public class BasicEventSource extends StoppableTask implements EventSource {
     public void run() {
         log.debug("ready - awaiting events");
 
-        while (true) {
-            final String message = sock.receive();
+        while (!isInterrupted()) {
+            final String message = eventSock.receive();
 
             log.trace("from {}, received {}", getEventSource(message), message);
 
             if (message == null)
                 continue;
+            if (SHUTDOWN.equals(message))
+                break;
 
             try {
                 final Event e = factory.createEvent(message);
@@ -70,6 +78,8 @@ public class BasicEventSource extends StoppableTask implements EventSource {
                 log.debug("skipping");
             }
         }
+
+        log.debug("shutting down");
     }
 
 
@@ -78,12 +88,8 @@ public class BasicEventSource extends StoppableTask implements EventSource {
      */
     @Override
     public void shutDown() {
-        try {
-            interrupt();
-            sock.close();
-        } catch (final Throwable x) {
-            // ignored
-        }
+        interrupt();
+        shutdownSocket.send(SHUTDOWN);
     }
 
 
@@ -102,7 +108,7 @@ public class BasicEventSource extends StoppableTask implements EventSource {
      */
     @Override
     public String toString() {
-        return "#<BasicEventSource: using " + sock + ">";
+        return "#<BasicEventSource: using " + eventSock + ">";
     }
 
 

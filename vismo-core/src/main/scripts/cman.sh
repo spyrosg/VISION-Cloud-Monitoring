@@ -18,4 +18,4 @@ cluster5="10.0.3.211,10.0.3.212,10.0.3.213"
 # cluster 6
 cluster6="10.0.3.214,10.0.3.215,10.0.3.216"
 
-fab -k -u root -p oro-mv-aureo -H "$cluster2,$cluster3,$cluster6" -f cman.py "$@"
+fab -k -u root -p oro-mv-aureo -H "$cluster1,$cluster4,$cluster5" -f cman.py "$@"

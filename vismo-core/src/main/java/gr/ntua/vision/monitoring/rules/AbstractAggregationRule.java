@@ -26,7 +26,7 @@ abstract class AbstractAggregationRule implements AggregationRule {
     /***/
     private static final String   PUT_OPERATION    = "PUT";
     /***/
-	private static final String SRE_SERVICE = "SRE";
+    private static final String   SRE_SERVICE      = "SRE";
     /***/
     protected final long          period;
     /***/
@@ -165,7 +165,8 @@ abstract class AbstractAggregationRule implements AggregationRule {
     protected static boolean isCompleteObsEvent(final Event e) {
         return e.get(OBS_FIELD) != null;
     }
-    
+
+
     /**
      * Is this an SRE event?
      * 
@@ -214,29 +215,30 @@ abstract class AbstractAggregationRule implements AggregationRule {
 
     /**
      * @param eventList
-     * @return the list of write events.
-     */
-    protected static ArrayList<Event> selectWriteEvents(final List< ? extends Event> eventList) {
-        return selectEventsByOperation(eventList, PUT_OPERATION);
-    }
-
-    /**
-     * @param eventList
      * @param operation
      * @return the list of events that match only the given operation.
      */
     protected static ArrayList<Event> selectStorletEngineEvents(final List< ? extends Event> eventList) {
         final ArrayList<Event> newList = new ArrayList<Event>(eventList.size());
 
-        for (final Event e : eventList) {
+        for (final Event e : eventList)
             if (isStorletEngineEvent(e))
                 newList.add(e);
-        }
 
         log.trace("have {} events for '{}'", newList.size(), SRE_SERVICE);
-        
+
         return newList;
     }
+
+
+    /**
+     * @param eventList
+     * @return the list of write events.
+     */
+    protected static ArrayList<Event> selectWriteEvents(final List< ? extends Event> eventList) {
+        return selectEventsByOperation(eventList, PUT_OPERATION);
+    }
+
 
     /**
      * @param eventList
@@ -247,16 +249,16 @@ abstract class AbstractAggregationRule implements AggregationRule {
         final ArrayList<Event> newList = new ArrayList<Event>(eventList.size());
 
         for (final Event e : eventList) {
-        	final String val = (String) e.get(OPERATION_FIELD);
-        	
-        	log.trace("event op={}", val);
-        	
+            final String val = (String) e.get(OPERATION_FIELD);
+
+            log.trace("event op={}", val);
+
             if (operation.equalsIgnoreCase(val))
                 newList.add(e);
         }
 
         log.trace("have {} events for '{}'", newList.size(), operation);
-        
+
         return newList;
     }
 }
