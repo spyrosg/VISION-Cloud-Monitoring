@@ -58,7 +58,7 @@ public class VismoFactory {
         if (hostIsClusterHead(vminfo.getAddress().getHostAddress())) {
             final BasicEventSource localSource = getLocalSource(zmq);
             final BasicEventSource workersSource = new BasicEventSource(zmq.newBoundPullSocket("tcp://*:"
-                    + conf.getClusterHeadPort()));
+                    + conf.getClusterHeadPort()), zmq.newConnectedPushSocket("tcp://*:" + conf.getClusterHeadPort()));
 
             service.addTask(localSource);
             service.addTask(workersSource);
@@ -106,7 +106,8 @@ public class VismoFactory {
      * @return
      */
     private BasicEventSource getLocalSource(final ZMQSockets zmq) {
-        return new BasicEventSource(zmq.newBoundPullSocket(conf.getProducersPoint()));
+        return new BasicEventSource(zmq.newBoundPullSocket(conf.getProducersPoint()), zmq.newConnectedPushSocket(conf
+                .getProducersPoint()));
     }
 
 
