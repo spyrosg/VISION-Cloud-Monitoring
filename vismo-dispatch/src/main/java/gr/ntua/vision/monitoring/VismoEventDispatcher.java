@@ -128,7 +128,7 @@ public class VismoEventDispatcher implements EventDispatcher {
      * @return the name of the cluster this machines belongs to.
      */
     private static String getOriginatingCluster() {
-        return conf.getTestClusterName();
+        return conf.getClusterName();
     }
 
 
