@@ -4,6 +4,7 @@ import gr.ntua.vision.monitoring.EventSourceListener;
 import gr.ntua.vision.monitoring.StoppableTask;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventFactory;
+import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class BasicEventSource extends StoppableTask implements EventSource {
     /***/
     private static final Pattern                 patt      = Pattern.compile("\"originating-machine\": ?\"([^\"]*)\"");
     /***/
-    private final EventFactory                   factory;
+    private final EventFactory                   factory   = new VismoEventFactory();
     /** the listeners lists. */
     private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
     /** the log target. */
@@ -35,11 +36,9 @@ public class BasicEventSource extends StoppableTask implements EventSource {
      * 
      * @param sock
      *            the socket used to receive events from outside the system.
-     * @param factory
      */
-    public BasicEventSource(final EventFactory factory, final VismoSocket sock) {
+    public BasicEventSource(final VismoSocket sock) {
         super("basic-event-source");
-        this.factory = factory;
         this.sock = sock;
     }
 

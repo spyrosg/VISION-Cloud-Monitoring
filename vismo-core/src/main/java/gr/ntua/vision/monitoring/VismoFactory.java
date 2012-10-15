@@ -1,6 +1,5 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.rules.AccountingRule;
 import gr.ntua.vision.monitoring.rules.AggregationRule;
 import gr.ntua.vision.monitoring.rules.CTORule;
@@ -58,7 +57,7 @@ public class VismoFactory {
 
         if (hostIsClusterHead(vminfo.getAddress().getHostAddress())) {
             final BasicEventSource localSource = getLocalSource(zmq);
-            final BasicEventSource workersSource = new BasicEventSource(getEventFactory(), zmq.newBoundPullSocket("tcp://*:"
+            final BasicEventSource workersSource = new BasicEventSource(zmq.newBoundPullSocket("tcp://*:"
                     + conf.getClusterHeadPort()));
 
             service.addTask(localSource);
@@ -107,7 +106,7 @@ public class VismoFactory {
      * @return
      */
     private BasicEventSource getLocalSource(final ZMQSockets zmq) {
-        return new BasicEventSource(getEventFactory(), zmq.newBoundPullSocket(conf.getProducersPoint()));
+        return new BasicEventSource(zmq.newBoundPullSocket(conf.getProducersPoint()));
     }
 
 
@@ -130,14 +129,6 @@ public class VismoFactory {
         log.trace("*** name is '{}'", conf.getTestClusterName());
         log.trace("*** machines: {}", conf.getTestClusterMachines());
         log.trace("*** head is at {}", conf.getClusterHead());
-    }
-
-
-    /**
-     * @return
-     */
-    private static VismoEventFactory getEventFactory() {
-        return new VismoEventFactory();
     }
 
 
