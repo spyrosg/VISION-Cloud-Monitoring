@@ -28,6 +28,8 @@ abstract class AbstractAggregationRule implements AggregationRule {
     /***/
     private static final String   SRE_SERVICE      = "SRE";
     /***/
+    private static final String   STORLET_KEY      = "storletType";
+    /***/
     protected final long          period;
     /***/
     protected final String        topic;
@@ -175,7 +177,7 @@ abstract class AbstractAggregationRule implements AggregationRule {
      * @return <code>true</code> iff the
      */
     protected static boolean isStorletEngineEvent(final Event e) {
-        return e.originatingService().equals(SRE_SERVICE);
+        return e.originatingService().equals(SRE_SERVICE) || e.get(STORLET_KEY) != null;
     }
 
 
