@@ -76,7 +76,7 @@ public class VismoFactory {
      * @throws SocketException
      */
     private boolean hostIsCloudHead() throws SocketException {
-        return true; // return conf.isIPCloudHead(vminfo.getAddress().getHostAddress());
+        return conf.isIPCloudHead(vminfo.getAddress().getHostAddress());
     }
 
 
