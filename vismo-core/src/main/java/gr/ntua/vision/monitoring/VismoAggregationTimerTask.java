@@ -1,6 +1,7 @@
 package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.rules.AggregationRule;
 import gr.ntua.vision.monitoring.rules.VismoRuleAggregationListener;
 import gr.ntua.vision.monitoring.scheduling.VismoRepeatedTask;
 import gr.ntua.vision.monitoring.sinks.EventSink;
@@ -14,9 +15,11 @@ import org.slf4j.LoggerFactory;
  */
 public class VismoAggregationTimerTask extends VismoRepeatedTask implements EventSourceListener {
     /***/
-    private static final Logger log = LoggerFactory.getLogger(VismoAggregationTimerTask.class);
+    private static final Logger log   = LoggerFactory.getLogger(VismoAggregationTimerTask.class);
+    /** the aggregation period. */
+    private final long          period;
     /***/
-    private final RuleList      rules;
+    private final RuleList      rules = new RuleList();
     /***/
     private final EventSink     sink;
 
@@ -24,11 +27,11 @@ public class VismoAggregationTimerTask extends VismoRepeatedTask implements Even
     /**
      * Constructor.
      * 
-     * @param rules
+     * @param period
      * @param sink
      */
-    public VismoAggregationTimerTask(final RuleList rules, final EventSink sink) {
-        this.rules = rules;
+    public VismoAggregationTimerTask(final long period, final EventSink sink) {
+        this.period = period;
         this.sink = sink;
     }
 
@@ -38,7 +41,7 @@ public class VismoAggregationTimerTask extends VismoRepeatedTask implements Even
      */
     @Override
     public long getPeriod() {
-        return rules.getPeriod();
+        return period;
     }
 
 
@@ -59,13 +62,21 @@ public class VismoAggregationTimerTask extends VismoRepeatedTask implements Even
         log.trace("starting aggregation");
 
         final long start = System.currentTimeMillis();
-        final VismoRuleAggregationListener aggregationListener = new VismoRuleAggregationListener(sink, start);
+        final VismoRuleAggregationListener aggregationListener = new VismoRuleAggregationListener(sink, period, start);
 
         rules.runRules(aggregationListener);
 
         final long end = System.currentTimeMillis();
 
         log.trace("ending aggregation in {} seconds", (end - start) / 1000.0);
+    }
+
+
+    /**
+     * @param rule
+     */
+    public void submit(final AggregationRule rule) {
+        rules.add(rule);
     }
 
 

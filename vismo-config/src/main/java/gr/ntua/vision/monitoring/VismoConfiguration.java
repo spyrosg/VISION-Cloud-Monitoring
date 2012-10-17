@@ -21,6 +21,8 @@ public class VismoConfiguration extends PropertiesConfiguration {
     /***/
     private static final String CLUSTER_HEAD_PROPERTY      = "cluster.head";
     /***/
+    private static final String CLUSTER_HEADS_PROPERTY     = "cluster.heads";
+    /***/
     private static final String CLUSTER_NAME_PROPERTY      = "cluster.name";
     /***/
     private static final String CONSUMERS_PORT_PROPERTY    = "consumers.port";
@@ -90,6 +92,14 @@ public class VismoConfiguration extends PropertiesConfiguration {
      */
     public int getClusterHeadPort() {
         return getAsInt(CLUSTER_HEAD_PORT_PROPERTY);
+    }
+
+
+    /**
+     * @return the list of ips of the cloud heads.
+     */
+    public List<String> getClusterHeads() {
+        return getAsList(CLUSTER_HEADS_PROPERTY);
     }
 
 

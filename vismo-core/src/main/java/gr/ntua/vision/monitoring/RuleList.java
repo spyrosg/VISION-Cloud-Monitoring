@@ -24,18 +24,6 @@ public class RuleList {
     private final Map<AggregationRule, List<Event>> eventBuckets = new HashMap<AggregationRule, List<Event>>();
     /** the actual rule list. */
     private final ArrayList<AggregationRule>        list         = new ArrayList<AggregationRule>();
-    /***/
-    private final long                              period;
-
-
-    /**
-     * Constructor.
-     * 
-     * @param period
-     */
-    public RuleList(final long period) {
-        this.period = period;
-    }
 
 
     /**
@@ -44,14 +32,6 @@ public class RuleList {
     public void add(final AggregationRule rule) {
         log.debug("adding rule {}", rule);
         list.add(rule);
-    }
-
-
-    /**
-     * @return the period
-     */
-    public long getPeriod() {
-        return period;
     }
 
 

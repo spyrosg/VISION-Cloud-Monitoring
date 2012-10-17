@@ -15,6 +15,8 @@ public class VismoRuleAggregationListener implements RuleAggregationListener {
     /***/
     private final Logger    log = LoggerFactory.getLogger(VismoRuleAggregationListener.class);
     /***/
+    private final long      period;
+    /***/
     private final EventSink sink;
 
 
@@ -22,10 +24,12 @@ public class VismoRuleAggregationListener implements RuleAggregationListener {
      * Constructor.
      * 
      * @param sink
+     * @param period
      * @param aggregationPeriodEnd
      */
-    public VismoRuleAggregationListener(final EventSink sink, final long aggregationPeriodEnd) {
+    public VismoRuleAggregationListener(final EventSink sink, final long period, final long aggregationPeriodEnd) {
         this.sink = sink;
+        this.period = period;
         this.aggregationPeriodEnd = aggregationPeriodEnd;
     }
 
@@ -36,7 +40,7 @@ public class VismoRuleAggregationListener implements RuleAggregationListener {
      */
     @Override
     public void endAggregation(final AggregationRule rule, final AggregationResult result) {
-        result.puttStart(aggregationPeriodEnd - rule.aggregationPeriod());
+        result.puttStart(aggregationPeriodEnd - period);
         result.puttEnd(aggregationPeriodEnd);
         log.debug("ending {}", rule, result);
         sink.send(result);
