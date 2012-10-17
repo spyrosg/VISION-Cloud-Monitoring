@@ -70,23 +70,13 @@ public class VismoFactory {
 
 
     /**
-     * @param zmq
-     * @return
-     */
-    private BasicEventSource getLocalSource(final ZMQSockets zmq) {
-        return new BasicEventSource(zmq.newBoundPullSocket(conf.getProducersPoint()), zmq.newConnectedPushSocket(conf
-                .getProducersPoint()));
-    }
-
-
-    /**
      * Check whether localhost is the cluster head (according to the configuration).
      * 
      * @return <code>true</code> when localhost is a cloud head, <code>false</code> otherwise.
      * @throws SocketException
      */
     private boolean hostIsCloudHead() throws SocketException {
-        return conf.isIPCloudHead(vminfo.getAddress().getHostAddress());
+        return true; // return conf.isIPCloudHead(vminfo.getAddress().getHostAddress());
     }
 
 
@@ -98,6 +88,15 @@ public class VismoFactory {
      */
     private boolean hostIsClusterHead() throws SocketException {
         return conf.isIPClusterHead(vminfo.getAddress().getHostAddress());
+    }
+
+
+    /**
+     * @return
+     */
+    private BasicEventSource localSource() {
+        return new BasicEventSource(zmq.newBoundPullSocket(conf.getProducersPoint()), zmq.newConnectedPushSocket(conf
+                .getProducersPoint()));
     }
 
 
@@ -114,6 +113,27 @@ public class VismoFactory {
      * @param service
      */
     private void setupWithCloudHead(final VismoService service) {
+        final BasicEventSource localSource = localSource();
+        final BasicEventSource clusterHeadsSource = sourceforAddress("tcp://*:" + conf.getCloudHeadPort());
+
+        final PubSubEventSink sink = new PubSubEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
+        final VismoAggregationTimerTask threeSecTimer = new VismoAggregationTimerTask(THREE_SECONDS, sink);
+        final VismoAggregationTimerTask oneMinTimer = new VismoAggregationTimerTask(ONE_MINUTE, sink);
+
+        for (final BasicEventSource source : new BasicEventSource[] { localSource, clusterHeadsSource }) {
+            source.subscribe(threeSecTimer);
+            source.subscribe(oneMinTimer);
+            source.subscribe(new PassThroughChannel(sink));
+            source.subscribe(new SLAPerRequestChannel(sink));
+
+            service.addTask(source);
+        }
+
+        service.addTask(threeSecTimer);
+        service.addTask(oneMinTimer);
+
+        submitRules(threeSecTimer, new CTORule("cto-3-sec", THREE_SECONDS));
+        submitRules(oneMinTimer, new CTORule("cto-1-min", ONE_MINUTE), new AccountingRule(ONE_MINUTE));
     }
 
 
@@ -121,21 +141,23 @@ public class VismoFactory {
      * @param service
      */
     private void setupWithClusterHead(final VismoService service) {
-        final BasicEventSource localSource = getLocalSource(zmq);
-        final BasicEventSource workersSource = new BasicEventSource(
-                zmq.newBoundPullSocket("tcp://*:" + conf.getClusterHeadPort()), zmq.newConnectedPushSocket("tcp://*:"
-                        + conf.getClusterHeadPort()));
+        final BasicEventSource localSource = localSource();
+        final BasicEventSource workersSource = sourceforAddress("tcp://*:" + conf.getClusterHeadPort());
 
         final PubSubEventSink sink = new PubSubEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
         final VismoAggregationTimerTask threeSecTimer = new VismoAggregationTimerTask(THREE_SECONDS, sink);
         final VismoAggregationTimerTask oneMinTimer = new VismoAggregationTimerTask(ONE_MINUTE, sink);
+
+        final BasicEventSink cloudSink = new BasicEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getCloudHeads().get(0)
+                + ":" + conf.getCloudHeadPort()));
 
         for (final BasicEventSource source : new BasicEventSource[] { localSource, workersSource }) {
             source.subscribe(threeSecTimer);
             source.subscribe(oneMinTimer);
             source.subscribe(new PassThroughChannel(sink));
             source.subscribe(new SLAPerRequestChannel(sink));
-            // source.subscribe(new PassThroughChannel(cloudHeadSink));
+
+            source.subscribe(new PassThroughChannel(cloudSink));
 
             service.addTask(source);
         }
@@ -152,13 +174,22 @@ public class VismoFactory {
      * @param service
      */
     private void setupWithWorker(final VismoService service) {
-        final BasicEventSource localSource = getLocalSource(zmq);
+        final BasicEventSource localSource = localSource();
         final BasicEventSink clusterHead = new BasicEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getClusterHead() + ":"
                 + conf.getClusterHeadPort()));
 
         localSource.subscribe(new PassThroughChannel(clusterHead));
         localSource.subscribe(new SLAPerRequestChannel(clusterHead));
         service.addTask(localSource);
+    }
+
+
+    /**
+     * @param address
+     * @return
+     */
+    private BasicEventSource sourceforAddress(final String address) {
+        return new BasicEventSource(zmq.newBoundPullSocket(address), zmq.newConnectedPushSocket(address));
     }
 
 
