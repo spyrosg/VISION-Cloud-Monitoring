@@ -102,11 +102,6 @@
                 </source>
 
                 <source>
-                  <location>../vismo-dispatch/src/main/python/dummy-event-server.py</location>
-                  <destination>dummy-event-server.py</destination>
-                </source>
-
-                <source>
                   <location>../vismo-dispatch/src/main/python/vismo_dispatch.py</location>
                   <destination>vismo_dispatch.py</destination>
                 </source>
@@ -116,10 +111,6 @@
                   <destination>pyjavaproperties.py</destination>
                 </source>
 
-                <source>
-                  <location>../vismo-config/src/main/resources/config.properties</location>
-                  <destination>config.properties</destination>
-                </source>
               </sources>
             </mapping>
 
