@@ -7,7 +7,6 @@ import gr.ntua.vision.monitoring.scheduling.JVMStatusReportTask;
 import gr.ntua.vision.monitoring.sinks.BasicEventSink;
 import gr.ntua.vision.monitoring.sinks.PubSubEventSink;
 import gr.ntua.vision.monitoring.sources.BasicEventSource;
-import gr.ntua.vision.monitoring.sources.EventSource;
 import gr.ntua.vision.monitoring.udp.UDPFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
@@ -127,24 +126,25 @@ public class VismoFactory {
                 zmq.newBoundPullSocket("tcp://*:" + conf.getClusterHeadPort()), zmq.newConnectedPushSocket("tcp://*:"
                         + conf.getClusterHeadPort()));
 
-        service.addTask(localSource);
-        service.addTask(workersSource);
-
         final PubSubEventSink sink = new PubSubEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
-        final VismoAggregationTimerTask threeSecTimer = submitRules(new VismoAggregationTimerTask(THREE_SECONDS, sink),
-                                                                    new CTORule("cto-3-sec", THREE_SECONDS));
-        final VismoAggregationTimerTask oneMinTimer = submitRules(new VismoAggregationTimerTask(ONE_MINUTE, sink), new CTORule(
-                "cto-1-min", ONE_MINUTE), new AccountingRule(ONE_MINUTE));
+        final VismoAggregationTimerTask threeSecTimer = new VismoAggregationTimerTask(THREE_SECONDS, sink);
+        final VismoAggregationTimerTask oneMinTimer = new VismoAggregationTimerTask(ONE_MINUTE, sink);
 
-        service.addTask(threeSecTimer);
-        service.addTask(oneMinTimer);
-
-        for (final EventSource source : new EventSource[] { localSource, workersSource }) {
+        for (final BasicEventSource source : new BasicEventSource[] { localSource, workersSource }) {
             source.subscribe(threeSecTimer);
             source.subscribe(oneMinTimer);
             source.subscribe(new PassThroughChannel(sink));
             source.subscribe(new SLAPerRequestChannel(sink));
+            // source.subscribe(new PassThroughChannel(cloudHeadSink));
+
+            service.addTask(source);
         }
+
+        service.addTask(threeSecTimer);
+        service.addTask(oneMinTimer);
+
+        submitRules(threeSecTimer, new CTORule("cto-3-sec", THREE_SECONDS));
+        submitRules(oneMinTimer, new CTORule("cto-1-min", ONE_MINUTE), new AccountingRule(ONE_MINUTE));
     }
 
 
@@ -167,10 +167,8 @@ public class VismoFactory {
      * @param rules
      * @return
      */
-    private static VismoAggregationTimerTask submitRules(final VismoAggregationTimerTask task, final AggregationRule... rules) {
+    private static void submitRules(final VismoAggregationTimerTask task, final AggregationRule... rules) {
         for (final AggregationRule rule : rules)
             task.submit(rule);
-
-        return task;
     }
 }
