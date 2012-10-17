@@ -177,7 +177,7 @@ abstract class AbstractAggregationRule implements AggregationRule {
      * @return <code>true</code> iff the
      */
     protected static boolean isStorletEngineEvent(final Event e) {
-        return e.originatingService().equals(SRE_SERVICE) || e.get(STORLET_KEY) != null;
+        return SRE_SERVICE.equals(e.originatingService()) && e.get(STORLET_KEY) != null;
     }
 
 
