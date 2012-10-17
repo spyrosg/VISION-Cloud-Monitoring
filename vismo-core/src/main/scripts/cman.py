@@ -84,7 +84,7 @@ def grep_log(pattern):
 
 
 @task(alias='up')
-@hosts('10.0.1.101')
+@hosts('10.0.3.212')
 def upload_rpm_to_testbed(url, name):
     """Upload the rpm to the testbed."""
 
