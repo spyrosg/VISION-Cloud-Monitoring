@@ -102,3 +102,7 @@ def install_rpm():
     run('rpm -e vismo')
     run('rpm -i /tmp/vismo*.rpm')
 
+
+@task(alias='config')
+def print_config():
+    run('cat /srv/vismo/config.properties')
