@@ -52,7 +52,7 @@ def start_service():
 def stop_service():
     """Stop the service."""
 
-    run('service {0} stop'.format(SERVICE_NAME))
+    run('service {0} stop || echo'.format(SERVICE_NAME))
 
 
 
@@ -99,10 +99,21 @@ def upload_rpm_to_testbed(url, name):
 def install_rpm():
     """Install the latest rpm."""
 
-    run('rpm -e vismo')
     run('rpm -i /tmp/vismo*.rpm')
+
+
+@task(alias='rm')
+def uninstall_rpm():
+    """Uninstall the latest rpm."""
+
+    run('rpm -e vismo || echo')
 
 
 @task(alias='config')
 def print_config():
     run('cat /srv/vismo/config.properties')
+
+
+@task(alias='netstat')
+def netstat():
+    run("netstat -a -p | egrep '(56429|56430)'")
