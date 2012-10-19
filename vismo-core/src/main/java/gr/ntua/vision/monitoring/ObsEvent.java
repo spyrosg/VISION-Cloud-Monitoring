@@ -12,9 +12,9 @@ import java.util.UUID;
  */
 public class ObsEvent implements Event {
     /***/
-    private final long   timestamp;
-    /***/
     private final String id;
+    /***/
+    private final long   timestamp;
 
 
     /**
@@ -32,6 +32,14 @@ public class ObsEvent implements Event {
     @Override
     public Object get(final String key) {
         throw new UnsupportedOperationException("niy");
+    }
+
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
     }
 
 
@@ -68,13 +76,5 @@ public class ObsEvent implements Event {
     @Override
     public String topic() {
         throw new UnsupportedOperationException("niy");
-    }
-
-
-    /**
-     * @return the id
-     */
-    public String getId() {
-        return id;
     }
 }
