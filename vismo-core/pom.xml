@@ -7,7 +7,7 @@
   <parent>
     <artifactId>vismo</artifactId>
     <groupId>gr.ntua.vision</groupId>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.6-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
@@ -102,11 +102,6 @@
                 </source>
 
                 <source>
-                  <location>../vismo-dispatch/src/main/python/dummy-event-server.py</location>
-                  <destination>dummy-event-server.py</destination>
-                </source>
-
-                <source>
                   <location>../vismo-dispatch/src/main/python/vismo_dispatch.py</location>
                   <destination>vismo_dispatch.py</destination>
                 </source>
@@ -116,10 +111,6 @@
                   <destination>pyjavaproperties.py</destination>
                 </source>
 
-                <source>
-                  <location>../vismo-config/src/main/resources/config.properties</location>
-                  <destination>config.properties</destination>
-                </source>
               </sources>
             </mapping>
 
@@ -149,19 +140,19 @@
     <dependency>
       <artifactId>vismo-config</artifactId>
       <groupId>gr.ntua.vision</groupId>
-      <version>1.0.4-SNAPSHOT</version>
+      <version>1.0.6-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <artifactId>vismo-notify</artifactId>
       <groupId>gr.ntua.vision</groupId>
-      <version>1.0.4-SNAPSHOT</version>
+      <version>1.0.6-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <artifactId>vismo-zmq</artifactId>
       <groupId>gr.ntua.vision</groupId>
-      <version>1.0.4-SNAPSHOT</version>
+      <version>1.0.6-SNAPSHOT</version>
     </dependency>
 
     <dependency>

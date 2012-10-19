@@ -4,6 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 
@@ -11,8 +13,10 @@ import java.util.Properties;
  * A plain configuration object, backed by a {@link Properties} object.
  */
 public abstract class PropertiesConfiguration {
+    /***/
+    private static final String SEP = ", ";
     /** the properties object that backs the configuration. */
-    private final Properties props;
+    private final Properties    props;
 
 
     /**
@@ -47,7 +51,35 @@ public abstract class PropertiesConfiguration {
      * @return the value of the property name.
      */
     protected String get(final String name) {
-        return props.getProperty(name);
+        final String v = props.getProperty(name);
+
+        requireNonNullValue(v, name);
+
+        return v;
+    }
+
+
+    /**
+     * Get the value for the given property name as an integer.
+     * 
+     * @param name
+     *            the property name.
+     * @return the value of the property name.
+     */
+    protected int getAsInt(final String name) {
+        return Integer.valueOf(get(name));
+    }
+
+
+    /**
+     * Get the value for the given property name as a list of strings.
+     * 
+     * @param name
+     *            the property name.
+     * @return the value of the property name.
+     */
+    protected List<String> getAsList(final String name) {
+        return Arrays.asList(get(name).split(SEP));
     }
 
 
@@ -93,5 +125,15 @@ public abstract class PropertiesConfiguration {
      */
     private static void loadFromFile(final Properties props, final String filename) throws IOException {
         loadFromStream(props, new BufferedInputStream(new FileInputStream(filename)));
+    }
+
+
+    /**
+     * @param val
+     * @param name
+     */
+    private static void requireNonNullValue(final String val, final String name) {
+        if (val == null)
+            throw new Error("undefined configuration property: '" + name + "'");
     }
 }

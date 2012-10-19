@@ -22,7 +22,7 @@ public class VismoEventDispatcherTest {
     private static final Properties  props              = new Properties() {
                                                             {
                                                                 setProperty("producers.point", "tcp://127.0.0.1:34890");
-                                                                setProperty("consumers.point", "tcp://127.0.0.1:34891");
+                                                                setProperty("consumers.port", "34891");
                                                                 setProperty("udp.port", "34892");
                                                             }
                                                         };

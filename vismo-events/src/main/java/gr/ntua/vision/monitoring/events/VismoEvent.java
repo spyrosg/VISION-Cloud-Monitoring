@@ -45,7 +45,7 @@ class VismoEvent implements Event {
      */
     @Override
     public InetAddress originatingIP() throws UnknownHostException {
-        return InetAddress.getByName((String) dict.get("originating-ip"));
+        return InetAddress.getByName((String) dict.get("originating-machine"));
     }
 
 

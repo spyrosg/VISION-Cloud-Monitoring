@@ -127,7 +127,6 @@ class VismoEventDispatcher(EventDispatcher):
         self.start_request_event = None
         self.start_response_event = None
         self.end_response_event = None
-        self.id = str(uuid4())
 
     def load_configuration(self):
         p = Properties()
@@ -176,8 +175,15 @@ class VismoEventDispatcher(EventDispatcher):
                 return topic
 
         if 'content_size' in event:
-            event['content-size'] = event['content_size']
+            content_size = event['content_size']
             del event['content_size']
+
+            if content_size is None:
+                content_size = 0
+            if isinstance(content_size, basestring):
+                content_size = long(content_size)
+
+            event['content-size'] = content_size
         if 'obj' in event:
             event['object'] = event['obj']
             del event['obj']
@@ -191,8 +197,7 @@ class VismoEventDispatcher(EventDispatcher):
         event['originating-machine'] = self.ip
         event['originating-service'] = self.service_name
         event['originating-cluster'] = self.cluster_name
-        event['id'] = self.id
-
+        event['id'] = str(uuid4())
 
     def _sock_send(self, event):
         self.sock.send(json.dumps(event))
@@ -225,6 +230,7 @@ class VismoEventDispatcher(EventDispatcher):
         # if we have all the events
         if self.start_request_event and self.start_response_event and self.end_response_event:
             main_event = dict(self.end_response_event)
+            main_event['id'] = str(uuid4())
 
             main_event['transaction-latency'] = self.calculate_latency()
             main_event['transaction-duration'] = self.calculate_transaction_duration()
@@ -236,7 +242,6 @@ class VismoEventDispatcher(EventDispatcher):
             # TODO: Calculate availability and other Niki's required stuff
 
             # not needed
-            del main_event['status']
             del main_event['tag']
 
             self._sock_send(event)

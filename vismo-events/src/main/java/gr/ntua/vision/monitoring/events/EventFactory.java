@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.events;
 
 /**
- *
+ * This is used to deserialize events.
  */
 public interface EventFactory {
     /**

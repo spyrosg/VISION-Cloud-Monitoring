@@ -1,7 +1,7 @@
 package endtoend;
 
 import static org.junit.Assert.assertTrue;
-import gr.ntua.vision.monitoring.EventListener;
+import gr.ntua.vision.monitoring.EventSourceListener;
 import gr.ntua.vision.monitoring.events.Event;
 
 
@@ -9,7 +9,7 @@ import gr.ntua.vision.monitoring.events.Event;
  * This is used to verify that the main monitoring instance receives the expected number of events from {@link FakeEventProducer},
  * during the test.
  */
-class EventCounterListener implements EventListener {
+class EventCounterListener implements EventSourceListener {
     /***/
     private final int noExpectedEvents;
     /***/
@@ -31,10 +31,10 @@ class EventCounterListener implements EventListener {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.EventListener#notify(java.lang.String)
+     * @see gr.ntua.vision.monitoring.EventSourceListener#receive(gr.ntua.vision.monitoring.events.Event)
      */
     @Override
-    public void notify(@SuppressWarnings("unused") final Event e) {
+    public void receive(final Event e) {
         ++noReceivedEvents;
     }
 }

@@ -14,8 +14,6 @@ public class ZMQSockets {
     private final ZContext ctx;
 
 
-    // TODO: maybe use a builder?
-
     /**
      * Constructor.
      * 
@@ -36,7 +34,7 @@ public class ZMQSockets {
         final Socket sock = ctx.createSocket(ZMQ.PUB);
 
         sock.setLinger(0);
-        sock.setSendTimeOut(0); // FIXME: non-blocking for now
+        sock.setSendTimeOut(0);
         sock.bind(addr);
 
         return new VismoSocket(sock, addr);
@@ -53,6 +51,36 @@ public class ZMQSockets {
 
         sock.setLinger(0);
         sock.bind(addr);
+
+        return new VismoSocket(sock, addr);
+    }
+
+
+    /**
+     * @param addr
+     *            the address to bind to.
+     * @return a bound to the address pull socket.
+     */
+    public VismoSocket newBoundPushSocket(final String addr) {
+        final Socket sock = ctx.createSocket(ZMQ.PUSH);
+
+        sock.setLinger(0);
+        sock.bind(addr);
+
+        return new VismoSocket(sock, addr);
+    }
+
+
+    /**
+     * @param addr
+     *            the address to connect to.
+     * @return a connected to the address push socket.
+     */
+    public VismoSocket newConnectedPullSocket(final String addr) {
+        final Socket sock = ctx.createSocket(ZMQ.PULL);
+
+        sock.setLinger(0);
+        sock.connect(addr);
 
         return new VismoSocket(sock, addr);
     }

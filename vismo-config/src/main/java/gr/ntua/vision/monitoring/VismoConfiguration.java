@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 
 
@@ -10,11 +11,23 @@ import java.util.Properties;
  */
 public class VismoConfiguration extends PropertiesConfiguration {
     /***/
-    private static final String CONSUMERS_POINT_PROPERTY = "consumers.point";
+    private static final String CLOUD_HEAD_PORT_PROPERTY   = "cloud.head.port";
     /***/
-    private static final String PRODUCERS_POINT_PROPERTY = "producers.point";
+    private static final String CLOUD_HEADS_PROPERTY       = "cloud.heads";
     /***/
-    private static final String UDP_PORT_PROPERTY        = "udp.port";
+    private static final String CLOUD_NAME_PROPERTY        = "cloud.name";
+    /***/
+    private static final String CLUSTER_HEAD_PORT_PROPERTY = "cluster.head.port";
+    /***/
+    private static final String CLUSTER_HEAD_PROPERTY      = "cluster.head";
+    /***/
+    private static final String CLUSTER_NAME_PROPERTY      = "cluster.name";
+    /***/
+    private static final String CONSUMERS_PORT_PROPERTY    = "consumers.port";
+    /***/
+    private static final String PRODUCERS_POINT_PROPERTY   = "producers.point";
+    /***/
+    private static final String UDP_PORT_PROPERTY          = "udp.port";
 
 
     /**
@@ -41,15 +54,63 @@ public class VismoConfiguration extends PropertiesConfiguration {
 
 
     /**
-     * @return the consumers port.
+     * @return the cloud head's port.
      */
-    public String getConsumersPoint() {
-        return get(CONSUMERS_POINT_PROPERTY);
+    public int getCloudHeadPort() {
+        return getAsInt(CLOUD_HEAD_PORT_PROPERTY);
     }
 
 
     /**
-     * @return the producers port.
+     * @return the list of ips of the cloud heads.
+     */
+    public List<String> getCloudHeads() {
+        return getAsList(CLOUD_HEADS_PROPERTY);
+    }
+
+
+    /**
+     * @return an identifier of the "cloud".
+     */
+    public String getCloudName() {
+        return get(CLOUD_NAME_PROPERTY);
+    }
+
+
+    /**
+     * @return the ip of the cluster head.
+     */
+    public String getClusterHead() {
+        return get(CLUSTER_HEAD_PROPERTY);
+    }
+
+
+    /**
+     * @return the cluster head's port.
+     */
+    public int getClusterHeadPort() {
+        return getAsInt(CLUSTER_HEAD_PORT_PROPERTY);
+    }
+
+
+    /**
+     * @return an identifier of this cluster.
+     */
+    public String getClusterName() {
+        return get(CLUSTER_NAME_PROPERTY);
+    }
+
+
+    /**
+     * @return the consumers port.
+     */
+    public int getConsumersPort() {
+        return getAsInt(CONSUMERS_PORT_PROPERTY);
+    }
+
+
+    /**
+     * @return the producers address.
      */
     public String getProducersPoint() {
         return get(PRODUCERS_POINT_PROPERTY);
@@ -57,10 +118,34 @@ public class VismoConfiguration extends PropertiesConfiguration {
 
 
     /**
-     * @return the udp server port.
+     * @return the udp server's port.
      */
     public int getUDPPort() {
-        return Integer.valueOf(get(UDP_PORT_PROPERTY));
+        return getAsInt(UDP_PORT_PROPERTY);
+    }
+
+
+    /**
+     * Check that given ip one of the cloud heads.
+     * 
+     * @param ip
+     *            the ip.
+     * @return <code>true</code> iff the given ip is one of the cloud head ips.
+     */
+    public boolean isIPCloudHead(final String ip) {
+        return getCloudHeads().contains(ip);
+    }
+
+
+    /**
+     * Check that given ip is the cluster head.
+     * 
+     * @param ip
+     *            the ip.
+     * @return <code>true</code> iff the given ip and the ip of cluster head are the same.
+     */
+    public boolean isIPClusterHead(final String ip) {
+        return getClusterHead().equals(ip);
     }
 
 

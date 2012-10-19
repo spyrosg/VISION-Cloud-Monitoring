@@ -1,6 +1,7 @@
 package gr.ntua.vision.monitoring.notify;
 
 import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
@@ -34,13 +35,13 @@ public class EventRegistry {
      */
     private static class EventHandlerTask implements Runnable {
         /** the log target. */
-        private static final Logger     ilog = Logger.getLogger(EventHandlerTask.class.getName());
+        private static final Logger ilog = Logger.getLogger(EventHandlerTask.class.getName());
         /** the event factory. */
-        private final VismoEventFactory factory;
+        private final EventFactory  factory;
         /** the actual handler. */
-        private final EventHandler      handler;
+        private final EventHandler  handler;
         /** the zmq socket. */
-        private final VismoSocket       sock;
+        private final VismoSocket   sock;
 
 
         /**
@@ -53,7 +54,7 @@ public class EventRegistry {
          * @param handler
          *            the actual handler.
          */
-        public EventHandlerTask(final VismoEventFactory factory, final VismoSocket sock, final EventHandler handler) {
+        public EventHandlerTask(final EventFactory factory, final VismoSocket sock, final EventHandler handler) {
             this.factory = factory;
             this.sock = sock;
             this.handler = handler;
@@ -81,11 +82,11 @@ public class EventRegistry {
                 final Event e = factory.createEvent(msg.substring(topicIndex + 1));
 
                 if (e != null)
-                	try {
-                		handler.handle(e);
-                	} catch (Throwable x) {
-                		x.printStackTrace();
-                	}
+                    try {
+                        handler.handle(e);
+                    } catch (final Throwable x) {
+                        x.printStackTrace();
+                    }
             }
         }
     }

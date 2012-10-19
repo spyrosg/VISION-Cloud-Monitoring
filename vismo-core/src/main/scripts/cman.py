@@ -52,7 +52,7 @@ def start_service():
 def stop_service():
     """Stop the service."""
 
-    run('service {0} stop'.format(SERVICE_NAME))
+    run('service {0} stop || echo'.format(SERVICE_NAME))
 
 
 
@@ -83,19 +83,37 @@ def grep_log(pattern):
     run("grep '{0}' /var/log/vismo* || echo".format(pattern))
 
 
-@task(alias='reinstall')
-def reinstall_rpm():
-    def get_rpm(dir):
-        """Get the name of the rpm."""
+@task(alias='up')
+@hosts('10.0.3.212')
+def upload_rpm_to_testbed(url, name):
+    """Upload the rpm to the testbed."""
 
-        return filter(lambda f: f.startswith(RPM_NAME) and f.endswith('.rpm'), listdir(dir))[0]
+    run('rm -fr /tmp/vismo*.rpm')
+    run("""wget -q '{0}' -O /tmp/{1}""".format(url, name))
 
-    rpm_file = get_rpm('.')
-    tmp_dir = '/tmp/vismo-tmp'
+    for host in env.hosts:
+        run('scp /tmp/{0} {1}:/tmp/'.format(name, host))
 
-    run('mkdir -p {0}'.format(tmp_dir))
-    put(rpm_file, tmp_dir)
-    run('rpm -e {0} || echo'.format(RPM_NAME))
-    run('rpm -i {0}/{1}'.format(tmp_dir, rpm_file))
-    run('rm -fr {0}'.format(tmp_dir))
 
+@task(alias='install')
+def install_rpm():
+    """Install the latest rpm."""
+
+    run('rpm -i /tmp/vismo*.rpm')
+
+
+@task(alias='rm')
+def uninstall_rpm():
+    """Uninstall the latest rpm."""
+
+    run('rpm -e vismo || echo')
+
+
+@task(alias='config')
+def print_config():
+    run('cat /srv/vismo/config.properties')
+
+
+@task(alias='netstat')
+def netstat():
+    run("netstat -a -p | egrep '(56429|56430)'")
