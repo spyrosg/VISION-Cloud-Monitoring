@@ -14,18 +14,9 @@ import com.yammer.dropwizard.config.Environment;
  */
 public class VismoService extends Service<VismoServiceConfiguration> {
     /***/
-    private static final String STATIC_RESOURCES_PATH = "/static";
-    /***/
     private static final String EVENTS_ADDRESS        = "tcp://10.0.3.213:56430";
-
-
-    /**
-     * @param args
-     * @throws Exception
-     */
-    public static void main(String... args) throws Exception {
-        new VismoService().run(args);
-    }
+    /***/
+    private static final String STATIC_RESOURCES_PATH = "/static";
 
 
     /**
@@ -34,15 +25,7 @@ public class VismoService extends Service<VismoServiceConfiguration> {
     private VismoService() {
         super("vismo-web");
 
-        serveStaticResourcesFrom(STATIC_RESOURCES_PATH);
-    }
-
-
-    /**
-     * @param resourcePath
-     */
-    private void serveStaticResourcesFrom(final String resourcePath) {
-        addBundle(new AssetsBundle(resourcePath, CacheBuilderSpec.disableCaching(), "/"));
+        serveResourcesFrom(STATIC_RESOURCES_PATH);
     }
 
 
@@ -51,11 +34,28 @@ public class VismoService extends Service<VismoServiceConfiguration> {
      *      com.yammer.dropwizard.config.Environment)
      */
     @Override
-    protected void initialize(VismoServiceConfiguration conf, Environment env) throws Exception {
+    protected void initialize(final VismoServiceConfiguration conf, final Environment env) throws Exception {
         final String rootPath = conf.getHttpConfiguration().getRootPath();
         final String cleanedPath = rootPath.substring(0, rootPath.length() - 2);
 
         env.addResource(new HelloWorldResource());
-        env.addServlet(new VisionEventsServlet(new EventRegistry(EVENTS_ADDRESS, true)), cleanedPath + "/events/*");
+        env.addServlet(new VisionEventsServlet(new EventRegistry(EVENTS_ADDRESS)), cleanedPath + "/events/*");
+    }
+
+
+    /**
+     * @param resourcePath
+     */
+    private void serveResourcesFrom(final String resourcePath) {
+        addBundle(new AssetsBundle(resourcePath, CacheBuilderSpec.disableCaching(), "/"));
+    }
+
+
+    /**
+     * @param args
+     * @throws Exception
+     */
+    public static void main(final String... args) throws Exception {
+        new VismoService().run(args);
     }
 }

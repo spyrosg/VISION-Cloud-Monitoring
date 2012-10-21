@@ -72,6 +72,7 @@ public final class VismoEventsSource implements EventSource, EventHandler {
      * @throws IOException
      */
     private void send(final String msg) throws IOException {
-        emitter.data(msg + "\n\n");
+        if (!closed)
+            emitter.data(msg + "\n\n");
     }
 }
