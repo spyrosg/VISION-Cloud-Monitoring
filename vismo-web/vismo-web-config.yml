@@ -1,0 +1,16 @@
+
+http:
+  rootPath: /api/*
+  port: 56433
+  # this is required by the eventsource servlet
+  connectorType: nonblocking
+
+logging:
+  level: INFO
+  loggers:
+    "gr.ntua.vision.monitoring.web": TRACE
+    "com.sun.jmx": OFF
+  console:
+    enabled: true
+    threshold: INFO
+

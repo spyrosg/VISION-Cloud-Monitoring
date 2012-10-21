@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <prerequisites>
+    <maven>3.0.0</maven>
+  </prerequisites>
+
+  <parent>
+    <groupId>gr.ntua.vision</groupId>
+    <artifactId>vismo</artifactId>
+    <version>1.0.7-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>vismo-web</artifactId>
+  <name>vismo-web</name>
+  <description>frontend to vismo</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.yammer.dropwizard</groupId>
+      <artifactId>dropwizard-core</artifactId>
+      <version>0.5.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-eventsource-servlet</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+
+    <dependency>
+      <artifactId>vismo-notify</artifactId>
+      <groupId>gr.ntua.vision</groupId>
+      <version>1.0.7-SNAPSHOT</version>
+    </dependency>
+
+  </dependencies>
+
+</project>
