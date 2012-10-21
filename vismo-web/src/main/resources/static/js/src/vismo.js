@@ -21,11 +21,10 @@ var vismo = (function() {
             var sum1 = 0;
             var sum2 = 0;
             var MAX_EVENT_LIMIT = 100;
-            // Time
             var index1 = 1,
                 index2 = 1;
 
-            drawFigure(divid, points1, points2);
+            draw_barcharts(divid, points1, points2);
 
             vismo_events_source.onopen = function () {
                 debug('opened stream, receiving events');
@@ -41,14 +40,14 @@ var vismo = (function() {
 
                 if (is_obs_service_event(data)) {
                     console.log('have obs event');
-                    points1.push([++index1, ++sum1]);
+                    points1.push([index1, ++sum1]);
                 }
                 if (is_accounting_event(data)) {
                     console.log('have accounting event');
-                    points2.push([++index2, ++sum2]);
+                    points2.push([index2, ++sum2]);
                 }
 
-                drawFigure(divid, points1, points2);
+                draw_barcharts(divid, points1, points2);
                 delete e;
             };
         },
@@ -71,7 +70,7 @@ function setup_header() {
 }
 
 // Draw the plot (points) in the div with the id given
-function drawFigure(divid, points1, points2) {
+function draw_figure(divid, points1, points2) {
     $('#' + divid).empty();
     var plot = $.jqplot (divid, [points1,points2], {
         title: 'Graphical representation of Events',
@@ -89,8 +88,8 @@ function drawFigure(divid, points1, points2) {
                 label: "Count",
                 min:0,
                 //max:30
-                numberTicks:31
-            }
+                numberTicks:21
+                }
         },
         seriesDefaults: {
             lineWidth:5,
@@ -100,3 +99,39 @@ function drawFigure(divid, points1, points2) {
     });
 }
 
+function draw_barcharts(div_id, s1, s2) {
+    $('#' + div_id).empty();
+
+    var plot1 = $.jqplot(div_id, [s1, s2], {
+        // The "seriesDefaults" option is an options object that will
+        // be applied to all series in the chart.
+        seriesDefaults: {
+            renderer:$.jqplot.BarRenderer,
+            rendererOptions: {fillToZero: true}
+        },
+        // Custom labels for the series are specified with the "label"
+        // option on the series option.  Here a series option object
+        // is specified for each series.
+        series:[
+            { label: 'all events' },
+            { label: 'accounting events' },
+            //{ label: 'Airfare' }
+        ],
+        // Show the legend and put it outside the grid, but inside the
+        // plot container, shrinking the grid to accomodate the legend.
+        // A value of "outside" would not shrink the grid and allow
+        // the legend to overflow the container.
+        legend: {
+            show: true,
+            placement: 'outsideGrid'
+        },
+        axes: {
+            // Pad the y axis just a little so bars can get close to, but
+            // not touch, the grid boundaries.  1.2 is the default padding.
+            yaxis: {
+                pad: 1.05,
+                tickOptions: { formatString: '$%d' }
+            }
+        }
+    });
+}
