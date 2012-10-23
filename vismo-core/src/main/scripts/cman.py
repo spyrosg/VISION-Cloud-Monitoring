@@ -79,7 +79,7 @@ def stop_dummy_server():
 
 @task(alias='grep')
 def grep_log(pattern):
-    """Grep containers log with given pattern"""
+    """Grep the vismo log with given pattern"""
     run("grep '{0}' /var/log/vismo* || echo".format(pattern))
 
 
