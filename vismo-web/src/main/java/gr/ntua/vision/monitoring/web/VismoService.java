@@ -14,8 +14,6 @@ import com.yammer.dropwizard.config.Environment;
  */
 public class VismoService extends Service<VismoServiceConfiguration> {
     /***/
-    private static final String EVENTS_ADDRESS        = "tcp://10.0.3.213:56430";
-    /***/
     private static final String STATIC_RESOURCES_PATH = "/static";
 
 
@@ -24,7 +22,6 @@ public class VismoService extends Service<VismoServiceConfiguration> {
      */
     private VismoService() {
         super("vismo-web");
-
         serveResourcesFrom(STATIC_RESOURCES_PATH);
     }
 
@@ -39,7 +36,7 @@ public class VismoService extends Service<VismoServiceConfiguration> {
         final String cleanedPath = rootPath.substring(0, rootPath.length() - 2);
 
         env.addResource(new HelloWorldResource());
-        env.addServlet(new VisionEventsServlet(new EventRegistry(EVENTS_ADDRESS)), cleanedPath + "/events/*");
+        env.addServlet(new VisionEventsServlet(new EventRegistry(conf.getAddress())), cleanedPath + "/events/*");
     }
 
 

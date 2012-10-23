@@ -53,6 +53,7 @@ public final class VismoEventsSource implements EventSource, EventHandler {
         log.debug("onClose for emitter: {}", emitter);
         closed = true;
         emitter.close();
+        emitter = null;
     }
 
 
