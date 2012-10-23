@@ -2,9 +2,9 @@
 
 curl -v \
 	-X PUT \
-	--user 'vassilis@ntua:changeme' \
+	--user 'vassilis@ntua:123' \
 	-H 'Accept: application/cdmi-object' \
 	-H 'Content-Type: application/cdmi-object' \
 	-H 'X-CDMI-Specification-Version: 1.0' \
 	-d '{ "metadata": { "owner": "vassilis" }, "value": "this is my foo object" }' \
-	http://10.0.1.101/vision-cloud/object-service/ntua/$1/$2
+	http://10.0.2.214/vision-cloud/object-service/ntua/$1/$2
