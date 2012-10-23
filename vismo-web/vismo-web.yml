@@ -2,6 +2,7 @@
 http:
   rootPath: /api/*
   port: 56433
+  adminPort: 56434
   # this is required by the eventsource servlet
   connectorType: nonblocking
 
@@ -14,4 +15,5 @@ logging:
     enabled: true
     threshold: TRACE
 
+# the vismo events sub address
 address: "tcp://10.0.3.213:56430"

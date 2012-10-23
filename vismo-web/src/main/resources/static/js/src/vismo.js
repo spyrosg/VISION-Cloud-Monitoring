@@ -64,7 +64,7 @@ var vismo = (function() {
 
 
 function is_obs_service_event(ev) {
-    return ev.indexOf('transaction-throughput') >= 0;
+    return ev.indexOf('obs') >= 0;
 }
 
 function is_accounting_event(ev) {

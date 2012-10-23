@@ -4,10 +4,9 @@ import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.HashSet;
 
 import org.eclipse.jetty.servlets.EventSource;
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,11 +16,13 @@ import org.slf4j.LoggerFactory;
  */
 public final class VismoEventsSource implements EventSource, EventHandler {
     /***/
-    private static final Logger log    = LoggerFactory.getLogger(VismoEventsSource.class);
+    private static final Logger   log      = LoggerFactory.getLogger(VismoEventsSource.class);
     /***/
-    private volatile boolean    closed = false;
+    private volatile boolean      closed   = false;
     /***/
-    private volatile Emitter    emitter;
+    private volatile Emitter      emitter;
+    /***/
+    private final HashSet<String> eventIds = new HashSet<String>();
 
 
     /**
@@ -32,12 +33,25 @@ public final class VismoEventsSource implements EventSource, EventHandler {
         if (closed)
             return;
 
-        @SuppressWarnings("rawtypes")
-        final Map m = (Map) e.get("!dict");
-        final String s = JSONObject.toJSONString(m);
+        // @SuppressWarnings("rawtypes")
+        // final Map m = (Map) e.get("!dict");
+        // final String s = JSONObject.toJSONString(m);
+
+        final String topic = e.topic();
+        final String patchedTopic = e.get("transaction-throughput") != null ? "obs" : topic;
+        final String id = (String) e.get("id");
+        final String ip = (String) e.get("originating-machine");
+
+        log.trace("from {}, with topic '{}'", ip, patchedTopic);
+
+        if (eventIds.contains(id))
+            return; // drop
+
+        eventIds.add(id);
 
         try {
-            send(s);
+            if (patchedTopic != null)
+                send(patchedTopic + ":" + ip);
         } catch (final IOException e1) {
             log.error("error sending event", e1);
             onClose();
