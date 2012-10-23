@@ -12,5 +12,6 @@ logging:
     "com.sun.jmx": OFF
   console:
     enabled: true
-    threshold: INFO
+    threshold: TRACE
 
+address: "tcp://10.0.3.213:56430"

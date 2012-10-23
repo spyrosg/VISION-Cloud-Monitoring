@@ -17,12 +17,15 @@ var vismo = (function() {
             var vismo_events_source = new EventSource('/api/events');
             var points1 = [[0, 0]];
             var points2 = [[0, 0]];
+            var points3 = [[0, 0]];
             // Total number of events of our interest
             var sum1 = 0;
             var sum2 = 0;
+            var sum3 = 0;
             var MAX_EVENT_LIMIT = 100;
             var index1 = 1,
-                index2 = 1;
+                index2 = 2,
+                index3 = 3;
 
             draw_barcharts(divid, points1, points2);
 
@@ -46,9 +49,14 @@ var vismo = (function() {
                     console.log('have accounting event');
                     points2.push([index2, ++sum2]);
                 }
+                if (is_cto_event(data)) {
+                    console.log('have cto event');
+                    points3.push([index3, ++sum3]);
+                }
 
-                draw_barcharts(divid, points1, points2);
+                draw_barcharts(divid, points1, points2, points3);
                 delete e;
+                delete data;
             };
         },
     };
@@ -63,10 +71,8 @@ function is_accounting_event(ev) {
     return ev.indexOf('Accounting') >= 0;
 }
 
-function setup_header() {
-    $.get('/api/ip', function(ip) {
-        $('h2').append(' ').append('(' + ip + ')');
-    });
+function is_cto_event(ev) {
+    return ev.indexOf('cto-') >= 0;
 }
 
 // Draw the plot (points) in the div with the id given
@@ -99,15 +105,17 @@ function draw_figure(divid, points1, points2) {
     });
 }
 
-function draw_barcharts(div_id, s1, s2) {
+function draw_barcharts(div_id, s1, s2, s3) {
     $('#' + div_id).empty();
 
-    var plot1 = $.jqplot(div_id, [s1, s2], {
+    var ticks = ['all events', 'accounting events', 'cto events'];
+
+    var plot1 = $.jqplot(div_id, [s1, s2, s3], {
         // The "seriesDefaults" option is an options object that will
         // be applied to all series in the chart.
         seriesDefaults: {
             renderer:$.jqplot.BarRenderer,
-            rendererOptions: {fillToZero: true}
+            rendererOptions: { fillToZero: true }
         },
         // Custom labels for the series are specified with the "label"
         // option on the series option.  Here a series option object
@@ -115,7 +123,7 @@ function draw_barcharts(div_id, s1, s2) {
         series:[
             { label: 'all events' },
             { label: 'accounting events' },
-            //{ label: 'Airfare' }
+            { label: 'cto events' },
         ],
         // Show the legend and put it outside the grid, but inside the
         // plot container, shrinking the grid to accomodate the legend.
@@ -126,11 +134,15 @@ function draw_barcharts(div_id, s1, s2) {
             placement: 'outsideGrid'
         },
         axes: {
+             xaxis: {
+                renderer: $.jqplot.CategoryAxisRenderer,
+                ticks: ticks
+            },
             // Pad the y axis just a little so bars can get close to, but
             // not touch, the grid boundaries.  1.2 is the default padding.
             yaxis: {
                 pad: 1.05,
-                tickOptions: { formatString: '$%d' }
+                tickOptions: { formatString: '%d' }
             }
         }
     });
