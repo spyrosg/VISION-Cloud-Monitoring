@@ -38,7 +38,7 @@ def status_service():
 def ps_status():
     """Report service's status."""
 
-    run("""ps aux | awk '/vismo.jar/ && !/awk/'""")
+    run("""ps aux | awk '/vismo.jar/ && !/awk/ { print $1, $2, $3 }'""")
 
 
 @task(alias='start')
@@ -117,3 +117,19 @@ def print_config():
 @task(alias='netstat')
 def netstat():
     run("netstat -a -p | egrep '(56429|56430)'")
+
+
+@task(alias='tomcat')
+def tomcat_running():
+    run("""ps aux | awk '/org.apache.catalina.startup.Bootstrap/ && !/awk/ { print $1, $2, $3 }'""")
+
+
+@task(alias='web')
+def vismo_web_running():
+    run("""ps aux | awk '/vismo-web/ && !/awk/ { print $1, $2, $3 }'""")
+
+
+@task(alias='w')
+def w():
+    run(""" w | awk '/load/ { print $(NF - 2), $(NF - 1), $NF }'""")
+
