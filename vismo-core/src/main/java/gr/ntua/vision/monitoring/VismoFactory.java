@@ -196,7 +196,6 @@ public class VismoFactory {
     /**
      * @param task
      * @param rules
-     * @return
      */
     private static void submitRules(final VismoAggregationTimerTask task, final AggregationRule... rules) {
         for (final AggregationRule rule : rules)

@@ -90,7 +90,7 @@ public class VismoService implements UDPListener {
     /**
      * @return the jvm's pid.
      */
-    private String status() {
+    public String status() {
         return String.valueOf(vminfo.getPID());
     }
 
@@ -98,7 +98,7 @@ public class VismoService implements UDPListener {
     /**
      * 
      */
-    private void stop() {
+    public void stop() {
         log.info("shutting down");
 
         timer.cancel();
