@@ -31,8 +31,6 @@ public class VismoFactory {
     /***/
     private final VismoConfiguration conf;
     /***/
-    private final VismoVMInfo        vminfo        = new VismoVMInfo();
-    /***/
     private final ZMQSockets         zmq           = new ZMQSockets(new ZContext());
 
 
@@ -47,17 +45,18 @@ public class VismoFactory {
 
 
     /**
+     * @param vminfo
      * @return the vismo service.
      * @throws SocketException
      */
-    public VismoService build() throws SocketException {
+    public VismoService build(final VMInfo vminfo) throws SocketException {
         final VismoService service = new VismoService(vminfo);
 
-        logConfig();
+        logConfig(vminfo);
 
-        if (hostIsCloudHead())
+        if (hostIsCloudHead(vminfo))
             setupWithCloudHead(service);
-        else if (hostIsClusterHead())
+        else if (hostIsClusterHead(vminfo))
             setupWithClusterHead(service);
         else
             setupWithWorker(service);
@@ -72,10 +71,11 @@ public class VismoFactory {
     /**
      * Check whether localhost is the cluster head (according to the configuration).
      * 
+     * @param vminfo
      * @return <code>true</code> when localhost is a cloud head, <code>false</code> otherwise.
      * @throws SocketException
      */
-    private boolean hostIsCloudHead() throws SocketException {
+    private boolean hostIsCloudHead(final VMInfo vminfo) throws SocketException {
         return conf.isIPCloudHead(vminfo.getAddress().getHostAddress());
     }
 
@@ -83,16 +83,17 @@ public class VismoFactory {
     /**
      * Check whether localhost is a cluster head (according to the configuration).
      * 
+     * @param vminfo
      * @return <code>true</code> when localhost is a cluster head, <code>false</code> otherwise.
      * @throws SocketException
      */
-    private boolean hostIsClusterHead() throws SocketException {
+    private boolean hostIsClusterHead(final VMInfo vminfo) throws SocketException {
         return conf.isIPClusterHead(vminfo.getAddress().getHostAddress());
     }
 
 
     /**
-     * @return
+     * @return the localhost source.
      */
     private BasicEventSource localSource() {
         return new BasicEventSource(zmq.newBoundPullSocket(conf.getProducersPoint()), zmq.newConnectedPushSocket(conf
@@ -101,11 +102,12 @@ public class VismoFactory {
 
 
     /**
+     * @param vminfo
      * @throws SocketException
      */
-    private void logConfig() throws SocketException {
-        log.debug("is cluster head? {}", hostIsClusterHead());
-        log.debug("is cloud head? {}", hostIsCloudHead());
+    private void logConfig(final VMInfo vminfo) throws SocketException {
+        log.debug("is cluster head? {}", hostIsClusterHead(vminfo));
+        log.debug("is cloud head? {}", hostIsCloudHead(vminfo));
     }
 
 

@@ -27,9 +27,10 @@ public class Main {
 
         final VismoConfiguration config = new VismoConfiguration(args[0]);
         final String command = args[1];
+        final VMInfo vminfo = new VismoVMInfo();
 
         if (command.equals("start")) {
-            final VismoService service = new VismoFactory(config).build();
+            final VismoService service = new VismoFactory(config).build(vminfo);
 
             service.start();
         } else {

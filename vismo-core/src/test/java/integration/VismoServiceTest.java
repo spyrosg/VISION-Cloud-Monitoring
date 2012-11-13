@@ -14,7 +14,7 @@ import org.zeromq.ZContext;
 
 
 /**
- * 
+ * Testing that the service starts and stops properly.
  */
 public class VismoServiceTest {
     /***/

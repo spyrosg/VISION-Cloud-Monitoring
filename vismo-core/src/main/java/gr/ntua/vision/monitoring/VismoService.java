@@ -73,9 +73,9 @@ public class VismoService implements UDPListener {
 
 
     /**
-     * 
+     * @return <code>this</code>.
      */
-    public void start() {
+    public VismoService start() {
         log.debug("starting {} task{}", tasks.size(), tasks.size() != 1 ? "s" : "");
 
         for (final StoppableTask task : tasks) {
@@ -84,6 +84,8 @@ public class VismoService implements UDPListener {
         }
 
         timer.start();
+
+        return this;
     }
 
 
