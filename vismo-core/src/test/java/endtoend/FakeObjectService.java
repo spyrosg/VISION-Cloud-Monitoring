@@ -25,7 +25,10 @@ public class FakeObjectService {
     }
 
 
+    /**
+     * 
+     */
     public void sendEvent() {
-
+        // NOP
     }
 }

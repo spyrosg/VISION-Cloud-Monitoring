@@ -13,7 +13,7 @@
   </parent>
 
   <artifactId>vismo-web</artifactId>
-  <name>vismo-web</name>
+  <name>Vismo Web</name>
   <description>frontend to vismo</description>
 
   <build>

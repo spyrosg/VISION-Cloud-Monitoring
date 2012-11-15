@@ -51,6 +51,16 @@ public class BasicEventSource extends StoppableTask implements EventSource {
 
 
     /**
+     * @see gr.ntua.vision.monitoring.sources.EventSource#add(gr.ntua.vision.monitoring.EventSourceListener)
+     */
+    @Override
+    public void add(final EventSourceListener listener) {
+        log.debug("subscribing listener {}", listener);
+        listeners.add(listener);
+    }
+
+
+    /**
      * Receive and dispatch events.
      * 
      * @see java.lang.Runnable#run()
@@ -90,16 +100,6 @@ public class BasicEventSource extends StoppableTask implements EventSource {
     public void shutDown() {
         interrupt();
         shutdownSocket.send(SHUTDOWN);
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.sources.EventSource#subscribe(gr.ntua.vision.monitoring.EventSourceListener)
-     */
-    @Override
-    public void subscribe(final EventSourceListener listener) {
-        log.debug("subscribing listener {}", listener);
-        listeners.add(listener);
     }
 
 

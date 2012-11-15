@@ -15,5 +15,5 @@ public interface EventSource {
      * @param listener
      *            the listener.
      */
-    void subscribe(EventSourceListener listener);
+    void add(EventSourceListener listener);
 }

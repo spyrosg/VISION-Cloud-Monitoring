@@ -123,10 +123,10 @@ public class VismoFactory {
         final VismoAggregationTimerTask oneMinTimer = new VismoAggregationTimerTask(ONE_MINUTE, sink);
 
         for (final BasicEventSource source : new BasicEventSource[] { localSource, clusterHeadsSource }) {
-            source.subscribe(threeSecTimer);
-            source.subscribe(oneMinTimer);
-            source.subscribe(new PassThroughChannel(sink));
-            source.subscribe(new SLAPerRequestChannel(sink));
+            source.add(threeSecTimer);
+            source.add(oneMinTimer);
+            source.add(new PassThroughChannel(sink));
+            source.add(new SLAPerRequestChannel(sink));
 
             service.addTask(source);
         }
@@ -154,12 +154,12 @@ public class VismoFactory {
                 + ":" + conf.getCloudHeadPort()));
 
         for (final BasicEventSource source : new BasicEventSource[] { localSource, workersSource }) {
-            source.subscribe(threeSecTimer);
-            source.subscribe(oneMinTimer);
-            source.subscribe(new PassThroughChannel(sink));
-            source.subscribe(new SLAPerRequestChannel(sink));
+            source.add(threeSecTimer);
+            source.add(oneMinTimer);
+            source.add(new PassThroughChannel(sink));
+            source.add(new SLAPerRequestChannel(sink));
 
-            source.subscribe(new PassThroughChannel(cloudSink));
+            source.add(new PassThroughChannel(cloudSink));
 
             service.addTask(source);
         }
@@ -180,8 +180,8 @@ public class VismoFactory {
         final BasicEventSink clusterHead = new BasicEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getClusterHead() + ":"
                 + conf.getClusterHeadPort()));
 
-        localSource.subscribe(new PassThroughChannel(clusterHead));
-        localSource.subscribe(new SLAPerRequestChannel(clusterHead));
+        localSource.add(new PassThroughChannel(clusterHead));
+        localSource.add(new SLAPerRequestChannel(clusterHead));
         service.addTask(localSource);
     }
 

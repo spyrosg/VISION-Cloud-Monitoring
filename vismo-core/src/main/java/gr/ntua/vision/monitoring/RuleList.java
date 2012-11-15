@@ -8,7 +8,6 @@ import gr.ntua.vision.monitoring.rules.RuleAggregationListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +18,11 @@ import org.slf4j.LoggerFactory;
  */
 public class RuleList {
     /***/
-    private static final Logger                     log          = LoggerFactory.getLogger(RuleList.class);
-    /***/
-    private final Map<AggregationRule, List<Event>> eventBuckets = new HashMap<AggregationRule, List<Event>>();
+    private static final Logger                         log          = LoggerFactory.getLogger(RuleList.class);
+    /** this is used to collect events for each rule, for the current period. */
+    private final HashMap<AggregationRule, List<Event>> eventBuckets = new HashMap<AggregationRule, List<Event>>();
     /** the actual rule list. */
-    private final ArrayList<AggregationRule>        list         = new ArrayList<AggregationRule>();
+    private final ArrayList<AggregationRule>            list         = new ArrayList<AggregationRule>();
 
 
     /**
