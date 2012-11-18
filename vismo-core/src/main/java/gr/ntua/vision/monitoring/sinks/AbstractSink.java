@@ -1,24 +1,19 @@
 package gr.ntua.vision.monitoring.sinks;
 
+import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
 
-import java.util.HashSet;
+import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.json.simple.JSONObject;
 
 
 /**
- *
+ * This is providing utility methods for transmitting an event through a socket.
  */
 abstract class AbstractSink implements EventSink {
     /***/
-    private static final Logger   log      = LoggerFactory.getLogger(AbstractSink.class);
-    /***/
-    protected final VismoSocket   sock;
-    // TODO: eventually remove eventIds or else vismo will blow with {@link OutOfMemoryError}.
-    /***/
-    private final HashSet<String> eventIds = new HashSet<String>();
+    private final VismoSocket sock;
 
 
     /**
@@ -32,27 +27,36 @@ abstract class AbstractSink implements EventSink {
 
 
     /**
-     * Check whether the event has already passed.
-     * 
-     * @param id
-     * @return <code>true</code> iff the event has already been seen, according to its id, <code>false</code> otherwise.
+     * @see java.lang.Object#toString()
      */
-    protected boolean eventAlreadySent(final String id) {
-        if (eventIds.contains(id)) {
-            log.error("dropping already sent event with id: {}", id);
-            return true;
-        }
-
-        eventIds.add(id);
-
-        return false;
+    @Override
+    public String toString() {
+        return "#<AbstractSink: " + sock + ">";
     }
 
 
     /**
-     * @param message
+     * Transmit the string.
+     * 
+     * @param str
+     *            a string.
      */
-    protected void send(final String message) {
-        sock.send(message);
+    protected void send(final String str) {
+        sock.send(str);
+    }
+
+
+    /**
+     * Serialize the event.
+     * 
+     * @param e
+     *            the event.
+     * @return a string representation for the event.
+     */
+    protected static String serialize(final Event e) {
+        @SuppressWarnings("rawtypes")
+        final Map dict = (Map) e.get("!dict");
+
+        return JSONObject.toJSONString(dict);
     }
 }
