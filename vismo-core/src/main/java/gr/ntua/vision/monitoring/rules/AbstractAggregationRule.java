@@ -217,7 +217,6 @@ abstract class AbstractAggregationRule implements AggregationRule {
 
     /**
      * @param eventList
-     * @param operation
      * @return the list of events that match only the given operation.
      */
     protected static ArrayList<Event> selectStorletEngineEvents(final List< ? extends Event> eventList) {

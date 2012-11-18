@@ -75,9 +75,9 @@ public final class VismoEventsSource implements EventSource, EventHandler {
      * @see org.eclipse.jetty.servlets.EventSource#onOpen(org.eclipse.jetty.servlets.EventSource.Emitter)
      */
     @Override
-    public void onOpen(final Emitter emitter) {
-        log.debug("onOpen for emitter: {}", emitter);
-        this.emitter = emitter;
+    public void onOpen(final Emitter emitter1) {
+        log.debug("onOpen for emitter: {}", emitter1);
+        this.emitter = emitter1;
         this.closed = false;
     }
 

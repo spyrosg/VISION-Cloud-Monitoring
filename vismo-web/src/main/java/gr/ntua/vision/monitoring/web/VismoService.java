@@ -1,7 +1,6 @@
 package gr.ntua.vision.monitoring.web;
 
 import gr.ntua.vision.monitoring.notify.EventRegistry;
-import gr.ntua.vision.monitoring.web.resources.HelloWorldResource;
 
 import com.google.common.cache.CacheBuilderSpec;
 import com.yammer.dropwizard.Service;
@@ -35,7 +34,6 @@ public class VismoService extends Service<VismoServiceConfiguration> {
         final String rootPath = conf.getHttpConfiguration().getRootPath();
         final String cleanedPath = rootPath.substring(0, rootPath.length() - 2);
 
-        env.addResource(new HelloWorldResource());
         env.addServlet(new VisionEventsServlet(new EventRegistry(conf.getAddress())), cleanedPath + "/events/*");
     }
 
