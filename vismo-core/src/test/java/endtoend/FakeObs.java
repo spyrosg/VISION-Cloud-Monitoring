@@ -97,18 +97,4 @@ public class FakeObs {
             final long size) {
         return new GETObsEvent(tenant, user, container, object, size);
     }
-
-
-    /**
-     * @param tenant
-     * @param user
-     * @param container
-     * @param object
-     * @param size
-     * @return a write event.
-     */
-    private static ObsEvent getWriteEvent(final String tenant, final String user, final String container, final String object,
-            final long size) {
-        return new PUTObsEvent(tenant, user, container, object, size);
-    }
 }

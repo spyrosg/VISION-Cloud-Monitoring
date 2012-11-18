@@ -41,7 +41,6 @@ public class VismoEndToEndTest {
     private VismoService             clusterHead;
     /***/
     private final VMInfo             clusterHeadInfo = new VMInfo() {
-                                                         @SuppressWarnings("unused")
                                                          @Override
                                                          public InetAddress getAddress() throws SocketException {
                                                              try {
@@ -52,7 +51,6 @@ public class VismoEndToEndTest {
                                                          }
 
 
-                                                         @SuppressWarnings("unused")
                                                          @Override
                                                          public NetworkInterface getInterface() throws SocketException {
                                                              return null;
@@ -78,7 +76,6 @@ public class VismoEndToEndTest {
                                                          private static final String workerIP = "10.2.2.101";
 
 
-                                                         @SuppressWarnings("unused")
                                                          @Override
                                                          public InetAddress getAddress() throws SocketException {
                                                              try {
@@ -89,7 +86,6 @@ public class VismoEndToEndTest {
                                                          }
 
 
-                                                         @SuppressWarnings("unused")
                                                          @Override
                                                          public NetworkInterface getInterface() throws SocketException {
                                                              return null;

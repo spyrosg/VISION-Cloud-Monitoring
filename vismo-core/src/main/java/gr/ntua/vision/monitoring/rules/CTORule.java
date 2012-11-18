@@ -100,7 +100,7 @@ public class CTORule extends AbstractAggregationRule {
 
     /**
      * @param eventList
-     * @return
+     * @return the aggregated stats over all tenants.
      */
     private static ArrayList<HashMap<String, Object>> aggregate1(final List< ? extends Event> eventList) {
         final HashMap<ContainerRequest, RequestCTOStats> requestsByUser = aggregateOverUsers(eventList);
@@ -112,7 +112,7 @@ public class CTORule extends AbstractAggregationRule {
 
     /**
      * @param requestsByUser
-     * @return
+     * @return the aggregated stats over all container per user.
      */
     @SuppressWarnings("unchecked")
     private static ArrayList<HashMap<String, Object>> aggregateOverContainers(
@@ -141,7 +141,7 @@ public class CTORule extends AbstractAggregationRule {
 
     /**
      * @param containerList
-     * @return
+     * @return the aggregated stats over all tenants.
      */
     private static ArrayList<HashMap<String, Object>> aggregateOverTenants(final ArrayList<HashMap<String, Object>> containerList) {
         final ArrayList<HashMap<String, Object>> tenantList = new ArrayList<HashMap<String, Object>>();
@@ -192,7 +192,7 @@ public class CTORule extends AbstractAggregationRule {
 
     /**
      * @param eventList
-     * @return
+     * @return the aggregated stats per user.
      */
     private static HashMap<ContainerRequest, RequestCTOStats> aggregateOverUsers(final List< ? extends Event> eventList) {
         final HashMap<ContainerRequest, RequestCTOStats> requests = new HashMap<ContainerRequest, RequestCTOStats>();
@@ -252,8 +252,10 @@ public class CTORule extends AbstractAggregationRule {
 
 
     /**
+     * Assemble the container object.
+     * 
      * @param containerName
-     * @return
+     * @return the container object.
      */
     private static HashMap<String, Object> getContainerObject(final String containerName) {
         final HashMap<String, Object> container = new HashMap<String, Object>();
@@ -266,9 +268,11 @@ public class CTORule extends AbstractAggregationRule {
 
 
     /**
+     * Assemble the cto stats object.
+     * 
      * @param eventList
      * @param topic
-     * @return
+     * @return the cto stats object.
      */
     private static HashMap<String, Object> getCTOEvent(final List< ? extends Event> eventList, final String topic) {
         final List<Event> readEventList = selectReadEvents(eventList);
@@ -290,9 +294,11 @@ public class CTORule extends AbstractAggregationRule {
 
 
     /**
+     * Assemble the cto stats object for given user.
+     * 
      * @param userName
      * @param stats
-     * @return
+     * @return the cto stats object for given user.
      */
     private static HashMap<String, Object> getUserObject(final String userName, final RequestCTOStats stats) {
         final HashMap<String, Object> user = new HashMap<String, Object>();

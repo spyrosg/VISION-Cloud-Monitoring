@@ -18,7 +18,7 @@ public interface MonitoringSocket {
 
     /**
      * @param message
-     * @return
+     * @return <code>true</code> when the message was successfully transmitted, <code>false</code> otherwise.
      */
     boolean send(String message);
 }
