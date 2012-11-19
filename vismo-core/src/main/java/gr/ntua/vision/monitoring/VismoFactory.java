@@ -3,9 +3,9 @@ package gr.ntua.vision.monitoring;
 import gr.ntua.vision.monitoring.rules.AccountingRule;
 import gr.ntua.vision.monitoring.rules.AggregationRule;
 import gr.ntua.vision.monitoring.rules.CTORule;
-import gr.ntua.vision.monitoring.scheduling.JVMStatusReportTask;
-import gr.ntua.vision.monitoring.sinks.BasicEventSink;
-import gr.ntua.vision.monitoring.sinks.PubSubEventSink;
+import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
+import gr.ntua.vision.monitoring.sinks.EventSink;
+import gr.ntua.vision.monitoring.sinks.UniqueEventSink;
 import gr.ntua.vision.monitoring.sources.BasicEventSource;
 import gr.ntua.vision.monitoring.udp.UDPFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
@@ -62,7 +62,7 @@ public class VismoFactory {
             setupWithWorker(service);
 
         service.addTask(new UDPFactory(conf.getUDPPort()).buildServer(service));
-        service.addTask(new JVMStatusReportTask(ONE_MINUTE));
+        // FIXME: service.addTask(new JVMStatusReportTask(ONE_MINUTE));
 
         return service;
     }
@@ -118,7 +118,7 @@ public class VismoFactory {
         final BasicEventSource localSource = localSource();
         final BasicEventSource clusterHeadsSource = sourceforAddress("tcp://*:" + conf.getCloudHeadPort());
 
-        final PubSubEventSink sink = new PubSubEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
+        final EventSink sink = new UniqueEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
         final VismoAggregationTimerTask threeSecTimer = new VismoAggregationTimerTask(THREE_SECONDS, sink);
         final VismoAggregationTimerTask oneMinTimer = new VismoAggregationTimerTask(ONE_MINUTE, sink);
 
@@ -131,8 +131,8 @@ public class VismoFactory {
             service.addTask(source);
         }
 
-        service.addTask(threeSecTimer);
-        service.addTask(oneMinTimer);
+        // service.addTask(threeSecTimer);
+        // service.addTask(oneMinTimer);
 
         submitRules(threeSecTimer, new CTORule("cto-3-sec", THREE_SECONDS));
         submitRules(oneMinTimer, new CTORule("cto-1-min", ONE_MINUTE), new AccountingRule(ONE_MINUTE));
@@ -143,32 +143,26 @@ public class VismoFactory {
      * @param service
      */
     private void setupWithClusterHead(final VismoService service) {
+        final VismoRulesEngine engine = new VismoRulesEngine();
         final BasicEventSource localSource = localSource();
         final BasicEventSource workersSource = sourceforAddress("tcp://*:" + conf.getClusterHeadPort());
 
-        final PubSubEventSink sink = new PubSubEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
-        final VismoAggregationTimerTask threeSecTimer = new VismoAggregationTimerTask(THREE_SECONDS, sink);
-        final VismoAggregationTimerTask oneMinTimer = new VismoAggregationTimerTask(ONE_MINUTE, sink);
-
-        final BasicEventSink cloudSink = new BasicEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getCloudHeads().get(0)
-                + ":" + conf.getCloudHeadPort()));
+        final EventSink sink = new UniqueEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
+        final EventSink cloudSink = new UniqueEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getCloudHeads().get(0) + ":"
+                + conf.getCloudHeadPort()));
 
         for (final BasicEventSource source : new BasicEventSource[] { localSource, workersSource }) {
-            source.add(threeSecTimer);
-            source.add(oneMinTimer);
-            source.add(new PassThroughChannel(sink));
-            source.add(new SLAPerRequestChannel(sink));
+            // source.add(new PassThroughChannel(sink));
+            // source.add(new SLAPerRequestChannel(sink));
+            // source.add(new PassThroughChannel(cloudSink));
 
-            source.add(new PassThroughChannel(cloudSink));
-
+            source.add(engine);
             service.addTask(source);
         }
 
-        service.addTask(threeSecTimer);
-        service.addTask(oneMinTimer);
-
-        submitRules(threeSecTimer, new CTORule("cto-3-sec", THREE_SECONDS));
-        submitRules(oneMinTimer, new CTORule("cto-1-min", ONE_MINUTE), new AccountingRule(ONE_MINUTE));
+        engine.submitRule(new CTORule("cto-3-sec", THREE_SECONDS));
+        engine.submitRule(new CTORule("cto-1-min", ONE_MINUTE));
+        engine.submitRule(new AccountingRule(ONE_MINUTE));
     }
 
 
@@ -177,18 +171,18 @@ public class VismoFactory {
      */
     private void setupWithWorker(final VismoService service) {
         final BasicEventSource localSource = localSource();
-        final BasicEventSink clusterHead = new BasicEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getClusterHead() + ":"
-                + conf.getClusterHeadPort()));
+        final UniqueEventSink clusterHeadSink = new UniqueEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getClusterHead()
+                + ":" + conf.getClusterHeadPort()));
 
-        localSource.add(new PassThroughChannel(clusterHead));
-        localSource.add(new SLAPerRequestChannel(clusterHead));
+        localSource.add(new PassThroughChannel(clusterHeadSink));
+        localSource.add(new SLAPerRequestChannel(clusterHeadSink));
         service.addTask(localSource);
     }
 
 
     /**
      * @param address
-     * @return
+     * @return the event source for given address
      */
     private BasicEventSource sourceforAddress(final String address) {
         return new BasicEventSource(zmq.newBoundPullSocket(address), zmq.newConnectedPushSocket(address));

@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 
  */
-public class AccountingRule extends AbstractAggregationRule {
+public class AccountingRule extends VismoAggregationRule {
     /**
      *
      */
@@ -160,15 +160,6 @@ public class AccountingRule extends AbstractAggregationRule {
     public boolean matches(final Event e) {
         // FIXME: add a field to events coming from vismo_dispatch
         return isCompleteObsEvent(e) || isStorletEngineEvent(e);
-    }
-
-
-    /**
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return "#<" + this.getClass().getSimpleName() + ", running every " + (period / 1000) + " second(s)>";
     }
 
 

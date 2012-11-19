@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  */
-abstract class AbstractAggregationRule implements AggregationRule {
+abstract class VismoAggregationRule extends PeriodicRule {
     /***/
     protected static final String OBS_FIELD        = "transaction-duration";
     /***/
@@ -20,7 +20,7 @@ abstract class AbstractAggregationRule implements AggregationRule {
     /***/
     private static final String   GET_OPERATION    = "GET";
     /***/
-    private static final Logger   log              = LoggerFactory.getLogger(AbstractAggregationRule.class);
+    private static final Logger   log              = LoggerFactory.getLogger(VismoAggregationRule.class);
     /***/
     private static final String   OPERATION_FIELD  = "operation";
     /***/
@@ -29,8 +29,6 @@ abstract class AbstractAggregationRule implements AggregationRule {
     private static final String   SRE_SERVICE      = "SRE";
     /***/
     private static final String   STORLET_KEY      = "storletType";
-    /***/
-    protected final long          period;
     /***/
     protected final String        topic;
 
@@ -41,54 +39,9 @@ abstract class AbstractAggregationRule implements AggregationRule {
      * @param topic
      * @param period
      */
-    public AbstractAggregationRule(final String topic, final long period) {
+    public VismoAggregationRule(final String topic, final long period) {
+        super(period);
         this.topic = topic;
-        this.period = period;
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.rules.AggregationRule#aggregationPeriod()
-     */
-    @Override
-    public long aggregationPeriod() {
-        return period;
-    }
-
-
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        final AbstractAggregationRule other = (AbstractAggregationRule) obj;
-        if (period != other.period)
-            return false;
-        if (topic == null) {
-            if (other.topic != null)
-                return false;
-        } else if (!topic.equals(other.topic))
-            return false;
-        return true;
-    }
-
-
-    /**
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (period ^ (period >>> 32));
-        result = prime * result + ((topic == null) ? 0 : topic.hashCode());
-        return result;
     }
 
 

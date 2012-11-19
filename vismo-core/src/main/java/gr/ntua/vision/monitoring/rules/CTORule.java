@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * <li>the # of in between <strong>DIFFERENT</strong> responses per user (field: count-rethink-time)</li>
  * </ol>
  */
-public class CTORule extends AbstractAggregationRule {
+public class CTORule extends VismoAggregationRule {
     /**
      * 
      */
@@ -85,16 +85,6 @@ public class CTORule extends AbstractAggregationRule {
     public boolean matches(final Event e) {
         // FIXME: add a field to events coming from vismo_dispatch
         return isCompleteObsEvent(e);
-    }
-
-
-    /**
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return "#<" + this.getClass().getSimpleName() + ", topic: " + topic + ", running every " + (period / 1000)
-                + " second(s)>";
     }
 
 

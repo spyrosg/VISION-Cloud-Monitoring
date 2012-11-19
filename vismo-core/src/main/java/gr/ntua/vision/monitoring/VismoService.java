@@ -1,7 +1,5 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.scheduling.VismoRepeatedTask;
-import gr.ntua.vision.monitoring.scheduling.VismoTimer;
 import gr.ntua.vision.monitoring.udp.UDPListener;
 
 import java.net.SocketException;
@@ -25,8 +23,6 @@ public class VismoService implements UDPListener {
     /***/
     private final ArrayList<StoppableTask> tasks  = new ArrayList<StoppableTask>();
     /***/
-    private final VismoTimer               timer  = new VismoTimer();
-    /***/
     private final VMInfo                   vminfo;
 
 
@@ -48,14 +44,6 @@ public class VismoService implements UDPListener {
      */
     public void addTask(final StoppableTask task) {
         tasks.add(task);
-    }
-
-
-    /**
-     * @param task
-     */
-    public void addTask(final VismoRepeatedTask task) {
-        timer.schedule(task);
     }
 
 
@@ -83,8 +71,6 @@ public class VismoService implements UDPListener {
             task.start();
         }
 
-        timer.start();
-
         return this;
     }
 
@@ -102,10 +88,6 @@ public class VismoService implements UDPListener {
      */
     public void stop() {
         log.info("shutting down");
-
-        timer.cancel();
-
-        log.info("stopping tasks");
 
         for (final StoppableTask task : tasks)
             try {
