@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  */
-abstract class VismoAggregationRule extends PeriodicRule {
+public abstract class VismoAggregationRule extends PeriodicRule {
     /***/
     protected static final String OBS_FIELD        = "transaction-duration";
     /***/

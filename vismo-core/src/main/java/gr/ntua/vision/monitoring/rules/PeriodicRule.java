@@ -9,7 +9,7 @@ import java.util.TimerTask;
 /**
  *
  */
-abstract class PeriodicRule extends TimerTask implements AggregationRule {
+public abstract class PeriodicRule extends TimerTask implements AggregationRule {
     /** the list of events matched to the rule in the last period. */
     private final ArrayList<Event> matchedEvents = new ArrayList<Event>();
     /** the period for this rule. */

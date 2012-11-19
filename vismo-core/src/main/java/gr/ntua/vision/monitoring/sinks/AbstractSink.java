@@ -31,7 +31,7 @@ abstract class AbstractSink implements EventSink {
      */
     @Override
     public String toString() {
-        return "#<AbstractSink: " + sock + ">";
+        return "#<" + getClass().getSimpleName() + ": " + sock + ">";
     }
 
 

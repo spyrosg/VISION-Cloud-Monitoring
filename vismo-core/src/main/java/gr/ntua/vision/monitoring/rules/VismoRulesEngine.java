@@ -1,5 +1,6 @@
 package gr.ntua.vision.monitoring.rules;
 
+import gr.ntua.vision.monitoring.EventSinks;
 import gr.ntua.vision.monitoring.EventSourceListener;
 import gr.ntua.vision.monitoring.events.Event;
 
@@ -14,7 +15,19 @@ public class VismoRulesEngine implements EventSourceListener {
     /***/
     private final ArrayList<AggregationRule> rules = new ArrayList<AggregationRule>();
     /***/
+    private final EventSinks                 sinks;
+    /***/
     private final Timer                      timer = new Timer();
+
+
+    /**
+     * Constructor.
+     * 
+     * @param sinks
+     */
+    public VismoRulesEngine(final EventSinks sinks) {
+        this.sinks = sinks;
+    }
 
 
     /**
@@ -22,9 +35,7 @@ public class VismoRulesEngine implements EventSourceListener {
      */
     @Override
     public void receive(final Event e) {
-        for (final AggregationRule rule : rules)
-            if (rule.matches(e))
-                rule.collect(e);
+        // TODO Auto-generated method stub
     }
 
 

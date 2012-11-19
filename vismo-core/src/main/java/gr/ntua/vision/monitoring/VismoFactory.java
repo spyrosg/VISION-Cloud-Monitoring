@@ -3,6 +3,7 @@ package gr.ntua.vision.monitoring;
 import gr.ntua.vision.monitoring.rules.AccountingRule;
 import gr.ntua.vision.monitoring.rules.AggregationRule;
 import gr.ntua.vision.monitoring.rules.CTORule;
+import gr.ntua.vision.monitoring.rules.VismoAggregationRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sinks.UniqueEventSink;
@@ -11,6 +12,8 @@ import gr.ntua.vision.monitoring.udp.UDPFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.net.SocketException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -143,13 +146,18 @@ public class VismoFactory {
      * @param service
      */
     private void setupWithClusterHead(final VismoService service) {
-        final VismoRulesEngine engine = new VismoRulesEngine();
-        final BasicEventSource localSource = localSource();
-        final BasicEventSource workersSource = sourceforAddress("tcp://*:" + conf.getClusterHeadPort());
-
         final EventSink sink = new UniqueEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
         final EventSink cloudSink = new UniqueEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getCloudHeads().get(0) + ":"
                 + conf.getCloudHeadPort()));
+
+        final EventSinks sinks = new EventSinks(sink, cloudSink);
+        final VismoRulesEngine engine = new VismoRulesEngine(sinks);
+
+        for (final VismoAggregationRule r : getRules())
+            engine.submitRule(r);
+
+        final BasicEventSource localSource = localSource();
+        final BasicEventSource workersSource = sourceforAddress("tcp://*:" + conf.getClusterHeadPort());
 
         for (final BasicEventSource source : new BasicEventSource[] { localSource, workersSource }) {
             // source.add(new PassThroughChannel(sink));
@@ -159,10 +167,6 @@ public class VismoFactory {
             source.add(engine);
             service.addTask(source);
         }
-
-        engine.submitRule(new CTORule("cto-3-sec", THREE_SECONDS));
-        engine.submitRule(new CTORule("cto-1-min", ONE_MINUTE));
-        engine.submitRule(new AccountingRule(ONE_MINUTE));
     }
 
 
@@ -186,6 +190,15 @@ public class VismoFactory {
      */
     private BasicEventSource sourceforAddress(final String address) {
         return new BasicEventSource(zmq.newBoundPullSocket(address), zmq.newConnectedPushSocket(address));
+    }
+
+
+    /**
+     * @return
+     */
+    private static List<VismoAggregationRule> getRules() {
+        return Arrays.asList(new CTORule("cto-3-sec", THREE_SECONDS), new CTORule("cto-1-min", ONE_MINUTE), new AccountingRule(
+                ONE_MINUTE));
     }
 
 
