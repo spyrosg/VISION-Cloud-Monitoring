@@ -80,7 +80,7 @@ public class VismoSocket implements MonitoringSocket {
      * @return the socket type.
      */
     private static String getType(final Socket sock) {
-        switch (sock.getType()){
+        switch(sock.getType()){
             case 0:
                 return "PAIR";
             case 1:

@@ -62,6 +62,8 @@ public class UDPServer extends StoppableTask {
 
 
     /**
+     * Shutdown the thread by interrupting it.
+     * 
      * @see gr.ntua.vision.monitoring.StoppableTask#shutDown()
      */
     @Override
