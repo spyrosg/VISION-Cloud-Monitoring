@@ -11,7 +11,7 @@ import org.zeromq.ZMQ;
 
 
 /**
- * This is responsible for starting/stopping the vismo instance. It maintains a list of the application running threads.
+ * This is responsible for starting/stopping the vismo instance. It maintains the set of application's running threads.
  */
 public class VismoService implements UDPListener {
     /***/
@@ -61,6 +61,8 @@ public class VismoService implements UDPListener {
 
 
     /**
+     * Actually start the application.
+     * 
      * @return <code>this</code>.
      */
     public VismoService start() {
@@ -84,19 +86,30 @@ public class VismoService implements UDPListener {
 
 
     /**
-     * 
+     * Stop the application.
      */
     public void stop() {
         log.info("shutting down");
 
         for (final StoppableTask task : tasks)
-            try {
-                task.shutDown();
-            } catch (final Throwable x) {
-                log.error("trying to shutdown {}", task);
-                log.error("error", x);
-            }
+            shutDownTask(task);
 
         log.debug("shutdown completed normally.");
+    }
+
+
+    /**
+     * Kill the task.
+     * 
+     * @param task
+     *            the task.
+     */
+    private static void shutDownTask(final StoppableTask task) {
+        try {
+            task.shutDown();
+        } catch (final Throwable x) {
+            log.error("trying to shutdown {}", task);
+            log.error("error", x);
+        }
     }
 }

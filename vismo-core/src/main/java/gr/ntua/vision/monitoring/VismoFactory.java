@@ -150,11 +150,10 @@ public class VismoFactory {
         final EventSink cloudSink = new UniqueEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getCloudHeads().get(0) + ":"
                 + conf.getCloudHeadPort()));
 
-        final EventSinks sinks = new EventSinks(sink, cloudSink);
-        final VismoRulesEngine engine = new VismoRulesEngine(sinks);
+        final VismoRulesEngine engine = new VismoRulesEngine(new EventSinks(sink, cloudSink));
 
-        for (final VismoAggregationRule r : getRules())
-            engine.submitRule(r);
+        // FIXME: for (final VismoAggregationRule r : getRules())
+        // engine.submitRule(r);
 
         final BasicEventSource localSource = localSource();
         final BasicEventSource workersSource = sourceforAddress("tcp://*:" + conf.getClusterHeadPort());
@@ -164,7 +163,7 @@ public class VismoFactory {
             // source.add(new SLAPerRequestChannel(sink));
             // source.add(new PassThroughChannel(cloudSink));
 
-            source.add(engine);
+            engine.registerWithSource(source);
             service.addTask(source);
         }
     }
