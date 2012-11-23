@@ -35,17 +35,6 @@ public class VismoRulesEngine implements EventSourceListener {
 
 
     /**
-     * Add a rule to run to the rule engine. The rule will run the next time there's a new event.
-     * 
-     * @param rule
-     *            the rule.
-     */
-    public void addRule(final RuleProc<Event> rule) {
-        rules.add(rule);
-    }
-
-
-    /**
      * @see gr.ntua.vision.monitoring.EventSourceListener#receive(gr.ntua.vision.monitoring.events.Event)
      */
     @Override
@@ -90,6 +79,26 @@ public class VismoRulesEngine implements EventSourceListener {
 
 
     /**
+     * @param rule
+     */
+    public void submitRule(final VismoPeriodicRule rule) {
+        rules.add(rule);
+        schedule(rule);
+    }
+
+
+    /**
+     * Add a rule to run to the rule engine. The rule will run the next time there's a new event.
+     * 
+     * @param rule
+     *            the rule.
+     */
+    public void submitRule(final VismoRule rule) {
+        rules.add(rule);
+    }
+
+
+    /**
      * Run the event through all rules.
      * 
      * @param e
@@ -98,5 +107,13 @@ public class VismoRulesEngine implements EventSourceListener {
     private void evaluateRulesAgainst(final Event e) {
         for (final RuleProc<Event> r : rules)
             r.performWith(e);
+    }
+
+
+    /**
+     * @param rule
+     */
+    private void schedule(final VismoPeriodicRule rule) {
+        timer.schedule(rule, 0, rule.period());
     }
 }

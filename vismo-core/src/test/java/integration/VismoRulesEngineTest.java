@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import gr.ntua.vision.monitoring.EventSinks;
 import gr.ntua.vision.monitoring.EventSourceListener;
 import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.rules.VismoPeriodicRule;
 import gr.ntua.vision.monitoring.rules.VismoRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSink;
@@ -12,6 +13,7 @@ import gr.ntua.vision.monitoring.sources.EventSource;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -191,10 +193,100 @@ public class VismoRulesEngineTest {
         }
     }
 
+
+    /**
+     * 
+     */
+    private static class IntSumRule extends VismoPeriodicRule {
+        /***/
+        private final String key;
+        /***/
+        private final long   period;
+
+
+        /**
+         * Constructor.
+         * 
+         * @param engine
+         * @param period
+         * @param key
+         */
+        public IntSumRule(final VismoRulesEngine engine, final long period, final String key) {
+            super(engine);
+            this.period = period;
+            this.key = key;
+        }
+
+
+        /**
+         * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
+         */
+        @Override
+        public void performWith(final Event e) {
+            if (matches(e))
+                collect(e);
+        }
+
+
+        /**
+         * @see gr.ntua.vision.monitoring.rules.VismoPeriodicRule#period()
+         */
+        @Override
+        public long period() {
+            return period;
+        }
+
+
+        /**
+         * @see gr.ntua.vision.monitoring.rules.VismoPeriodicRule#aggregate(java.util.List)
+         */
+        @Override
+        protected Event aggregate(final List<Event> eventList) {
+            if (eventList.size() == 0)
+                return null;
+
+            final ArrayList<Integer> intList = new ArrayList<Integer>(eventList.size());
+            extract(intList, eventList);
+
+            return new DummyEvent(key, sum(intList));
+        }
+
+
+        /**
+         * @param intList
+         * @param eventList
+         */
+        private void extract(final ArrayList<Integer> intList, final List<Event> eventList) {
+            for (final Event e : eventList)
+                intList.add((Integer) e.get(key));
+        }
+
+
+        /**
+         * @param e
+         * @return <code>true</code> if the event contains the specified key.
+         */
+        private boolean matches(final Event e) {
+            return e.get(key) != null;
+        }
+
+
+        /**
+         * @param intList
+         * @return foldl (+) intList 0
+         */
+        private static int sum(final ArrayList<Integer> intList) {
+            int sum = 0;
+
+            for (final int i : intList)
+                sum += i;
+
+            return sum;
+        }
+    }
+
     /** the object under test. */
     private VismoRulesEngine          engine;
-    /**  */
-    private InMemoryEventSink         sink;
     /***/
     private final InMemoryEventSource source = new InMemoryEventSource();
     /** this is where the events should end up. */
@@ -203,16 +295,39 @@ public class VismoRulesEngineTest {
 
     /***/
     @Test
+    public void itShouldEvaluateAnAsynchronousRule() {
+        final String KEY = "foo";
+        final int VAL1 = 2;
+        final int VAL2 = 3;
+        final long RULE_PERIOD = 100;
+        final long TIMEOUT = 150;
+
+        engine.submitRule(new IntSumRule(engine, RULE_PERIOD, KEY));
+        source.triggerRuleEvaluationWith(new DummyEvent(KEY, VAL1));
+        source.triggerRuleEvaluationWith(new DummyEvent(KEY, VAL2));
+
+        assertEquals(0, store.size());
+        waitTimerToTriggerRuleAggregation(TIMEOUT);
+        assertEquals(1, store.size());
+
+        final Event d = lastEvent();
+
+        assertEquals(VAL1 + VAL2, d.get(KEY));
+    }
+
+
+    /***/
+    @Test
     public void itShouldEvaluateASynchonousRule() {
         final String KEY = "foo";
         final int VAL = 0;
 
-        engine.addRule(new IncRule(engine, KEY));
+        engine.submitRule(new IncRule(engine, KEY));
         source.triggerRuleEvaluationWith(new DummyEvent(KEY, VAL));
 
         assertEquals(1, store.size());
 
-        final Event d = store.get(0);
+        final Event d = lastEvent();
 
         assertEquals(VAL + 1, d.get(KEY));
     }
@@ -223,8 +338,27 @@ public class VismoRulesEngineTest {
      */
     @Before
     public void setUp() {
-        sink = new InMemoryEventSink(store);
-        engine = new VismoRulesEngine(new EventSinks(sink));
-        source.add(engine);
+        engine = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(store)));
+        engine.registerWithSource(source);
+    }
+
+
+    /**
+     * @return the last event from the store.
+     */
+    private Event lastEvent() {
+        return store.get(store.size() - 1);
+    }
+
+
+    /**
+     * @param n
+     */
+    private static void waitTimerToTriggerRuleAggregation(final long n) {
+        try {
+            Thread.sleep(n);
+        } catch (final InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
