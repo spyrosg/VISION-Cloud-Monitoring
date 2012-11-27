@@ -16,40 +16,36 @@ import org.slf4j.LoggerFactory;
 @Path("/")
 public class RulesManagementResource {
     private static final HashMap<Integer, String> catalog = new HashMap<Integer, String>();
-    private static final Logger      log          = LoggerFactory.getLogger(RulesManagementResource.class);
+    private static final Logger                   log     = LoggerFactory.getLogger(RulesManagementResource.class);
+
 
     @GET
     @Produces("text/plain")
     @Path("rules/{id}")
-    public String RulesConfigurationGet(@PathParam("id") Integer id){                
+    public String RulesConfigurationGet(@PathParam("id") Integer id) {
         log.info("requesting rule: {}", id + ".");
         return catalog.get(id);
     }
 
+
     @PUT
     @Path("rules/{name}/{period}/{desc}")
     @Consumes("text/plain")
-    public String RulesConfigurationPut(
-            @PathParam("name") String name,
-            @PathParam("period") Integer period,
-            @PathParam("desc") String desc)
-    {    
+    public String RulesConfigurationPut(@PathParam("name") String name, @PathParam("period") Integer period,
+            @PathParam("desc") String desc) {
         log.info("configuring new rule: {}", name, ".");
-        catalog.put(catalog.size()+1, name+":"+period+":"+desc);
-        //return the object that was inserted
+        catalog.put(catalog.size() + 1, name + ":" + period + ":" + desc);
         return catalog.get(catalog.size());
 
     }
 
+
     @DELETE
     @Produces("text/plain")
     @Path("rules/{id}")
-    public String RulesConfigurationDelete(
-            @PathParam("id") Integer id)
-    {  
+    public String RulesConfigurationDelete(@PathParam("id") Integer id) {
         log.info("removed rule: {}", id, ".");
-        //catalog.remove(id);
-        return catalog.get(catalog.size());
+        return catalog.remove(id);
     }
 
 }

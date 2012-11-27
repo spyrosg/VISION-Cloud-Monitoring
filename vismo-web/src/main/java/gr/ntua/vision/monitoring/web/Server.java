@@ -4,44 +4,54 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 
 
 public class Server {
+    /***/
+    private static SelectorThread    grizzlyInstance = null;
+    /***/
+    private final String              BASE_URI        = getBaseURI();
+    /***/
+    private final Map<String, String> initParams      = new HashMap<String, String>();
+    /***/
+    private static final Logger      log             = LoggerFactory.getLogger(Server.class);
 
-    private static SelectorThread    instance   = null;
 
-    public static final String       BASE_URI   = getBaseURI();
-
-    final static Map<String, String> initParams = new HashMap<String, String>();
-
-
-    public static void start() throws IllegalArgumentException, IOException {
+    /***/
+    public void start() throws IllegalArgumentException, IOException {
         initParams.put("com.sun.jersey.config.property.packages", "gr.ntua.vision.monitoring.web.resources");
-        System.out.println("Starting grizzly...");
+        log.info("starting grizzly...");
         getGrizzly();
-        System.out.println(String.format("grizzly started"));
+        log.info("grizzly started");
     }
 
 
-    public static void stop() throws IllegalArgumentException, IOException {
-        System.out.println("Stopping grizzly...");
+    /***/
+    public void stop() throws IllegalArgumentException, IOException {
+        log.info("stopping grizzly...");
         getGrizzly().stopEndpoint();
-        System.out.println(String.format("grizzly stopped"));
+        log.info("grizzly stopped");
 
     }
 
-
-    public static SelectorThread getGrizzly() throws IllegalArgumentException, IOException {
-        if (instance == null) {
-            instance = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+    /**
+     * @throws IOException
+     */
+    private SelectorThread getGrizzly() throws IllegalArgumentException, IOException {
+        if (grizzlyInstance == null) {
+            grizzlyInstance = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
         }
-        return instance;
+        return grizzlyInstance;
     }
 
 
-    private static String getBaseURI() {
+    /***/
+    private String getBaseURI() {
         return "http://localhost:" + (System.getenv("PORT") != null ? System.getenv("PORT") : "9998") + "/";
     }
 
