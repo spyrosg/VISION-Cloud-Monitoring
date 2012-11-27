@@ -8,9 +8,10 @@ import java.util.List;
 
 
 /**
- * 
+ * This is the rule that aggregates over object service and storlet events and produces events specific to the <code>VISION</code>
+ * accounting service.
  */
-public class AccountingRule extends VismoAggregationRule {
+public class AccountingRule extends AggregationRule {
     /**
      *
      */
@@ -133,33 +134,37 @@ public class AccountingRule extends VismoAggregationRule {
     /**
      * Constructor.
      * 
+     * @param engine
      * @param period
      */
-    public AccountingRule(final long period) {
-        super(TOPIC, period);
+    public AccountingRule(final VismoRulesEngine engine, final long period) {
+        super(engine, period, TOPIC);
     }
 
 
     /**
-     * @see gr.ntua.vision.monitoring.rules.AggregationRule#aggregate(java.util.List)
+     * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
+     */
+    @Override
+    public void performWith(final Event e) {
+        if (matches(e))
+            collect(e);
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List)
      */
     @SuppressWarnings("unchecked")
     @Override
-    public AggregationResult aggregate(final List< ? extends Event> eventList) {
+    protected Event aggregate(final List<Event> eventList) {
+        if (eventList.size() == 0)
+            return null;
+
         @SuppressWarnings("rawtypes")
         final HashMap dict = getAccountingEventObject(eventList);
 
         return new VismoAggregationResult(dict);
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.rules.AggregationRule#matches(gr.ntua.vision.monitoring.events.Event)
-     */
-    @Override
-    public boolean matches(final Event e) {
-        // FIXME: add a field to events coming from vismo_dispatch
-        return isCompleteObsEvent(e) || isStorletEngineEvent(e);
     }
 
 
@@ -179,6 +184,16 @@ public class AccountingRule extends VismoAggregationRule {
         dict.put("topic", TOPIC);
 
         return dict;
+    }
+
+
+    /**
+     * @param e
+     * @return
+     */
+    private static boolean matches(final Event e) {
+        // FIXME: add a field to events coming from vismo_dispatch
+        return isCompleteObsEvent(e) || isStorletEngineEvent(e);
     }
 
 

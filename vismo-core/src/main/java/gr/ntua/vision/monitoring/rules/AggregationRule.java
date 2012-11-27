@@ -10,9 +10,9 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * 
+ * Utility class for aggregating over object service events.
  */
-public abstract class VismoAggregationRule extends PeriodicRule {
+abstract class AggregationRule extends PeriodicRule {
     /***/
     protected static final String OBS_FIELD        = "transaction-duration";
     /***/
@@ -20,7 +20,7 @@ public abstract class VismoAggregationRule extends PeriodicRule {
     /***/
     private static final String   GET_OPERATION    = "GET";
     /***/
-    private static final Logger   log              = LoggerFactory.getLogger(VismoAggregationRule.class);
+    private static final Logger   log              = LoggerFactory.getLogger(AggregationRule.class);
     /***/
     private static final String   OPERATION_FIELD  = "operation";
     /***/
@@ -36,12 +36,22 @@ public abstract class VismoAggregationRule extends PeriodicRule {
     /**
      * Constructor.
      * 
-     * @param topic
+     * @param engine
      * @param period
+     * @param topic
      */
-    public VismoAggregationRule(final String topic, final long period) {
-        super(period);
+    public AggregationRule(final VismoRulesEngine engine, final long period, final String topic) {
+        super(engine, period);
         this.topic = topic;
+    }
+
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "#<" + getClass().getSimpleName() + ", topic=" + topic + "period=" + (period() / 1000) + "s>";
     }
 
 

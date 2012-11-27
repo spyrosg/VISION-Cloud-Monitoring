@@ -8,6 +8,9 @@ import gr.ntua.vision.monitoring.sources.EventSource;
 import java.util.ArrayList;
 import java.util.Timer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * This is used to evaluate the rules. Rules are triggered from events, which are received from one or more {@link EventSource}s
@@ -16,6 +19,8 @@ import java.util.Timer;
  * triggered by a timer thread).
  */
 public class VismoRulesEngine implements EventSourceListener {
+    /***/
+    private static final Logger              log   = LoggerFactory.getLogger(VismoRulesEngine.class);
     /***/
     private final ArrayList<RuleProc<Event>> rules = new ArrayList<RuleProc<Event>>();
     /***/
@@ -44,10 +49,13 @@ public class VismoRulesEngine implements EventSourceListener {
 
 
     /**
-     * @param dummySource
+     * Register with source.
+     * 
+     * @param source
+     *            the event source.
      */
-    public void registerWithSource(final EventSource dummySource) {
-        dummySource.add(this);
+    public void registerWithSource(final EventSource source) {
+        source.add(this);
     }
 
 
@@ -58,6 +66,7 @@ public class VismoRulesEngine implements EventSourceListener {
      *            the rule.
      */
     public void removeRule(final RuleProc<Event> rule) {
+        log.debug("removing {}", rule);
         rules.remove(rule);
     }
 
@@ -81,8 +90,8 @@ public class VismoRulesEngine implements EventSourceListener {
     /**
      * @param rule
      */
-    public void submitRule(final VismoPeriodicRule rule) {
-        rules.add(rule);
+    void submitRule(final PeriodicRule rule) {
+        add(rule);
         schedule(rule);
     }
 
@@ -93,8 +102,17 @@ public class VismoRulesEngine implements EventSourceListener {
      * @param rule
      *            the rule.
      */
-    public void submitRule(final VismoRule rule) {
-        rules.add(rule);
+    void submitRule(final Rule rule) {
+        add(rule);
+    }
+
+
+    /**
+     * @param r
+     */
+    private void add(final RuleProc<Event> r) {
+        log.debug("submitting {}", r);
+        rules.add(r);
     }
 
 
@@ -113,7 +131,7 @@ public class VismoRulesEngine implements EventSourceListener {
     /**
      * @param rule
      */
-    private void schedule(final VismoPeriodicRule rule) {
+    private void schedule(final PeriodicRule rule) {
         timer.schedule(rule, 0, rule.period());
     }
 }

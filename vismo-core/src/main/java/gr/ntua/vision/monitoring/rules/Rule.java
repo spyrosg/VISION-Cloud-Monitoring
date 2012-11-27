@@ -6,7 +6,7 @@ import gr.ntua.vision.monitoring.events.Event;
 /**
  * 
  */
-public abstract class VismoRule implements RuleProc<Event> {
+public abstract class Rule implements RuleProc<Event> {
     /***/
     private final VismoRulesEngine engine;
 
@@ -16,8 +16,17 @@ public abstract class VismoRule implements RuleProc<Event> {
      * 
      * @param engine
      */
-    public VismoRule(final VismoRulesEngine engine) {
+    public Rule(final VismoRulesEngine engine) {
         this.engine = engine;
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.rules.RuleProc#submitTo(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
+     */
+    @Override
+    public void submitTo(final VismoRulesEngine engine) {
+        engine.submitRule(this);
     }
 
 

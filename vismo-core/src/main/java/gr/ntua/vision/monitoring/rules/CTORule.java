@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * <li>the # of in between <strong>DIFFERENT</strong> responses per user (field: count-rethink-time)</li>
  * </ol>
  */
-public class CTORule extends VismoAggregationRule {
+public class CTORule extends AggregationRule {
     /**
      * 
      */
@@ -57,34 +57,38 @@ public class CTORule extends VismoAggregationRule {
     /**
      * Constructor.
      * 
+     * @param engine
      * @param topic
      * @param period
      */
-    public CTORule(final String topic, final long period) {
-        super(topic, period);
+    public CTORule(final VismoRulesEngine engine, final String topic, final long period) {
+        super(engine, period, topic);
     }
 
 
     /**
-     * @see gr.ntua.vision.monitoring.rules.AggregationRule#aggregate(java.util.List)
+     * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
+     */
+    @Override
+    public void performWith(final Event e) {
+        if (matches(e))
+            collect(e);
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List)
      */
     @SuppressWarnings("unchecked")
     @Override
-    public AggregationResult aggregate(final List< ? extends Event> eventList) {
+    protected Event aggregate(final List<Event> eventList) {
+        if (eventList.size() == 0)
+            return null;
+
         @SuppressWarnings("rawtypes")
         final Map dict = getCTOEvent(eventList, topic);
 
         return new VismoAggregationResult(dict);
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.rules.AggregationRule#matches(gr.ntua.vision.monitoring.events.Event)
-     */
-    @Override
-    public boolean matches(final Event e) {
-        // FIXME: add a field to events coming from vismo_dispatch
-        return isCompleteObsEvent(e);
     }
 
 
@@ -307,5 +311,15 @@ public class CTORule extends VismoAggregationRule {
         user.put("sum-transaction-time", stats.sumTransactionTimes() / 1000.0);
 
         return user;
+    }
+
+
+    /**
+     * @param e
+     * @return
+     */
+    private static boolean matches(final Event e) {
+        // FIXME: add a field to events coming from vismo_dispatch
+        return isCompleteObsEvent(e);
     }
 }

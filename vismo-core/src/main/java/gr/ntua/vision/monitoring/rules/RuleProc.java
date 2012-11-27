@@ -13,4 +13,10 @@ public interface RuleProc<C> {
      * @param e
      */
     void performWith(final C e);
+
+
+    /**
+     * @param engine
+     */
+    void submitTo(final VismoRulesEngine engine);
 }
