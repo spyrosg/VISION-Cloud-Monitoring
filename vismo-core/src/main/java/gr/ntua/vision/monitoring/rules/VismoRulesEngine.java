@@ -35,6 +35,7 @@ public class VismoRulesEngine implements EventSourceListener {
      * @param sinks
      */
     public VismoRulesEngine(final EventSinks sinks) {
+        log.debug("using {}", sinks);
         this.sinks = sinks;
     }
 
@@ -55,6 +56,7 @@ public class VismoRulesEngine implements EventSourceListener {
      *            the event source.
      */
     public void registerWithSource(final EventSource source) {
+        log.debug("registering with {}", source);
         source.add(this);
     }
 

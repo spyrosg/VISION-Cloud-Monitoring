@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 import gr.ntua.vision.monitoring.EventSinks;
 import gr.ntua.vision.monitoring.EventSourceListener;
 import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.rules.VismoPeriodicRule;
-import gr.ntua.vision.monitoring.rules.VismoRule;
+import gr.ntua.vision.monitoring.rules.PeriodicRule;
+import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sources.EventSource;
@@ -102,7 +102,7 @@ public class VismoRulesEngineTest {
     /**
      * A rule to increment the field of an event.
      */
-    private static class IncRule extends VismoRule {
+    private static class IncRule extends Rule {
         /***/
         private final String key;
 
@@ -197,11 +197,9 @@ public class VismoRulesEngineTest {
     /**
      * 
      */
-    private static class IntSumRule extends VismoPeriodicRule {
+    private static class IntSumRule extends PeriodicRule {
         /***/
         private final String key;
-        /***/
-        private final long   period;
 
 
         /**
@@ -212,8 +210,7 @@ public class VismoRulesEngineTest {
          * @param key
          */
         public IntSumRule(final VismoRulesEngine engine, final long period, final String key) {
-            super(engine);
-            this.period = period;
+            super(engine, period);
             this.key = key;
         }
 
@@ -229,16 +226,7 @@ public class VismoRulesEngineTest {
 
 
         /**
-         * @see gr.ntua.vision.monitoring.rules.VismoPeriodicRule#period()
-         */
-        @Override
-        public long period() {
-            return period;
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.rules.VismoPeriodicRule#aggregate(java.util.List)
+         * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List)
          */
         @Override
         protected Event aggregate(final List<Event> eventList) {
@@ -302,7 +290,7 @@ public class VismoRulesEngineTest {
         final long RULE_PERIOD = 100;
         final long TIMEOUT = 150;
 
-        engine.submitRule(new IntSumRule(engine, RULE_PERIOD, KEY));
+        new IntSumRule(engine, RULE_PERIOD, KEY).submitTo(engine);
         source.triggerRuleEvaluationWith(new DummyEvent(KEY, VAL1));
         source.triggerRuleEvaluationWith(new DummyEvent(KEY, VAL2));
 
@@ -322,7 +310,7 @@ public class VismoRulesEngineTest {
         final String KEY = "foo";
         final int VAL = 0;
 
-        engine.submitRule(new IncRule(engine, KEY));
+        new IncRule(engine, KEY).submitTo(engine);
         source.triggerRuleEvaluationWith(new DummyEvent(KEY, VAL));
 
         assertEquals(1, store.size());

@@ -1,9 +1,10 @@
 package gr.ntua.vision.monitoring;
 
+import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.rules.AccountingRule;
-import gr.ntua.vision.monitoring.rules.AggregationRule;
 import gr.ntua.vision.monitoring.rules.CTORule;
-import gr.ntua.vision.monitoring.rules.VismoAggregationRule;
+import gr.ntua.vision.monitoring.rules.PassThroughRule;
+import gr.ntua.vision.monitoring.rules.RuleProc;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sinks.UniqueEventSink;
@@ -91,7 +92,7 @@ public class VismoFactory {
      * @throws SocketException
      */
     private boolean hostIsClusterHead(final VMInfo vminfo) throws SocketException {
-        return conf.isIPClusterHead(vminfo.getAddress().getHostAddress());
+        return true; // return conf.isIPClusterHead(vminfo.getAddress().getHostAddress());
     }
 
 
@@ -118,7 +119,7 @@ public class VismoFactory {
      * @param service
      */
     private void setupWithCloudHead(final VismoService service) {
-        final BasicEventSource localSource = localSource();
+        /*final BasicEventSource localSource = localSource();
         final BasicEventSource clusterHeadsSource = sourceforAddress("tcp://*:" + conf.getCloudHeadPort());
 
         final EventSink sink = new UniqueEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
@@ -139,6 +140,7 @@ public class VismoFactory {
 
         submitRules(threeSecTimer, new CTORule("cto-3-sec", THREE_SECONDS));
         submitRules(oneMinTimer, new CTORule("cto-1-min", ONE_MINUTE), new AccountingRule(ONE_MINUTE));
+        */
     }
 
 
@@ -149,23 +151,17 @@ public class VismoFactory {
         final EventSink sink = new UniqueEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
         final EventSink cloudSink = new UniqueEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getCloudHeads().get(0) + ":"
                 + conf.getCloudHeadPort()));
-
         final VismoRulesEngine engine = new VismoRulesEngine(new EventSinks(sink, cloudSink));
-
-        // FIXME: for (final VismoAggregationRule r : getRules())
-        // engine.submitRule(r);
-
         final BasicEventSource localSource = localSource();
         final BasicEventSource workersSource = sourceforAddress("tcp://*:" + conf.getClusterHeadPort());
 
         for (final BasicEventSource source : new BasicEventSource[] { localSource, workersSource }) {
-            // source.add(new PassThroughChannel(sink));
-            // source.add(new SLAPerRequestChannel(sink));
-            // source.add(new PassThroughChannel(cloudSink));
-
             engine.registerWithSource(source);
             service.addTask(source);
         }
+
+        for (final RuleProc<Event> rule : getRules(engine))
+            rule.submitTo(engine);
     }
 
 
@@ -177,8 +173,9 @@ public class VismoFactory {
         final UniqueEventSink clusterHeadSink = new UniqueEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getClusterHead()
                 + ":" + conf.getClusterHeadPort()));
 
-        localSource.add(new PassThroughChannel(clusterHeadSink));
-        localSource.add(new SLAPerRequestChannel(clusterHeadSink));
+        // FIXME: use rules
+        // localSource.add(new PassThroughChannel(clusterHeadSink));
+        // localSource.add(new SLAPerRequestChannel(clusterHeadSink));
         service.addTask(localSource);
     }
 
@@ -193,20 +190,12 @@ public class VismoFactory {
 
 
     /**
+     * @param engine
      * @return
      */
-    private static List<VismoAggregationRule> getRules() {
-        return Arrays.asList(new CTORule("cto-3-sec", THREE_SECONDS), new CTORule("cto-1-min", ONE_MINUTE), new AccountingRule(
-                ONE_MINUTE));
-    }
-
-
-    /**
-     * @param task
-     * @param rules
-     */
-    private static void submitRules(final VismoAggregationTimerTask task, final AggregationRule... rules) {
-        for (final AggregationRule rule : rules)
-            task.submit(rule);
+    @SuppressWarnings("unchecked")
+    private static List<RuleProc<Event>> getRules(final VismoRulesEngine engine) {
+        return Arrays.asList(new CTORule(engine, "cto-3-sec", THREE_SECONDS), new CTORule(engine, "cto-1-min", ONE_MINUTE),
+                             new AccountingRule(engine, ONE_MINUTE), new PassThroughRule(engine));
     }
 }

@@ -51,7 +51,7 @@ abstract class AggregationRule extends PeriodicRule {
      */
     @Override
     public String toString() {
-        return "#<" + getClass().getSimpleName() + ", topic=" + topic + "period=" + (period() / 1000) + "s>";
+        return "#<" + getClass().getSimpleName() + ", topic=" + topic + ", period=" + (period() / 1000) + "s>";
     }
 
 

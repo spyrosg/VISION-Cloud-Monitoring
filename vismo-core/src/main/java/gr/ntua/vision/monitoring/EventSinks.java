@@ -42,4 +42,13 @@ public class EventSinks {
         for (final EventSink sink : sinks)
             sink.send(e);
     }
+
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "#<EventSinks: " + sinks + ">";
+    }
 }
