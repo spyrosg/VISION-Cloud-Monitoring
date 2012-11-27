@@ -92,7 +92,7 @@ public class VismoFactory {
      * @throws SocketException
      */
     private boolean hostIsClusterHead(final VMInfo vminfo) throws SocketException {
-        return true; // return conf.isIPClusterHead(vminfo.getAddress().getHostAddress());
+        return conf.isIPClusterHead(vminfo.getAddress().getHostAddress());
     }
 
 
