@@ -54,8 +54,8 @@ public class VismoRulesEngineTest {
          * @see gr.ntua.vision.monitoring.events.Event#get(java.lang.String)
          */
         @Override
-        public Object get(final String key) {
-            if (this.key.equals(key))
+        public Object get(final String k) {
+            if (this.key.equals(k))
                 return val;
 
             return null;
@@ -128,6 +128,15 @@ public class VismoRulesEngineTest {
 
             send(new DummyEvent(key, val + 1));
         }
+
+
+        /**
+         * @see java.lang.Object#toString()
+         */
+        @Override
+        public String toString() {
+            return "#<IncRule: " + key + ">";
+        }
     }
 
 
@@ -155,6 +164,15 @@ public class VismoRulesEngineTest {
         @Override
         public void send(final Event e) {
             eventStore.add(e);
+        }
+
+
+        /**
+         * @see java.lang.Object#toString()
+         */
+        @Override
+        public String toString() {
+            return "#<InMemoryEventSink: " + eventStore + ">";
         }
     }
 
@@ -185,6 +203,15 @@ public class VismoRulesEngineTest {
 
 
         /**
+         * @see java.lang.Object#toString()
+         */
+        @Override
+        public String toString() {
+            return "#<InMemoryEventSource>";
+        }
+
+
+        /**
          * @param e
          */
         public void triggerRuleEvaluationWith(final Event e) {
@@ -195,7 +222,7 @@ public class VismoRulesEngineTest {
 
 
     /**
-     * 
+     * A rule to sum integers.
      */
     private static class IntSumRule extends PeriodicRule {
         /***/
@@ -222,6 +249,15 @@ public class VismoRulesEngineTest {
         public void performWith(final Event e) {
             if (matches(e))
                 collect(e);
+        }
+
+
+        /**
+         * @see java.lang.Object#toString()
+         */
+        @Override
+        public String toString() {
+            return "#<IntSumRule: " + key + ">";
         }
 
 
