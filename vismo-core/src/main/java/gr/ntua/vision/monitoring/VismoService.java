@@ -1,9 +1,11 @@
 package gr.ntua.vision.monitoring;
 
+import gr.ntua.vision.monitoring.scheduling.VismoPeriodicTask;
 import gr.ntua.vision.monitoring.udp.UDPListener;
 
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Timer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,8 @@ public class VismoService implements UDPListener {
     /***/
     private final ArrayList<StoppableTask> tasks  = new ArrayList<StoppableTask>();
     /***/
+    private final Timer                    timer  = new Timer();
+    /***/
     private final VMInfo                   vminfo;
 
 
@@ -40,10 +44,24 @@ public class VismoService implements UDPListener {
 
 
     /**
+     * Add a task owned by <code>this</code> service. The task will start executing upon {@link #start()}.
+     * 
      * @param task
+     *            the task.
      */
     public void addTask(final StoppableTask task) {
         tasks.add(task);
+    }
+
+
+    /**
+     * Schedule a periodic task. The task will start executing immediately.
+     * 
+     * @param task
+     *            the task.
+     */
+    public void addTask(final VismoPeriodicTask task) {
+        timer.schedule(task, 0, task.period());
     }
 
 
@@ -90,6 +108,8 @@ public class VismoService implements UDPListener {
      */
     public void stop() {
         log.info("shutting down");
+
+        timer.cancel();
 
         for (final StoppableTask task : tasks)
             shutDownTask(task);

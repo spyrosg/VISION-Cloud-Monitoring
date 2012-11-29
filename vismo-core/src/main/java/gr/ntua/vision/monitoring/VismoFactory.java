@@ -6,6 +6,7 @@ import gr.ntua.vision.monitoring.rules.CTORule;
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.RuleProc;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
+import gr.ntua.vision.monitoring.scheduling.JVMStatusReportTask;
 import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sinks.UniqueEventSink;
 import gr.ntua.vision.monitoring.sources.BasicEventSource;
@@ -66,7 +67,7 @@ public class VismoFactory {
             setupWithWorker(service);
 
         service.addTask(new UDPFactory(conf.getUDPPort()).buildServer(service));
-        // FIXME: service.addTask(new JVMStatusReportTask(ONE_MINUTE));
+        service.addTask(new JVMStatusReportTask(ONE_MINUTE));
 
         return service;
     }

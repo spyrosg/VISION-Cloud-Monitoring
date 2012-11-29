@@ -2,7 +2,6 @@ package gr.ntua.vision.monitoring.scheduling;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import java.util.TimerTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,7 @@ import com.sun.management.OperatingSystemMXBean;
  * 
  */
 @SuppressWarnings("restriction")
-public class JVMStatusReportTask extends TimerTask {
+public class JVMStatusReportTask extends VismoPeriodicTask {
     /***/
     private static final Logger                log         = LoggerFactory.getLogger(JVMStatusReportTask.class);
     /** the number of bytes in a megabyte. */
@@ -49,6 +48,15 @@ public class JVMStatusReportTask extends TimerTask {
      */
     public JVMStatusReportTask(final long period) {
         this.period = period;
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.scheduling.VismoPeriodicTask#period()
+     */
+    @Override
+    public long period() {
+        return period;
     }
 
 
