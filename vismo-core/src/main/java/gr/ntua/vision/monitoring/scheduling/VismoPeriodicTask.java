@@ -4,11 +4,11 @@ import java.util.TimerTask;
 
 
 /**
- * This task represents calculations that happen repeatedly.
+ * This task represents calculations that happen periodically.
  */
-public abstract class VismoRepeatedTask extends TimerTask {
+public abstract class VismoPeriodicTask extends TimerTask {
     /**
      * @return the execution period of the task in milliseconds.
      */
-    public abstract long getPeriod();
+    public abstract long period();
 }
