@@ -1,6 +1,5 @@
 package gr.ntua.vision.monitoring.sources;
 
-import gr.ntua.vision.monitoring.EventSourceListener;
 import gr.ntua.vision.monitoring.StoppableTask;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventFactory;
@@ -51,7 +50,7 @@ public class BasicEventSource extends StoppableTask implements EventSource {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.sources.EventSource#add(gr.ntua.vision.monitoring.EventSourceListener)
+     * @see gr.ntua.vision.monitoring.sources.EventSource#add(gr.ntua.vision.monitoring.sources.EventSourceListener)
      */
     @Override
     public void add(final EventSourceListener listener) {

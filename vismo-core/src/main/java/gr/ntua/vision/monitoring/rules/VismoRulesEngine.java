@@ -1,9 +1,9 @@
 package gr.ntua.vision.monitoring.rules;
 
 import gr.ntua.vision.monitoring.EventSinks;
-import gr.ntua.vision.monitoring.EventSourceListener;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.sources.EventSource;
+import gr.ntua.vision.monitoring.sources.EventSourceListener;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -41,7 +41,7 @@ public class VismoRulesEngine implements EventSourceListener {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.EventSourceListener#receive(gr.ntua.vision.monitoring.events.Event)
+     * @see gr.ntua.vision.monitoring.sources.EventSourceListener#receive(gr.ntua.vision.monitoring.events.Event)
      */
     @Override
     public void receive(final Event e) {
