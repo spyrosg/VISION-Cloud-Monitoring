@@ -4,8 +4,8 @@ import gr.ntua.vision.monitoring.rules.AccountingRule;
 import gr.ntua.vision.monitoring.rules.AggregationRule;
 import gr.ntua.vision.monitoring.rules.CTORule;
 import gr.ntua.vision.monitoring.scheduling.JVMStatusReportTask;
-import gr.ntua.vision.monitoring.sinks.BasicEventSink;
-import gr.ntua.vision.monitoring.sinks.PubSubEventSink;
+import gr.ntua.vision.monitoring.sinks.EventSink;
+import gr.ntua.vision.monitoring.sinks.UniqueEventSink;
 import gr.ntua.vision.monitoring.sources.BasicEventSource;
 import gr.ntua.vision.monitoring.udp.UDPFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
@@ -118,7 +118,7 @@ public class VismoFactory {
         final BasicEventSource localSource = localSource();
         final BasicEventSource clusterHeadsSource = sourceforAddress("tcp://*:" + conf.getCloudHeadPort());
 
-        final PubSubEventSink sink = new PubSubEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
+        final EventSink sink = new UniqueEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
         final VismoAggregationTimerTask threeSecTimer = new VismoAggregationTimerTask(THREE_SECONDS, sink);
         final VismoAggregationTimerTask oneMinTimer = new VismoAggregationTimerTask(ONE_MINUTE, sink);
 
@@ -146,12 +146,12 @@ public class VismoFactory {
         final BasicEventSource localSource = localSource();
         final BasicEventSource workersSource = sourceforAddress("tcp://*:" + conf.getClusterHeadPort());
 
-        final PubSubEventSink sink = new PubSubEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
+        final EventSink sink = new UniqueEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
         final VismoAggregationTimerTask threeSecTimer = new VismoAggregationTimerTask(THREE_SECONDS, sink);
         final VismoAggregationTimerTask oneMinTimer = new VismoAggregationTimerTask(ONE_MINUTE, sink);
 
-        final BasicEventSink cloudSink = new BasicEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getCloudHeads().get(0)
-                + ":" + conf.getCloudHeadPort()));
+        final EventSink cloudSink = new UniqueEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getCloudHeads().get(0) + ":"
+                + conf.getCloudHeadPort()));
 
         for (final BasicEventSource source : new BasicEventSource[] { localSource, workersSource }) {
             source.add(threeSecTimer);
@@ -177,7 +177,7 @@ public class VismoFactory {
      */
     private void setupWithWorker(final VismoService service) {
         final BasicEventSource localSource = localSource();
-        final BasicEventSink clusterHead = new BasicEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getClusterHead() + ":"
+        final EventSink clusterHead = new UniqueEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getClusterHead() + ":"
                 + conf.getClusterHeadPort()));
 
         localSource.add(new PassThroughChannel(clusterHead));
