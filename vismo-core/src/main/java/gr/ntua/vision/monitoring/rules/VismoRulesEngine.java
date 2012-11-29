@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.rules;
 
-import gr.ntua.vision.monitoring.EventSinks;
 import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.sinks.EventSinks;
 import gr.ntua.vision.monitoring.sources.EventSource;
 import gr.ntua.vision.monitoring.sources.EventSourceListener;
 

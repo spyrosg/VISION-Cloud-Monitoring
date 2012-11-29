@@ -8,6 +8,7 @@ import gr.ntua.vision.monitoring.rules.RuleProc;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.scheduling.JVMStatusReportTask;
 import gr.ntua.vision.monitoring.sinks.EventSink;
+import gr.ntua.vision.monitoring.sinks.EventSinks;
 import gr.ntua.vision.monitoring.sinks.UniqueEventSink;
 import gr.ntua.vision.monitoring.sources.BasicEventSource;
 import gr.ntua.vision.monitoring.udp.UDPFactory;

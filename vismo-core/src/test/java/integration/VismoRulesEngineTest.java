@@ -1,12 +1,12 @@
 package integration;
 
 import static org.junit.Assert.assertEquals;
-import gr.ntua.vision.monitoring.EventSinks;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.rules.PeriodicRule;
 import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSink;
+import gr.ntua.vision.monitoring.sinks.EventSinks;
 import gr.ntua.vision.monitoring.sources.EventSource;
 import gr.ntua.vision.monitoring.sources.EventSourceListener;
 
