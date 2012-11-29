@@ -64,8 +64,8 @@ public abstract class PeriodicRule extends TimerTask implements RuleProc<Event> 
      * @see gr.ntua.vision.monitoring.rules.RuleProc#submitTo(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
      */
     @Override
-    public void submitTo(final VismoRulesEngine engine) {
-        engine.submitRule(this);
+    public void submitTo(final VismoRulesEngine eng) {
+        eng.submitRule(this);
     }
 
 

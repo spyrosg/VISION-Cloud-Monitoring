@@ -189,7 +189,7 @@ public class AccountingRule extends AggregationRule {
 
     /**
      * @param e
-     * @return
+     * @return <code>true</code> iff is an obs or storlet event.
      */
     private static boolean matches(final Event e) {
         // FIXME: add a field to events coming from vismo_dispatch
