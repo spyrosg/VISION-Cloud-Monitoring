@@ -1,4 +1,5 @@
-package examples;
+package endtoend;
+
 
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.notify.EventHandler;
@@ -6,11 +7,16 @@ import gr.ntua.vision.monitoring.notify.EventRegistry;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  *
  */
 public class FakeEventConsumer {
+    
+    private static final Logger log               = LoggerFactory.getLogger(FakeEventConsumer.class);
     /**
      *
      */
@@ -26,7 +32,7 @@ public class FakeEventConsumer {
                 final Object special = e.get(SPECIAL_FIELD);
 
                 if (special != null)
-                    System.err.println(getClass().getSimpleName() + ": " + e.get("originating-machine") + " => " + dict);
+                    log.debug(getClass().getSimpleName() + ": " + e.get("originating-machine") + " => " + dict);
             } catch (final Throwable x) {
                 x.printStackTrace();
             }
@@ -71,6 +77,8 @@ public class FakeEventConsumer {
     /**
      * @param args
      */
+    
+    /*
     public static void main(final String... args) {
         final EventRegistry registry = new EventRegistry("tcp://10.0.1.103:56430");
         
@@ -79,4 +87,5 @@ public class FakeEventConsumer {
         //registry.registerToAll(new SAPLogger());
         registry.registerToAll(new LoggingHandler());
     }
+    */
 }
