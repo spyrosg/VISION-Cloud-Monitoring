@@ -67,8 +67,6 @@ public class VismoEndToEndTest {
     /***/
     private final VismoFactory       factory         = new VismoFactory(conf);
     /***/
-    private FakeObjectService        obs;
-    /***/
     private VismoService             worker;
     /***/
     private final VMInfo             workerInfo      = new VMInfo() {
