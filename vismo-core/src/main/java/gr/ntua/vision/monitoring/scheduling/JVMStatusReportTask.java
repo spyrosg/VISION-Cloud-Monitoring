@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring.scheduling;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.util.Timer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,21 +53,21 @@ public class JVMStatusReportTask extends VismoPeriodicTask {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.scheduling.VismoPeriodicTask#period()
-     */
-    @Override
-    public long period() {
-        return period;
-    }
-
-
-    /**
      * @see java.util.TimerTask#run()
      */
     @Override
     public void run() {
         reportFreeMemoryPercent();
         reportCPUUsage();
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.scheduling.VismoPeriodicTask#scheduleWith(java.util.Timer)
+     */
+    @Override
+    public void scheduleWith(final Timer timer) {
+        timer.schedule(this, 0, period);
     }
 
 

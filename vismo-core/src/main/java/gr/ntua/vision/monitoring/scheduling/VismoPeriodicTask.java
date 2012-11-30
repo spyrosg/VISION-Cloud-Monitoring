@@ -1,5 +1,6 @@
 package gr.ntua.vision.monitoring.scheduling;
 
+import java.util.Timer;
 import java.util.TimerTask;
 
 
@@ -8,7 +9,10 @@ import java.util.TimerTask;
  */
 public abstract class VismoPeriodicTask extends TimerTask {
     /**
-     * @return the execution period of the task in milliseconds.
+     * Schedule the task to be run under the timer.
+     * 
+     * @param timer
+     *            the timer.
      */
-    public abstract long period();
+    public abstract void scheduleWith(final Timer timer);
 }
