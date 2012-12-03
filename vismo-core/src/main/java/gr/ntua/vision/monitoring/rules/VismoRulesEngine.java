@@ -26,7 +26,7 @@ public class VismoRulesEngine implements EventSourceListener {
     /***/
     private final EventSinks                 sinks;
     /***/
-    private final Timer                      timer = new Timer();
+    private final Timer                      timer = new Timer(true);
 
 
     /**
@@ -37,6 +37,15 @@ public class VismoRulesEngine implements EventSourceListener {
     public VismoRulesEngine(final EventSinks sinks) {
         log.debug("using {}", sinks);
         this.sinks = sinks;
+    }
+
+
+    /**
+     * Turn off the engine. No more rules will be run.
+     */
+    public void halt() {
+        timer.cancel();
+        rules.clear();
     }
 
 
@@ -55,7 +64,7 @@ public class VismoRulesEngine implements EventSourceListener {
      * @param source
      *            the event source.
      */
-    public void registerWithSource(final EventSource source) {
+    public void registerToSource(final EventSource source) {
         log.debug("registering with {}", source);
         source.add(this);
     }
@@ -78,14 +87,6 @@ public class VismoRulesEngine implements EventSourceListener {
      */
     public void send(final Event e) {
         sinks.push(e);
-    }
-
-
-    /**
-     * Turn off the engine. No more rules will be run.
-     */
-    public void shutDown() {
-        timer.cancel();
     }
 
 

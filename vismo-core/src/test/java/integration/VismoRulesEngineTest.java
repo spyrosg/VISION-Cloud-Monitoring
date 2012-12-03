@@ -363,7 +363,7 @@ public class VismoRulesEngineTest {
     @Before
     public void setUp() {
         engine = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(store)));
-        engine.registerWithSource(source);
+        engine.registerToSource(source);
     }
 
 

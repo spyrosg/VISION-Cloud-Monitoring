@@ -158,7 +158,7 @@ public class VismoFactory {
         final BasicEventSource workersSource = sourceforAddress("tcp://*:" + conf.getClusterHeadPort());
 
         for (final BasicEventSource source : new BasicEventSource[] { localSource, workersSource }) {
-            engine.registerWithSource(source);
+            engine.registerToSource(source);
             service.addTask(source);
         }
 
