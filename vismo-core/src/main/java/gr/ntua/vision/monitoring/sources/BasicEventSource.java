@@ -59,6 +59,18 @@ public class BasicEventSource extends StoppableTask implements EventSource {
 
 
     /**
+     * Since zmq sockets are not interruptible, we use another socket to send the stop message to <code>this</code>. This is
+     * guaranteed to stop the thread.
+     * 
+     * @see gr.ntua.vision.monitoring.StoppableTask#halt()
+     */
+    @Override
+    public void halt() {
+        shutdownSocket.send(SHUTDOWN);
+    }
+
+
+    /**
      * Receive and dispatch events.
      * 
      * @see java.lang.Runnable#run()
@@ -88,16 +100,6 @@ public class BasicEventSource extends StoppableTask implements EventSource {
         }
 
         log.debug("shutting down");
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.StoppableTask#shutDown()
-     */
-    @Override
-    public void shutDown() {
-        interrupt();
-        shutdownSocket.send(SHUTDOWN);
     }
 
 

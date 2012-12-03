@@ -1,8 +1,8 @@
 package gr.ntua.vision.monitoring;
 
 /**
- * A stoppable task is a thread that can be explicitly stopped. It falls in the implementer's hands how the task should accomplish
- * a proper shutdown sequence. It is advised that each guarantee provided by the implementation be noted properly.
+ * A stoppable task is a thread that can be explicitly stopped. It falls in the implementer's hands how the task halt properly. It
+ * is advised that each guarantee provided by the implementation be noted properly.
  */
 public abstract class StoppableTask extends Thread {
     /**
@@ -17,7 +17,7 @@ public abstract class StoppableTask extends Thread {
 
 
     /**
-     * Shut down the task.
+     * Halt the computation, relinquish any resources held by <code>this</code>.
      */
-    public abstract void shutDown();
+    public abstract void halt();
 }

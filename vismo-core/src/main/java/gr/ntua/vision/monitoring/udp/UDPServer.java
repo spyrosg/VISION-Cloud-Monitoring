@@ -40,6 +40,17 @@ public class UDPServer extends StoppableTask {
 
 
     /**
+     * Shutdown the thread by interrupting it.
+     * 
+     * @see gr.ntua.vision.monitoring.StoppableTask#halt()
+     */
+    @Override
+    public void halt() {
+        interrupt();
+    }
+
+
+    /**
      * @see java.lang.Thread#run()
      */
     @Override
@@ -58,17 +69,6 @@ public class UDPServer extends StoppableTask {
             }
 
         log.debug("shutting down");
-    }
-
-
-    /**
-     * Shutdown the thread by interrupting it.
-     * 
-     * @see gr.ntua.vision.monitoring.StoppableTask#shutDown()
-     */
-    @Override
-    public void shutDown() {
-        interrupt();
     }
 
 

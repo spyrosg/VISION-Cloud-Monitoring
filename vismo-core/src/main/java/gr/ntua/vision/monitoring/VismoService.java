@@ -126,7 +126,7 @@ public class VismoService implements UDPListener {
      */
     private static void shutDownTask(final StoppableTask task) {
         try {
-            task.shutDown();
+            task.halt();
         } catch (final Throwable x) {
             log.error("trying to shutdown {}", task);
             log.error("error", x);
