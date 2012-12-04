@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  */
-public class BasicEventSource extends StoppableTask implements EventSource {
+public class VismoEventSource extends StoppableTask implements EventSource {
     /***/
     private static final Pattern                 patt      = Pattern.compile("\"originating-machine\": ?\"([^\"]*)\"");
     /***/
@@ -29,7 +29,7 @@ public class BasicEventSource extends StoppableTask implements EventSource {
     /** the listeners lists. */
     private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
     /** the log target. */
-    private final Logger                         log       = LoggerFactory.getLogger(BasicEventSource.class);
+    private final Logger                         log       = LoggerFactory.getLogger(VismoEventSource.class);
     /** this is used to shutdown the thread. */
     private final VismoSocket                    shutdownSocket;
 
@@ -42,8 +42,8 @@ public class BasicEventSource extends StoppableTask implements EventSource {
      * @param shutdownSocket
      *            this is used to shutdown the thread.
      */
-    public BasicEventSource(final VismoSocket eventSock, final VismoSocket shutdownSocket) {
-        super("basic-event-source");
+    public VismoEventSource(final VismoSocket eventSock, final VismoSocket shutdownSocket) {
+        super("vismo-event-source");
         this.eventSock = eventSock;
         this.shutdownSocket = shutdownSocket;
     }
