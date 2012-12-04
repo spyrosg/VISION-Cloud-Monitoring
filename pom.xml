@@ -21,6 +21,7 @@
     <module>vismo-config</module>
     <module>vismo-zmq</module>
     <module>vismo-web</module>
+    <module>vismo-heartbeat</module>
   </modules>
 
   <properties>
