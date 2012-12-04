@@ -9,10 +9,8 @@ import java.net.SocketException;
  * and servers, in the sense that a client will only talk to the server listening to the given port.
  */
 public class UDPFactory {
-    /***/
-    private static final int CLIENT_TIMEOUT = 1000;
     /** the port number to use. */
-    private final int        port;
+    private final int port;
 
 
     /**
@@ -31,11 +29,7 @@ public class UDPFactory {
      * @throws SocketException
      */
     public UDPClient buildClient() throws SocketException {
-        final DatagramSocket sock = new DatagramSocket();
-
-        sock.setSoTimeout(CLIENT_TIMEOUT);
-
-        return new UDPClient(sock, port);
+        return new UDPClient(port);
     }
 
 

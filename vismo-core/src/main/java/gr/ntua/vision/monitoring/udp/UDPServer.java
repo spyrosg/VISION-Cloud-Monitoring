@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- *
+ * This is used to receive commands from a client. The commands are passed to any listeners.
  */
 public class UDPServer extends Thread {
     /***/
