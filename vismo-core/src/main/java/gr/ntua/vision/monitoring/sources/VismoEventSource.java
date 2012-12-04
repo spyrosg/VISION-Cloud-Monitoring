@@ -108,7 +108,7 @@ public class VismoEventSource extends StoppableTask implements EventSource {
      */
     @Override
     public String toString() {
-        return "#<BasicEventSource: using " + eventSock + ">";
+        return "#<" + getClass().getSimpleName() + " using " + eventSock + ">";
     }
 
 

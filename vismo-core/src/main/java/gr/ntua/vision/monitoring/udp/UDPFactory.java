@@ -40,12 +40,10 @@ public class UDPFactory {
 
 
     /**
-     * @param listener
-     *            the listener.
-     * @return a upd server.
+     * @return a udp server.
      * @throws SocketException
      */
-    public UDPServer buildServer(final UDPListener listener) throws SocketException {
-        return new UDPServer(new DatagramSocket(port), listener);
+    public UDPServer buildServer() throws SocketException {
+        return new UDPServer(new DatagramSocket(port));
     }
 }
