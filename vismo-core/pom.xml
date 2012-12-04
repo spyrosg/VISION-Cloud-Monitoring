@@ -15,6 +15,101 @@
   <name>Vismo</name>
   <description>The distributed infrastructure that moves around events in VISION Cloud.</description>
 
+  <profiles>
+    <profile>
+      <id>package.rpm</id>
+      <activation>
+        <property>
+          <name>package.rpm</name>
+          <value>1</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+
+          <!-- also generate a rpm -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>rpm-maven-plugin</artifactId>
+            <version>2.1-alpha-1</version>
+
+            <executions>
+              <execution>
+                <goals>
+                  <goal>rpm</goal>
+                </goals>
+              </execution>
+            </executions>
+
+            <configuration>
+              <name>vismo</name>
+              <copyright>NOT-SPECIFIED</copyright>
+              <group>Application/System</group>
+              <summary>The monitoring infrastructure of the VISION Cloud.</summary>
+              <description>The monitoring infrastructure of the VISION Cloud.</description>
+              <packager>vassilis</packager>
+              <release>1.0</release>
+
+              <requires>
+                <require>java &gt;= 1.6</require>
+                <require>zeromq &gt;= 2.1.9</require>
+                <require>python-zmq &gt;= 2.1.9</require>
+              </requires>
+
+              <defineStatements>
+                <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
+              </defineStatements>
+
+              <mappings>
+
+                <mapping>
+                  <directory>/srv/vismo</directory>
+                  <username>root</username>
+                  <groupname>root</groupname>
+                  <filemode>0644</filemode>
+                  <directoryIncluded>false</directoryIncluded>
+                  <sources>
+                    <source>
+                      <location>target/vismo-core-${project.version}.jar</location>
+                      <destination>vismo.jar</destination>
+                    </source>
+
+                    <source>
+                      <location>../vismo-dispatch/src/main/python/vismo_dispatch.py</location>
+                      <destination>vismo_dispatch.py</destination>
+                    </source>
+
+                    <source>
+                      <location>../vismo-dispatch/src/main/python/pyjavaproperties.py</location>
+                      <destination>pyjavaproperties.py</destination>
+                    </source>
+
+                  </sources>
+                </mapping>
+
+                <mapping>
+                  <directory>/etc/init.d</directory>
+                  <username>root</username>
+                  <groupname>root</groupname>
+                  <filemode>0755</filemode>
+                  <directoryIncluded>false</directoryIncluded>
+                  <sources>
+                    <source>
+                      <location>src/main/scripts/init.d</location>
+                      <destination>vision-vismo</destination>
+                    </source>
+                  </sources>
+                </mapping>
+
+              </mappings>
+            </configuration>
+
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
   <build>
     <plugins>
 
@@ -54,84 +149,6 @@
         </executions>
       </plugin>
 
-      <!-- also generate a rpm -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>rpm-maven-plugin</artifactId>
-        <version>2.1-alpha-1</version>
-
-        <executions>
-          <execution>
-            <goals>
-              <goal>rpm</goal>
-            </goals>
-          </execution>
-        </executions>
-
-        <configuration>
-          <name>vismo</name>
-          <copyright>NOT-SPECIFIED</copyright>
-          <group>Application/System</group>
-          <summary>The monitoring infrastructure of the VISION Cloud.</summary>
-          <description>The monitoring infrastructure of the VISION Cloud.</description>
-          <packager>vassilis</packager>
-          <release>1.0</release>
-
-          <requires>
-            <require>java &gt;= 1.6</require>
-            <require>zeromq &gt;= 2.1.9</require>
-            <require>python-zmq &gt;= 2.1.9</require>
-          </requires>
-
-          <defineStatements>
-            <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
-          </defineStatements>
-
-          <mappings>
-
-            <mapping>
-              <directory>/srv/vismo</directory>
-              <username>root</username>
-              <groupname>root</groupname>
-              <filemode>0644</filemode>
-              <directoryIncluded>false</directoryIncluded>
-              <sources>
-                <source>
-                  <location>target/vismo-core-${project.version}.jar</location>
-                  <destination>vismo.jar</destination>
-                </source>
-
-                <source>
-                  <location>../vismo-dispatch/src/main/python/vismo_dispatch.py</location>
-                  <destination>vismo_dispatch.py</destination>
-                </source>
-
-                <source>
-                  <location>../vismo-dispatch/src/main/python/pyjavaproperties.py</location>
-                  <destination>pyjavaproperties.py</destination>
-                </source>
-
-              </sources>
-            </mapping>
-
-            <mapping>
-              <directory>/etc/init.d</directory>
-              <username>root</username>
-              <groupname>root</groupname>
-              <filemode>0755</filemode>
-              <directoryIncluded>false</directoryIncluded>
-              <sources>
-                <source>
-                  <location>src/main/scripts/init.d</location>
-                  <destination>vision-vismo</destination>
-                </source>
-              </sources>
-            </mapping>
-
-          </mappings>
-        </configuration>
-
-      </plugin>
     </plugins>
   </build>
 
