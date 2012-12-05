@@ -16,18 +16,17 @@
   <description>The distributed infrastructure that moves around events in VISION Cloud.</description>
 
   <profiles>
+
+    <!-- conditionally generate a rpm -->
     <profile>
       <id>package.rpm</id>
       <activation>
-        <property>
-          <name>package.rpm</name>
-          <value>1</value>
-        </property>
+        <property><name>package.rpm</name><value>1</value></property>
       </activation>
+
       <build>
         <plugins>
 
-          <!-- also generate a rpm -->
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>rpm-maven-plugin</artifactId>
@@ -108,6 +107,55 @@
         </plugins>
       </build>
     </profile>
+
+    <!-- conditionally run all tests (some need testbed vpn connectivity) -->
+    <profile>
+      <id>testbed.tests</id>
+      <activation>
+        <property><name>testbed.tests</name><value>1</value></property>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.8.1</version>
+            <configuration>
+              <parallel>classes</parallel>
+            </configuration>
+          </plugin>
+
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- run all other tests every time -->
+    <profile>
+      <id>other.tests</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+
+      <build>
+        <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.8.1</version>
+            <configuration>
+              <parallel>classes</parallel>
+              <excludes>
+                <exclude>endtoend/ContainerPutRemoveTest.java</exclude>
+                <exclude>endtoend/ObjectPutGetRemoveTest.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
   <build>
@@ -153,11 +201,11 @@
   </build>
 
   <dependencies>
-	
+
     <dependency>
-  	  <groupId>com.restfuse</groupId>
-  	  <artifactId>com.eclipsesource.restfuse</artifactId>
-  	  <version>1.1.1</version>
+      <groupId>com.restfuse</groupId>
+      <artifactId>com.eclipsesource.restfuse</artifactId>
+      <version>1.1.1</version>
     </dependency>
 
     <dependency>
