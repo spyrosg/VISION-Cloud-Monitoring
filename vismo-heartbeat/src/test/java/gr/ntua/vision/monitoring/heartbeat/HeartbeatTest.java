@@ -30,8 +30,7 @@ public class HeartbeatTest {
         receiver.init();
         sender.init();
         sleep(2000);
-        // we expect the membership to be true
-        assertEquals("We expect membership to be valid", checkMembership(receiver.getMembers()), true);
+        assertEquals("We expect membership to be valid", true,checkMembership(receiver.getMembers()));
     }
 
 
@@ -47,7 +46,7 @@ public class HeartbeatTest {
         receiver.init();
         sender.init();
         sleep(4000);
-        assertEquals("We expect membership to be invalid", checkMembership(receiver.getMembers()), false);
+        assertEquals("We expect membership to be invalid",false,  checkMembership(receiver.getMembers()));
     }
 
 
