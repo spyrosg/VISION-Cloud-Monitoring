@@ -114,6 +114,9 @@ public final class HeartbeatReceiver {
         }
 
 
+        /*
+         * 
+         */
         public final void interrupt() {
             try {
                 socket.leaveGroup(groupMulticastAddress);
@@ -170,6 +173,9 @@ public final class HeartbeatReceiver {
         }
 
 
+        /*
+         * 
+         */
         public final void interrupt() {
             try {
                 socket.leaveGroup(groupMulticastAddress);
