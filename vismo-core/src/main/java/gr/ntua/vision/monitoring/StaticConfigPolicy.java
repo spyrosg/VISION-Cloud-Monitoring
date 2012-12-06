@@ -10,11 +10,11 @@ import org.zeromq.ZContext;
 
 
 /**
- * 
+ * Provides a {@link VismoService} using the configuration.
  */
-public class VismoServiceFactory {
+public class StaticConfigPolicy implements NodePolicy {
     /***/
-    private static final Logger      log = LoggerFactory.getLogger(VismoServiceFactory.class);
+    private static final Logger      log = LoggerFactory.getLogger(StaticConfigPolicy.class);
     /***/
     private final VismoConfiguration conf;
 
@@ -24,7 +24,7 @@ public class VismoServiceFactory {
      * 
      * @param conf
      */
-    public VismoServiceFactory(final VismoConfiguration conf) {
+    public StaticConfigPolicy(final VismoConfiguration conf) {
         this.conf = conf;
     }
 
@@ -32,19 +32,24 @@ public class VismoServiceFactory {
     /**
      * @param vminfo
      * @return the {@link VismoService}.
-     * @throws SocketException
      */
-    public VismoService build(final VismoVMInfo vminfo) throws SocketException {
+    @Override
+    public VismoService build(final VMInfo vminfo) {
         final ZMQSockets zmq = new ZMQSockets(new ZContext());
 
-        logConfig(vminfo);
+        try {
+            logConfig(vminfo);
 
-        if (hostIsCloudHead(vminfo))
-            return new CloudHeadNodeFactory(conf, zmq).build(vminfo);
-        else if (hostIsClusterHead(vminfo))
-            return new ClusterHeadNodeFactory(conf, zmq).build(vminfo);
-        else
-            return new WorkerNodeFactory(conf, zmq).build(vminfo);
+            if (hostIsCloudHead(vminfo))
+                return new CloudHeadNodeFactory(conf, zmq).build(vminfo);
+            else if (hostIsClusterHead(vminfo))
+                return new ClusterHeadNodeFactory(conf, zmq).build(vminfo);
+            else
+                return new WorkerNodeFactory(conf, zmq).build(vminfo);
+        } catch (final SocketException e) {
+            log.error("socket exception", e);
+            throw new RuntimeException(e);
+        }
     }
 
 
