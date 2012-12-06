@@ -1,17 +1,8 @@
 package gr.ntua.vision.monitoring;
 
-import gr.ntua.vision.monitoring.rules.AccountingRule;
-import gr.ntua.vision.monitoring.rules.CTORule;
-import gr.ntua.vision.monitoring.rules.PassThroughRule;
-import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
-import gr.ntua.vision.monitoring.sinks.EventSinks;
-import gr.ntua.vision.monitoring.sinks.EventSinksFactory;
-import gr.ntua.vision.monitoring.sources.EventSources;
-import gr.ntua.vision.monitoring.sources.EventSourcesFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.net.SocketException;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,67 +35,16 @@ public class VismoServiceFactory {
      * @throws SocketException
      */
     public VismoService build(final VismoVMInfo vminfo) throws SocketException {
+        final ZMQSockets zmq = new ZMQSockets(new ZContext());
+
         logConfig(vminfo);
 
         if (hostIsCloudHead(vminfo))
-            return buildCloudHead(vminfo);
+            return new CloudHeadNodeFactory(conf, zmq).build(vminfo);
         else if (hostIsClusterHead(vminfo))
-            return buildClusterHead(vminfo);
+            return new ClusterHeadNodeFactory(conf, zmq).build(vminfo);
         else
-            return buildWorker(vminfo);
-    }
-
-
-    /**
-     * @param vminfo
-     * @return
-     */
-    private VismoService buildCloudHead(final VismoVMInfo vminfo) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    /**
-     * @param vminfo
-     * @return
-     */
-    private VismoClusterHeadNode buildClusterHead(final VMInfo vminfo) {
-        final ZMQSockets zmq = getZMQSockets();
-        final EventSourcesFactory sourcesFactory = newEventsSourceFactory(zmq);
-        final EventSinksFactory sinksFactory = newEventsSinksFactory(zmq);
-
-        final EventSources sources = sourcesFactory.createforClusterHead();
-        final EventSinks sinks = sinksFactory.createForClusterHead();
-
-        final VismoRulesEngine engine = new VismoRulesEngine(sinks);
-
-        sources.subscribeAll(engine);
-        registerDefaultRules(engine);
-        registerClusterRules(engine);
-
-        return new VismoClusterHeadNode(vminfo, sources, engine);
-    }
-
-
-    /**
-     * @param vminfo
-     * @return
-     */
-    private VismoWorkerNode buildWorker(final VMInfo vminfo) {
-        final ZMQSockets zmq = getZMQSockets();
-        final EventSourcesFactory sourcesFactory = newEventsSourceFactory(zmq);
-        final EventSinksFactory sinksFactory = newEventsSinksFactory(zmq);
-
-        final EventSources sources = sourcesFactory.createforWorker();
-        final EventSinks sinks = sinksFactory.createForWorker();
-
-        final VismoRulesEngine engine = new VismoRulesEngine(sinks);
-
-        sources.subscribeAll(engine);
-        registerDefaultRules(engine);
-
-        return new VismoWorkerNode(vminfo, sources, engine);
+            return new WorkerNodeFactory(conf, zmq).build(vminfo);
     }
 
 
@@ -139,55 +79,5 @@ public class VismoServiceFactory {
     private void logConfig(final VMInfo vminfo) throws SocketException {
         log.debug("is cluster head? {}", hostIsClusterHead(vminfo));
         log.debug("is cloud head? {}", hostIsCloudHead(vminfo));
-    }
-
-
-    /**
-     * @param zmq
-     * @return
-     */
-    private EventSinksFactory newEventsSinksFactory(final ZMQSockets zmq) {
-        return new EventSinksFactory(conf, zmq);
-    }
-
-
-    /**
-     * @param zmq
-     * @return
-     */
-    private EventSourcesFactory newEventsSourceFactory(final ZMQSockets zmq) {
-        return new EventSourcesFactory(conf, zmq);
-    }
-
-
-    /**
-     * @return
-     */
-    private static ZMQSockets getZMQSockets() {
-        return new ZMQSockets(new ZContext());
-    }
-
-
-    /**
-     * @param engine
-     */
-    private static void registerClusterRules(final VismoRulesEngine engine) {
-        // TODO: rename method
-
-        final long ONE_MINUTE = TimeUnit.MINUTES.toMillis(1);
-        final long THREE_SECONDS = TimeUnit.SECONDS.toMillis(3);
-
-        new CTORule(engine, "cto-3-sec", THREE_SECONDS).submitTo(engine);
-        new CTORule(engine, "cto-1-min", ONE_MINUTE).submitTo(engine);
-        new AccountingRule(engine, ONE_MINUTE).submitTo(engine);
-    }
-
-
-    /**
-     * @param engine
-     */
-    private static void registerDefaultRules(final VismoRulesEngine engine) {
-        new PassThroughRule(engine).submitTo(engine);
-        // TODO: add SLAPerRequest rule
     }
 }
