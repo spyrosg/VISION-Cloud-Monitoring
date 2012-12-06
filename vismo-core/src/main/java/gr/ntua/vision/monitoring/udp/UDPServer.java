@@ -40,7 +40,10 @@ public class UDPServer extends Thread {
 
 
     /**
+     * Add a listener.
+     * 
      * @param listener
+     *            the listener
      */
     public void add(final UDPListener listener) {
         listeners.add(listener);
@@ -62,41 +65,23 @@ public class UDPServer extends Thread {
                 log.debug("received: {}", msg);
 
                 if (KILL.equals(msg)) {
-                    doKill();
-                    send(KILL, pack);
+                    sendKill();
+                    sendBack(KILL, pack);
                     break;
                 }
                 if (STATUS.equals(msg)) {
                     final ArrayList<String> statuses = new ArrayList<String>();
 
-                    doStatus(statuses);
+                    sendStatus(statuses);
 
                     final String response = join(statuses, ", ");
-                    send(response, pack);
+                    sendBack(response, pack);
                 }
             } catch (final IOException e) {
                 log.error("while receiving", e);
             }
 
         log.debug("shutting down");
-    }
-
-
-    /**
-     * 
-     */
-    private void doKill() {
-        for (final UDPListener listener : listeners)
-            listener.halt();
-    }
-
-
-    /**
-     * @param statuses
-     */
-    private void doStatus(final ArrayList<String> statuses) {
-        for (final UDPListener listener : listeners)
-            listener.collectStatus(statuses);
     }
 
 
@@ -125,11 +110,29 @@ public class UDPServer extends Thread {
      *            the datagram packet received.
      * @throws IOException
      */
-    private void send(final String payload, final DatagramPacket pack) throws IOException {
+    private void sendBack(final String payload, final DatagramPacket pack) throws IOException {
         final byte[] buf = payload.getBytes();
         final DatagramPacket res = new DatagramPacket(buf, buf.length, pack.getAddress(), pack.getPort());
 
         sock.send(res);
+    }
+
+
+    /**
+     * 
+     */
+    private void sendKill() {
+        for (final UDPListener listener : listeners)
+            listener.halt();
+    }
+
+
+    /**
+     * @param statuses
+     */
+    private void sendStatus(final ArrayList<String> statuses) {
+        for (final UDPListener listener : listeners)
+            listener.collectStatus(statuses);
     }
 
 
