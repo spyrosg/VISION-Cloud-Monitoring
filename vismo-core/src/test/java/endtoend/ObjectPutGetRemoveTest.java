@@ -7,6 +7,7 @@ import static com.eclipsesource.restfuse.Assert.assertCreated;
 import gr.ntua.vision.monitoring.notify.EventRegistry;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 
 import org.junit.runner.RunWith;
@@ -50,6 +51,7 @@ public class ObjectPutGetRemoveTest {
     /**
      * checks the put of an object in the object service
      */
+    @Ignore
     @HttpTest(method = Method.PUT, path = OBJECT_PATH, content = "thodoris test object")
     public void checkPutObject() {
         log.debug("put object reply code: {}", response.getStatus() + ".");
@@ -60,6 +62,7 @@ public class ObjectPutGetRemoveTest {
     /**
      * checks the get of an object from the object service
      */
+    @Ignore
     @HttpTest(method = Method.GET, path = OBJECT_PATH, content = "thodoris test object")
     public void checkGetObject() {
         log.debug("get object reply code: {}", response.getStatus() + ".");
@@ -70,6 +73,7 @@ public class ObjectPutGetRemoveTest {
     /**
      * checks the deletion of an object in the object service
      */
+    @Ignore
     @HttpTest(method = Method.DELETE, path = OBJECT_PATH, content = "thodoris test object")
     public void checkDeleteObject() {
         log.debug("delete object reply code: {}", response.getStatus() + ".");
