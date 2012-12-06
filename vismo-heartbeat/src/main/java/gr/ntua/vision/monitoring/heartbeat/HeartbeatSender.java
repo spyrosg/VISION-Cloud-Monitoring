@@ -31,8 +31,8 @@ public final class HeartbeatSender {
 
     private static final Logger   log                        = LoggerFactory.getLogger(HeartbeatSender.class);
 
-    private static final int      DEFAULT_HEARTBEAT_INTERVAL = 2000;
-    private static final int      MINIMUM_HEARTBEAT_INTERVAL = 1000;
+    private static final int      DEFAULT_HEARTBEAT_INTERVAL = 1000;
+    private static final int      MINIMUM_HEARTBEAT_INTERVAL = 500;
 
     private static long           heartBeatInterval          = DEFAULT_HEARTBEAT_INTERVAL;
 
@@ -71,14 +71,14 @@ public final class HeartbeatSender {
     /**
      * Shutdown this heartbeat sender
      */
-    public final void dispose() {
+    public final void halt() {
         stopped = true;
-        senderThread.interrupt();
+        senderThread.interrupt();        
     }
 
 
     /**
-     * A thread which sends a multicast heartbeat every second
+     * A thread which sends a multicast heartbeat 
      */
     private final class MulticastSenderThread extends Thread {
         private MulticastSocket socket;
@@ -91,25 +91,14 @@ public final class HeartbeatSender {
                     socket.setTimeToLive(timeToLive.intValue());
                     socket.joinGroup(groupMulticastAddress);
 
-                    while (!stopped) {
                         byte[] buffer = createPayload();
                         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, groupMulticastAddress,
                                 groupMulticastPort.intValue());
                         socket.send(packet);
-
-                        try {
-                            wait(heartBeatInterval);
-
-                        } catch (InterruptedException e) {
-                            if (!stopped) {
-                                log.info("Error receiving heartbeat. Initial cause was " + e.getMessage(), e);
-                            }
-                        }
-                    }
                 } catch (IOException e) {
-                    log.info("Error on multicast socket", e);
+                    log.debug("Error on multicast socket", e);
                 } catch (Throwable e) {
-                    log.info("Unexpected throwable in run thread. Continuing..." + e.getMessage(), e);
+                    log.debug("Unexpected throwable in run thread. Continuing..." + e.getMessage(), e);
                 } finally {
                     closeSocket();
                 }
@@ -117,7 +106,7 @@ public final class HeartbeatSender {
                     try {
                         sleep(heartBeatInterval);
                     } catch (InterruptedException e) {
-                        log.info("Sleep after error interrupted. Initial cause was " + e.getMessage(), e);
+                        log.debug("Sleep after error interrupted. Initial cause was " + e.getMessage());
                     }
                 }
             }
@@ -174,6 +163,7 @@ public final class HeartbeatSender {
         /*
          * @see java.lang.Thread#interrupt()
          */
+        @Override
         public final void interrupt() {
             closeSocket();
             super.interrupt();
@@ -186,16 +176,16 @@ public final class HeartbeatSender {
                     try {
                         socket.leaveGroup(groupMulticastAddress);
                     } catch (IOException e) {
-                        log.info("Error leaving multicast group. Message was " + e.getMessage());
+                        log.debug("Error leaving multicast group. Message was " + e.getMessage());
                     }
                     socket.close();
                 }
             } catch (NoSuchMethodError e) {
-                log.info("socket.isClosed is not supported by JDK");
+                log.debug("socket.isClosed is not supported by JDK");
                 try {
                     socket.leaveGroup(groupMulticastAddress);
                 } catch (IOException ex) {
-                    log.info("Error leaving multicast group. Message was " + ex.getMessage());
+                    log.debug("Error leaving multicast group. Message was " + ex.getMessage());
                 }
                 socket.close();
             }
@@ -210,7 +200,7 @@ public final class HeartbeatSender {
      * @param heartBeatInterval
      *            a time in ms, greater than 1000
      */
-    public static void setHeartBeatInterval(long heartBeatInterval) {
+    public void setHeartBeatInterval(long heartBeatInterval) {
         if (heartBeatInterval < MINIMUM_HEARTBEAT_INTERVAL) {
             log.info("Trying to set heartbeat interval too low. Using MINIMUM_HEARTBEAT_INTERVAL instead.");
             HeartbeatSender.heartBeatInterval = MINIMUM_HEARTBEAT_INTERVAL;

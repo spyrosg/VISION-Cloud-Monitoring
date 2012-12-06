@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 public final class HeartbeatReceiver {
 
     private static final Logger              log                        = LoggerFactory.getLogger(HeartbeatReceiver.class);
-    private static final int                 MEMBERSHIP_TIMEOUT         = 1000;
+    private static final int                 MEMBERSHIP_TIMEOUT         = 2000;
     private static final int                 MEMBERSHIP_UPDATE_INTERVAL = 500;
     private HashMap<String, Long>            hostsTimestamp             = new HashMap<String, Long>();
     private HashMap<String, Boolean>         hostsMembership            = new HashMap<String, Boolean>();
@@ -46,7 +46,6 @@ public final class HeartbeatReceiver {
      */
     final void init() throws IOException {
         socket = new MulticastSocket(groupMulticastPort.intValue());
-        System.out.println(socket);
         socket.joinGroup(groupMulticastAddress);
         receiverThread = new MulticastReceiverThread();
         receiverThread.start();
@@ -59,12 +58,23 @@ public final class HeartbeatReceiver {
     /**
      * Shutdown the heartbeat service.
      */
-    public final void dispose() {
-        log.info("dispose called");
+    public final void halt() {
         stopped = true;
         receiverThread.interrupt();
         processorThread.interrupt();
+        
+        try {
+            socket.leaveGroup(groupMulticastAddress);
+        } catch (IOException e) {
+            log.debug("Error leaving group");
+        }
+        socket.close();
 
+    }
+    
+    public final HashMap<String, Boolean>  getMembers()
+    {
+        return hostsMembership;
     }
 
 
@@ -79,10 +89,9 @@ public final class HeartbeatReceiver {
                 try {
                     Thread.sleep(MEMBERSHIP_UPDATE_INTERVAL);
                 } catch (InterruptedException e) {
-                    log.info("Sleep interrupted. Initial cause was " + e.getMessage(), e);
+                    log.debug("Multicast Processor Thread sleep interrupted");
                 }
                 updateHostsMembership(MEMBERSHIP_TIMEOUT);
-                System.out.println(hostsMembership);
             }
         }
 
@@ -117,13 +126,8 @@ public final class HeartbeatReceiver {
         /*
          * 
          */
+        @Override
         public final void interrupt() {
-            try {
-                socket.leaveGroup(groupMulticastAddress);
-            } catch (IOException e) {
-                log.info("Error leaving group");
-            }
-            socket.close();
             super.interrupt();
         }
 
@@ -134,15 +138,6 @@ public final class HeartbeatReceiver {
      * A multicast receiver which continuously receives heartbeats.
      */
     private final class MulticastReceiverThread extends Thread {
-
-        /**
-         * Constructor
-         */
-        public MulticastReceiverThread() {
-            super("Multicast Heartbeat Receiver Thread");
-            setDaemon(true);
-        }
-
 
         public final void run() {
             byte[] buf = new byte[1000];
@@ -155,34 +150,28 @@ public final class HeartbeatReceiver {
 
                     } catch (IOException e) {
                         if (!stopped) {
-                            log.info("Error receiving heartbeat. " + e.getMessage() + ". Initial cause was " + e.getMessage(), e);
+                            log.debug("Error receiving heartbeat. " + e.getMessage() + ". Initial cause was " + e.getMessage(), e);
                         }
                     }
                 }
             } catch (Throwable t) {
-                log.info("Multicast receiver thread caught throwable. Cause was " + t.getMessage() + ". Continuing...");
+                log.debug("Multicast receiver thread caught throwable. Cause was " + t.getMessage() + ". Continuing...");
             }
         }
 
 
         /*
-         * updates the hosts timestamps
+         * updates the hosts timestamp
          */
         private void processPacket(DatagramPacket packet) {
             hostsTimestamp.put(packet.getAddress().toString().substring(1), Long.valueOf(System.currentTimeMillis()));
         }
 
-
         /*
          * 
          */
+        @Override
         public final void interrupt() {
-            try {
-                socket.leaveGroup(groupMulticastAddress);
-            } catch (IOException e) {
-                log.info("Error leaving group");
-            }
-            socket.close();
             super.interrupt();
         }
     }
