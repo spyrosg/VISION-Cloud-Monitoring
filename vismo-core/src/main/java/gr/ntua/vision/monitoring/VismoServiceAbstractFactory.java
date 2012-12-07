@@ -9,10 +9,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- *
- */
-/**
- *
+ * This is used to build up the vismo instance. Such an instance requires event sources, event sinks and a rules' engine.
  */
 abstract class VismoServiceAbstractFactory {
     /***/
@@ -20,12 +17,14 @@ abstract class VismoServiceAbstractFactory {
 
 
     /**
+     * Build and configure the {@link VismoService} instance.
+     * 
      * @param vminfo
-     * @return
+     * @return the {@link VismoService} object ready to run.
      */
     public VismoService build(final VMInfo vminfo) {
-        final EventSources sources = newEventSources();
-        final VismoRulesEngine engine = new VismoRulesEngine(newEventSinks());
+        final EventSources sources = getEventSources();
+        final VismoRulesEngine engine = new VismoRulesEngine(getEventSinks());
 
         sources.subscribeAll(engine);
         boostrap(engine);
@@ -35,7 +34,10 @@ abstract class VismoServiceAbstractFactory {
 
 
     /**
+     * This is used to configure the rules' engine, mainly to add rules before the actual execution starts.
+     * 
      * @param engine
+     *            the rules' engine.
      */
     protected abstract void boostrap(VismoRulesEngine engine);
 
@@ -45,7 +47,7 @@ abstract class VismoServiceAbstractFactory {
      * 
      * @return an {@link EventSinks} object, already configured.
      */
-    protected abstract EventSinks newEventSinks();
+    protected abstract EventSinks getEventSinks();
 
 
     /**
@@ -53,5 +55,5 @@ abstract class VismoServiceAbstractFactory {
      * 
      * @return an {@link EventSources} object, already configured.
      */
-    protected abstract EventSources newEventSources();
+    protected abstract EventSources getEventSources();
 }

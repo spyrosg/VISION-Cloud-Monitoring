@@ -7,10 +7,10 @@ import org.zeromq.ZContext;
 
 
 /**
- * 
+ * Configure and provide the system with the appropriate event sinks.
  */
 public class EventSinksFactory {
-    /***/
+    /** the configuration object. */
     private final VismoConfiguration conf;
     /***/
     private final ZMQSockets         zmq;
@@ -20,6 +20,7 @@ public class EventSinksFactory {
      * Constructor.
      * 
      * @param conf
+     *            the configuration object.
      */
     public EventSinksFactory(final VismoConfiguration conf) {
         this(conf, new ZMQSockets(new ZContext()));
@@ -30,6 +31,7 @@ public class EventSinksFactory {
      * Constructor.
      * 
      * @param conf
+     *            the configuration object.
      * @param zmq
      */
     public EventSinksFactory(final VismoConfiguration conf, final ZMQSockets zmq) {
@@ -43,7 +45,7 @@ public class EventSinksFactory {
      * 
      * @return an {@link EventSinks} object.
      */
-    public EventSinks createForClusterHead() {
+    public EventSinks buildForClusterHead() {
         final EventSink sink = new UniqueEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
         final EventSink cloudSink = new UniqueEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getCloudHeads().get(0) + ":"
                 + conf.getCloudHeadPort()));
@@ -57,7 +59,7 @@ public class EventSinksFactory {
      * 
      * @return an {@link EventSinks} object.
      */
-    public EventSinks createForWorker() {
+    public EventSinks buildForWorker() {
         return new EventSinks(new UniqueEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getClusterHead() + ":"
                 + conf.getClusterHeadPort())));
     }

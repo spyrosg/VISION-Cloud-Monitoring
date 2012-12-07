@@ -21,7 +21,7 @@ public class VismoVMInfo implements VMInfo {
 
         try {
             iface = getInterface();
-        } catch (SocketException e) {
+        } catch (final SocketException e) {
             throw new RuntimeException(e);
         }
 

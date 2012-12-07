@@ -7,10 +7,10 @@ import org.zeromq.ZContext;
 
 
 /**
- * 
+ * Configure and provide the system with the appropriate event sources.
  */
 public class EventSourcesFactory {
-    /***/
+    /** the configuration object. */
     private final VismoConfiguration conf;
     /***/
     private final ZMQSockets         zmq;
@@ -20,6 +20,7 @@ public class EventSourcesFactory {
      * Constructor.
      * 
      * @param conf
+     *            the configuration object.
      */
     public EventSourcesFactory(final VismoConfiguration conf) {
         this(conf, new ZMQSockets(new ZContext()));
@@ -30,6 +31,7 @@ public class EventSourcesFactory {
      * Constructor.
      * 
      * @param conf
+     *            the configuration object.
      * @param zmq
      */
     public EventSourcesFactory(final VismoConfiguration conf, final ZMQSockets zmq) {
@@ -77,7 +79,7 @@ public class EventSourcesFactory {
 
     /**
      * @param port
-     * @return
+     * @return an address bound to all interfaces and the given port.
      */
     private static String withPort(final int port) {
         return "tcp://*:" + port;

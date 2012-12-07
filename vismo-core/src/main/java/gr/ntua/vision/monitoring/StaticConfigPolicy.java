@@ -2,8 +2,6 @@ package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
-import java.net.SocketException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeromq.ZContext;
@@ -37,19 +35,14 @@ public class StaticConfigPolicy implements NodePolicy {
     public VismoService build(final VMInfo vminfo) {
         final ZMQSockets zmq = new ZMQSockets(new ZContext());
 
-        try {
-            logConfig(vminfo);
+        logConfig(vminfo);
 
-            if (hostIsCloudHead(vminfo))
-                return new CloudHeadNodeFactory(conf, zmq).build(vminfo);
-            else if (hostIsClusterHead(vminfo))
-                return new ClusterHeadNodeFactory(conf, zmq).build(vminfo);
-            else
-                return new WorkerNodeFactory(conf, zmq).build(vminfo);
-        } catch (final SocketException e) {
-            log.error("socket exception", e);
-            throw new RuntimeException(e);
-        }
+        if (hostIsCloudHead(vminfo))
+            return new CloudHeadNodeFactory(conf, zmq).build(vminfo);
+        else if (hostIsClusterHead(vminfo))
+            return new ClusterHeadNodeFactory(conf, zmq).build(vminfo);
+        else
+            return new WorkerNodeFactory(conf, zmq).build(vminfo);
     }
 
 
@@ -58,9 +51,8 @@ public class StaticConfigPolicy implements NodePolicy {
      * 
      * @param vminfo
      * @return <code>true</code> when localhost is a cloud head, <code>false</code> otherwise.
-     * @throws SocketException
      */
-    private boolean hostIsCloudHead(final VMInfo vminfo) throws SocketException {
+    private boolean hostIsCloudHead(final VMInfo vminfo) {
         return conf.isIPCloudHead(vminfo.getAddress().getHostAddress());
     }
 
@@ -70,18 +62,16 @@ public class StaticConfigPolicy implements NodePolicy {
      * 
      * @param vminfo
      * @return <code>true</code> when localhost is a cluster head, <code>false</code> otherwise.
-     * @throws SocketException
      */
-    private boolean hostIsClusterHead(final VMInfo vminfo) throws SocketException {
+    private boolean hostIsClusterHead(final VMInfo vminfo) {
         return conf.isIPClusterHead(vminfo.getAddress().getHostAddress());
     }
 
 
     /**
      * @param vminfo
-     * @throws SocketException
      */
-    private void logConfig(final VMInfo vminfo) throws SocketException {
+    private void logConfig(final VMInfo vminfo) {
         log.debug("is cluster head? {}", hostIsClusterHead(vminfo));
         log.debug("is cloud head? {}", hostIsCloudHead(vminfo));
     }

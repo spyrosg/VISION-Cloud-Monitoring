@@ -15,9 +15,9 @@ import org.slf4j.LoggerFactory;
  * This is used to build the vismo worker instance.
  */
 public class WorkerNodeFactory extends DefaultRulesFactory {
-    /***/
+    /** the log target. */
     private static final Logger      log = LoggerFactory.getLogger(WorkerNodeFactory.class);
-    /***/
+    /** the configuration object. */
     private final VismoConfiguration conf;
     /***/
     private final ZMQSockets         zmq;
@@ -43,19 +43,19 @@ public class WorkerNodeFactory extends DefaultRulesFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.VismoServiceAbstractFactory#newEventSinks()
+     * @see gr.ntua.vision.monitoring.VismoServiceAbstractFactory#getEventSinks()
      */
     @Override
-    protected EventSinks newEventSinks() {
-        return new EventSinksFactory(conf, zmq).createForWorker();
+    protected EventSinks getEventSinks() {
+        return new EventSinksFactory(conf, zmq).buildForWorker();
     }
 
 
     /**
-     * @see gr.ntua.vision.monitoring.VismoServiceAbstractFactory#newEventSources()
+     * @see gr.ntua.vision.monitoring.VismoServiceAbstractFactory#getEventSources()
      */
     @Override
-    protected EventSources newEventSources() {
+    protected EventSources getEventSources() {
         return new EventSourcesFactory(conf, zmq).createforWorker();
     }
 }

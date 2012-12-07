@@ -7,10 +7,10 @@ import java.util.List;
 
 
 /**
- * 
+ * This provides a grouping for all event sinks used by system.
  */
 public class EventSinks {
-    /***/
+    /** the set of sinks. */
     private final List<EventSink> sinks;
 
 
@@ -35,7 +35,10 @@ public class EventSinks {
 
 
     /**
+     * Push the event to all sinks.
+     * 
      * @param e
+     *            the event.
      */
     public void push(final Event e) {
         for (final EventSink sink : sinks)

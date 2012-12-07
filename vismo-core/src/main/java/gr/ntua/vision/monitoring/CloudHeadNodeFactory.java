@@ -41,20 +41,20 @@ public class CloudHeadNodeFactory extends DefaultRulesFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.VismoServiceAbstractFactory#newEventSinks()
+     * @see gr.ntua.vision.monitoring.VismoServiceAbstractFactory#getEventSinks()
      */
     @Override
-    protected EventSinks newEventSinks() {
+    protected EventSinks getEventSinks() {
         // TODO Auto-generated method stub
         return null;
     }
 
 
     /**
-     * @see gr.ntua.vision.monitoring.VismoServiceAbstractFactory#newEventSources()
+     * @see gr.ntua.vision.monitoring.VismoServiceAbstractFactory#getEventSources()
      */
     @Override
-    protected EventSources newEventSources() {
+    protected EventSources getEventSources() {
         // TODO Auto-generated method stub
         return null;
     }

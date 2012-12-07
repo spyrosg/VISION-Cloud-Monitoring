@@ -7,12 +7,12 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Providing for a grouping for all event sources.
+ * This provides a grouping for all event sources in the system.
  */
 public class EventSources {
-    /***/
+    /** the log target. */
     private static final Logger               log     = LoggerFactory.getLogger(EventSources.class);
-    /** the actual sources set. */
+    /** the sources set. */
     private final ArrayList<VismoEventSource> sources = new ArrayList<VismoEventSource>();
 
 

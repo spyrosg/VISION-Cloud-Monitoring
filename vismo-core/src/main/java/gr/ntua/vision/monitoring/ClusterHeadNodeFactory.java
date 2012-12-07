@@ -43,19 +43,19 @@ public class ClusterHeadNodeFactory extends DefaultRulesFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.VismoServiceAbstractFactory#newEventSinks()
+     * @see gr.ntua.vision.monitoring.VismoServiceAbstractFactory#getEventSinks()
      */
     @Override
-    protected EventSinks newEventSinks() {
-        return new EventSinksFactory(conf, zmq).createForClusterHead();
+    protected EventSinks getEventSinks() {
+        return new EventSinksFactory(conf, zmq).buildForClusterHead();
     }
 
 
     /**
-     * @see gr.ntua.vision.monitoring.VismoServiceAbstractFactory#newEventSources()
+     * @see gr.ntua.vision.monitoring.VismoServiceAbstractFactory#getEventSources()
      */
     @Override
-    protected EventSources newEventSources() {
+    protected EventSources getEventSources() {
         return new EventSourcesFactory(conf, zmq).createforClusterHead();
     }
 
