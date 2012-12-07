@@ -78,6 +78,7 @@ public final class HeartbeatSender {
                     final byte[] buffer = createPayload();
                     final DatagramPacket packet = new DatagramPacket(buffer, buffer.length, groupMulticastAddress,
                             groupMulticastPort.intValue());
+                    log.info("Sending packet from: "+new String(packet.getData())+" to: " + packet.getSocketAddress().toString().substring(1));
                     socket.send(packet);
                 } catch (final IOException e) {
                     HeartbeatSender.log.debug("Error on multicast socket", e);
@@ -103,7 +104,7 @@ public final class HeartbeatSender {
             if (ipString.isEmpty())
                 ipString = inetAddress.toString().substring(1);
             else
-                ipString = ipString + ":" + inetAddress.toString().substring(1);
+                ipString = ipString + " & " + inetAddress.toString().substring(1);
             return ipString;
         }
 
