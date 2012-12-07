@@ -29,101 +29,11 @@ import org.slf4j.LoggerFactory;
  */
 public final class HeartbeatSender {
 
-    private static final Logger   log                        = LoggerFactory.getLogger(HeartbeatSender.class);
-
-    private static final int      DEFAULT_HEARTBEAT_INTERVAL = 1000;
-    private static final int      MINIMUM_HEARTBEAT_INTERVAL = 500;
-
-    private static long           heartBeatInterval          = DEFAULT_HEARTBEAT_INTERVAL;
-
-    private final InetAddress     groupMulticastAddress;
-    private final Integer         groupMulticastPort;
-    private final Integer         timeToLive;
-    private MulticastSenderThread senderThread;
-    private boolean               stopped;
-
-
     /**
-     * Constructor.
-     * 
-     * @param multicastAddress
-     * @param multicastPort
-     * @param timeToLive
-     *            See class description for the meaning of this parameter.
-     */
-    public HeartbeatSender(InetAddress multicastAddress, Integer multicastPort, Integer timeToLive) {
-        System.setProperty("Djava.net.preferIPv4Stack", "true");
-        this.groupMulticastAddress = multicastAddress;
-        this.groupMulticastPort = multicastPort;
-        this.timeToLive = timeToLive;
-    }
-
-
-    /**
-     * Start the heartbeat thread
-     */
-    public final void init() {
-        senderThread = new MulticastSenderThread();
-        senderThread.start();
-    }
-
-
-    /**
-     * Shutdown this heartbeat sender
-     */
-    public final void halt() {
-        stopped = true;
-        senderThread.interrupt();        
-    }
-
-
-    /**
-     * A thread which sends a multicast heartbeat 
+     * A thread which sends a multicast heartbeat
      */
     private final class MulticastSenderThread extends Thread {
         private MulticastSocket socket;
-
-
-        public final void run() {
-            while (!stopped) {
-                try {
-                    socket = new MulticastSocket(groupMulticastPort.intValue());
-                    socket.setTimeToLive(timeToLive.intValue());
-                    socket.joinGroup(groupMulticastAddress);
-
-                        byte[] buffer = createPayload();
-                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, groupMulticastAddress,
-                                groupMulticastPort.intValue());
-                        socket.send(packet);
-                } catch (IOException e) {
-                    log.debug("Error on multicast socket", e);
-                } catch (Throwable e) {
-                    log.debug("Unexpected throwable in run thread. Continuing..." + e.getMessage(), e);
-                } finally {
-                    closeSocket();
-                }
-                if (!stopped) {
-                    try {
-                        sleep(heartBeatInterval);
-                    } catch (InterruptedException e) {
-                        log.debug("Sleep after error interrupted. Initial cause was " + e.getMessage());
-                    }
-                }
-            }
-        }
-
-
-        /**
-         * create the multicast packet payload.
-         * 
-         * @throws SocketException
-         * @throws UnknownHostException
-         */
-        private byte[] createPayload() throws UnknownHostException, SocketException {
-            String interfaceIp = getHostIP();
-            byte[] msg = interfaceIp.getBytes();
-            return msg;
-        }
 
 
         /**
@@ -135,28 +45,15 @@ public final class HeartbeatSender {
          */
         public String getHostIP() throws UnknownHostException, SocketException {
             String hostAddress = "";
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-                NetworkInterface intf = en.nextElement();
-                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-                    InetAddress inetAddress = enumIpAddr.nextElement();
-                    if (!inetAddress.isLoopbackAddress()) {
+            for (final Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                final NetworkInterface intf = en.nextElement();
+                for (final Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                    final InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (!inetAddress.isLoopbackAddress())
                         hostAddress = buildIPAllInterfacesString(hostAddress, inetAddress);
-                    }
                 }
             }
             return hostAddress;
-        }
-
-
-        /*
-         * 
-         */
-        private String buildIPAllInterfacesString(String ipString, InetAddress inetAddress) {
-            if (ipString.isEmpty())
-                ipString = inetAddress.toString().substring(1);
-            else
-                ipString = ipString + ":" + inetAddress.toString().substring(1);
-            return ipString;
         }
 
 
@@ -170,27 +67,142 @@ public final class HeartbeatSender {
         }
 
 
+        @Override
+        public final void run() {
+            while (!stopped) {
+                try {
+                    socket = new MulticastSocket(groupMulticastPort.intValue());
+                    socket.setTimeToLive(timeToLive.intValue());
+                    socket.joinGroup(groupMulticastAddress);
+
+                    final byte[] buffer = createPayload();
+                    final DatagramPacket packet = new DatagramPacket(buffer, buffer.length, groupMulticastAddress,
+                            groupMulticastPort.intValue());
+                    socket.send(packet);
+                } catch (final IOException e) {
+                    HeartbeatSender.log.debug("Error on multicast socket", e);
+                } catch (final Throwable e) {
+                    HeartbeatSender.log.debug("Unexpected throwable in run thread. Continuing..." + e.getMessage(), e);
+                } finally {
+                    closeSocket();
+                }
+                if (!stopped)
+                    try {
+                        Thread.sleep(HeartbeatSender.heartBeatInterval);
+                    } catch (final InterruptedException e) {
+                        HeartbeatSender.log.debug("Sleep after error interrupted. Initial cause was " + e.getMessage());
+                    }
+            }
+        }
+
+
+        /*
+         * 
+         */
+        private String buildIPAllInterfacesString(String ipString, final InetAddress inetAddress) {
+            if (ipString.isEmpty())
+                ipString = inetAddress.toString().substring(1);
+            else
+                ipString = ipString + ":" + inetAddress.toString().substring(1);
+            return ipString;
+        }
+
+
         private void closeSocket() {
             try {
                 if (socket != null && !socket.isClosed()) {
                     try {
                         socket.leaveGroup(groupMulticastAddress);
-                    } catch (IOException e) {
-                        log.debug("Error leaving multicast group. Message was " + e.getMessage());
+                    } catch (final IOException e) {
+                        HeartbeatSender.log.debug("Error leaving multicast group. Message was " + e.getMessage());
                     }
                     socket.close();
                 }
-            } catch (NoSuchMethodError e) {
-                log.debug("socket.isClosed is not supported by JDK");
+            } catch (final NoSuchMethodError e) {
+                HeartbeatSender.log.debug("socket.isClosed is not supported by JDK");
                 try {
                     socket.leaveGroup(groupMulticastAddress);
-                } catch (IOException ex) {
-                    log.debug("Error leaving multicast group. Message was " + ex.getMessage());
+                } catch (final IOException ex) {
+                    HeartbeatSender.log.debug("Error leaving multicast group. Message was " + ex.getMessage());
                 }
                 socket.close();
             }
         }
 
+
+        /**
+         * create the multicast packet payload.
+         * 
+         * @throws SocketException
+         * @throws UnknownHostException
+         */
+        private byte[] createPayload() throws UnknownHostException, SocketException {
+            final String interfaceIp = getHostIP();
+            final byte[] msg = interfaceIp.getBytes();
+            return msg;
+        }
+
+    }
+
+    private static final int      DEFAULT_HEARTBEAT_INTERVAL = 1000;
+    private static long           heartBeatInterval          = HeartbeatSender.DEFAULT_HEARTBEAT_INTERVAL;
+    private static final Logger   log                        = LoggerFactory.getLogger(HeartbeatSender.class);
+    private static final int      MINIMUM_HEARTBEAT_INTERVAL = 500;
+    private final InetAddress     groupMulticastAddress;
+    private final Integer         groupMulticastPort;
+    private MulticastSenderThread senderThread;
+    private boolean               stopped;
+
+    private final Integer         timeToLive;
+
+
+    /**
+     * Constructor.
+     * 
+     * @param multicastAddress
+     * @param multicastPort
+     * @param timeToLive
+     *            See class description for the meaning of this parameter.
+     */
+    public HeartbeatSender(final InetAddress multicastAddress, final Integer multicastPort, final Integer timeToLive) {
+        System.setProperty("Djava.net.preferIPv4Stack", "true");
+        this.groupMulticastAddress = multicastAddress;
+        this.groupMulticastPort = multicastPort;
+        this.timeToLive = timeToLive;
+    }
+
+
+    /**
+     * Returns the heartbeat interval.
+     */
+    public static long getHeartBeatInterval() {
+        return HeartbeatSender.heartBeatInterval;
+    }
+
+
+    /**
+     * @return the TTL
+     */
+    public Integer getTimeToLive() {
+        return timeToLive;
+    }
+
+
+    /**
+     * Shutdown this heartbeat sender
+     */
+    public final void halt() {
+        stopped = true;
+        senderThread.interrupt();
+    }
+
+
+    /**
+     * Start the heartbeat thread
+     */
+    public final void init() {
+        senderThread = new MulticastSenderThread();
+        senderThread.start();
     }
 
 
@@ -200,28 +212,11 @@ public final class HeartbeatSender {
      * @param heartBeatInterval
      *            a time in ms, greater than 1000
      */
-    public void setHeartBeatInterval(long heartBeatInterval) {
-        if (heartBeatInterval < MINIMUM_HEARTBEAT_INTERVAL) {
-            log.info("Trying to set heartbeat interval too low. Using MINIMUM_HEARTBEAT_INTERVAL instead.");
-            HeartbeatSender.heartBeatInterval = MINIMUM_HEARTBEAT_INTERVAL;
-        } else {
+    public void setHeartBeatInterval(final long heartBeatInterval) {
+        if (heartBeatInterval < HeartbeatSender.MINIMUM_HEARTBEAT_INTERVAL) {
+            HeartbeatSender.log.info("Trying to set heartbeat interval too low. Using MINIMUM_HEARTBEAT_INTERVAL instead.");
+            HeartbeatSender.heartBeatInterval = HeartbeatSender.MINIMUM_HEARTBEAT_INTERVAL;
+        } else
             HeartbeatSender.heartBeatInterval = heartBeatInterval;
-        }
-    }
-
-
-    /**
-     * Returns the heartbeat interval.
-     */
-    public static long getHeartBeatInterval() {
-        return heartBeatInterval;
-    }
-
-
-    /**
-     * @return the TTL
-     */
-    public Integer getTimeToLive() {
-        return timeToLive;
     }
 }
