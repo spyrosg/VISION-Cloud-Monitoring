@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision.monitoring.threading;
 
 /**
  * A stoppable task is a thread that can be explicitly stopped. It falls in the implementer's hands how the task halt properly. It

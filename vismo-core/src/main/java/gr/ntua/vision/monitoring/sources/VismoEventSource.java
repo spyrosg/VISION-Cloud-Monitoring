@@ -1,9 +1,9 @@
 package gr.ntua.vision.monitoring.sources;
 
-import gr.ntua.vision.monitoring.StoppableTask;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
+import gr.ntua.vision.monitoring.threading.StoppableTask;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
 
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class VismoEventSource extends StoppableTask implements EventSource {
      * Since zmq sockets are not interruptible, we use another socket to send the stop message to <code>this</code>. This is
      * guaranteed to stop the thread.
      * 
-     * @see gr.ntua.vision.monitoring.StoppableTask#halt()
+     * @see gr.ntua.vision.monitoring.threading.StoppableTask#halt()
      */
     @Override
     public void halt() {
