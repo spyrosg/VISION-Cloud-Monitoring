@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring.scheduling;
+package gr.ntua.vision.monitoring.threading;
 
 import java.util.Timer;
 import java.util.TimerTask;

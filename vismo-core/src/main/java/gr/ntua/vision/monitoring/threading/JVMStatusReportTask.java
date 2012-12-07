@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring.scheduling;
+package gr.ntua.vision.monitoring.threading;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
@@ -63,7 +63,7 @@ public class JVMStatusReportTask extends VismoPeriodicTask {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.scheduling.VismoPeriodicTask#scheduleWith(java.util.Timer)
+     * @see gr.ntua.vision.monitoring.threading.VismoPeriodicTask#scheduleWith(java.util.Timer)
      */
     @Override
     public void scheduleWith(final Timer timer) {
