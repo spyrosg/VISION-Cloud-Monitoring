@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
 
 public class HeartbeatTest {
 
-    private static final String MULTICAST_IP   = "224.0.0.2";
-    private static final int    MULTICAST_PORT = 6000;
+    private static final String MULTICAST_IP   = "224.0.0.1";
+    private static final int    MULTICAST_PORT = 6307;
     private static final int    TTL            = 3;
     
     private static final Logger   log                        = LoggerFactory.getLogger(HeartbeatSender.class);
