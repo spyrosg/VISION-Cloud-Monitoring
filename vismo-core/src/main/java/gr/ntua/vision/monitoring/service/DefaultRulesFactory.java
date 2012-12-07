@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision.monitoring.service;
 
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;

@@ -1,11 +1,11 @@
 package gr.ntua.vision.monitoring.policy;
 
-import gr.ntua.vision.monitoring.CloudHeadNodeFactory;
-import gr.ntua.vision.monitoring.ClusterHeadNodeFactory;
 import gr.ntua.vision.monitoring.VMInfo;
 import gr.ntua.vision.monitoring.VismoConfiguration;
-import gr.ntua.vision.monitoring.VismoService;
-import gr.ntua.vision.monitoring.WorkerNodeFactory;
+import gr.ntua.vision.monitoring.service.CloudHeadNodeFactory;
+import gr.ntua.vision.monitoring.service.ClusterHeadNodeFactory;
+import gr.ntua.vision.monitoring.service.VismoService;
+import gr.ntua.vision.monitoring.service.WorkerNodeFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import org.slf4j.Logger;

@@ -1,5 +1,6 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision.monitoring.service;
 
+import gr.ntua.vision.monitoring.VMInfo;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSinks;
 import gr.ntua.vision.monitoring.sources.EventSources;

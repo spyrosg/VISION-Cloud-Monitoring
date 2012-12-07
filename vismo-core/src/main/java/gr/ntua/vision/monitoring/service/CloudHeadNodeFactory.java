@@ -1,5 +1,6 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision.monitoring.service;
 
+import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.rules.AccountingRule;
 import gr.ntua.vision.monitoring.rules.CTORule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
@@ -31,7 +32,7 @@ public class CloudHeadNodeFactory extends DefaultRulesFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.VismoServiceAbstractFactory#boostrap(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
+     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#boostrap(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
      */
     @Override
     protected void boostrap(final VismoRulesEngine engine) {
@@ -41,7 +42,7 @@ public class CloudHeadNodeFactory extends DefaultRulesFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.VismoServiceAbstractFactory#getEventSinks()
+     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#getEventSinks()
      */
     @Override
     protected EventSinks getEventSinks() {
@@ -51,7 +52,7 @@ public class CloudHeadNodeFactory extends DefaultRulesFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.VismoServiceAbstractFactory#getEventSources()
+     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#getEventSources()
      */
     @Override
     protected EventSources getEventSources() {
