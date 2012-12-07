@@ -5,7 +5,6 @@ import static com.eclipsesource.restfuse.Assert.assertCreated;
 import gr.ntua.vision.monitoring.notify.EventRegistry;
 
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Before;
 
@@ -52,7 +51,6 @@ public class ContainerPutRemoveTest {
     /**
      * checks the creation of the test container
      */
-    @Ignore
     @HttpTest(method = Method.PUT, path = CONTAINER_PATH, authentications = { @Authentication(user = "vasillis@ntua", password = "123", type = AuthenticationType.BASIC) })
     public void createContainerForTest() {
         log.debug("put container reply code: {}", response.getBody(String.class) + ".");
@@ -63,7 +61,6 @@ public class ContainerPutRemoveTest {
     /**
      * checks the deletion of the test container
      */
-    @Ignore
     @HttpTest(method = Method.DELETE, path = CONTAINER_PATH, authentications = { @Authentication(user = "vasillis@ntua", password = "123", type = AuthenticationType.BASIC) })
     public void deleteContainerForTest() {
         log.debug("delete container reply code: {}", response.getBody(String.class) + ".");
