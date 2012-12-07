@@ -73,10 +73,8 @@ public class FakeEventConsumer {
      */
     public static void main(final String... args) {
         final EventRegistry registry = new EventRegistry("tcp://10.0.1.103:56430");
-        
-        
 
-        //registry.registerToAll(new SAPLogger());
+        // registry.registerToAll(new SAPLogger());
         registry.registerToAll(new LoggingHandler());
     }
 }

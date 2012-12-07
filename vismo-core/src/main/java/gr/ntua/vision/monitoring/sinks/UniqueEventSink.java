@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  * This is used to transmit events to a socket, if the event has not been encountered before.
  */
 public class UniqueEventSink extends AbstractSink {
-    /***/
+    /** the log target. */
     private static final Logger   log      = LoggerFactory.getLogger(UniqueEventSink.class);
     // TODO: eventually remove eventIds or else vismo will blow with {@link OutOfMemoryError}.
     /***/

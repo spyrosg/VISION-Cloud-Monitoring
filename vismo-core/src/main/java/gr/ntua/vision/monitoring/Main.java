@@ -1,9 +1,13 @@
 package gr.ntua.vision.monitoring;
 
+import gr.ntua.vision.monitoring.policy.StaticConfigPolicy;
+import gr.ntua.vision.monitoring.service.VismoService;
 import gr.ntua.vision.monitoring.udp.UDPClient;
 import gr.ntua.vision.monitoring.udp.UDPFactory;
+import gr.ntua.vision.monitoring.udp.UDPServer;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 
@@ -12,43 +16,40 @@ import java.net.SocketTimeoutException;
  */
 public class Main {
     /** the program name. */
-    private static final String PROG = "vismo";
+    private static final String      PROG = "vismo";
+    /***/
+    private final VismoConfiguration conf;
 
 
     /**
-     * @param args
-     * @throws IOException
+     * Constructor.
+     * 
+     * @param conf
      */
-    public static void main(final String... args) throws IOException {
-        if (args.length != 2) {
-            showHelp();
-            System.exit(1);
-        }
-
-        final VismoConfiguration config = new VismoConfiguration(args[0]);
-        final String command = args[1];
-        final VMInfo vminfo = new VismoVMInfo();
-
-        if (command.equals("start")) {
-            final VismoService service = new VismoFactory(config).build(vminfo);
-
-            service.start();
-        } else {
-            final UDPClient client = new UDPFactory(config.getUDPPort()).buildClient();
-
-            if (command.equals("status"))
-                reportVismoStatus(client);
-            else
-                shutdownVismo(client);
-        }
+    private Main(final VismoConfiguration conf) {
+        this.conf = conf;
     }
 
 
     /**
-     * @param client
+     * @throws SocketException
+     */
+    public void start() throws SocketException {
+        final VismoService service = new StaticConfigPolicy(conf).build(new VismoVMInfo());
+        final UDPServer udpServer = new UDPFactory(conf.getUDPPort()).buildServer();
+
+        udpServer.add(service);
+        udpServer.start();
+        service.start();
+    }
+
+
+    /**
      * @throws IOException
      */
-    private static void reportVismoStatus(final UDPClient client) throws IOException {
+    public void status() throws IOException {
+        final UDPClient client = new UDPFactory(conf.getUDPPort()).buildClient();
+
         String resp = null;
 
         for (int i = 0; i < 3; ++i)
@@ -67,7 +68,46 @@ public class Main {
 
 
     /**
-     * 
+     * @throws IOException
+     */
+    public void stop() throws IOException {
+        final UDPClient client = new UDPFactory(conf.getUDPPort()).buildClient();
+
+        try {
+            client.shutdownVismo();
+            System.err.println(PROG + ": stopping.");
+        } catch (final SocketTimeoutException e) {
+            System.err.println(PROG + " is stopped.");
+        }
+    }
+
+
+    /**
+     * @param args
+     * @throws IOException
+     */
+    public static void main(final String... args) throws IOException {
+        if (args.length != 2) {
+            showHelp();
+            System.exit(1);
+        }
+
+        final Main main = new Main(new VismoConfiguration(args[0]));
+        final String command = args[1];
+
+        if ("start".equals(command))
+            main.start();
+        else if ("status".equals(command))
+            main.status();
+        else if ("stop".equals(command))
+            main.stop();
+        else
+            showHelp();
+    }
+
+
+    /**
+     * Print the help message.
      */
     private static void showHelp() {
         System.err.println("Usage: java -jar " + PROG + ".jar config-file command");
@@ -75,19 +115,6 @@ public class Main {
         System.err.println("  start   start a vismo instance.");
         System.err.println("  status  report the status of vismo.");
         System.err.println("  stop    stop any running vismo instance.");
-    }
-
-
-    /**
-     * @param client
-     * @throws IOException
-     */
-    private static void shutdownVismo(final UDPClient client) throws IOException {
-        try {
-            System.err.println(PROG + ": stopping.");
-            client.shutdownVismo();
-        } catch (final SocketTimeoutException e) {
-            System.err.println(PROG + " is stopped.");
-        }
+        System.err.println("  help    show this help message and exit.");
     }
 }

@@ -1,26 +1,28 @@
 package gr.ntua.vision.monitoring.udp;
 
-import gr.ntua.vision.monitoring.StoppableTask;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
+import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 /**
- *
+ * This is used to receive commands from a client. The commands are passed to any listeners.
  */
-public class UDPServer extends StoppableTask {
+public class UDPServer extends Thread {
+    /***/
+    private static final String          KILL      = "stop!";
     /** the log target. */
-    private static final Logger  log = LoggerFactory.getLogger(UDPServer.class);
-    /** the listener to notify. */
-    private final UDPListener    listener;
+    private static final Logger          log       = LoggerFactory.getLogger(UDPServer.class);
+    /***/
+    private static final String          STATUS    = "status?";
+    /***/
+    private final ArrayList<UDPListener> listeners = new ArrayList<UDPListener>();
     /** the socket to use. */
-    private final DatagramSocket sock;
+    private final DatagramSocket         sock;
 
 
     /**
@@ -28,14 +30,23 @@ public class UDPServer extends StoppableTask {
      * 
      * @param sock
      *            the socket to use.
-     * @param listener
-     *            the listener to notify.
      */
-    UDPServer(final DatagramSocket sock, final UDPListener listener) {
+    UDPServer(final DatagramSocket sock) {
         super("udp-server");
         this.sock = sock;
-        this.listener = listener;
+        setDaemon(true);
         log.info("listening on port={}", sock.getLocalPort());
+    }
+
+
+    /**
+     * Add a listener.
+     * 
+     * @param listener
+     *            the listener
+     */
+    public void add(final UDPListener listener) {
+        listeners.add(listener);
     }
 
 
@@ -52,21 +63,25 @@ public class UDPServer extends StoppableTask {
                 final String msg = new String(pack.getData(), 0, pack.getLength());
 
                 log.debug("received: {}", msg);
-                send(listener.notify(msg), pack.getAddress(), pack.getPort());
+
+                if (KILL.equals(msg)) {
+                    sendKill();
+                    sendBack(KILL, pack);
+                    break;
+                }
+                if (STATUS.equals(msg)) {
+                    final ArrayList<String> statuses = new ArrayList<String>();
+
+                    sendStatus(statuses);
+
+                    final String response = join(statuses, ", ");
+                    sendBack(response, pack);
+                }
             } catch (final IOException e) {
                 log.error("while receiving", e);
             }
 
         log.debug("shutting down");
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.StoppableTask#shutDown()
-     */
-    @Override
-    public void shutDown() {
-        interrupt();
     }
 
 
@@ -91,16 +106,54 @@ public class UDPServer extends StoppableTask {
      * 
      * @param payload
      *            the payload to send.
-     * @param addr
-     *            the address to sent to.
-     * @param port
-     *            the port to sent to.
+     * @param pack
+     *            the datagram packet received.
      * @throws IOException
      */
-    private void send(final String payload, final InetAddress addr, final int port) throws IOException {
+    private void sendBack(final String payload, final DatagramPacket pack) throws IOException {
         final byte[] buf = payload.getBytes();
-        final DatagramPacket res = new DatagramPacket(buf, buf.length, addr, port);
+        final DatagramPacket res = new DatagramPacket(buf, buf.length, pack.getAddress(), pack.getPort());
 
         sock.send(res);
+    }
+
+
+    /**
+     * 
+     */
+    private void sendKill() {
+        for (final UDPListener listener : listeners)
+            listener.halt();
+    }
+
+
+    /**
+     * @param statuses
+     */
+    private void sendStatus(final ArrayList<String> statuses) {
+        for (final UDPListener listener : listeners)
+            listener.collectStatus(statuses);
+    }
+
+
+    /**
+     * @param list
+     * @param sep
+     * @return the string concatenation of the strings, separated by the separator.
+     */
+    private static String join(final ArrayList<String> list, final String sep) {
+        if (list.size() == 0)
+            return "";
+        if (list.size() == 1)
+            return list.get(0);
+
+        final StringBuilder buf = new StringBuilder();
+
+        for (int i = 0; i < list.size() - 1; ++i)
+            buf.append(list.get(i)).append(sep);
+
+        buf.append(list.get(list.size() - 1));
+
+        return buf.toString();
     }
 }

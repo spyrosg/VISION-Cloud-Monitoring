@@ -4,7 +4,6 @@ import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.VismoEventDispatcher;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
-import java.net.SocketException;
 import java.util.Properties;
 
 import org.junit.After;
@@ -44,11 +43,9 @@ public class VismoEventDispatcherTest {
     }
 
 
-    /**
-     * @throws SocketException
-     */
+    /***/
     @Before
-    public void setUp() throws SocketException {
+    public void setUp() {
         vismo = new FakeVismoInstance(zmq.newBoundPullSocket(conf.getProducersPoint()), NO_EXPECTED_EVENTS);
         vismo.start();
         final VismoEventDispatcher d = new VismoEventDispatcher(VismoEventDispatcherTest.class.getName());

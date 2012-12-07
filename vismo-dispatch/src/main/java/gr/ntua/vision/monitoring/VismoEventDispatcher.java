@@ -4,7 +4,6 @@ import gr.ntua.vision.monitoring.zmq.VismoSocket;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -48,9 +47,8 @@ public class VismoEventDispatcher implements EventDispatcher {
      * 
      * @param serviceName
      *            the name of the service generating the events.
-     * @throws SocketException
      */
-    public VismoEventDispatcher(final String serviceName) throws SocketException {
+    public VismoEventDispatcher(final String serviceName) {
         this(serviceName, zmq.newConnectedPushSocket(conf.getProducersPoint()));
     }
 
@@ -62,9 +60,8 @@ public class VismoEventDispatcher implements EventDispatcher {
      *            the name of the service generating the events.
      * @param sock
      *            the socket to use.
-     * @throws SocketException
      */
-    public VismoEventDispatcher(final String serviceName, final VismoSocket sock) throws SocketException {
+    public VismoEventDispatcher(final String serviceName, final VismoSocket sock) {
         this.sock = sock;
         this.originatingService = serviceName;
         this.ip = new VismoVMInfo().getAddress().getHostAddress();

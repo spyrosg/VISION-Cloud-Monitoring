@@ -1,7 +1,6 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision.monitoring.sources;
 
 import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.sources.EventSource;
 
 
 /**

@@ -16,11 +16,9 @@ public class VismoVMInfoTest {
     private final VMInfo vminfo = new VismoVMInfo();
 
 
-    /**
-     * @throws Exception
-     */
+    /***/
     @Test
-    public void isValidIPAddress() throws Exception {
+    public void isValidIPAddress() {
         assertNotNull(vminfo.getAddress());
     }
 

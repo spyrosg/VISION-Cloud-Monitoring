@@ -16,7 +16,6 @@
   <description>The distributed infrastructure that moves around events in VISION Cloud.</description>
 
   <profiles>
-
     <!-- conditionally generate a rpm -->
     <profile>
       <id>package.rpm</id>
@@ -156,6 +155,7 @@
         </plugins>
       </build>
     </profile>
+
   </profiles>
 
   <build>

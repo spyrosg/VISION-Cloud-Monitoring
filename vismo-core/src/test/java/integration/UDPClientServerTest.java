@@ -6,6 +6,7 @@ import gr.ntua.vision.monitoring.udp.UDPListener;
 import gr.ntua.vision.monitoring.udp.UDPServer;
 
 import java.net.SocketException;
+import java.util.List;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -34,11 +35,13 @@ public class UDPClientServerTest {
     /**
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void serverNotifiesListenerOnClientRequests() throws Exception {
         context.checking(new Expectations() {
             {
-                exactly(2).of(listener).notify(with(any(String.class)));
+                exactly(1).of(listener).halt();
+                exactly(1).of(listener).collectStatus(with(any(List.class)));
             }
         });
 
@@ -55,7 +58,8 @@ public class UDPClientServerTest {
         listener = context.mock(UDPListener.class);
         final UDPFactory udpFactory = new UDPFactory(PORT);
         client = udpFactory.buildClient();
-        server = udpFactory.buildServer(listener);
+        server = udpFactory.buildServer();
+        server.add(listener);
         server.setDaemon(true);
         server.start();
     }

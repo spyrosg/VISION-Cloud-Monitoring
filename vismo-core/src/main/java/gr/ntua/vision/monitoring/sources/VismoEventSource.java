@@ -1,10 +1,9 @@
 package gr.ntua.vision.monitoring.sources;
 
-import gr.ntua.vision.monitoring.EventSourceListener;
-import gr.ntua.vision.monitoring.StoppableTask;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
+import gr.ntua.vision.monitoring.threading.StoppableTask;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
 
 import java.util.ArrayList;
@@ -18,7 +17,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  */
-public class BasicEventSource extends StoppableTask implements EventSource {
+public class VismoEventSource extends StoppableTask implements EventSource {
     /***/
     private static final Pattern                 patt      = Pattern.compile("\"originating-machine\": ?\"([^\"]*)\"");
     /***/
@@ -30,7 +29,7 @@ public class BasicEventSource extends StoppableTask implements EventSource {
     /** the listeners lists. */
     private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
     /** the log target. */
-    private final Logger                         log       = LoggerFactory.getLogger(BasicEventSource.class);
+    private final Logger                         log       = LoggerFactory.getLogger(VismoEventSource.class);
     /** this is used to shutdown the thread. */
     private final VismoSocket                    shutdownSocket;
 
@@ -43,20 +42,31 @@ public class BasicEventSource extends StoppableTask implements EventSource {
      * @param shutdownSocket
      *            this is used to shutdown the thread.
      */
-    public BasicEventSource(final VismoSocket eventSock, final VismoSocket shutdownSocket) {
-        super("basic-event-source");
+    public VismoEventSource(final VismoSocket eventSock, final VismoSocket shutdownSocket) {
+        super("vismo-event-source");
         this.eventSock = eventSock;
         this.shutdownSocket = shutdownSocket;
     }
 
 
     /**
-     * @see gr.ntua.vision.monitoring.sources.EventSource#add(gr.ntua.vision.monitoring.EventSourceListener)
+     * @see gr.ntua.vision.monitoring.sources.EventSource#add(gr.ntua.vision.monitoring.sources.EventSourceListener)
      */
     @Override
     public void add(final EventSourceListener listener) {
-        log.debug("subscribing listener {}", listener);
         listeners.add(listener);
+    }
+
+
+    /**
+     * Since zmq sockets are not interruptible, we use another socket to send the stop message to <code>this</code>. This is
+     * guaranteed to stop the thread.
+     * 
+     * @see gr.ntua.vision.monitoring.threading.StoppableTask#halt()
+     */
+    @Override
+    public void halt() {
+        shutdownSocket.send(SHUTDOWN);
     }
 
 
@@ -94,21 +104,11 @@ public class BasicEventSource extends StoppableTask implements EventSource {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.StoppableTask#shutDown()
-     */
-    @Override
-    public void shutDown() {
-        interrupt();
-        shutdownSocket.send(SHUTDOWN);
-    }
-
-
-    /**
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        return "#<BasicEventSource: using " + eventSock + ">";
+        return "#<" + getClass().getSimpleName() + " using " + eventSock + ">";
     }
 
 

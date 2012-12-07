@@ -2,36 +2,227 @@ package gr.ntua.vision.monitoring.rules;
 
 import gr.ntua.vision.monitoring.events.Event;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
- * This is used to represent an operation on a sequence of events, over a period of time.
+ * Utility class for aggregating over object service events.
  */
-public interface AggregationRule {
+abstract class AggregationRule extends PeriodicRule {
+    /***/
+    protected static final String OBS_FIELD        = "transaction-duration";
+    /***/
+    private static final String   DELETE_OPERATION = "DELETE";
+    /***/
+    private static final String   GET_OPERATION    = "GET";
+    /***/
+    private static final Logger   log              = LoggerFactory.getLogger(AggregationRule.class);
+    /***/
+    private static final String   OPERATION_FIELD  = "operation";
+    /***/
+    private static final String   PUT_OPERATION    = "PUT";
+    /***/
+    private static final String   SRE_SERVICE      = "SRE";
+    /***/
+    private static final String   STORLET_KEY      = "storletType";
+    /***/
+    protected final String        topic;
+
+
     /**
-     * This is the <strong>then</strong> part of the rule. Perform the aggregation on a number of events that have previously
-     * matched the rule.
+     * Constructor.
      * 
-     * @param eventList
-     *            the list of events to aggregate.
-     * @return the result.
+     * @param engine
+     * @param period
+     * @param topic
      */
-    AggregationResult aggregate(List< ? extends Event> eventList);
+    public AggregationRule(final VismoRulesEngine engine, final long period, final String topic) {
+        super(engine, period);
+        this.topic = topic;
+    }
 
 
     /**
-     * @return in milliseconds the period of the aggregation.
+     * @see java.lang.Object#toString()
      */
-    long aggregationPeriod();
+    @Override
+    public String toString() {
+        return "#<" + getClass().getSimpleName() + ", topic=" + topic + ", period=" + (period() / 1000) + "s>";
+    }
 
 
     /**
-     * This is the <strong>when</strong> part of the rule. If this is <code>true</code> the rule is activated, i.e, will be
-     * consequently run.
+     * @param e
+     * @param field
+     * @return the value of the given field as a double number.
+     */
+    protected static Double getFieldValueAsDouble(final Event e, final String field) {
+        final Object val = e.get(field);
+
+        if (val == null) {
+            log.warn("missing required field '{}' or is null; returning 0", field);
+
+            return 0d;
+        }
+
+        if (val instanceof String) {
+            log.warn("required field '{}' should be {}; try to parse it", field, Long.class);
+
+            return Double.valueOf((String) val);
+        }
+
+        try {
+            return (Double) val;
+        } catch (final ClassCastException x) {
+            log.trace("expecting field '{}' of type {} ...", field, Long.class);
+            log.trace("but got value {} of type {}", val, val.getClass());
+            log.trace("exception: ", x);
+
+            return 0d;
+        }
+    }
+
+
+    /**
+     * @param e
+     * @param field
+     * @return the value of the given field as a long number.
+     */
+    protected static Long getFieldValueAsLong(final Event e, final String field) {
+        final Object val = e.get(field);
+
+        if (val == null) {
+            log.warn("missing required field '{}' or is null; returning 0", field);
+
+            return 0l;
+        }
+
+        if (val instanceof String) {
+            log.warn("required field '{}' should be {}; try to parse it", field, Long.class);
+
+            return Long.valueOf((String) val);
+        }
+
+        try {
+            return (Long) val;
+        } catch (final ClassCastException x) {
+            log.trace("expecting field '{}' of type {} ...", field, Long.class);
+            log.trace("but got value {} of type {}", val, val.getClass());
+            log.trace("exception: ", x);
+
+            return 0l;
+        }
+    }
+
+
+    /**
+     * Is this a complete object service event? Since we receive all events from object service, some of them are incomplete, in
+     * the sense that contain parts of the request/response cycle.
      * 
      * @param e
-     * @return <code>true</code> if the rule applies to the event, <code>false</code> otherwise.
+     *            the event.
+     * @return <code>true</code> iff the
      */
-    boolean matches(Event e);
+    protected static boolean isCompleteObsEvent(final Event e) {
+        return e.get(OBS_FIELD) != null;
+    }
+
+
+    /**
+     * Is this an SRE event?
+     * 
+     * @param e
+     *            the event.
+     * @return <code>true</code> iff the
+     */
+    protected static boolean isStorletEngineEvent(final Event e) {
+        return SRE_SERVICE.equals(e.originatingService()) && e.get(STORLET_KEY) != null;
+    }
+
+
+    /**
+     * @param eventList
+     * @return the list of delete events.
+     */
+    protected static ArrayList<Event> selectDeleteEvents(final List< ? extends Event> eventList) {
+        return selectEventsByOperation(eventList, DELETE_OPERATION);
+    }
+
+
+    /**
+     * @param eventList
+     * @param field
+     * @return the list of events that contain the given field.
+     */
+    protected static ArrayList<Event> selectEventsByField(final List< ? extends Event> eventList, final String field) {
+        final ArrayList<Event> list = new ArrayList<Event>();
+
+        for (final Event e : eventList)
+            if (e.get(field) != null)
+                list.add(e);
+
+        return list;
+    }
+
+
+    /**
+     * @param eventList
+     * @return the list of read events.
+     */
+    protected static ArrayList<Event> selectReadEvents(final List< ? extends Event> eventList) {
+        return selectEventsByOperation(eventList, GET_OPERATION);
+    }
+
+
+    /**
+     * @param eventList
+     * @return the list of events that match only the given operation.
+     */
+    protected static ArrayList<Event> selectStorletEngineEvents(final List< ? extends Event> eventList) {
+        final ArrayList<Event> newList = new ArrayList<Event>(eventList.size());
+
+        for (final Event e : eventList)
+            if (isStorletEngineEvent(e))
+                newList.add(e);
+
+        log.trace("have {} events for '{}'", newList.size(), SRE_SERVICE);
+
+        return newList;
+    }
+
+
+    /**
+     * @param eventList
+     * @return the list of write events.
+     */
+    protected static ArrayList<Event> selectWriteEvents(final List< ? extends Event> eventList) {
+        return selectEventsByOperation(eventList, PUT_OPERATION);
+    }
+
+
+    /**
+     * @param eventList
+     * @param operation
+     * @return the list of events that match only the given operation.
+     */
+    private static ArrayList<Event> selectEventsByOperation(final List< ? extends Event> eventList, final String operation) {
+        final ArrayList<Event> newList = new ArrayList<Event>(eventList.size());
+
+        for (final Event e : eventList) {
+            final String val = (String) e.get(OPERATION_FIELD);
+
+            log.trace("event op={}", val);
+
+            if (operation.equalsIgnoreCase(val))
+                newList.add(e);
+        }
+
+        log.trace("have {} events for '{}'", newList.size(), operation);
+
+        return newList;
+    }
 }

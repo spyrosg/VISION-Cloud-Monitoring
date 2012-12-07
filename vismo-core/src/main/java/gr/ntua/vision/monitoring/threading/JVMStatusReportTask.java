@@ -1,7 +1,8 @@
-package gr.ntua.vision.monitoring.scheduling;
+package gr.ntua.vision.monitoring.threading;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.util.Timer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,7 @@ import com.sun.management.OperatingSystemMXBean;
  * 
  */
 @SuppressWarnings("restriction")
-public class JVMStatusReportTask extends VismoRepeatedTask {
+public class JVMStatusReportTask extends VismoPeriodicTask {
     /***/
     private static final Logger                log         = LoggerFactory.getLogger(JVMStatusReportTask.class);
     /** the number of bytes in a megabyte. */
@@ -52,21 +53,21 @@ public class JVMStatusReportTask extends VismoRepeatedTask {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.scheduling.VismoRepeatedTask#getPeriod()
-     */
-    @Override
-    public long getPeriod() {
-        return period;
-    }
-
-
-    /**
      * @see java.util.TimerTask#run()
      */
     @Override
     public void run() {
         reportFreeMemoryPercent();
         reportCPUUsage();
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.threading.VismoPeriodicTask#scheduleWith(java.util.Timer)
+     */
+    @Override
+    public void scheduleWith(final Timer timer) {
+        timer.schedule(this, 0, period);
     }
 
 

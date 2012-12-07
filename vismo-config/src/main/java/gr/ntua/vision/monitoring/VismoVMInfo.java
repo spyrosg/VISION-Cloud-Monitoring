@@ -13,12 +13,18 @@ import java.util.Enumeration;
  */
 public class VismoVMInfo implements VMInfo {
     /**
-     * @throws SocketException
      * @see gr.ntua.vision.monitoring.VMInfo#getAddress()
      */
     @Override
-    public InetAddress getAddress() throws SocketException {
-        final NetworkInterface iface = getInterface();
+    public InetAddress getAddress() {
+        final NetworkInterface iface;
+
+        try {
+            iface = getInterface();
+        } catch (final SocketException e) {
+            throw new RuntimeException(e);
+        }
+
         final Enumeration<InetAddress> addresses = iface.getInetAddresses();
 
         while (addresses.hasMoreElements()) {
@@ -35,11 +41,27 @@ public class VismoVMInfo implements VMInfo {
 
 
     /**
-     * @throws SocketException
-     * @see gr.ntua.vision.monitoring.VMInfo#getInterface()
+     * @see gr.ntua.vision.monitoring.VMInfo#getPID()
      */
     @Override
-    public NetworkInterface getInterface() throws SocketException {
+    public int getPID() {
+        final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+        final int index = jvmName.indexOf("@");
+
+        if (index < 0)
+            throw new Error("Cannot get the pid of this jvm");
+
+        return Integer.parseInt(jvmName.substring(0, index));
+    }
+
+
+    /**
+     * Try to get the name of the first public, not loop-back interface that is up on the host machine.
+     * 
+     * @return the first public interface, or <code>null</code> when no such interface exists.
+     * @throws SocketException
+     */
+    private static NetworkInterface getInterface() throws SocketException {
         final Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
 
         while (ifaces.hasMoreElements()) {
@@ -61,20 +83,5 @@ public class VismoVMInfo implements VMInfo {
         }
 
         return null;
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.VMInfo#getPID()
-     */
-    @Override
-    public int getPID() {
-        final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
-        final int index = jvmName.indexOf("@");
-
-        if (index < 0)
-            throw new Error("Cannot get the pid of this jvm");
-
-        return Integer.parseInt(jvmName.substring(0, index));
     }
 }
