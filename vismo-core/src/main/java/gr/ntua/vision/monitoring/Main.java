@@ -1,5 +1,6 @@
 package gr.ntua.vision.monitoring;
 
+import gr.ntua.vision.monitoring.policy.StaticConfigPolicy;
 import gr.ntua.vision.monitoring.udp.UDPClient;
 import gr.ntua.vision.monitoring.udp.UDPFactory;
 import gr.ntua.vision.monitoring.udp.UDPServer;
