@@ -12,16 +12,10 @@ public class VismoEventRegistry extends EventRegistry {
     /***/
     private static VismoConfiguration conf;
     /***/
-    private static final String       VISMO_CONFIG_RESOURCE        = "/config.properties";
-    /***/
-    private static final String       VISMO_CONFIG_SYSTEM_PROPERTY = "vismo.config.properties";
+    private static final String       VISMO_CONFIG_FILE = "/etc/visioncloud_vismo.conf";
 
     static {
-        try {
-            loadConfiguration();
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+        loadConfiguration();
     }
 
 
@@ -47,17 +41,12 @@ public class VismoEventRegistry extends EventRegistry {
     /**
      * Try to load the configuration. First try reading the file specified in the system property; if the property is null, try
      * loading the configuration from inside the jar.
-     * 
-     * @throws IOException
      */
-    private static void loadConfiguration() throws IOException {
-        final String configFile = System.getProperty(VISMO_CONFIG_SYSTEM_PROPERTY);
-
-        if (configFile != null) {
-            conf = new VismoConfiguration(configFile);
-            return;
+    private static void loadConfiguration() {
+        try {
+            conf = new VismoConfiguration(VISMO_CONFIG_FILE);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
         }
-
-        conf = VismoConfiguration.loadFromResource(VismoEventRegistry.class.getResourceAsStream((VISMO_CONFIG_RESOURCE)));
     }
 }

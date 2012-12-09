@@ -13,7 +13,7 @@ import json
 
 
 # this is the file that holds the lib's configuration
-CONFIGURATION_PROPERTIES = '/srv/vismo/config.properties'
+CONFIGURATION_PROPERTIES = '/etc/visioncloud_vismo.conf'
 #CONFIGURATION_PROPERTIES = 'config.properties'
 
 
