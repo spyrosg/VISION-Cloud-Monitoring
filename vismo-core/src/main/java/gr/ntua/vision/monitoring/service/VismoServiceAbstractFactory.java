@@ -30,17 +30,30 @@ abstract class VismoServiceAbstractFactory {
         sources.subscribeAll(engine);
         boostrap(engine);
 
-        return new VismoService(vminfo, sources, engine);
+        final VismoService service = new VismoService(vminfo, sources, engine);
+
+        bootstrap(service);
+
+        return service;
     }
 
 
     /**
-     * This is used to configure the rules' engine, mainly to add rules before the actual execution starts.
+     * This is used to configure the rules' engine; mainly to add rules before the actual execution starts.
      * 
      * @param engine
      *            the rules' engine.
      */
     protected abstract void boostrap(VismoRulesEngine engine);
+
+
+    /**
+     * This is used to further configure the vismo service just before it's run.
+     * 
+     * @param service
+     *            the vismo service.
+     */
+    protected abstract void bootstrap(VismoService service);
 
 
     /**
