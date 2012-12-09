@@ -14,7 +14,7 @@ import com.sun.management.OperatingSystemMXBean;
  * 
  */
 @SuppressWarnings("restriction")
-public class JVMStatusReportTask extends VismoPeriodicTask {
+public class JVMStatusReportTask extends PeriodicTask {
     /***/
     private static final Logger                log         = LoggerFactory.getLogger(JVMStatusReportTask.class);
     /** the number of bytes in a megabyte. */
@@ -63,7 +63,7 @@ public class JVMStatusReportTask extends VismoPeriodicTask {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.threading.VismoPeriodicTask#scheduleWith(java.util.Timer)
+     * @see gr.ntua.vision.monitoring.threading.PeriodicTask#scheduleWith(java.util.Timer)
      */
     @Override
     public void scheduleWith(final Timer timer) {

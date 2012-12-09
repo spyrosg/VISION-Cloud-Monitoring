@@ -3,7 +3,7 @@ package gr.ntua.vision.monitoring.service;
 import gr.ntua.vision.monitoring.VMInfo;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sources.EventSources;
-import gr.ntua.vision.monitoring.threading.VismoPeriodicTask;
+import gr.ntua.vision.monitoring.threading.PeriodicTask;
 import gr.ntua.vision.monitoring.udp.UDPListener;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public class VismoService implements UDPListener, Service {
      * @param task
      *            the task.
      */
-    public void addTask(final VismoPeriodicTask task) {
+    public void addTask(final PeriodicTask task) {
         task.scheduleWith(timer);
     }
 
