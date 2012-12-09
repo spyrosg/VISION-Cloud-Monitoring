@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 /**
  *
  */
-public class ClusterHeadNodeFactory extends DefaultRulesFactory {
+public class ClusterHeadNodeFactory extends CommonServiceFactory {
     /***/
     private final VismoConfiguration conf;
     /***/

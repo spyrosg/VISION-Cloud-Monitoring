@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This is used to build the vismo worker instance.
  */
-public class WorkerNodeFactory extends DefaultRulesFactory {
+public class WorkerNodeFactory extends CommonServiceFactory {
     /** the log target. */
     private static final Logger      log = LoggerFactory.getLogger(WorkerNodeFactory.class);
     /** the configuration object. */

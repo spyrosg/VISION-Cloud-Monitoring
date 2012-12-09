@@ -7,7 +7,7 @@ import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 /**
  *
  */
-public abstract class DefaultRulesFactory extends VismoServiceAbstractFactory {
+public abstract class CommonServiceFactory extends VismoServiceAbstractFactory {
     /**
      * Submitting to rule engine the default rules.
      * 
