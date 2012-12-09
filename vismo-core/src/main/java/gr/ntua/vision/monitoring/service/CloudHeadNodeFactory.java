@@ -36,7 +36,7 @@ public class CloudHeadNodeFactory extends CommonServiceFactory {
      */
     @Override
     protected void boostrap(final VismoRulesEngine engine) {
-        registerDefaultRules(engine);
+        super.boostrap(engine);
         registerRules(engine);
     }
 
@@ -65,8 +65,6 @@ public class CloudHeadNodeFactory extends CommonServiceFactory {
      * @param engine
      */
     private static void registerRules(final VismoRulesEngine engine) {
-        // TODO: rename method
-
         final long ONE_MINUTE = TimeUnit.MINUTES.toMillis(1);
         final long THREE_SECONDS = TimeUnit.SECONDS.toMillis(3);
 

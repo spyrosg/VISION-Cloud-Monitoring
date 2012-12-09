@@ -1,7 +1,6 @@
 package gr.ntua.vision.monitoring.service;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
-import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSinks;
 import gr.ntua.vision.monitoring.sinks.EventSinksFactory;
 import gr.ntua.vision.monitoring.sources.EventSources;
@@ -31,15 +30,6 @@ public class WorkerNodeFactory extends CommonServiceFactory {
     public WorkerNodeFactory(final VismoConfiguration conf, final ZMQSockets zmq) {
         this.conf = conf;
         this.zmq = zmq;
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#boostrap(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
-     */
-    @Override
-    protected void boostrap(final VismoRulesEngine engine) {
-        registerDefaultRules(engine);
     }
 
 

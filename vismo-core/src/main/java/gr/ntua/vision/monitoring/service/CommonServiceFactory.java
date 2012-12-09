@@ -10,22 +10,26 @@ import gr.ntua.vision.monitoring.threading.JVMStatusReportTask;
  */
 public abstract class CommonServiceFactory extends VismoServiceAbstractFactory {
     /**
-     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#bootstrap(gr.ntua.vision.monitoring.service.VismoService)
+     * Submitting default rules.
+     * 
+     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#boostrap(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
      */
     @Override
-    protected void bootstrap(final VismoService service) {
-        service.addTask(new JVMStatusReportTask(60 * 1000));
+    protected void boostrap(final VismoRulesEngine engine) {
+        new PassThroughRule(engine).submitTo(engine);
+        // TODO: add SLAPerRequest rule
     }
 
 
     /**
-     * Submitting default rules to the rules' engine.
+     * Scheduling default tasks.
      * 
-     * @param engine
-     *            the rules engine.
+     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#bootstrap(gr.ntua.vision.monitoring.service.VismoService)
      */
-    protected static void registerDefaultRules(final VismoRulesEngine engine) {
-        new PassThroughRule(engine).submitTo(engine);
-        // TODO: add SLAPerRequest rule
+    @Override
+    protected void bootstrap(final VismoService service) {
+        final long ONE_MINUTE = 60 * 1000;
+
+        service.addTask(new JVMStatusReportTask(ONE_MINUTE));
     }
 }
