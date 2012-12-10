@@ -55,7 +55,7 @@ public class ClusterHeadNodeFactory extends CommonServiceFactory {
      */
     @Override
     protected EventSources getEventSources() {
-        return new EventSourcesFactory(conf, zmq).createforClusterHead();
+        return new EventSourcesFactory(conf, zmq).buildforClusterHead();
     }
 
 

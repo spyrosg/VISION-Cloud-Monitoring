@@ -14,7 +14,7 @@ import org.zeromq.ZContext;
 
 
 /**
- * Provides a {@link VismoService} using the configuration.
+ * Provides a {@link VismoService} instance using the configuration.
  */
 public class StaticConfigPolicy implements NodePolicy {
     /** the log target. */
@@ -78,7 +78,7 @@ public class StaticConfigPolicy implements NodePolicy {
      * @param vminfo
      */
     private void logConfig(final VMInfo vminfo) {
-        log.debug("is cluster head? {}", hostIsClusterHead(vminfo));
-        log.debug("is cloud head? {}", hostIsCloudHead(vminfo));
+        log.info("is cluster head? {}", hostIsClusterHead(vminfo));
+        log.info("is cloud head? {}", hostIsCloudHead(vminfo));
     }
 }

@@ -5,10 +5,10 @@ import gr.ntua.vision.monitoring.rules.AccountingRule;
 import gr.ntua.vision.monitoring.rules.CTORule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSinks;
+import gr.ntua.vision.monitoring.sinks.EventSinksFactory;
 import gr.ntua.vision.monitoring.sources.EventSources;
+import gr.ntua.vision.monitoring.sources.EventSourcesFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
-
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -46,8 +46,7 @@ public class CloudHeadNodeFactory extends CommonServiceFactory {
      */
     @Override
     protected EventSinks getEventSinks() {
-        // TODO Auto-generated method stub
-        return null;
+        return new EventSinksFactory(conf, zmq).buildForCloudHead();
     }
 
 
@@ -56,8 +55,7 @@ public class CloudHeadNodeFactory extends CommonServiceFactory {
      */
     @Override
     protected EventSources getEventSources() {
-        // TODO Auto-generated method stub
-        return null;
+        return new EventSourcesFactory(conf, zmq).buildforCloudHead();
     }
 
 
@@ -65,8 +63,10 @@ public class CloudHeadNodeFactory extends CommonServiceFactory {
      * @param engine
      */
     private static void registerRules(final VismoRulesEngine engine) {
-        final long ONE_MINUTE = TimeUnit.MINUTES.toMillis(1);
-        final long THREE_SECONDS = TimeUnit.SECONDS.toMillis(3);
+        // TODO: rename method
+
+        final long ONE_MINUTE = 60 * 1000;
+        final long THREE_SECONDS = 3 * 1000;
 
         new CTORule(engine, "cto-3-sec", THREE_SECONDS).submitTo(engine);
         new CTORule(engine, "cto-1-min", ONE_MINUTE).submitTo(engine);
