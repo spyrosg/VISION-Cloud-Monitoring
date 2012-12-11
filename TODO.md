@@ -16,9 +16,9 @@ Y3 goals (prioritized)
     - using a simple multicast based protocol
     - a client running in each vismo instance
     - an indepedent program (command line) that collects and prints uptime info
-2. benchmark / validation
+2. benchmark / validation (VAS)
 3. a high level rules' aggregation language (dsl)
-4. event generation for low level machine metrics
+4. event generation for low level machine metrics (VAS)
 5. opensourcing
     - add
     - your
