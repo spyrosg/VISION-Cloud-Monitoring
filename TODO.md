@@ -2,23 +2,24 @@
 Y3 goals (prioritized)
 --------
 
-1. updating rules in runtime.
+1. updating rules in runtime (TH)
     - adding a rule
     - removing a rule
-2. a high level rules' aggregation language (dsl)
-3. a http interface to add/remove rules
+    - a http interface to add/remove rules
     - by name?
     - by java byteclass injection (in the request body)?
     - how to keep rules in the system?
     - ...?
-4. a heartbeat service
+1. distributed rules application (VAS)
+    - all vismo instances irregardless of their level/role should aggregate events
+1. a heartbeat service (TH)
     - using a simple multicast based protocol
     - a client running in each vismo instance
     - an indepedent program (command line) that collects and prints uptime info
-5. distributed rules application
-    - all vismo instances irregardless of their level/role should aggregate events
-6. event generation for low level machine metrics
-7. opensourcing
+2. benchmark / validation
+3. a high level rules' aggregation language (dsl)
+4. event generation for low level machine metrics
+5. opensourcing
     - add
     - your
     - stuff
