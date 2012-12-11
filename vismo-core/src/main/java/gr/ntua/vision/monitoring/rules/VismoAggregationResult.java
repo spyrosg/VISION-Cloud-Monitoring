@@ -49,7 +49,7 @@ public class VismoAggregationResult implements AggregationResult {
      */
     @Override
     public InetAddress originatingIP() throws UnknownHostException {
-        return InetAddress.getByName((String) get1("originating-ip"));
+        return InetAddress.getLocalHost();
     }
 
 
@@ -126,6 +126,22 @@ public class VismoAggregationResult implements AggregationResult {
 
 
     /**
+     * @param dict
+     */
+    private void addBasicFields(final Map<String, Object> dict) {
+        dict.put("timestamp", System.currentTimeMillis());
+        dict.put("id", UUID.randomUUID().toString());
+
+        try {
+            // FIXME: this should be taken off {@link VMInfo}
+            dict.put("originating-machine", originatingIP().getHostAddress());
+        } catch (final UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
      * Retrieve the value of given key.
      * 
      * @param key
@@ -133,15 +149,6 @@ public class VismoAggregationResult implements AggregationResult {
      */
     private Object get1(final String key) {
         return dict.get(key);
-    }
-
-
-    /**
-     * @param dict
-     */
-    private static void addBasicFields(final Map<String, Object> dict) {
-        dict.put("timestamp", System.currentTimeMillis());
-        dict.put("id", UUID.randomUUID().toString());
     }
 
 
