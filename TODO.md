@@ -1,48 +1,36 @@
-Y3 goals
+
+Y3 goals (prioritized)
 --------
-[1] + Formal means to add rules to monitoring (including timing) through a high level language.
-      ~ Rest Resource Interface
-      ~ Test feature
-[2] + Dynamic updates of rules (including timing) (plus propagation of rules)
-      + Creation of Rule 
-      + Request of active users (provided by heartbeat service)
-      + Send the existence of new Rule with Reliable Multicast
-      + Instances request the new Rule
-      + Serialization of Rule object
-      + Test feature
-[3] + Automatic configuration of monitoring component
-      + Distribution of configuration to active users (provided by the heartbeat service)
-      + Test feature
-[4] + Automatic deployment of monitoring component
-[5] + Heartbeat function for all the instances
-      ~ Simple Multicast heartbeat Client/Service 
-      ~ Multithreaded Service
-      + Test feature
-[6] + Optimized Aggregation (how to achieve partial aggregation)
-[7] + Replace vismo-config module with a service that knows which machines are running.
-      + Replace based on heartbeat service
-      + Test feature
-[8] + Refactor MonitoringDriver to run multiple vismo instances so that we can test aggregation on multiple resources
-      + Implementation
-      + Test feature
-[9] + Send log output to one dedicated machine
-      + Implementation
-      + Test feature
-[10] + Free mem: free -o -m (total = used+free)
-[11]+ Http ui
-[12]+ Persistence
-[13]+ Open source plan (what we will do)
-      + Licenses
-      + What we will provide
-      + How we will provide
-[14]+ Open source documentation/website
-[15]+ Open source refactoring of code for modularity/usability
+
+1. updating rules in runtime.
+    - adding a rule
+    - removing a rule
+2. a high level rules' aggregation language (dsl)
+3. a http interface to add/remove rules
+    - by name?
+    - by java byteclass injection (in the request body)?
+    - how to keep rules in the system?
+    - ...?
+4. a heartbeat service
+    - using a simple multicast based protocol
+    - a client running in each vismo instance
+    - an indepedent program (command line) that collects and prints uptime info
+5. distributed rules application
+    - all vismo instances irregardless of their level/role should aggregate events
+6. event generation for low level machine metrics
+7. opensourcing
+    - add
+    - your
+    - stuff
+    - here
+
 
 Symbols
 -------
 + : to be done
 - : done
 ~ : to revisit
+
 
 Indicative Days
 ---------------
