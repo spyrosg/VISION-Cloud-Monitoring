@@ -19,7 +19,7 @@ public class HeartbeatTest {
 
     private static final String MULTICAST_IP   = "224.0.0.1";
     private static final int    MULTICAST_PORT = 6307;
-    private static final int    TTL            = 3;
+    private static final int    TTL            = 0;
 
     private static final Logger log            = LoggerFactory.getLogger(HeartbeatSender.class);
 
@@ -27,7 +27,6 @@ public class HeartbeatTest {
     /*
      * 
      */
-    @Ignore
     @Test
     public void testHeartbeatServiceSuccessfull() throws IOException {
         log.info("starting HeartbeatServiceSuccessfull test...");
@@ -50,7 +49,6 @@ public class HeartbeatTest {
     /*
      * 
      */
-    @Ignore
     @Test
     public void testHeartbeatServiceUnSuccessfull() throws IOException {
         log.info("starting HeartbeatServiceUnSuccessfull test...");
