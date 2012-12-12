@@ -8,6 +8,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +37,7 @@ public final class HeartbeatSender {
         private MulticastSocket socket;
 
 
-        /**
-         * gets the ip addresses of the node interfaces.
+        /*
          * 
          * @return
          * @throws UnknownHostException
@@ -78,7 +78,8 @@ public final class HeartbeatSender {
                     final byte[] buffer = createPayload();
                     final DatagramPacket packet = new DatagramPacket(buffer, buffer.length, groupMulticastAddress,
                             groupMulticastPort.intValue());
-                    log.info("Sending packet from: "+new String(packet.getData())+" to: " + packet.getSocketAddress().toString().substring(1));
+                    HeartbeatSender.log.info("MSender" + SENDER_ID + ": sending packet to: "
+                            + packet.getSocketAddress().toString().substring(1));
                     socket.send(packet);
                 } catch (final IOException e) {
                     HeartbeatSender.log.debug("Error on multicast socket", e);
@@ -89,7 +90,7 @@ public final class HeartbeatSender {
                 }
                 if (!stopped)
                     try {
-                        Thread.sleep(HeartbeatSender.heartBeatInterval);
+                        Thread.sleep(sendInterval);
                     } catch (final InterruptedException e) {
                         HeartbeatSender.log.debug("Sleep after error interrupted. Initial cause was " + e.getMessage());
                     }
@@ -109,6 +110,9 @@ public final class HeartbeatSender {
         }
 
 
+        /*
+         * 
+         */
         private void closeSocket() {
             try {
                 if (socket != null && !socket.isClosed()) {
@@ -132,23 +136,23 @@ public final class HeartbeatSender {
 
 
         /**
-         * create the multicast packet payload.
+         * create the multicast packet payload containing the senderID
          * 
          * @throws SocketException
          * @throws UnknownHostException
          */
         private byte[] createPayload() throws UnknownHostException, SocketException {
-            final String interfaceIp = getHostIP();
-            final byte[] msg = interfaceIp.getBytes();
+            final byte[] msg = (SENDER_ID + "").getBytes();
             return msg;
         }
 
     }
 
-    private static final int      DEFAULT_HEARTBEAT_INTERVAL = 1000;
-    private static long           heartBeatInterval          = HeartbeatSender.DEFAULT_HEARTBEAT_INTERVAL;
+    private final int      DEFAULT_HEARTBEAT_INTERVAL = 1000;
+    private long           sendInterval          = DEFAULT_HEARTBEAT_INTERVAL;
     private static final Logger   log                        = LoggerFactory.getLogger(HeartbeatSender.class);
-    private static final int      MINIMUM_HEARTBEAT_INTERVAL = 500;
+    private final int      MINIMUM_HEARTBEAT_INTERVAL = 500;
+    private int                   SENDER_ID;
     private final InetAddress     groupMulticastAddress;
     private final Integer         groupMulticastPort;
     private MulticastSenderThread senderThread;
@@ -170,14 +174,15 @@ public final class HeartbeatSender {
         this.groupMulticastAddress = multicastAddress;
         this.groupMulticastPort = multicastPort;
         this.timeToLive = timeToLive;
+        this.SENDER_ID = getRandomID();
     }
 
 
     /**
      * Returns the heartbeat interval.
      */
-    public static long getHeartBeatInterval() {
-        return HeartbeatSender.heartBeatInterval;
+    public long getHeartBeatInterval() {
+        return sendInterval;
     }
 
 
@@ -214,10 +219,19 @@ public final class HeartbeatSender {
      *            a time in ms, greater than 1000
      */
     public void setHeartBeatInterval(final long heartBeatInterval) {
-        if (heartBeatInterval < HeartbeatSender.MINIMUM_HEARTBEAT_INTERVAL) {
+        if (heartBeatInterval < MINIMUM_HEARTBEAT_INTERVAL) {
             HeartbeatSender.log.info("Trying to set heartbeat interval too low. Using MINIMUM_HEARTBEAT_INTERVAL instead.");
-            HeartbeatSender.heartBeatInterval = HeartbeatSender.MINIMUM_HEARTBEAT_INTERVAL;
+            sendInterval = MINIMUM_HEARTBEAT_INTERVAL;
         } else
-            HeartbeatSender.heartBeatInterval = heartBeatInterval;
+            sendInterval = heartBeatInterval;
+    }
+
+
+    /*
+     * returns a random int 
+     */
+    private int getRandomID() {
+        final Random randomGenerator = new Random();
+        return randomGenerator.nextInt(10000);
     }
 }

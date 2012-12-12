@@ -32,12 +32,12 @@ public final class HeartbeatReceiver {
             while (!stopped) {
 
                 try {
-                    Thread.sleep(HeartbeatReceiver.MEMBERSHIP_UPDATE_INTERVAL);
+                    Thread.sleep(MEMBERSHIP_UPDATE_INTERVAL);
                 } catch (final InterruptedException e) {
                     HeartbeatReceiver.log.debug("Multicast Processor Thread sleep interrupted");
                 }
-                updateHostsMembership(HeartbeatReceiver.MEMBERSHIP_TIMEOUT);
-                log.info("Memberlist: " + hostsMembership.toString());
+                updateHostsMembership(MEMBERSHIP_TIMEOUT);
+                HeartbeatReceiver.log.info("Memberlist: " + hostsMembership.toString());
             }
         }
 
@@ -112,16 +112,17 @@ public final class HeartbeatReceiver {
          * updates the hosts timestamp
          */
         private void processPacket(final DatagramPacket packet) {
-            hostsTimestamp.put(packet.getAddress().toString().substring(1), Long.valueOf(System.currentTimeMillis()));
+            hostsTimestamp.put(packet.getAddress().toString().substring(1) + ":" + new String(packet.getData()).trim(),
+                               Long.valueOf(System.currentTimeMillis()));
         }
     }
     private static final Logger              log                        = LoggerFactory.getLogger(HeartbeatReceiver.class);
-    private static final int                 MEMBERSHIP_TIMEOUT         = 2000;
-    private static final int                 MEMBERSHIP_UPDATE_INTERVAL = 500;
     private final InetAddress                groupMulticastAddress;
     private final Integer                    groupMulticastPort;
     private final HashMap<String, Boolean>   hostsMembership            = new HashMap<String, Boolean>();
     private final HashMap<String, Long>      hostsTimestamp             = new HashMap<String, Long>();
+    private final int                        MEMBERSHIP_TIMEOUT         = 2000;
+    private final int                        MEMBERSHIP_UPDATE_INTERVAL = 500;
     private MulticastReceiverProcessorThread processorThread;
     private MulticastReceiverThread          receiverThread;
     private MulticastSocket                  socket;
@@ -138,6 +139,11 @@ public final class HeartbeatReceiver {
         System.setProperty("Djava.net.preferIPv4Stack", "true");
         this.groupMulticastAddress = multicastAddress;
         this.groupMulticastPort = multicastPort;
+    }
+
+
+    public final void clearMembership() {
+        hostsMembership.clear();
     }
 
 
@@ -177,10 +183,6 @@ public final class HeartbeatReceiver {
         processorThread = new MulticastReceiverProcessorThread();
         processorThread.start();
 
-    }
-    
-    public final void clearMembership(){
-        hostsMembership.clear();
     }
 
 }

@@ -15,33 +15,43 @@ import org.slf4j.LoggerFactory;
 
 
 public class HeartbeatTest {
-
-    private static final String MULTICAST_IP   = "224.0.0.1";
-    private static final int    MULTICAST_PORT = 6307;
-    private static final int    TTL            = 64;
-    
-    private static final Logger   log                        = LoggerFactory.getLogger(HeartbeatSender.class);
-
+    private static final Logger log            = LoggerFactory.getLogger(HeartbeatSender.class);
+    private final String        MULTICAST_IP   = "224.0.0.1";
+    private final int           MULTICAST_PORT = 6307;
+    private final int           TTL            = 1;
 
     /*
      * 
      */
     @Test
     public void testHeartbeatServiceSuccessfull() throws IOException {
-        log.info("starting HeartbeatServiceSuccessfull test...");
-        
+        HeartbeatTest.log.info("starting HeartbeatServiceSuccessfull test...");
 
-        final HeartbeatReceiver receiver = new HeartbeatReceiver(InetAddress.getByName(HeartbeatTest.MULTICAST_IP),
-                HeartbeatTest.MULTICAST_PORT);
+        final HeartbeatReceiver receiver = new HeartbeatReceiver(InetAddress.getByName(MULTICAST_IP), MULTICAST_PORT);
         receiver.clearMembership();
-        final HeartbeatSender sender = new HeartbeatSender(InetAddress.getByName(HeartbeatTest.MULTICAST_IP),
-                HeartbeatTest.MULTICAST_PORT, HeartbeatTest.TTL);
-        sender.setHeartBeatInterval(1000);
+        // initiate the first sender
+        final HeartbeatSender sender1 = new HeartbeatSender(InetAddress.getByName(MULTICAST_IP), MULTICAST_PORT, TTL);
+        sender1.setHeartBeatInterval(1000);
+        // initiate the second sender
+        final HeartbeatSender sender2 = new HeartbeatSender(InetAddress.getByName(MULTICAST_IP), MULTICAST_PORT, TTL);
+        sender2.setHeartBeatInterval(1000);
+
+        // initiate the second sender
+        final HeartbeatSender sender3 = new HeartbeatSender(InetAddress.getByName(MULTICAST_IP), MULTICAST_PORT, TTL);
+        sender3.setHeartBeatInterval(1000);
+
         receiver.init();
-        sender.init();
+        sender1.init();
+        sender2.init();
+        sender3.init();
+        
         sleep(2000);
+        
         Assert.assertEquals("We expect membership to be valid", true, checkMembership(receiver.getMembers()));
-        sender.halt();
+        
+        sender1.halt();
+        sender2.halt();
+        sender3.halt();
         receiver.halt();
     }
 
@@ -51,25 +61,24 @@ public class HeartbeatTest {
      */
     @Test
     public void testHeartbeatServiceUnSuccessfull() throws IOException {
-        log.info("starting HeartbeatServiceUnSuccessfull test...");
+        HeartbeatTest.log.info("starting HeartbeatServiceUnSuccessfull test...");
 
-        final HeartbeatReceiver receiver = new HeartbeatReceiver(InetAddress.getByName(HeartbeatTest.MULTICAST_IP),
-                HeartbeatTest.MULTICAST_PORT);
+        final HeartbeatReceiver receiver = new HeartbeatReceiver(InetAddress.getByName(MULTICAST_IP), MULTICAST_PORT);
         receiver.clearMembership();
-        final HeartbeatSender sender = new HeartbeatSender(InetAddress.getByName(HeartbeatTest.MULTICAST_IP),
-                HeartbeatTest.MULTICAST_PORT, HeartbeatTest.TTL);
-        sender.setHeartBeatInterval(10000);
+        final HeartbeatSender sender1 = new HeartbeatSender(InetAddress.getByName(MULTICAST_IP), MULTICAST_PORT, TTL);
+        sender1.setHeartBeatInterval(10000);
+
         receiver.init();
-        sender.init();
+        sender1.init();
         sleep(4000);
         Assert.assertEquals("We expect membership to be invalid", false, checkMembership(receiver.getMembers()));
-        sender.halt();
+        sender1.halt();
         receiver.halt();
     }
 
 
     /*
-     * 
+     * checks if all the members are valid.
      */
     private boolean checkMembership(final HashMap<String, Boolean> members) {
 
@@ -89,7 +98,7 @@ public class HeartbeatTest {
 
 
     /*
-     * 
+     *sleep method. 
      */
     private void sleep(final long time) {
         try {
