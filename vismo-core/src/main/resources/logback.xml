@@ -14,9 +14,17 @@
     <suffixPattern>{}vismo %-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m\n%ex</suffixPattern>
   </appender>
 
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>${LOGFILE:-/dev/null}</file>
+    <encoder>
+      <pattern>%-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m\n%ex</pattern>
+    </encoder>
+  </appender>
+
   <root level="TRACE">
     <appender-ref ref="STDERR" />
     <appender-ref ref="SYSLOG" />
+    <appender-ref ref="FILE" />
   </root>
 
 </configuration>
