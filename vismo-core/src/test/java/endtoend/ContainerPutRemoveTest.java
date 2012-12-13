@@ -3,6 +3,7 @@ package endtoend;
 import gr.ntua.vision.monitoring.notify.EventRegistry;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -56,6 +57,7 @@ public class ContainerPutRemoveTest {
     /**
      * checks the creation of the test container
      */
+    @Ignore
     @HttpTest(method = Method.PUT, path = ContainerPutRemoveTest.CONTAINER_PATH, authentications = { @Authentication(user = "vasillis@ntua", password = "123", type = AuthenticationType.BASIC) })
     public void createContainerForTest() {
         ContainerPutRemoveTest.log.debug("put container reply code: {}", response.getBody(String.class) + ".");
@@ -66,6 +68,7 @@ public class ContainerPutRemoveTest {
     /**
      * checks the deletion of the test container
      */
+    @Ignore
     @HttpTest(method = Method.DELETE, path = ContainerPutRemoveTest.CONTAINER_PATH, authentications = { @Authentication(user = "vasillis@ntua", password = "123", type = AuthenticationType.BASIC) })
     public void deleteContainerForTest() {
         ContainerPutRemoveTest.log.debug("delete container reply code: {}", response.getBody(String.class) + ".");

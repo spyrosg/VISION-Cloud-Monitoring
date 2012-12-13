@@ -1,6 +1,7 @@
 package unit;
 
-import gr.ntua.vision.monitoring.web.RulesWebServer;
+import static com.eclipsesource.restfuse.Assert.assertOk;
+import static com.eclipsesource.restfuse.Assert.assertNoContent;
 
 import java.io.IOException;
 
@@ -9,13 +10,14 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 
-import com.eclipsesource.restfuse.Assert;
 import com.eclipsesource.restfuse.Destination;
 import com.eclipsesource.restfuse.HttpJUnitRunner;
 import com.eclipsesource.restfuse.Method;
 import com.eclipsesource.restfuse.Response;
 import com.eclipsesource.restfuse.annotation.Context;
 import com.eclipsesource.restfuse.annotation.HttpTest;
+
+import gr.ntua.vision.monitoring.web.RulesWebServer;
 
 
 /**
@@ -24,31 +26,7 @@ import com.eclipsesource.restfuse.annotation.HttpTest;
 @RunWith(HttpJUnitRunner.class)
 public class RulesManagementResourceTest {
     /***/
-    private static RulesWebServer server   = new RulesWebServer();
-
-    /***/
-    @Rule
-    public Destination            restfuse = new Destination("http://localhost:9998");
-
-    /***/
-    @Context
-    private Response              response;
-
-
-    /**
-     * @return server
-     */
-    public static RulesWebServer getServer() {
-        return RulesManagementResourceTest.server;
-    }
-
-
-    /**
-     * @param server
-     */
-    public static void setServer(final RulesWebServer server) {
-        RulesManagementResourceTest.server = server;
-    }
+    static RulesWebServer server = new RulesWebServer();
 
 
     /**
@@ -57,28 +35,24 @@ public class RulesManagementResourceTest {
      */
     @BeforeClass
     public static void startServer() throws IllegalArgumentException, IOException {
-        RulesManagementResourceTest.getServer().start();
+        server.start();
     }
+
+    /***/
+    @Rule
+    public Destination restfuse = new Destination("http://localhost:9998");
+
+    /***/
+    @Context
+    private Response   response;
 
 
     /**
-     * stops the server
-     * 
-     * @throws IllegalArgumentException
-     * @throws IOException
+     * checks the insertion of a rule
      */
-    @AfterClass
-    public static void stopServer() throws IllegalArgumentException, IOException {
-        RulesManagementResourceTest.getServer().stop();
-    }
-
-
-    /**
-     * checks the deletion of a rule
-     */
-    @HttpTest(method = Method.DELETE, path = "rules/1")
-    public void checkRestDeleteRule1() {
-        Assert.assertOk(response);
+    @HttpTest(method = Method.PUT, path = "rules/Aggregation-default/1/The-default1-aggregation")
+    public void checkRestPutRule1() {
+        assertOk(response);
     }
 
 
@@ -87,7 +61,16 @@ public class RulesManagementResourceTest {
      */
     @HttpTest(method = Method.GET, path = "rules/1")
     public void checkRestGetRule1() {
-        Assert.assertOk(response);
+        assertOk(response);
+    }
+
+
+    /**
+     * checks the deletion of a rule
+     */
+    @HttpTest(method = Method.DELETE, path = "rules/1")
+    public void checkRestDeleteRule1() {
+        assertOk(response);
     }
 
 
@@ -96,16 +79,17 @@ public class RulesManagementResourceTest {
      */
     @HttpTest(method = Method.GET, path = "rules/1")
     public void checkRestGetRule1AfterDelete() {
-        Assert.assertNoContent(response);
+        assertNoContent(response);
     }
 
 
     /**
-     * checks the insertion of a rule
+     * @throws IllegalArgumentException
+     * @throws IOException
      */
-    @HttpTest(method = Method.PUT, path = "rules/Aggregation-default/1/The-default1-aggregation")
-    public void checkRestPutRule1() {
-        Assert.assertOk(response);
+    @AfterClass
+    public static void stopServer() throws IllegalArgumentException, IOException {
+        server.stop();
     }
 
 }
