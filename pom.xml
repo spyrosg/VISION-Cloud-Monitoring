@@ -47,7 +47,16 @@
       <email>alexv@mail.ntua.gr</email>
       <timezone>+2</timezone>
     </developer>
+
+    <developer>
+      <id>thodoris</id>
+      <name>Θοδωρής Μεσσήνης</name>
+      <email>mthodor@mail.ntua.gr</email>
+      <timezone>+2</timezone>
+    </developer>
   </developers>
+
+  
 
   <scm>
     <connection>scm:git:http://147.102.19.118:8080/git/vismo.git</connection>

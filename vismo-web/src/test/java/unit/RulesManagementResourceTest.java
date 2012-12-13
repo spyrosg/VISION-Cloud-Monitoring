@@ -17,12 +17,12 @@ import com.eclipsesource.restfuse.Response;
 import com.eclipsesource.restfuse.annotation.Context;
 import com.eclipsesource.restfuse.annotation.HttpTest;
 
-import gr.ntua.vision.monitoring.web.Server;
+import gr.ntua.vision.monitoring.web.RulesWebServer;
 
 
 @RunWith(HttpJUnitRunner.class)
 public class RulesManagementResourceTest {
-    static Server server = new Server();
+    static RulesWebServer server = new RulesWebServer();
 
 
     @BeforeClass
