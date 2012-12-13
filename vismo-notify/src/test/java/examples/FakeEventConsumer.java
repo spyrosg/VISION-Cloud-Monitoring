@@ -23,7 +23,7 @@ public class FakeEventConsumer {
             try {
                 @SuppressWarnings("rawtypes")
                 final Map dict = (Map) e.get("!dict");
-                final Object special = e.get(SPECIAL_FIELD);
+                final Object special = e.get(FakeEventConsumer.SPECIAL_FIELD);
 
                 if (special != null)
                     System.err.println(getClass().getSimpleName() + ": " + e.get("originating-machine") + " => " + dict);
@@ -32,7 +32,6 @@ public class FakeEventConsumer {
             }
         }
     }
-
 
     /***/
     private static final String SPECIAL_FIELD = "transaction-throughput";

@@ -1,8 +1,8 @@
 package endtoend;
 
-
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.notify.EventHandler;
+
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -13,11 +13,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class FakeEventConsumer {
-    
-    /**
-     * 
-     */
-    static final Logger log               = LoggerFactory.getLogger(FakeEventConsumer.class);
+
     /**
      *
      */
@@ -30,19 +26,22 @@ public class FakeEventConsumer {
             try {
                 @SuppressWarnings("rawtypes")
                 final Map dict = (Map) e.get("!dict");
-                final Object special = e.get(SPECIAL_FIELD);
+                final Object special = e.get(FakeEventConsumer.SPECIAL_FIELD);
 
                 if (special != null)
-                    log.debug(getClass().getSimpleName() + ": " + e.get("originating-machine") + " => " + dict);
+                    FakeEventConsumer.log.debug(getClass().getSimpleName() + ": " + e.get("originating-machine") + " => " + dict);
             } catch (final Throwable x) {
                 x.printStackTrace();
             }
         }
     }
 
+    /**
+     * 
+     */
+    static final Logger         log           = LoggerFactory.getLogger(FakeEventConsumer.class);
 
     /***/
     private static final String SPECIAL_FIELD = "transaction-throughput";
-
 
 }

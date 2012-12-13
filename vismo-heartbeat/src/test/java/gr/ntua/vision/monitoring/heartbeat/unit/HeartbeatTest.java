@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author tmessini
- *
  */
 public class HeartbeatTest {
     /**
@@ -35,6 +34,38 @@ public class HeartbeatTest {
      * 
      */
     private final int           TTL            = 1;
+
+
+    /**
+     * @param members
+     * @return true or false depending on membership.
+     */
+    private static boolean checkMembership(final HashMap<String, Boolean> members) {
+
+        boolean result = true;
+
+        if (members.size() == 0)
+            return false;
+        final Iterator<String> iterator = members.keySet().iterator();
+        while (iterator.hasNext())
+            result = result && members.get(iterator.next().toString()).booleanValue();
+        return result;
+
+    }
+
+
+    /**
+     * @param time
+     */
+    private static void sleep(final long time) {
+        try {
+            Thread.sleep(time);
+        } catch (final InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
     /*
      * 
@@ -63,17 +94,16 @@ public class HeartbeatTest {
         sender1.init();
         sender2.init();
         sender3.init();
-        
-        sleep(2000);
-        
-        Assert.assertEquals("We expect membership to be valid", true, checkMembership(receiver.getMembers()));
-        
+
+        HeartbeatTest.sleep(2000);
+
+        Assert.assertEquals("We expect membership to be valid", true, HeartbeatTest.checkMembership(receiver.getMembers()));
+
         sender1.halt();
         sender2.halt();
         sender3.halt();
         receiver.halt();
     }
-
 
 
     /**
@@ -90,43 +120,10 @@ public class HeartbeatTest {
 
         receiver.init();
         sender1.init();
-        sleep(4000);
-        Assert.assertEquals("We expect membership to be invalid", false, checkMembership(receiver.getMembers()));
+        HeartbeatTest.sleep(4000);
+        Assert.assertEquals("We expect membership to be invalid", false, HeartbeatTest.checkMembership(receiver.getMembers()));
         sender1.halt();
         receiver.halt();
-    }
-
-
-
-    /**
-     * @param members
-     * @return true or false depending on membership.
-     */
-    private static boolean checkMembership(final HashMap<String, Boolean> members) {
-
-        boolean result = true;
-
-        if (members.size() == 0)
-            return false;
-        final Iterator<String> iterator = members.keySet().iterator();
-        while (iterator.hasNext())
-            result = result && members.get(iterator.next().toString()).booleanValue();
-        return result;
-
-    }
-
-
-  
-    /**
-     * @param time
-     */
-    private static void sleep(final long time) {
-        try {
-            Thread.sleep(time);
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-        }
-
     }
 
 }
