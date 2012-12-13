@@ -7,7 +7,7 @@ import java.util.TimerTask;
 /**
  * This task represents calculations that happen periodically.
  */
-public abstract class VismoPeriodicTask extends TimerTask {
+public abstract class PeriodicTask extends TimerTask {
     /**
      * Schedule the task to be run under the timer.
      * 

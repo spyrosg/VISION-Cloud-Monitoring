@@ -1,7 +1,6 @@
 package gr.ntua.vision.monitoring.service;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
-import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSinks;
 import gr.ntua.vision.monitoring.sinks.EventSinksFactory;
 import gr.ntua.vision.monitoring.sources.EventSources;
@@ -15,7 +14,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This is used to build the vismo worker instance.
  */
-public class WorkerNodeFactory extends DefaultRulesFactory {
+public class WorkerNodeFactory extends CommonServiceFactory {
     /** the log target. */
     private static final Logger      log = LoggerFactory.getLogger(WorkerNodeFactory.class);
     /** the configuration object. */
@@ -35,15 +34,6 @@ public class WorkerNodeFactory extends DefaultRulesFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#boostrap(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
-     */
-    @Override
-    protected void boostrap(final VismoRulesEngine engine) {
-        registerDefaultRules(engine);
-    }
-
-
-    /**
      * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#getEventSinks()
      */
     @Override
@@ -57,6 +47,6 @@ public class WorkerNodeFactory extends DefaultRulesFactory {
      */
     @Override
     protected EventSources getEventSources() {
-        return new EventSourcesFactory(conf, zmq).createforWorker();
+        return new EventSourcesFactory(conf, zmq).buildforWorker();
     }
 }

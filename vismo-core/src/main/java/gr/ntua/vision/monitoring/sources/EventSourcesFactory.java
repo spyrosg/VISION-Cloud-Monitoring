@@ -41,11 +41,21 @@ public class EventSourcesFactory {
 
 
     /**
+     * Setup the sources group for cloud head.
+     * 
+     * @return an {@link EventSources} object.
+     */
+    public EventSources buildforCloudHead() {
+        return new EventSources().append(localSource()).append(sourceforAddress(withPort(conf.getCloudHeadPort())));
+    }
+
+
+    /**
      * Setup the sources group for cluster head.
      * 
      * @return an {@link EventSources} object.
      */
-    public EventSources createforClusterHead() {
+    public EventSources buildforClusterHead() {
         return new EventSources().append(localSource()).append(sourceforAddress(withPort(conf.getClusterHeadPort())));
     }
 
@@ -55,7 +65,7 @@ public class EventSourcesFactory {
      * 
      * @return an {@link EventSources} object.
      */
-    public EventSources createforWorker() {
+    public EventSources buildforWorker() {
         return new EventSources().append(localSource());
     }
 

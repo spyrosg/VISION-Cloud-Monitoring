@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+  <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>%-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m\n%ex</pattern>
     </encoder>
+    <target>System.err</target>
   </appender>
 
-  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>/var/log/vismo.log</file>
+  <appender name="SYSLOG" class="ch.qos.logback.classic.net.SyslogAppender">
+    <syslogHost>10.0.0.1</syslogHost>
+    <facility>USER</facility>
+    <suffixPattern>{}vismo %-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m\n%ex</suffixPattern>
+  </appender>
 
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>${LOGFILE:-/dev/null}</file>
     <encoder>
       <pattern>%-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m\n%ex</pattern>
     </encoder>
-
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>/var/log/vismo-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-      <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-        <maxFileSize>100MB</maxFileSize>
-      </timeBasedFileNamingAndTriggeringPolicy>
-    </rollingPolicy>
   </appender>
 
   <root level="TRACE">
-    <appender-ref ref="STDOUT" />
+    <appender-ref ref="STDERR" />
+    <appender-ref ref="SYSLOG" />
     <appender-ref ref="FILE" />
   </root>
 

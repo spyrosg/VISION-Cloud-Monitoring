@@ -41,6 +41,14 @@ public class EventSinksFactory {
 
 
     /**
+     * @return an {@link EventSinks} object.
+     */
+    public EventSinks buildForCloudHead() {
+        return new EventSinks(new UniqueEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort())));
+    }
+
+
+    /**
      * Setup the sinks for a cluster head node.
      * 
      * @return an {@link EventSinks} object.

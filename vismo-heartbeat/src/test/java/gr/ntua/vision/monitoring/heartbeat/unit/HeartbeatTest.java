@@ -18,21 +18,13 @@ import org.slf4j.LoggerFactory;
  * @author tmessini
  */
 public class HeartbeatTest {
-    /**
-     * 
-     */
+    /***/
     private static final Logger log            = LoggerFactory.getLogger(HeartbeatSender.class);
-    /**
-     * 
-     */
+    /***/
     private final String        MULTICAST_IP   = "224.0.0.1";
-    /**
-     * 
-     */
+    /***/
     private final int           MULTICAST_PORT = 6307;
-    /**
-     * 
-     */
+    /***/
     private final int           TTL            = 1;
 
 
@@ -41,35 +33,15 @@ public class HeartbeatTest {
      * @return true or false depending on membership.
      */
     private static boolean checkMembership(final HashMap<String, Boolean> members) {
-
         boolean result = true;
-
         if (members.size() == 0)
             return false;
         final Iterator<String> iterator = members.keySet().iterator();
         while (iterator.hasNext())
             result = result && members.get(iterator.next().toString()).booleanValue();
         return result;
-
     }
 
-
-    /**
-     * @param time
-     */
-    private static void sleep(final long time) {
-        try {
-            Thread.sleep(time);
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-
-    /*
-     * 
-     */
     /**
      * @throws IOException
      */
@@ -95,7 +67,7 @@ public class HeartbeatTest {
         sender2.init();
         sender3.init();
 
-        HeartbeatTest.sleep(2000);
+        sleep(2000);
 
         Assert.assertEquals("We expect membership to be valid", true, HeartbeatTest.checkMembership(receiver.getMembers()));
 
@@ -107,23 +79,15 @@ public class HeartbeatTest {
 
 
     /**
-     * @throws IOException
+     * @param time
      */
-    @Test
-    public void testHeartbeatServiceUnSuccessfull() throws IOException {
-        HeartbeatTest.log.info("starting HeartbeatServiceUnSuccessfull test...");
+    private static void sleep(final long time) {
+        try {
+            Thread.sleep(time);
+        } catch (final InterruptedException e) {
+            e.printStackTrace();
+        }
 
-        final HeartbeatReceiver receiver = new HeartbeatReceiver(InetAddress.getByName(MULTICAST_IP), MULTICAST_PORT);
-        receiver.clearMembership();
-        final HeartbeatSender sender1 = new HeartbeatSender(InetAddress.getByName(MULTICAST_IP), MULTICAST_PORT, TTL);
-        sender1.setHeartBeatInterval(10000);
-
-        receiver.init();
-        sender1.init();
-        HeartbeatTest.sleep(4000);
-        Assert.assertEquals("We expect membership to be invalid", false, HeartbeatTest.checkMembership(receiver.getMembers()));
-        sender1.halt();
-        receiver.halt();
     }
 
 }

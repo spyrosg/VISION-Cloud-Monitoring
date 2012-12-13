@@ -203,12 +203,6 @@
   <dependencies>
 
     <dependency>
-      <groupId>com.restfuse</groupId>
-      <artifactId>com.eclipsesource.restfuse</artifactId>
-      <version>1.1.1</version>
-    </dependency>
-
-    <dependency>
       <artifactId>vismo-config</artifactId>
       <groupId>gr.ntua.vision</groupId>
       <version>1.0.7-SNAPSHOT</version>
@@ -280,6 +274,13 @@
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-library</artifactId>
       <version>1.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.restfuse</groupId>
+      <artifactId>com.eclipsesource.restfuse</artifactId>
+      <version>1.1.1</version>
       <scope>test</scope>
     </dependency>
 

@@ -10,13 +10,11 @@ import gr.ntua.vision.monitoring.sources.EventSources;
 import gr.ntua.vision.monitoring.sources.EventSourcesFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
-import java.util.concurrent.TimeUnit;
-
 
 /**
  *
  */
-public class ClusterHeadNodeFactory extends DefaultRulesFactory {
+public class ClusterHeadNodeFactory extends CommonServiceFactory {
     /***/
     private final VismoConfiguration conf;
     /***/
@@ -38,7 +36,7 @@ public class ClusterHeadNodeFactory extends DefaultRulesFactory {
      */
     @Override
     protected void boostrap(final VismoRulesEngine engine) {
-        registerDefaultRules(engine);
+        super.boostrap(engine);
         registerRules(engine);
     }
 
@@ -57,7 +55,7 @@ public class ClusterHeadNodeFactory extends DefaultRulesFactory {
      */
     @Override
     protected EventSources getEventSources() {
-        return new EventSourcesFactory(conf, zmq).createforClusterHead();
+        return new EventSourcesFactory(conf, zmq).buildforClusterHead();
     }
 
 
@@ -67,8 +65,8 @@ public class ClusterHeadNodeFactory extends DefaultRulesFactory {
     private static void registerRules(final VismoRulesEngine engine) {
         // TODO: rename method
 
-        final long ONE_MINUTE = TimeUnit.MINUTES.toMillis(1);
-        final long THREE_SECONDS = TimeUnit.SECONDS.toMillis(3);
+        final long ONE_MINUTE = 60 * 1000;
+        final long THREE_SECONDS = 3 * 1000;
 
         new CTORule(engine, "cto-3-sec", THREE_SECONDS).submitTo(engine);
         new CTORule(engine, "cto-1-min", ONE_MINUTE).submitTo(engine);
