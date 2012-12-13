@@ -4,7 +4,6 @@ import static com.eclipsesource.restfuse.Assert.assertOk;
 import static com.eclipsesource.restfuse.Assert.assertCreated;
 import gr.ntua.vision.monitoring.notify.EventRegistry;
 
-import org.junit.After;
 import org.junit.Rule;
 import org.junit.Before;
 
@@ -24,24 +23,49 @@ import org.slf4j.LoggerFactory;
 
 
 
+/**
+ * @author tmessini
+ *
+ */
 @RunWith(HttpJUnitRunner.class)
 public class ContainerPutRemoveTest {
     
+    /**
+     * 
+     */
     private static final String CLOUDHEAD_ADDRESS = "10.0.1.103:8080";
 
+    /**
+     * 
+     */
     private static final String CONTAINER_PATH    = "/containers/ntua/testcontainer";
 
+    /**
+     * 
+     */
     private static final Logger log               = LoggerFactory.getLogger(ContainerPutRemoveTest.class);
     
+    /**
+     * 
+     */
     final EventRegistry registry = new EventRegistry("tcp://10.0.1.103:56430");
 
+    /**
+     * 
+     */
     @Rule
     public Destination          restfuse          = new Destination("http://" + CLOUDHEAD_ADDRESS);
 
+    /**
+     * 
+     */
     @Context
     private Response            response;
 
 
+    /**
+     * 
+     */
     @Before
     public void createConsumer()
     {
@@ -67,10 +91,6 @@ public class ContainerPutRemoveTest {
         assertOk(response);
     }
     
-    @After
-    public void shutdownConsumer()
-    {
-    
-    }
+
 
 }

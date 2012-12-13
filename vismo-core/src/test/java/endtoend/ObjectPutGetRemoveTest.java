@@ -22,24 +22,49 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+/**
+ * @author tmessini
+ *
+ */
 @RunWith(HttpJUnitRunner.class)
 public class ObjectPutGetRemoveTest {
 
+    /**
+     * 
+     */
     private static final String CLOUDHEAD_ADDRESS = "10.0.1.103";
 
+    /**
+     * 
+     */
     private static final String OBJECT_PATH       = "/vision-cloud/object-service/ntua/endtoendtest/object1";
 
+    /**
+     * 
+     */
     private static final Logger log               = LoggerFactory.getLogger(ObjectPutGetRemoveTest.class);
     
+    /**
+     * 
+     */
     final EventRegistry registry = new EventRegistry("tcp://10.0.1.103:56430");
     
+    /**
+     * 
+     */
     @Rule
     public Destination          restfuse          = new Destination("http://" + CLOUDHEAD_ADDRESS);
 
+    /**
+     * 
+     */
     @Context
     private Response            response;
 
 
+    /**
+     * 
+     */
     @Before
     public void createConsumer()
     {

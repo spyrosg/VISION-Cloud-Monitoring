@@ -20,19 +20,36 @@ import com.eclipsesource.restfuse.annotation.HttpTest;
 import gr.ntua.vision.monitoring.web.RulesWebServer;
 
 
+/**
+ * @author tmessini
+ *
+ */
 @RunWith(HttpJUnitRunner.class)
 public class RulesManagementResourceTest {
-    static RulesWebServer server = new RulesWebServer();
+    /**
+     * 
+     */
+    private static RulesWebServer server = new RulesWebServer();
 
 
+    /**
+     * @throws IllegalArgumentException
+     * @throws IOException
+     */
     @BeforeClass
     public static void startServer() throws IllegalArgumentException, IOException {
-        server.start();
+        getServer().start();
     }
 
+    /**
+     * 
+     */
     @Rule
     public Destination restfuse = new Destination("http://localhost:9998");
 
+    /**
+     * 
+     */
     @Context
     private Response   response;
 
@@ -73,9 +90,29 @@ public class RulesManagementResourceTest {
     }
 
 
+    /**
+     * @throws IllegalArgumentException
+     * @throws IOException
+     */
     @AfterClass
     public static void stopServer() throws IllegalArgumentException, IOException {
-        server.stop();
+        getServer().stop();
+    }
+
+
+    /**
+     * @return server
+     */
+    public static RulesWebServer getServer() {
+        return server;
+    }
+
+
+    /**
+     * @param server
+     */
+    public static void setServer(final RulesWebServer server) {
+        RulesManagementResourceTest.server = server;
     }
 
 }

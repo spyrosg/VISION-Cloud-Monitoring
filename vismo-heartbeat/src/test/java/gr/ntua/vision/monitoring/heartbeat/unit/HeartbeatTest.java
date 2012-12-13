@@ -14,14 +14,33 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+/**
+ * @author tmessini
+ *
+ */
 public class HeartbeatTest {
+    /**
+     * 
+     */
     private static final Logger log            = LoggerFactory.getLogger(HeartbeatSender.class);
+    /**
+     * 
+     */
     private final String        MULTICAST_IP   = "224.0.0.1";
+    /**
+     * 
+     */
     private final int           MULTICAST_PORT = 6307;
+    /**
+     * 
+     */
     private final int           TTL            = 1;
 
     /*
      * 
+     */
+    /**
+     * @throws IOException
      */
     @Test
     public void testHeartbeatServiceSuccessfull() throws IOException {
@@ -56,8 +75,9 @@ public class HeartbeatTest {
     }
 
 
-    /*
-     * 
+
+    /**
+     * @throws IOException
      */
     @Test
     public void testHeartbeatServiceUnSuccessfull() throws IOException {
@@ -77,30 +97,30 @@ public class HeartbeatTest {
     }
 
 
-    /*
-     * checks if all the members are valid.
+
+    /**
+     * @param members
+     * @return true or false depending on membership.
      */
-    private boolean checkMembership(final HashMap<String, Boolean> members) {
+    private static boolean checkMembership(final HashMap<String, Boolean> members) {
 
         boolean result = true;
 
         if (members.size() == 0)
             return false;
-        else {
-            final Iterator<String> iterator = members.keySet().iterator();
-            while (iterator.hasNext())
-                result = result && members.get(iterator.next().toString()).booleanValue();
-            return result;
-
-        }
+        final Iterator<String> iterator = members.keySet().iterator();
+        while (iterator.hasNext())
+            result = result && members.get(iterator.next().toString()).booleanValue();
+        return result;
 
     }
 
 
-    /*
-     *sleep method. 
+  
+    /**
+     * @param time
      */
-    private void sleep(final long time) {
+    private static void sleep(final long time) {
         try {
             Thread.sleep(time);
         } catch (final InterruptedException e) {
