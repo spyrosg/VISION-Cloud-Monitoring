@@ -11,7 +11,7 @@ import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 
 
-public class Server {
+public class RulesWebServer {
     /***/
     private static SelectorThread    grizzlyInstance = null;
     /***/
@@ -19,7 +19,7 @@ public class Server {
     /***/
     private final Map<String, String> initParams      = new HashMap<String, String>();
     /***/
-    private static final Logger      log             = LoggerFactory.getLogger(Server.class);
+    private static final Logger      log             = LoggerFactory.getLogger(RulesWebServer.class);
 
 
     /***/
