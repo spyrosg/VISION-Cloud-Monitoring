@@ -326,7 +326,7 @@ public class VismoRulesEngineTest {
         final long RULE_PERIOD = 100;
         final long TIMEOUT = 150;
 
-        new IntSumRule(engine, RULE_PERIOD, KEY).submitTo(engine);
+        new IntSumRule(engine, RULE_PERIOD, KEY).submit();
         source.triggerRuleEvaluationWith(new DummyEvent(KEY, VAL1));
         source.triggerRuleEvaluationWith(new DummyEvent(KEY, VAL2));
 
@@ -346,7 +346,7 @@ public class VismoRulesEngineTest {
         final String KEY = "foo";
         final int VAL = 0;
 
-        new IncRule(engine, KEY).submitTo(engine);
+        new IncRule(engine, KEY).submit();
         source.triggerRuleEvaluationWith(new DummyEvent(KEY, VAL));
 
         assertEquals(1, store.size());

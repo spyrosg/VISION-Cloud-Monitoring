@@ -35,7 +35,7 @@ public class Main {
      * @throws SocketException
      */
     public void start() throws SocketException {
-        final VismoService service = new StaticConfigPolicy(conf).build(new VismoVMInfo());
+        final VismoService service = (VismoService) new StaticConfigPolicy(conf).build(new VismoVMInfo());
         final UDPServer udpServer = new UDPFactory(conf.getUDPPort()).buildServer();
 
         udpServer.add(service);

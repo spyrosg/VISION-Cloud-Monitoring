@@ -45,28 +45,6 @@ public class ObjectPutGetRemoveTest {
     private Response            response;
 
 
-
-
-    /**
-     * checks the put of an object in the object service
-     */
-    @Ignore
-    @HttpTest(method = Method.PUT, path = ObjectPutGetRemoveTest.OBJECT_PATH, content = "thodoris test object")
-    public void checkPutObject() {
-        ObjectPutGetRemoveTest.log.debug("put object reply code: {}", response.getStatus() + ".");
-        Assert.assertCreated(response);
-    }
-    
-    /**
-     * checks the get of an object from the object service
-     */
-    @Ignore
-    @HttpTest(method = Method.GET, path = ObjectPutGetRemoveTest.OBJECT_PATH, content = "thodoris test object")
-    public void checkGetObject() {
-        ObjectPutGetRemoveTest.log.debug("get object reply code: {}", response.getStatus() + ".");
-        Assert.assertOk(response);
-    }
-
     /**
      * checks the deletion of an object in the object service
      */
@@ -78,6 +56,26 @@ public class ObjectPutGetRemoveTest {
     }
 
 
+    /**
+     * checks the get of an object from the object service
+     */
+    @Ignore
+    @HttpTest(method = Method.GET, path = ObjectPutGetRemoveTest.OBJECT_PATH, content = "thodoris test object")
+    public void checkGetObject() {
+        ObjectPutGetRemoveTest.log.debug("get object reply code: {}", response.getStatus() + ".");
+        Assert.assertOk(response);
+    }
+
+
+    /**
+     * checks the put of an object in the object service
+     */
+    @Ignore
+    @HttpTest(method = Method.PUT, path = ObjectPutGetRemoveTest.OBJECT_PATH, content = "thodoris test object")
+    public void checkPutObject() {
+        ObjectPutGetRemoveTest.log.debug("put object reply code: {}", response.getStatus() + ".");
+        Assert.assertCreated(response);
+    }
 
 
     /**
