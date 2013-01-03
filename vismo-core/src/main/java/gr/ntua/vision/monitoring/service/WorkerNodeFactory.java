@@ -47,6 +47,6 @@ public class WorkerNodeFactory extends CommonServiceFactory {
      */
     @Override
     protected EventSources getEventSources() {
-        return new EventSourcesFactory(conf, zmq).buildforWorker();
+        return new EventSourcesFactory(conf, zmq).buildForWorker();
     }
 }

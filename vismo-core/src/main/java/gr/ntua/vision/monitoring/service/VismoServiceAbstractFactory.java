@@ -23,7 +23,7 @@ abstract class VismoServiceAbstractFactory {
      * @param vminfo
      * @return the {@link VismoService} object ready to run.
      */
-    public VismoService build(final VMInfo vminfo) {
+    public Service build(final VMInfo vminfo) {
         final EventSources sources = getEventSources();
         final VismoRulesEngine engine = new VismoRulesEngine(getEventSinks());
 

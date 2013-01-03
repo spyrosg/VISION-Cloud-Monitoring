@@ -55,7 +55,7 @@ public class CloudHeadNodeFactory extends CommonServiceFactory {
      */
     @Override
     protected EventSources getEventSources() {
-        return new EventSourcesFactory(conf, zmq).buildforCloudHead();
+        return new EventSourcesFactory(conf, zmq).buildForCloudHead();
     }
 
 
@@ -68,8 +68,8 @@ public class CloudHeadNodeFactory extends CommonServiceFactory {
         final long ONE_MINUTE = 60 * 1000;
         final long THREE_SECONDS = 3 * 1000;
 
-        new CTORule(engine, "cto-3-sec", THREE_SECONDS).submitTo(engine);
-        new CTORule(engine, "cto-1-min", ONE_MINUTE).submitTo(engine);
-        new AccountingRule(engine, ONE_MINUTE).submitTo(engine);
+        new CTORule(engine, "cto-3-sec", THREE_SECONDS).submit();
+        new CTORule(engine, "cto-1-min", ONE_MINUTE).submit();
+        new AccountingRule(engine, ONE_MINUTE).submit();
     }
 }

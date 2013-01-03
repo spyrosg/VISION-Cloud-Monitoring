@@ -16,7 +16,7 @@ public abstract class CommonServiceFactory extends VismoServiceAbstractFactory {
      */
     @Override
     protected void boostrap(final VismoRulesEngine engine) {
-        new PassThroughRule(engine).submitTo(engine);
+        new PassThroughRule(engine).submit();
         // TODO: add SLAPerRequest rule
     }
 
