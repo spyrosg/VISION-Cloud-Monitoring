@@ -22,11 +22,11 @@ public abstract class Rule implements RuleProc<Event> {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.rules.RuleProc#submitTo(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
+     * @see gr.ntua.vision.monitoring.rules.RuleProc#submit()
      */
     @Override
-    public void submitTo(final VismoRulesEngine eng) {
-        eng.submitRule(this);
+    public void submit() {
+        this.engine.submitRule(this);
     }
 
 

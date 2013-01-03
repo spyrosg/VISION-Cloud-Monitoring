@@ -16,7 +16,7 @@ public interface RuleProc<C> {
 
 
     /**
-     * @param engine
+     * Submit rule to engine.
      */
-    void submitTo(final VismoRulesEngine engine);
+    void submit();
 }
