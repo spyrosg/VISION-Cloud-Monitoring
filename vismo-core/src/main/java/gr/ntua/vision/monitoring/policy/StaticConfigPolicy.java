@@ -4,6 +4,7 @@ import gr.ntua.vision.monitoring.VMInfo;
 import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.service.CloudHeadNodeFactory;
 import gr.ntua.vision.monitoring.service.ClusterHeadNodeFactory;
+import gr.ntua.vision.monitoring.service.Service;
 import gr.ntua.vision.monitoring.service.VismoService;
 import gr.ntua.vision.monitoring.service.WorkerNodeFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
@@ -38,7 +39,7 @@ public class StaticConfigPolicy implements NodePolicy {
      * @see gr.ntua.vision.monitoring.policy.NodePolicy#build(gr.ntua.vision.monitoring.VMInfo)
      */
     @Override
-    public VismoService build(final VMInfo vminfo) {
+    public Service build(final VMInfo vminfo) {
         final ZMQSockets zmq = new ZMQSockets(new ZContext());
 
         logConfig(vminfo);

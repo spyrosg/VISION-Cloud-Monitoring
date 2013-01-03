@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.policy;
 
 import gr.ntua.vision.monitoring.VMInfo;
-import gr.ntua.vision.monitoring.service.VismoService;
+import gr.ntua.vision.monitoring.service.Service;
 
 
 /**
@@ -12,7 +12,7 @@ public interface NodePolicy {
      * Configure and return the vismo service instance.
      * 
      * @param vminfo
-     * @return a configured {@link VismoService} ready to run.
+     * @return a configured {@link Service} ready to run.
      */
-    VismoService build(final VMInfo vminfo);
+    Service build(final VMInfo vminfo);
 }
