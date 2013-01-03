@@ -5,7 +5,7 @@ import static com.eclipsesource.restfuse.Assert.assertNoContent;
 
 import java.io.IOException;
 
-import org.junit.AfterClass;
+
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
@@ -26,8 +26,7 @@ import gr.ntua.vision.monitoring.web.RulesWebServer;
 @RunWith(HttpJUnitRunner.class)
 public class RulesManagementResourceTest {
     /***/
-    static RulesWebServer server = new RulesWebServer();
-
+    static RulesWebServer server = new RulesWebServer("gr.ntua.vision.monitoring.web.resources", 9998);
 
     /**
      * @throws IllegalArgumentException
@@ -87,9 +86,9 @@ public class RulesManagementResourceTest {
      * @throws IllegalArgumentException
      * @throws IOException
      */
-    @AfterClass
-    public static void stopServer() throws IllegalArgumentException, IOException {
-        server.stop();
-    }
+    //@AfterClass
+    //public static void stopServer() throws IllegalArgumentException, IOException {
+    //    server.stop();
+    //}
 
 }

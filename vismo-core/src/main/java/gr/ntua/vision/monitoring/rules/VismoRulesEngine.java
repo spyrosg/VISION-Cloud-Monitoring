@@ -96,6 +96,7 @@ public class VismoRulesEngine implements EventSourceListener {
     void submitRule(final PeriodicRule rule) {
         add(rule);
         schedule(rule);
+        
     }
 
 
@@ -136,5 +137,14 @@ public class VismoRulesEngine implements EventSourceListener {
      */
     private void schedule(final PeriodicRule rule) {
         timer.schedule(rule, 0, rule.period());
+    }
+    
+    /**
+     * @return number of rules
+     */
+    public int getRulesTotalNumber()
+    {
+        return rules.size();
+        
     }
 }

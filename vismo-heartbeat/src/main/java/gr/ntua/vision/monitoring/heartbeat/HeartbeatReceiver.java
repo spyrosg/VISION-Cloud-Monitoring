@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Iterator;
 
 import org.slf4j.Logger;
@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author tmessini
  */
-public final class HeartbeatReceiver {
+public class HeartbeatReceiver {
 
     /**
      * A multicast receiver which continuously receives heartbeats.
@@ -82,7 +82,7 @@ public final class HeartbeatReceiver {
                     getMembers().put(host, true);
                 else
                     getMembers().remove(host);
-            }
+                }
         }
 
     }
@@ -157,9 +157,9 @@ public final class HeartbeatReceiver {
     /***/
     private final Integer                    groupMulticastPort;
     /***/
-    private final HashMap<String, Boolean>   hostsMembership            = new HashMap<String, Boolean>();
+    private final ConcurrentHashMap<String, Boolean>   hostsMembership            = new ConcurrentHashMap<String, Boolean>();
     /***/
-    private final HashMap<String, Long>      hostsTimestamp             = new HashMap<String, Long>();
+    private final ConcurrentHashMap<String, Long>      hostsTimestamp             = new ConcurrentHashMap<String, Long>();
     /***/
     private final int                        MEMBERSHIP_TIMEOUT         = 2000;
     /***/
@@ -195,7 +195,7 @@ public final class HeartbeatReceiver {
     /**
      * @return host timestamp
      */
-    public HashMap<String, Long> getHostsTimestamp() {
+    public ConcurrentHashMap<String, Long> getHostsTimestamp() {
         return hostsTimestamp;
     }
 
@@ -203,7 +203,7 @@ public final class HeartbeatReceiver {
     /**
      * @return members
      */
-    public final HashMap<String, Boolean> getMembers() {
+    public final ConcurrentHashMap<String, Boolean> getMembers() {
         return hostsMembership;
     }
 

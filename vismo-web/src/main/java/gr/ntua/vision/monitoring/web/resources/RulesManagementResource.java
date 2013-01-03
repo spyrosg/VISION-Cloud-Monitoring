@@ -37,7 +37,7 @@ public class RulesManagementResource {
     @Produces("text/plain")
     @Path("rules/{id}")
     public static String RulesConfigurationDelete(@PathParam("id") final Integer id) {
-        RulesManagementResource.log.info("removed rule: {}", id, ".");
+        RulesManagementResource.log.info("removed rule: {}", id, ".");        
         return RulesManagementResource.catalog.remove(id);
     }
 

@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring.service;
 
 import gr.ntua.vision.monitoring.VMInfo;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
+import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
 import gr.ntua.vision.monitoring.sources.EventSources;
 import gr.ntua.vision.monitoring.threading.PeriodicTask;
 import gr.ntua.vision.monitoring.udp.UDPListener;
@@ -22,6 +23,8 @@ public class VismoService implements UDPListener, Service {
     private final Timer            timer = new Timer();
     /***/
     private final VMInfo           vminfo;
+    /***/
+    private final RulesPropagationManager manager;
 
 
     /**
@@ -30,11 +33,13 @@ public class VismoService implements UDPListener, Service {
      * @param vminfo
      * @param sources
      * @param engine
+     * @param manager 
      */
-    public VismoService(final VMInfo vminfo, final EventSources sources, final VismoRulesEngine engine) {
+    public VismoService(final VMInfo vminfo, final EventSources sources, final VismoRulesEngine engine, final RulesPropagationManager manager) {
         this.vminfo = vminfo;
         this.sources = sources;
         this.engine = engine;
+        this.manager = manager;
     }
 
 
@@ -54,7 +59,6 @@ public class VismoService implements UDPListener, Service {
      */
     @Override
     public void collectStatus(final List<String> statuses) {
-        // FIXME: it's incomplete, should be collecting statuses from various threads.
         statuses.add(String.valueOf(vminfo.getPID()));
     }
 
@@ -67,6 +71,7 @@ public class VismoService implements UDPListener, Service {
         timer.cancel();
         sources.halt();
         engine.halt();
+        // TODO: man.halt();
     }
 
 
@@ -76,5 +81,6 @@ public class VismoService implements UDPListener, Service {
     @Override
     public void start() {
         sources.start();
+        manager.start();
     }
 }

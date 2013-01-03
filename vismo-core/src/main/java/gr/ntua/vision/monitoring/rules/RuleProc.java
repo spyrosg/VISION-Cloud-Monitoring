@@ -19,4 +19,6 @@ public interface RuleProc<C> {
      * @param engine
      */
     void submitTo(final VismoRulesEngine engine);
+    
+    
 }

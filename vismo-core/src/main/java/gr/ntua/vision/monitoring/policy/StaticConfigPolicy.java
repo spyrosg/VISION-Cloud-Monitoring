@@ -1,5 +1,8 @@
 package gr.ntua.vision.monitoring.policy;
 
+
+import java.io.IOException;
+
 import gr.ntua.vision.monitoring.VMInfo;
 import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.service.CloudHeadNodeFactory;
@@ -35,10 +38,11 @@ public class StaticConfigPolicy implements NodePolicy {
 
 
     /**
+     * @throws IOException 
      * @see gr.ntua.vision.monitoring.policy.NodePolicy#build(gr.ntua.vision.monitoring.VMInfo)
      */
     @Override
-    public VismoService build(final VMInfo vminfo) {
+    public VismoService build(final VMInfo vminfo) throws IOException {
         final ZMQSockets zmq = new ZMQSockets(new ZContext());
 
         logConfig(vminfo);

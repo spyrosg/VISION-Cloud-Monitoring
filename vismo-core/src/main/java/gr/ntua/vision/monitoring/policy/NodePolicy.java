@@ -1,5 +1,7 @@
 package gr.ntua.vision.monitoring.policy;
 
+import java.io.IOException;
+
 import gr.ntua.vision.monitoring.VMInfo;
 import gr.ntua.vision.monitoring.service.VismoService;
 
@@ -13,6 +15,7 @@ public interface NodePolicy {
      * 
      * @param vminfo
      * @return a configured {@link VismoService} ready to run.
+     * @throws IOException 
      */
-    VismoService build(final VMInfo vminfo);
+    VismoService build(final VMInfo vminfo) throws IOException;
 }

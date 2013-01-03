@@ -16,34 +16,36 @@ import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
  */
 public class RulesWebServer {
     /***/
-    private static SelectorThread     grizzlyInstance = null;
-    /***/
     private static final Logger       log             = LoggerFactory.getLogger(RulesWebServer.class);
     /***/
-    private final String              BASE_URI        = RulesWebServer.getBaseURI();
+    private final String              BASE_URI;
     /***/
-    private final Map<String, String> initParams      = new HashMap<String, String>();
-
+    private final Map<String, String> initParams      = new HashMap<String, String>();    
+    /***/
+    private final int               serverPort;
+    
 
     /**
-     * @return baseUri
+     * we configure the system so as to use the resource package.
+     * @param resourcePackage
+     * @param serverPort 
      */
-    private static String getBaseURI() {
-        return "http://localhost:" + (System.getenv("PORT") != null ? System.getenv("PORT") : "9998") + "/";
+    public RulesWebServer(String resourcePackage, int serverPort)
+    {
+        this.serverPort = serverPort;
+        BASE_URI= "http://localhost:"+serverPort+"/";
+        initParams.put("com.sun.jersey.config.property.packages", resourcePackage); 
     }
+    
 
 
     /**
      * @throws IllegalArgumentException
      * @throws IOException
      */
-    public void start() throws IllegalArgumentException, IOException {
-        initParams.put("com.sun.jersey.config.property.packages", "gr.ntua.vision.monitoring.web.resources");
-        RulesWebServer.log.info("starting grizzly...");
-        getGrizzly();
-        // RulesEventReceiver rulesReceiver = new RulesEventReceiver(multicastAddress, multicastPort);
-        // RulesEventSender rulesSender = new RulesEventSender(multicastAddress, multicastPort, timeToLive);
-        RulesWebServer.log.info("grizzly started");
+    public void start() throws IllegalArgumentException, IOException {        
+        getGrizzly();      
+        RulesWebServer.log.info("grizzly started at "+getGrizzlyPort());
     }
 
 
@@ -52,7 +54,6 @@ public class RulesWebServer {
      * @throws IOException
      */
     public void stop() throws IllegalArgumentException, IOException {
-        RulesWebServer.log.info("stopping grizzly...");
         getGrizzly().stopEndpoint();
         RulesWebServer.log.info("grizzly stopped");
 
@@ -65,9 +66,16 @@ public class RulesWebServer {
      * @throws IOException
      */
     private SelectorThread getGrizzly() throws IllegalArgumentException, IOException {
-        if (RulesWebServer.grizzlyInstance == null)
-            RulesWebServer.grizzlyInstance = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
-        return RulesWebServer.grizzlyInstance;
+        return GrizzlyWebContainerFactory.create(BASE_URI, initParams);
     }
 
+    /**
+     * @return Grizzly port
+     */
+    private int getGrizzlyPort(){
+        
+        return serverPort;
+        
+    }
+    
 }

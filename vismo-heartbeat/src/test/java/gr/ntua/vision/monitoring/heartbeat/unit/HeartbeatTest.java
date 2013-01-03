@@ -3,9 +3,10 @@ package gr.ntua.vision.monitoring.heartbeat.unit;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatReceiver;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatSender;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.HashMap;
 import java.util.Iterator;
 
 import org.junit.Assert;
@@ -93,7 +94,7 @@ public class HeartbeatTest {
      * @param members
      * @return true or false.
      */
-    private static boolean checkMembership(final HashMap<String, Boolean> members) {
+    private static boolean checkMembership(final ConcurrentHashMap<String, Boolean> members) {
 
         boolean result = true;
 

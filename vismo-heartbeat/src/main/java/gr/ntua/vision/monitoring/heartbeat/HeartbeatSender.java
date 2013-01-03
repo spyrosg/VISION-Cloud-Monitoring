@@ -62,7 +62,7 @@ public final class HeartbeatSender {
             while (!stopped) {
                 try {
                     socket = new MulticastSocket(groupMulticastPort.intValue());
-                    socket.setTimeToLive(getTimeToLive().intValue());
+                    socket.setTimeToLive(getTimeToLive());
                     socket.joinGroup(getGroupMulticastAddress());
 
                     final byte[] buffer = createPayload();
@@ -148,7 +148,7 @@ public final class HeartbeatSender {
     private long                  sendInterval               = DEFAULT_HEARTBEAT_INTERVAL;
 
     /***/
-    private final Integer         timeToLive;
+    private final int         timeToLive;
 
 
     /**
@@ -206,7 +206,7 @@ public final class HeartbeatSender {
     /**
      * @return the TTL
      */
-    public Integer getTimeToLive() {
+    public int getTimeToLive() {
         return timeToLive;
     }
 

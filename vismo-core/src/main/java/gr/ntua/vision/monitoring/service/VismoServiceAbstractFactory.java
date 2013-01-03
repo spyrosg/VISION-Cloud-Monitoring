@@ -1,7 +1,10 @@
 package gr.ntua.vision.monitoring.service;
 
+import java.io.IOException;
+
 import gr.ntua.vision.monitoring.VMInfo;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
+import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
 import gr.ntua.vision.monitoring.sinks.EventSinks;
 import gr.ntua.vision.monitoring.sources.EventSources;
 
@@ -22,18 +25,22 @@ abstract class VismoServiceAbstractFactory {
      * 
      * @param vminfo
      * @return the {@link VismoService} object ready to run.
+     * @throws IOException 
      */
-    public VismoService build(final VMInfo vminfo) {
+    public VismoService build(final VMInfo vminfo) throws IOException {
+        
         final EventSources sources = getEventSources();
         final VismoRulesEngine engine = new VismoRulesEngine(getEventSinks());
-
+        
         sources.subscribeAll(engine);
         boostrap(engine);
-
-        final VismoService service = new VismoService(vminfo, sources, engine);
-
+        
+        final RulesPropagationManager rulesManager = new RulesPropagationManager(engine,"gr.ntua.vision.monitoring.rules.propagation", 9996);
+        
+        final VismoService service = new VismoService(vminfo, sources, engine, rulesManager);
+        
         bootstrap(service);
-
+        
         return service;
     }
 

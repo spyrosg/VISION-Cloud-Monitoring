@@ -7,7 +7,6 @@ import gr.ntua.vision.monitoring.udp.UDPFactory;
 import gr.ntua.vision.monitoring.udp.UDPServer;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 
@@ -32,9 +31,9 @@ public class Main {
 
 
     /**
-     * @throws SocketException
+     * @throws IOException 
      */
-    public void start() throws SocketException {
+    public void start() throws IOException {
         final VismoService service = new StaticConfigPolicy(conf).build(new VismoVMInfo());
         final UDPServer udpServer = new UDPFactory(conf.getUDPPort()).buildServer();
 
