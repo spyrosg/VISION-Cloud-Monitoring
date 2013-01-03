@@ -22,8 +22,6 @@ public class VismoEventDispatcher implements EventDispatcher {
     private static final String       VISMO_CONFIG_RESOURCE        = "/vismo-config.properties";
     /** the property used to denote the location of the configuration file. */
     private static final String       VISMO_CONFIG_SYSTEM_PROPERTY = "vismo.config.properties";
-    /** the zmq object. */
-    private static final ZMQSockets   zmq                          = new ZMQSockets(new ZContext());
     /** the event builder. */
     private final EventBuilder        builder;
     /** the machine's external ip address. */
@@ -49,7 +47,7 @@ public class VismoEventDispatcher implements EventDispatcher {
      *            the name of the service generating the events.
      */
     public VismoEventDispatcher(final String serviceName) {
-        this(serviceName, zmq.newConnectedPushSocket(conf.getProducersPoint()));
+        this(serviceName, new ZMQSockets(new ZContext()).newConnectedPushSocket(conf.getProducersPoint()));
     }
 
 
