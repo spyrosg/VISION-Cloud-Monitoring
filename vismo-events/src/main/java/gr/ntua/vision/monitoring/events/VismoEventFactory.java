@@ -9,7 +9,7 @@ import org.json.simple.parser.ParseException;
 
 
 /**
- * This is used to de-serialize events received from the wire to actual java objects of type {@link Event}.
+ * This is used to deserialize events received from the wire, to actual java objects of type {@link Event}.
  */
 public class VismoEventFactory implements EventFactory {
     /** the log target. */
@@ -31,7 +31,7 @@ public class VismoEventFactory implements EventFactory {
 
 
     /**
-     * De-serialize the message as a json object.
+     * Deserialize the message as a json object.
      * 
      * @param msg
      *            the message string.
