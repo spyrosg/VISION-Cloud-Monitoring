@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision.monitoring.dispatch;
 
 import java.util.HashMap;
 import java.util.Map;

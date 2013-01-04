@@ -1,7 +1,7 @@
 package endtoend;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
-import gr.ntua.vision.monitoring.VismoEventDispatcher;
+import gr.ntua.vision.monitoring.dispatch.VismoEventDispatcher;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.util.Properties;

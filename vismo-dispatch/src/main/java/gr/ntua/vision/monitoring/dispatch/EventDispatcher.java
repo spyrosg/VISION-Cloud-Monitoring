@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring;
+package gr.ntua.vision.monitoring.dispatch;
 
 /**
  * This is used to abstract away the details of generating/sending an event to the locally running vismo instance.

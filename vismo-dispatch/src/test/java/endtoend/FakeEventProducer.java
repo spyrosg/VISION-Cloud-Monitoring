@@ -1,6 +1,6 @@
 package endtoend;
 
-import gr.ntua.vision.monitoring.VismoEventDispatcher;
+import gr.ntua.vision.monitoring.dispatch.VismoEventDispatcher;
 
 
 /**
