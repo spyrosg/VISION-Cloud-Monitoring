@@ -1,6 +1,9 @@
 package gr.ntua.vision.monitoring.web;
 
-import gr.ntua.vision.monitoring.notify.EventRegistry;
+import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
+import gr.ntua.vision.monitoring.zmq.ZMQSockets;
+
+import org.zeromq.ZContext;
 
 import com.google.common.cache.CacheBuilderSpec;
 import com.yammer.dropwizard.Service;
@@ -33,8 +36,9 @@ public class VismoService extends Service<VismoServiceConfiguration> {
     protected void initialize(final VismoServiceConfiguration conf, final Environment env) throws Exception {
         final String rootPath = conf.getHttpConfiguration().getRootPath();
         final String cleanedPath = rootPath.substring(0, rootPath.length() - 2);
+        final ZMQSockets zmq = new ZMQSockets(new ZContext());
 
-        env.addServlet(new VisionEventsServlet(new EventRegistry(conf.getAddress())), cleanedPath + "/events/*");
+        env.addServlet(new VisionEventsServlet(new VismoEventRegistry(zmq, conf.getAddress())), cleanedPath + "/events/*");
     }
 
 

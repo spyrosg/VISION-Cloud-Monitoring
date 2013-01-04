@@ -2,9 +2,12 @@ package examples;
 
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.notify.EventHandler;
-import gr.ntua.vision.monitoring.notify.EventRegistry;
+import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
+import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.util.Map;
+
+import org.zeromq.ZContext;
 
 
 /**
@@ -41,7 +44,9 @@ public class FakeEventConsumer {
      * @param args
      */
     public static void main(final String... args) {
-        final EventRegistry registry = new EventRegistry("tcp://10.0.1.103:56430");
+        final ZMQSockets zmq = new ZMQSockets(new ZContext());
+        final VismoEventRegistry registry = new VismoEventRegistry(zmq, "tcp://10.0.1.103:56430");
+
         registry.registerToAll(new LoggingHandler());
     }
 }

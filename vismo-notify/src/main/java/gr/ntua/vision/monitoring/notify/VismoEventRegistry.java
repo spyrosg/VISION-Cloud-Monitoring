@@ -1,21 +1,24 @@
 package gr.ntua.vision.monitoring.notify;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
+import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.io.IOException;
+
+import org.zeromq.ZContext;
 
 
 /**
  *
  */
 public class VismoEventRegistry extends EventRegistry {
-    /***/
+    /** the configuration object. */
     private static VismoConfiguration conf;
-    /***/
+    /** the configuration file. */
     private static final String       VISMO_CONFIG_FILE = "/etc/visioncloud_vismo.conf";
 
     static {
-        loadConfiguration();
+        conf = loadConfiguration(VISMO_CONFIG_FILE);
     }
 
 
@@ -23,28 +26,30 @@ public class VismoEventRegistry extends EventRegistry {
      * Constructor.
      */
     public VismoEventRegistry() {
-        super("tcp://127.0.0.1:" + conf.getConsumersPort());
+        this(new ZMQSockets(new ZContext()), "tcp://127.0.0.1:" + conf.getConsumersPort());
     }
 
 
     /**
      * Constructor.
      * 
-     * @param debug
-     *            when <code>true</code>, it activates the console logger for this package.
+     * @param zmq
+     * @param address
      */
-    public VismoEventRegistry(final boolean debug) {
-        super("tcp://127.0.0.1:" + conf.getConsumersPort(), debug);
+    public VismoEventRegistry(final ZMQSockets zmq, final String address) {
+        super(zmq, address, false);
     }
 
 
     /**
-     * Try to load the configuration. First try reading the file specified in the system property; if the property is null, try
-     * loading the configuration from inside the jar.
+     * Load the configuration.
+     * 
+     * @param configFile
+     * @return the configuration object.
      */
-    private static void loadConfiguration() {
+    private static VismoConfiguration loadConfiguration(final String configFile) {
         try {
-            conf = new VismoConfiguration(VISMO_CONFIG_FILE);
+            return new VismoConfiguration(configFile);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }

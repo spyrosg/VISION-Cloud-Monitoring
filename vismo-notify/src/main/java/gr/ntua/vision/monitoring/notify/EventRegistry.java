@@ -20,8 +20,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import org.zeromq.ZContext;
-
 
 /**
  * The event registry is the mechanism through which an event consumer is notified of new events. The user is expected to register
@@ -29,7 +27,7 @@ import org.zeromq.ZContext;
  * own thread, without blocking the rest of the application or other handlers. This also means that the event handlers will be
  * notified asynchronously to the main client program loop.
  */
-public class EventRegistry {
+class EventRegistry {
     /**
      * The event handler task is responsible for listening for incoming events and pass those events to the handler.
      */
@@ -139,29 +137,32 @@ public class EventRegistry {
     /** the pool of threads. Each thread corresponds to one event handler. */
     private final ExecutorService pool         = Executors.newCachedThreadPool();
     /** the zmq object. */
-    private final ZMQSockets      zmq          = new ZMQSockets(new ZContext());
+    private final ZMQSockets      zmq;
 
 
     /**
      * Constructor.
      * 
+     * @param zmq
      * @param addr
      *            the address to connect to for incoming events.
      */
-    public EventRegistry(final String addr) {
-        this(addr, false);
+    public EventRegistry(final ZMQSockets zmq, final String addr) {
+        this(zmq, addr, false);
     }
 
 
     /**
      * Constructor.
      * 
+     * @param zmq
      * @param addr
      *            the address to connect to for incoming events.
      * @param debug
      *            when this is <code>true</code> enable debugging output.
      */
-    public EventRegistry(final String addr, final boolean debug) {
+    public EventRegistry(final ZMQSockets zmq, final String addr, final boolean debug) {
+        this.zmq = zmq;
         this.addr = addr;
 
         if (debug)

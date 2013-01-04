@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.web;
 
-import gr.ntua.vision.monitoring.notify.EventRegistry;
+import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,15 +15,15 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("serial")
 public class VisionEventsServlet extends EventSourceServlet {
     /***/
-    private static final Logger log = LoggerFactory.getLogger(VisionEventsServlet.class);
+    private static final Logger      log = LoggerFactory.getLogger(VisionEventsServlet.class);
     /***/
-    private final EventRegistry registry;
+    private final VismoEventRegistry registry;
 
 
     /**
      * @param registry
      */
-    public VisionEventsServlet(final EventRegistry registry) {
+    public VisionEventsServlet(final VismoEventRegistry registry) {
         this.registry = registry;
     }
 

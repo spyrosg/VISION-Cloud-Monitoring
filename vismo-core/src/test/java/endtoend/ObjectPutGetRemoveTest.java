@@ -1,6 +1,7 @@
 package endtoend;
 
-import gr.ntua.vision.monitoring.notify.EventRegistry;
+import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
+import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -8,6 +9,7 @@ import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zeromq.ZContext;
 
 import com.eclipsesource.restfuse.Assert;
 import com.eclipsesource.restfuse.Destination;
@@ -23,26 +25,27 @@ import com.eclipsesource.restfuse.annotation.HttpTest;
  */
 @RunWith(HttpJUnitRunner.class)
 public class ObjectPutGetRemoveTest {
+    /***/
+    private static final String     CLOUDHEAD_ADDRESS = "10.0.1.103";
+    /***/
+    private static final Logger     log               = LoggerFactory.getLogger(ObjectPutGetRemoveTest.class);
 
     /***/
-    private static final String CLOUDHEAD_ADDRESS = "10.0.1.103";
+    private static final String     OBJECT_PATH       = "/vision-cloud/object-service/ntua/endtoendtest/object1";
 
     /***/
-    private static final Logger log               = LoggerFactory.getLogger(ObjectPutGetRemoveTest.class);
-
-    /***/
-    private static final String OBJECT_PATH       = "/vision-cloud/object-service/ntua/endtoendtest/object1";
+    private static final ZMQSockets zmq               = new ZMQSockets(new ZContext());
 
     /***/
     @Rule
-    public Destination          restfuse          = new Destination("http://" + ObjectPutGetRemoveTest.CLOUDHEAD_ADDRESS);
+    public Destination              restfuse          = new Destination("http://" + ObjectPutGetRemoveTest.CLOUDHEAD_ADDRESS);
 
     /***/
-    final EventRegistry         registry          = new EventRegistry("tcp://10.0.1.103:56430");
+    final VismoEventRegistry        registry          = new VismoEventRegistry(zmq, "tcp://10.0.1.103:56430");
 
     /***/
     @Context
-    private Response            response;
+    private Response                response;
 
 
     /**

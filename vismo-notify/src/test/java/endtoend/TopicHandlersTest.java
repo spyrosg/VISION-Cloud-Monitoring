@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.notify.EventHandler;
-import gr.ntua.vision.monitoring.notify.EventRegistry;
+import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import org.junit.After;
@@ -68,7 +68,7 @@ public class TopicHandlersTest {
     /***/
     private FakeMonitoringInstance        inst;
     /***/
-    private EventRegistry                 registry;
+    private VismoEventRegistry            registry;
 
 
     /**
@@ -93,7 +93,7 @@ public class TopicHandlersTest {
         final ZMQSockets zmq = new ZMQSockets(new ZContext());
 
         setupFakeMonitoring(zmq);
-        setupRegistry();
+        setupRegistry(zmq);
     }
 
 
@@ -113,9 +113,11 @@ public class TopicHandlersTest {
     }
 
 
-    /***/
-    private void setupRegistry() {
-        registry = new EventRegistry(CONSUMERS_PORT, true);
+    /**
+     * @param zmq
+     */
+    private void setupRegistry(final ZMQSockets zmq) {
+        registry = new VismoEventRegistry(zmq, CONSUMERS_PORT);
     }
 
 
