@@ -41,12 +41,4 @@ public class FakeObjectService {
                     .field("operation", "PUT").field("content-size", 1000).send();
 
     }
-
-
-    /**
-     * 
-     */
-    public void start() {
-
-    }
 }

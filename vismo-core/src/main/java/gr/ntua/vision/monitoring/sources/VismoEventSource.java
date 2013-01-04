@@ -94,7 +94,7 @@ public class VismoEventSource extends StoppableTask implements EventSource {
 
                 notifyAll(e);
             } catch (final Throwable x) {
-                log.error("deserializing error", x);
+                log.error("deserialization error", x);
                 log.debug("skipping");
             }
         }

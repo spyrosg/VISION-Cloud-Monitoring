@@ -5,18 +5,15 @@ import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.VismoEventDispatcher;
 import gr.ntua.vision.monitoring.VismoVMInfo;
 import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
 import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.service.Service;
 import gr.ntua.vision.monitoring.service.WorkerNodeFactory;
-import gr.ntua.vision.monitoring.zmq.VismoSocket;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.util.Properties;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.zeromq.ZContext;
 
@@ -56,8 +53,6 @@ public class VismoServiceTest {
          */
         @Override
         public void performWith(final Event e) {
-            System.err.println(this + "#performWith: " + e);
-
             if (e != null)
                 ++counter;
         }
@@ -93,8 +88,6 @@ public class VismoServiceTest {
                                                            }
                                                        };
     /***/
-    private VismoEventRegistry reg;
-    /***/
     private Service            service;
     /***/
     private WorkerNodeFactory  serviceFactory;
@@ -107,17 +100,24 @@ public class VismoServiceTest {
     /**
      * @throws InterruptedException
      */
-    @Ignore("work in progress")
     @Test
     public void receivesExpectedEvents() throws InterruptedException {
         service.start();
-        obs.start();
 
         obs.sendReadEvents(NO_READ_EVENTS_TO_SEND);
         obs.sendWriteEvents(NO_WRITE_EVENTS_TO_SEND);
 
-        Thread.sleep(2000);
+        waitForEventsDelivery(1000);
         assertThatServiceReceivedAllEvents(NO_READ_EVENTS_TO_SEND + NO_WRITE_EVENTS_TO_SEND);
+    }
+
+
+    /**
+     * @param n
+     * @throws InterruptedException
+     */
+    private static void waitForEventsDelivery(int n) throws InterruptedException {
+        Thread.sleep(n);
     }
 
 
@@ -135,9 +135,7 @@ public class VismoServiceTest {
             }
         };
 
-        final VismoSocket sock = zmq.newConnectedPushSocket(conf.getProducersPoint());
-        obs = new FakeObjectService(new VismoEventDispatcher("fake-obs", sock));
-        System.err.println("vismo dispatcher using: " + sock);
+        obs = new FakeObjectService(new VismoEventDispatcher("fake-obs", zmq.newConnectedPushSocket(conf.getProducersPoint())));
         service = serviceFactory.build(vminfo);
     }
 
