@@ -23,9 +23,9 @@ import org.zeromq.ZContext;
  */
 public class VismoServiceTest {
     /**
-     * 
+     * This is used to count the number of events received.
      */
-    private final class EventCounter extends Rule {
+    private final class EventCountRule extends Rule {
         /***/
         private int counter = 0;
 
@@ -35,7 +35,7 @@ public class VismoServiceTest {
          * 
          * @param engine
          */
-        public EventCounter(final VismoRulesEngine engine) {
+        public EventCountRule(final VismoRulesEngine engine) {
             super(engine);
         }
 
@@ -63,7 +63,7 @@ public class VismoServiceTest {
     /***/
     private static final int   NO_WRITE_EVENTS_TO_SEND = 10;
     /***/
-    EventCounter               counterRule;
+    EventCountRule             countRule;
     /***/
     private VismoConfiguration conf;
     /***/
@@ -97,30 +97,6 @@ public class VismoServiceTest {
     private final ZMQSockets   zmq                     = new ZMQSockets(new ZContext());
 
 
-    /**
-     * @throws InterruptedException
-     */
-    @Test
-    public void receivesExpectedEvents() throws InterruptedException {
-        service.start();
-
-        obs.sendReadEvents(NO_READ_EVENTS_TO_SEND);
-        obs.sendWriteEvents(NO_WRITE_EVENTS_TO_SEND);
-
-        waitForEventsDelivery(1000);
-        assertThatServiceReceivedAllEvents(NO_READ_EVENTS_TO_SEND + NO_WRITE_EVENTS_TO_SEND);
-    }
-
-
-    /**
-     * @param n
-     * @throws InterruptedException
-     */
-    private static void waitForEventsDelivery(int n) throws InterruptedException {
-        Thread.sleep(n);
-    }
-
-
     /***/
     @Before
     public void setUp() {
@@ -130,8 +106,8 @@ public class VismoServiceTest {
             @Override
             protected void boostrap(final VismoRulesEngine engine) {
                 super.boostrap(engine);
-                counterRule = new EventCounter(engine);
-                counterRule.submit();
+                countRule = new EventCountRule(engine);
+                countRule.submit();
             }
         };
 
@@ -141,9 +117,31 @@ public class VismoServiceTest {
 
 
     /**
-     * @param noExpectedEvents
+     * @throws InterruptedException
      */
-    private void assertThatServiceReceivedAllEvents(final int noExpectedEvents) {
-        counterRule.hasSeenExpectedNoEvents(noExpectedEvents);
+    @Test
+    public void vismoReceivesEventsFromProducers() throws InterruptedException {
+        service.start();
+
+        obs.sendReadEvents(NO_READ_EVENTS_TO_SEND);
+        obs.sendWriteEvents(NO_WRITE_EVENTS_TO_SEND);
+
+        waitForEventsDelivery(1000);
+        assertThatServiceReceivedEvents();
+    }
+
+
+    /***/
+    private void assertThatServiceReceivedEvents() {
+        countRule.hasSeenExpectedNoEvents(NO_READ_EVENTS_TO_SEND + NO_WRITE_EVENTS_TO_SEND);
+    }
+
+
+    /**
+     * @param n
+     * @throws InterruptedException
+     */
+    private static void waitForEventsDelivery(final int n) throws InterruptedException {
+        Thread.sleep(n);
     }
 }
