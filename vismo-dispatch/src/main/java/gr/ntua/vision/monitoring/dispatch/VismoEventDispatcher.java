@@ -20,10 +20,8 @@ import org.zeromq.ZContext;
 public class VismoEventDispatcher implements EventDispatcher {
     /** the configuration object. */
     private static VismoConfiguration conf;
-    /** the resource file used when no configuration file is passed by the client. */
-    private static final String       VISMO_CONFIG_RESOURCE        = "/vismo-config.properties";
-    /** the property used to denote the location of the configuration file. */
-    private static final String       VISMO_CONFIG_SYSTEM_PROPERTY = "vismo.config.properties";
+    /** the configuration file. */
+    private static final String       VISMO_CONFIG_FILE = "/etc/visioncloud_vismo.conf";
     /** the event builder. */
     private final EventBuilder        builder;
     /** the machine's external ip address. */
@@ -34,11 +32,7 @@ public class VismoEventDispatcher implements EventDispatcher {
     private final VismoSocket         sock;
 
     static {
-        try {
-            loadConfiguration();
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+        conf = loadConfiguration(VISMO_CONFIG_FILE);
     }
 
 
@@ -80,7 +74,7 @@ public class VismoEventDispatcher implements EventDispatcher {
 
 
     /**
-     * Send the event to the locally running <code>vismo</code> instance.
+     * @see gr.ntua.vision.monitoring.dispatch.EventDispatcher#send()
      */
     @Override
     public void send() {
@@ -130,19 +124,16 @@ public class VismoEventDispatcher implements EventDispatcher {
 
 
     /**
-     * Try to load the configuration. First try reading the file specified in the system property; if the property is null, try
-     * loading the configuration from inside the jar.
+     * Load the configuration.
      * 
-     * @throws IOException
+     * @param configFile
+     * @return the configuration object.
      */
-    private static void loadConfiguration() throws IOException {
-        final String configFile = System.getProperty(VISMO_CONFIG_SYSTEM_PROPERTY);
-
-        if (configFile != null) {
-            conf = new VismoConfiguration(configFile);
-            return;
+    private static VismoConfiguration loadConfiguration(final String configFile) {
+        try {
+            return new VismoConfiguration(configFile);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
         }
-
-        conf = VismoConfiguration.loadFromResource(VismoEventDispatcher.class.getResourceAsStream((VISMO_CONFIG_RESOURCE)));
     }
 }
