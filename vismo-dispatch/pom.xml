@@ -19,19 +19,19 @@
     <dependency>
       <groupId>gr.ntua.vision</groupId>
       <artifactId>vismo-config</artifactId>
-      <version>1.0.7-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>gr.ntua.vision</groupId>
       <artifactId>vismo-events</artifactId>
-      <version>1.0.7-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>gr.ntua.vision</groupId>
       <artifactId>vismo-zmq</artifactId>
-      <version>1.0.7-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>

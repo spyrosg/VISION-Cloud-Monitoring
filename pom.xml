@@ -56,8 +56,6 @@
     </developer>
   </developers>
 
-  
-
   <scm>
     <connection>scm:git:http://147.102.19.118:8080/git/vismo.git</connection>
     <developerConnection>scm:git:git@147.102.19.118:vismo.git</developerConnection>

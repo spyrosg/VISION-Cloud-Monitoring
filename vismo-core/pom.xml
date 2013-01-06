@@ -204,19 +204,19 @@
     <dependency>
       <artifactId>vismo-config</artifactId>
       <groupId>gr.ntua.vision</groupId>
-      <version>1.0.7-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <artifactId>vismo-events</artifactId>
       <groupId>gr.ntua.vision</groupId>
-      <version>1.0.7-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <artifactId>vismo-zmq</artifactId>
       <groupId>gr.ntua.vision</groupId>
-      <version>1.0.7-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -286,14 +286,14 @@
     <dependency>
       <artifactId>vismo-notify</artifactId>
       <groupId>gr.ntua.vision</groupId>
-      <version>1.0.7-SNAPSHOT</version>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <artifactId>vismo-dispatch</artifactId>
       <groupId>gr.ntua.vision</groupId>
-      <version>1.0.7-SNAPSHOT</version>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
