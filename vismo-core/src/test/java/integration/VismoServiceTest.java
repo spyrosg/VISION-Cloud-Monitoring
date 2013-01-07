@@ -2,9 +2,11 @@ package integration;
 
 import static org.junit.Assert.assertEquals;
 import gr.ntua.vision.monitoring.VismoConfiguration;
-import gr.ntua.vision.monitoring.VismoEventDispatcher;
 import gr.ntua.vision.monitoring.VismoVMInfo;
+import gr.ntua.vision.monitoring.dispatch.VismoEventDispatcher;
 import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.notify.EventHandler;
+import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
 import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.service.Service;
@@ -100,7 +102,7 @@ public class VismoServiceTest {
     /***/
     @Before
     public void setUp() {
-        conf = new VismoConfiguration(p);
+        obs = new FakeObjectService(new VismoEventDispatcher("fake-obs", conf, zmq));
 
         serviceFactory = new WorkerNodeFactory(conf, zmq) {
             @Override
