@@ -25,6 +25,40 @@ import org.zeromq.ZContext;
  */
 public class VismoServiceTest {
     /**
+     * 
+     */
+    private static class EventCountHandler implements EventHandler {
+        /***/
+        private int counter = 0;
+
+
+        /**
+         * Constructor.
+         */
+        public EventCountHandler() {
+        }
+
+
+        /**
+         * @see gr.ntua.vision.monitoring.notify.EventHandler#handle(gr.ntua.vision.monitoring.events.Event)
+         */
+        @Override
+        public void handle(final Event e) {
+            if (e != null)
+                ++counter;
+        }
+
+
+        /**
+         * @param noExpectedEvents
+         */
+        public void hasSeenExpectedNoEvents(final int noExpectedEvents) {
+            assertEquals(noExpectedEvents, counter);
+        }
+    }
+
+
+    /**
      * This is used to count the number of events received.
      */
     private final class EventCountRule extends Rule {
@@ -59,44 +93,41 @@ public class VismoServiceTest {
                 ++counter;
         }
     }
-
     /***/
-    private static final int   NO_READ_EVENTS_TO_SEND  = 10;
+    private static final int         NO_READ_EVENTS_TO_SEND  = 10;
     /***/
-    private static final int   NO_WRITE_EVENTS_TO_SEND = 10;
-    /***/
-    EventCountRule             countRule;
-    /***/
-    private VismoConfiguration conf;
-    /***/
-    private FakeObjectService  obs;
+    private static final int         NO_WRITE_EVENTS_TO_SEND = 10;
     /***/
     @SuppressWarnings("serial")
-    private final Properties   p                       = new Properties() {
-                                                           {
-                                                               setProperty("cloud.name", "visioncloud.eu");
-                                                               setProperty("cloud.heads", "10.0.2.211, 10.0.2.212");
+    private static final Properties  p                       = new Properties() {
+                                                                 {
+                                                                     setProperty("cloud.name", "visioncloud.eu");
+                                                                     setProperty("cloud.heads", "10.0.2.211, 10.0.2.212");
 
-                                                               setProperty("cluster.name", "vision-1");
-                                                               setProperty("cluster.head", "10.0.2.211");
+                                                                     setProperty("cluster.name", "vision-1");
+                                                                     setProperty("cluster.head", "10.0.2.211");
 
-                                                               setProperty("producers.point", "tcp://127.0.0.1:56429");
-                                                               setProperty("consumers.port", "56430");
+                                                                     setProperty("producers.point", "tcp://127.0.0.1:56429");
+                                                                     setProperty("consumers.port", "56430");
 
-                                                               setProperty("udp.port", "56431");
-                                                               setProperty("cluster.head.port", "56432");
+                                                                     setProperty("udp.port", "56431");
+                                                                     setProperty("cluster.head.port", "56432");
 
-                                                               setProperty("cloud.head.port", "56433");
-                                                           }
-                                                       };
+                                                                     setProperty("cloud.head.port", "56433");
+                                                                 }
+                                                             };
     /***/
-    private Service            service;
+    EventCountRule                   countRule;
     /***/
-    private WorkerNodeFactory  serviceFactory;
+    private final VismoConfiguration conf                    = new VismoConfiguration(p);
     /***/
-    private final VismoVMInfo  vminfo                  = new VismoVMInfo();
+    private final EventCountHandler  countHandler            = new EventCountHandler();
     /***/
-    private final ZMQSockets   zmq                     = new ZMQSockets(new ZContext());
+    private FakeObjectService        obs;
+    /***/
+    private Service                  service;
+    /***/
+    private final ZMQSockets         zmq                     = new ZMQSockets(new ZContext());
 
 
     /***/
@@ -104,7 +135,7 @@ public class VismoServiceTest {
     public void setUp() {
         obs = new FakeObjectService(new VismoEventDispatcher("fake-obs", conf, zmq));
 
-        serviceFactory = new WorkerNodeFactory(conf, zmq) {
+        final WorkerNodeFactory serviceFactory = new WorkerNodeFactory(conf, zmq) {
             @Override
             protected void boostrap(final VismoRulesEngine engine) {
                 super.boostrap(engine);
@@ -113,8 +144,25 @@ public class VismoServiceTest {
             }
         };
 
-        obs = new FakeObjectService(new VismoEventDispatcher("fake-obs", zmq.newConnectedPushSocket(conf.getProducersPoint())));
-        service = serviceFactory.build(vminfo);
+        service = serviceFactory.build(new VismoVMInfo());
+    }
+
+
+    /**
+     * @throws InterruptedException
+     */
+    @Test
+    public void vismoDeliversEventsToClient() throws InterruptedException {
+        final VismoEventRegistry reg = new VismoEventRegistry(zmq, "tcp://127.0.0.1:" + conf.getConsumersPort());
+
+        reg.registerToAll(countHandler);
+        service.start();
+
+        obs.sendReadEvents(NO_READ_EVENTS_TO_SEND);
+        obs.sendWriteEvents(NO_WRITE_EVENTS_TO_SEND);
+
+        waitForEventsDelivery(1000);
+        assertThatClientReceivedEvents();
     }
 
 
@@ -129,12 +177,20 @@ public class VismoServiceTest {
         obs.sendWriteEvents(NO_WRITE_EVENTS_TO_SEND);
 
         waitForEventsDelivery(1000);
-        assertThatServiceReceivedEvents();
+        assertThatVismoReceivedEvents();
+    }
+
+
+    /**
+     * 
+     */
+    private void assertThatClientReceivedEvents() {
+        countHandler.hasSeenExpectedNoEvents(NO_READ_EVENTS_TO_SEND + NO_WRITE_EVENTS_TO_SEND);
     }
 
 
     /***/
-    private void assertThatServiceReceivedEvents() {
+    private void assertThatVismoReceivedEvents() {
         countRule.hasSeenExpectedNoEvents(NO_READ_EVENTS_TO_SEND + NO_WRITE_EVENTS_TO_SEND);
     }
 
