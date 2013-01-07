@@ -9,8 +9,8 @@ import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
 import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
+import gr.ntua.vision.monitoring.service.ClusterHeadNodeFactory;
 import gr.ntua.vision.monitoring.service.Service;
-import gr.ntua.vision.monitoring.service.WorkerNodeFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.util.Properties;
@@ -135,7 +135,7 @@ public class VismoServiceTest {
     public void setUp() {
         obs = new FakeObjectService(new VismoEventDispatcher("fake-obs", conf, zmq));
 
-        final WorkerNodeFactory serviceFactory = new WorkerNodeFactory(conf, zmq) {
+        final ClusterHeadNodeFactory serviceFactory = new ClusterHeadNodeFactory(conf, zmq) {
             @Override
             protected void boostrap(final VismoRulesEngine engine) {
                 super.boostrap(engine);
