@@ -3,9 +3,10 @@ package gr.ntua.vision.monitoring.heartbeat.unit;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatReceiver;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatSender;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.HashMap;
 import java.util.Iterator;
 
 import org.junit.Assert;
@@ -16,7 +17,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author tmessini
- *
  */
 public class HeartbeatTest {
     /***/
@@ -28,7 +28,7 @@ public class HeartbeatTest {
     /***/
     private final int           TTL            = 1;
 
-   
+
     /**
      * @throws IOException
      */
@@ -53,11 +53,11 @@ public class HeartbeatTest {
         sender1.init();
         sender2.init();
         sender3.init();
-        
+
         sleep(2000);
-        
+
         Assert.assertEquals("We expect membership to be valid", true, checkMembership(receiver.getMembers()));
-        
+
         sender1.halt();
         sender2.halt();
         sender3.halt();
@@ -65,9 +65,9 @@ public class HeartbeatTest {
     }
 
 
-
     /**
      * test a successfull registration scenario.
+     * 
      * @throws IOException
      */
     @Test
@@ -88,12 +88,11 @@ public class HeartbeatTest {
     }
 
 
-
     /**
      * @param members
      * @return true or false.
      */
-    private static boolean checkMembership(final HashMap<String, Boolean> members) {
+    private static boolean checkMembership(final ConcurrentHashMap<String, Boolean> members) {
 
         boolean result = true;
 
@@ -105,7 +104,6 @@ public class HeartbeatTest {
         return result;
 
     }
-
 
 
     /**
