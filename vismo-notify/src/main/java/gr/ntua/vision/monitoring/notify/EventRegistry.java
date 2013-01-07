@@ -56,7 +56,6 @@ class EventRegistry {
             this.factory = factory;
             this.sock = sock;
             this.handler = handler;
-            ilog.config("using: " + sock);
         }
 
 
@@ -131,24 +130,18 @@ class EventRegistry {
     }
 
     /***/
-    private static boolean        logActivated = false;
+    private static final Logger   log               = Logger.getLogger(EventRegistry.class.getName());
+    /** the property name to set when activating logging output. */
+    private static final String   notifyLogProperty = "notify.log";
     /** the address all consumers will connect to. */
     private final String          addr;
     /** the pool of threads. Each thread corresponds to one event handler. */
-    private final ExecutorService pool         = Executors.newCachedThreadPool();
+    private final ExecutorService pool              = Executors.newCachedThreadPool();
     /** the zmq object. */
     private final ZMQSockets      zmq;
 
-
-    /**
-     * Constructor.
-     * 
-     * @param zmq
-     * @param addr
-     *            the address to connect to for incoming events.
-     */
-    public EventRegistry(final ZMQSockets zmq, final String addr) {
-        this(zmq, addr, false);
+    static {
+        activateLogger();
     }
 
 
@@ -156,17 +149,13 @@ class EventRegistry {
      * Constructor.
      * 
      * @param zmq
+     *            the zmq object.
      * @param addr
      *            the address to connect to for incoming events.
-     * @param debug
-     *            when this is <code>true</code> enable debugging output.
      */
-    public EventRegistry(final ZMQSockets zmq, final String addr, final boolean debug) {
+    public EventRegistry(final ZMQSockets zmq, final String addr) {
         this.zmq = zmq;
         this.addr = addr;
-
-        if (debug)
-            activateLogger();
     }
 
 
@@ -181,6 +170,7 @@ class EventRegistry {
     public void register(final String topic, final EventHandler handler) {
         final VismoSocket sock = zmq.newSubSocketForTopic(addr, topic);
 
+        log.config("registering handler for topic '" + topic + "', using " + sock);
         pool.submit(new EventHandlerTask(new VismoEventFactory(), sock, handler));
     }
 
@@ -198,15 +188,15 @@ class EventRegistry {
 
     /***/
     private static void activateLogger() {
-        if (!logActivated) {
-            logActivated = true;
+        if (System.getProperty(notifyLogProperty) == null)
+            return;
 
-            final ConsoleHandler h = new ConsoleHandler();
-            h.setFormatter(new VisionFormatter());
+        final ConsoleHandler h = new ConsoleHandler();
+        final String pkg = EventRegistry.class.getPackage().getName();
 
-            h.setLevel(Level.ALL);
-            Logger.getLogger("").addHandler(h);
-            Logger.getLogger("").setLevel(Level.ALL);
-        }
+        h.setFormatter(new VisionFormatter());
+        h.setLevel(Level.ALL);
+        Logger.getLogger(pkg).addHandler(h);
+        Logger.getLogger(pkg).setLevel(Level.ALL);
     }
 }

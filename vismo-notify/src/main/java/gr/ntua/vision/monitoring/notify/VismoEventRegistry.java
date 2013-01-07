@@ -12,21 +12,14 @@ import org.zeromq.ZContext;
  *
  */
 public class VismoEventRegistry extends EventRegistry {
-    /** the configuration object. */
-    private static VismoConfiguration conf;
-    /** the configuration file. */
-    private static final String       VISMO_CONFIG_FILE = "/etc/visioncloud_vismo.conf";
-
-    static {
-        conf = loadConfiguration(VISMO_CONFIG_FILE);
-    }
-
-
     /**
      * Constructor.
+     * 
+     * @param vismoConfigFile
+     *            the vismo configuration file.
      */
-    public VismoEventRegistry() {
-        this(new ZMQSockets(new ZContext()), "tcp://127.0.0.1:" + conf.getConsumersPort());
+    public VismoEventRegistry(final String vismoConfigFile) {
+        this(new ZMQSockets(new ZContext()), toAddr(configWith(vismoConfigFile)));
     }
 
 
@@ -34,10 +27,12 @@ public class VismoEventRegistry extends EventRegistry {
      * Constructor.
      * 
      * @param zmq
+     *            the zmq object.
      * @param address
+     *            the address to connect for incoming events.
      */
     public VismoEventRegistry(final ZMQSockets zmq, final String address) {
-        super(zmq, address, false);
+        super(zmq, address);
     }
 
 
@@ -47,11 +42,21 @@ public class VismoEventRegistry extends EventRegistry {
      * @param configFile
      * @return the configuration object.
      */
-    private static VismoConfiguration loadConfiguration(final String configFile) {
+    private static VismoConfiguration configWith(final String configFile) {
         try {
             return new VismoConfiguration(configFile);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    /**
+     * @param conf
+     *            the configuration object.
+     * @return the zmq address to connect to.
+     */
+    private static String toAddr(final VismoConfiguration conf) {
+        return "tcp://127.0.0.1:" + conf.getConsumersPort();
     }
 }
