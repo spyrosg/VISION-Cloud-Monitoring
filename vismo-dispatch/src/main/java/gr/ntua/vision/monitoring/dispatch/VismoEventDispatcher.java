@@ -6,11 +6,21 @@ import gr.ntua.vision.monitoring.zmq.VismoSocket;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.UUID;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import org.json.simple.JSONValue;
-import org.zeromq.ZContext;
 
 
 /**
@@ -18,21 +28,62 @@ import org.zeromq.ZContext;
  * to provide a fluent interface to sending events.
  */
 public class VismoEventDispatcher implements EventDispatcher {
-    /** the configuration object. */
-    private static VismoConfiguration conf;
-    /** the configuration file. */
-    private static final String       VISMO_CONFIG_FILE = "/etc/visioncloud_vismo.conf";
+    /**
+     * A custom log formatter. The format should match the following logback notation:
+     * <code>%-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m\n%ex</code>.
+     */
+    private static class VisionFormatter extends Formatter {
+        // INFO [2012-06-11 10:05:42,525] gr.ntua.vision.monitoring.MonitoringInstance: Starting up, pid=28206, ip=vis0/10.0.0.10
+        /***/
+        private final DateFormat fmt;
+
+
+        /**
+         * Constructor.
+         */
+        public VisionFormatter() {
+            this.fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            this.fmt.setTimeZone(TimeZone.getTimeZone("GMT"));
+        }
+
+
+        /**
+         * @see java.util.logging.Formatter#format(java.util.logging.LogRecord)
+         */
+        @Override
+        public String format(final LogRecord r) {
+            final String s = String.format("%-6s [%s] %s: %s\n", r.getLevel(), fmt.format(new Date(r.getMillis())),
+                                           r.getSourceClassName(), r.getMessage());
+
+            if (r.getThrown() != null) {
+                final StringWriter sw = new StringWriter();
+                final PrintWriter pw = new PrintWriter(sw);
+
+                r.getThrown().printStackTrace(pw);
+
+                return s + sw.toString();
+            }
+
+            return s;
+        }
+    }
+    /***/
+    private static final String      dispatchLogProperty = "dispatch.log";
     /** the event builder. */
-    private final EventBuilder        builder;
+    private final EventBuilder       builder;
+    /** the configuration object. */
+    private final VismoConfiguration conf;
     /** the machine's external ip address. */
-    private final String              ip;
+    private final String             ip;
     /** the name of the service that generate events. */
-    private final String              originatingService;
+    private final String             originatingService;
     /** the socket to use. */
-    private final VismoSocket         sock;
+    private final VismoSocket        sock;
+    /***/
+    private static final Logger      log                 = Logger.getLogger(VismoEventDispatcher.class.getName());
 
     static {
-        conf = loadConfiguration(VISMO_CONFIG_FILE);
+        activateLogger();
     }
 
 
@@ -41,9 +92,13 @@ public class VismoEventDispatcher implements EventDispatcher {
      * 
      * @param serviceName
      *            the name of the service generating the events.
+     * @param configFile
+     *            the vismo configuration file.
+     * @param zmq
+     *            the zmq object.
      */
-    public VismoEventDispatcher(final String serviceName) {
-        this(serviceName, new ZMQSockets(new ZContext()).newConnectedPushSocket(conf.getProducersPoint()));
+    public VismoEventDispatcher(final String serviceName, final String configFile, final ZMQSockets zmq) {
+        this(serviceName, loadConfiguration(configFile), zmq);
     }
 
 
@@ -52,12 +107,15 @@ public class VismoEventDispatcher implements EventDispatcher {
      * 
      * @param serviceName
      *            the name of the service generating the events.
-     * @param sock
-     *            the socket to use.
+     * @param conf
+     *            the configuration object.
+     * @param zmq
+     *            the zmq object.
      */
-    public VismoEventDispatcher(final String serviceName, final VismoSocket sock) {
-        this.sock = sock;
+    public VismoEventDispatcher(final String serviceName, final VismoConfiguration conf, final ZMQSockets zmq) {
         this.originatingService = serviceName;
+        this.conf = conf;
+        this.sock = zmq.newConnectedPushSocket(conf.getProducersPoint());
         this.ip = new VismoVMInfo().getAddress().getHostAddress();
         this.builder = new EventBuilder(this);
     }
@@ -90,7 +148,11 @@ public class VismoEventDispatcher implements EventDispatcher {
      */
     void send(final Map<String, Object> map) {
         addBasicFields(map);
-        sock.send(JSONValue.toJSONString(map));
+
+        final String s = JSONValue.toJSONString(map);
+
+        log.config("sending event: " + s);
+        sock.send(s);
     }
 
 
@@ -108,18 +170,33 @@ public class VismoEventDispatcher implements EventDispatcher {
 
 
     /**
-     * @return an id for the event.
+     * @return the name of the cluster this machines belongs to.
      */
-    private static String getEventId() {
-        return UUID.randomUUID().toString();
+    private String getOriginatingCluster() {
+        return conf.getClusterName();
+    }
+
+
+    /***/
+    private static void activateLogger() {
+        if (System.getProperty(dispatchLogProperty) == null)
+            return;
+
+        final ConsoleHandler h = new ConsoleHandler();
+        final String pkg = EventDispatcher.class.getPackage().getName();
+
+        h.setFormatter(new VisionFormatter());
+        h.setLevel(Level.ALL);
+        Logger.getLogger(pkg).addHandler(h);
+        Logger.getLogger(pkg).setLevel(Level.ALL);
     }
 
 
     /**
-     * @return the name of the cluster this machines belongs to.
+     * @return an id for the event.
      */
-    private static String getOriginatingCluster() {
-        return conf.getClusterName();
+    private static String getEventId() {
+        return UUID.randomUUID().toString();
     }
 
 

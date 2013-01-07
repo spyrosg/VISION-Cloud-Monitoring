@@ -18,29 +18,24 @@ import org.zeromq.ZContext;
 public class VismoEventDispatcherTest {
     /***/
     @SuppressWarnings("serial")
-    private static final Properties  props                        = new Properties() {
-                                                                      {
-                                                                          setProperty("producers.point", "tcp://127.0.0.1:56429");
-                                                                          setProperty("consumers.port", "56430");
-                                                                          setProperty("udp.port", "56431");
-                                                                      }
-                                                                  };
+    private static final Properties  props              = new Properties() {
+                                                            {
+                                                                setProperty("producers.point", "tcp://127.0.0.1:56429");
+                                                                setProperty("consumers.port", "56430");
+                                                                setProperty("udp.port", "56431");
+                                                                setProperty("cluster.name", "foo");
+                                                            }
+                                                        };
     /***/
-    private static final String      VISMO_CONFIG_SYSTEM_PROPERTY = "vismo.config.properties";
+    private final VismoConfiguration conf               = new VismoConfiguration(props);
     /***/
-    private final VismoConfiguration conf                         = new VismoConfiguration(props);
-    /***/
-    private final int                NO_EXPECTED_EVENTS           = 10;
+    private final int                NO_EXPECTED_EVENTS = 10;
     /***/
     private FakeEventProducer        producer;
     /***/
     private FakeVismoInstance        vismo;
     /***/
-    private final ZMQSockets         zmq                          = new ZMQSockets(new ZContext());
-
-    static {
-        System.setProperty(VISMO_CONFIG_SYSTEM_PROPERTY, "src/test/resources/config.properties");
-    }
+    private final ZMQSockets         zmq                = new ZMQSockets(new ZContext());
 
 
     /***/
@@ -48,7 +43,7 @@ public class VismoEventDispatcherTest {
     public void setUp() {
         vismo = new FakeVismoInstance(zmq.newBoundPullSocket(conf.getProducersPoint()), NO_EXPECTED_EVENTS);
         vismo.start();
-        final VismoEventDispatcher d = new VismoEventDispatcher(VismoEventDispatcherTest.class.getName());
+        final VismoEventDispatcher d = new VismoEventDispatcher(VismoEventDispatcherTest.class.getName(), conf, zmq);
         producer = new FakeEventProducer(d, NO_EXPECTED_EVENTS);
     }
 
