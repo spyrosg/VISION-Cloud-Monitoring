@@ -1,8 +1,8 @@
 package gr.ntua.vision.monitoring.rules.propagation;
 
-import gr.ntua.vision.monitoring.rules.PassThroughRule;
-import gr.ntua.vision.monitoring.rules.TestingRule;
-import gr.ntua.vision.monitoring.rules.AccountingRule;
+import gr.ntua.vision.monitoring.rules.AbstractRuleFactory;
+import gr.ntua.vision.monitoring.rules.PeriodicRule;
+import gr.ntua.vision.monitoring.rules.Rule;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author tmessini
+ * 
  */
 public class MessageDeliverer extends Thread implements Observer {
 
@@ -24,47 +25,46 @@ public class MessageDeliverer extends Thread implements Observer {
     private HashMap<Integer, String> content;
     /***/
     private RulesPropagationManager  manager;
-
+    /***/
+    private AbstractRuleFactory factory =  new AbstractRuleFactory();
+    
 
     @Override
     public void run() {
         Message deliveredMessage;
         while (true)
             if (!manager.getDelQueue().isQEmpty()) {
-                // TODO do the pretty thing!
                 deliveredMessage = manager.getDelQueue().getMessage();
-                //log.info(manager.getPid() + ": message delivered: " + deliveredMessage);
+                log.info(manager.getPid() + ": message delivered: " + deliveredMessage);
                 content = deliveredMessage.getContent();
 
+                String type = deliveredMessage.getType();
+                
                 final Iterator<Integer> iterator = content.keySet().iterator();
-                // check all the values in content
                 while (iterator.hasNext()) {
+                    
+                    System.out.println(manager.getEngine().getRulesTotalNumber());
                     final String rule = content.get(iterator.next());
+                    
+                    System.out.println(rule);
                     final String[] ruleParts = rule.split(":");
-                    
-                    //TestingRule
-                    if (ruleParts[0].equals("TestingRule")) {
-                        final TestingRule testingRule = new TestingRule(manager.getEngine(), ruleParts[0], ruleParts[2]);
-                        testingRule.submitTo(manager.getEngine());
-                        log.info(manager.getPid() + ": rule: " + rule + " added! engineSize: " +manager.getEngine().getRulesTotalNumber());
+                    String ruleName = null;
+                    String rulePeriod = null;
+                    String ruleDesc = null;
+                            
+                    if (ruleParts != null)
+                    {
+                        ruleName= ruleParts[0];
+                        rulePeriod = ruleParts[1];
+                        ruleDesc = ruleParts[2];
                     }
-                    
-                    //PassThroughRule
-                    if (ruleParts[0].equals("PassThroughRule")) {
-                        final PassThroughRule passThroughRule = new PassThroughRule(manager.getEngine());                      
-                        passThroughRule.submitTo(manager.getEngine());
-                        manager.getEngine().removeRule(passThroughRule);
-                        log.info(manager.getPid() + ": rule: " + rule + " added! engineSize: " +manager.getEngine().getRulesTotalNumber());
-                    }
-                    
-                    //AccountingRule
-                    if (ruleParts[0].equals("AccountingRule")) {
-                        final AccountingRule aggregationRule = new AccountingRule(manager.getEngine(), Long.valueOf(ruleParts[1]));
-                        aggregationRule.submitTo(manager.getEngine());
-                        log.info(manager.getPid() + ": rule: " + rule + " added! engineSize: " +manager.getEngine().getRulesTotalNumber());
-                    }
-
+                                      
+                    Object ruleObject = 
+                            factory.createRuleFactory(ruleName).createRule(manager.getEngine(), rulePeriod, ruleName, ruleDesc);                          
+                    processObject(ruleObject, type);                                                                                  
                 }
+                    
+                    
 
             } else
                 synchronized (this) {
@@ -75,6 +75,36 @@ public class MessageDeliverer extends Thread implements Observer {
                     }
 
                 }
+    }
+
+    /**
+     * process the rule Object
+     * @param ruleObject
+     * @param type
+     */
+    private void processObject(Object ruleObject, String type) {
+        boolean ruleO =ruleObject instanceof Rule;
+        boolean periodicRuleO = ruleObject instanceof PeriodicRule;
+        if (ruleO && type.equals("add"))
+        {
+            ((Rule) ruleObject).submitTo(manager.getEngine());
+            System.out.println(manager.getEngine().getRulesTotalNumber());
+        }
+        if (ruleO && type.equals("del"))   
+        {
+              manager.getEngine().removeRule((Rule) ruleObject);
+              System.out.println(manager.getEngine().getRulesTotalNumber());
+        }        
+        if (periodicRuleO && type.equals("add"))
+        {
+            ((PeriodicRule) ruleObject).submitTo(manager.getEngine());      
+            System.out.println(manager.getEngine().getRulesTotalNumber());
+        }
+        if (periodicRuleO && type.equals("del"))
+        {
+              manager.getEngine().removeRule((PeriodicRule) ruleObject);  
+              System.out.println(manager.getEngine().getRulesTotalNumber());
+        }                
     }
 
 

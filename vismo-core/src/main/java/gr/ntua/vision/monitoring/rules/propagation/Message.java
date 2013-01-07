@@ -12,9 +12,7 @@ public class Message implements Serializable {
     private static final long        serialVersionUID = 1L;
     /***/
     private int                      commandId;
-    /**
-     * has the rules table.
-     */
+    /***/
     private HashMap<Integer, String> content;
     /***/
     private int                      fromId;

@@ -68,8 +68,6 @@ public final class HeartbeatSender {
                     final byte[] buffer = createPayload();
                     final DatagramPacket packet = new DatagramPacket(buffer, buffer.length, getGroupMulticastAddress(),
                             groupMulticastPort.intValue());
-                    HeartbeatSender.log.info("MSender" + SENDER_ID + ": sending packet to: "
-                            + packet.getSocketAddress().toString().substring(1));
                     socket.send(packet);
                 } catch (final IOException e) {
                     HeartbeatSender.log.debug("Error on multicast socket", e);
@@ -122,8 +120,7 @@ public final class HeartbeatSender {
          */
         @SuppressWarnings("javadoc")
         private byte[] createPayload() throws UnknownHostException, SocketException {
-            final byte[] msg = (SENDER_ID + "").getBytes();
-            return msg;
+            return Integer.toString(SENDER_ID).getBytes();
         }
 
     }
@@ -133,7 +130,7 @@ public final class HeartbeatSender {
     /***/
     final Integer                 groupMulticastPort;
     /***/
-    int                           SENDER_ID;
+    Integer                       SENDER_ID;
     /***/
     boolean                       stopped;
     /***/
@@ -146,9 +143,8 @@ public final class HeartbeatSender {
     private MulticastSenderThread senderThread;
     /***/
     private long                  sendInterval               = DEFAULT_HEARTBEAT_INTERVAL;
-
     /***/
-    private final int         timeToLive;
+    private final int             timeToLive;
 
 
     /**
@@ -164,16 +160,26 @@ public final class HeartbeatSender {
         this.groupMulticastAddress = multicastAddress;
         this.groupMulticastPort = multicastPort;
         this.timeToLive = timeToLive;
-        this.SENDER_ID = HeartbeatSender.getRandomID();
+        this.SENDER_ID = getRandomID();
     }
 
 
     /**
-     * @return a random id for process
+     * Constructor.
+     * 
+     * @param multicastAddress
+     * @param multicastPort
+     * @param timeToLive
+     *            See class description for the meaning of this parameter.
+     * @param id 
      */
-    private static int getRandomID() {
-        final Random randomGenerator = new Random();
-        return randomGenerator.nextInt(10000);
+    public HeartbeatSender(final InetAddress multicastAddress, final Integer multicastPort, final Integer timeToLive,
+            final Integer id) {
+        System.setProperty("Djava.net.preferIPv4Stack", "true");
+        this.groupMulticastAddress = multicastAddress;
+        this.groupMulticastPort = multicastPort;
+        this.timeToLive = timeToLive;
+        this.SENDER_ID = id;
     }
 
 
@@ -192,6 +198,16 @@ public final class HeartbeatSender {
      */
     public long getHeartBeatInterval() {
         return getSendInterval();
+    }
+
+
+    /**
+     * @return integer
+     */
+    @SuppressWarnings("static-method")
+    public Integer getRandomID() {
+        final Random randomGenerator = new Random();
+        return Integer.valueOf(randomGenerator.nextInt(100000) + 100000);
     }
 
 
@@ -250,4 +266,5 @@ public final class HeartbeatSender {
     public void setSendInterval(final long sendInterval) {
         this.sendInterval = sendInterval;
     }
+
 }

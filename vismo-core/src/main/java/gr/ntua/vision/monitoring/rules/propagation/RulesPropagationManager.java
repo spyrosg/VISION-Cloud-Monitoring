@@ -1,6 +1,9 @@
 package gr.ntua.vision.monitoring.rules.propagation;
 
+import gr.ntua.vision.monitoring.heartbeat.HeartbeatReceiver;
+import gr.ntua.vision.monitoring.heartbeat.HeartbeatSender;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
+import gr.ntua.vision.monitoring.web.RulesWebServer;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -52,7 +55,7 @@ public class RulesPropagationManager extends Thread {
     /***/
     private int                             size;
     /***/
-    private final RulesPropagationWebServer webServer;
+    private final RulesWebServer webServer;
     /***/
     private final VismoRulesEngine vismoRulesEngine;
 
@@ -67,9 +70,9 @@ public class RulesPropagationManager extends Thread {
             throws IOException {
         setPid();
         vismoRulesEngine = engine;
-        webServer = new RulesPropagationWebServer(resourcePath, serverPort);
+        webServer = new RulesWebServer(resourcePath, serverPort);
         heartbeatReceiver = new HeartbeatReceiver(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT);
-        heartbeatSender = new HeartbeatSender(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT, 1);
+        heartbeatSender = new HeartbeatSender(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT, 1, getPid());
         messageWatchdog = new RulesPropagationWatchDog(20000);
 
         messageReceiver.setManager(this);
@@ -78,7 +81,7 @@ public class RulesPropagationManager extends Thread {
         deliverer.setManager(this);
         resource.setManager(this);
         messageWatchdog.setManager(this);
-        heartbeatSender.setManager(this);
+        //heartbeatSender.setManager(this);
 
         inputQueue = new MessageQueue();
         outputQueue = new MessageQueue();

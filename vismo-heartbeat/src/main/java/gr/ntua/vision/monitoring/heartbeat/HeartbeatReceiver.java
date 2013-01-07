@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,7 @@ public class HeartbeatReceiver {
                     HeartbeatReceiver.log.debug("Multicast Processor Thread sleep interrupted");
                 }
                 updateHostsMembership(MEMBERSHIP_TIMEOUT);
-                HeartbeatReceiver.log.info("Memberlist: " + getMembers().toString());
+                // log.info("Memberlist: " + getMembers().toString());
             }
         }
 
@@ -82,7 +82,7 @@ public class HeartbeatReceiver {
                     getMembers().put(host, true);
                 else
                     getMembers().remove(host);
-                }
+            }
         }
 
     }
@@ -147,27 +147,28 @@ public class HeartbeatReceiver {
         }
     }
     /***/
-    static final Logger                      log                        = LoggerFactory.getLogger(HeartbeatReceiver.class);
+    static final Logger                              log                        = LoggerFactory
+                                                                                        .getLogger(HeartbeatReceiver.class);
     /***/
-    MulticastSocket                          socket;
+    MulticastSocket                                  socket;
     /***/
-    volatile boolean                         stopped                    = false;
+    volatile boolean                                 stopped                    = false;
     /***/
-    private final InetAddress                groupMulticastAddress;
+    private final InetAddress                        groupMulticastAddress;
     /***/
-    private final Integer                    groupMulticastPort;
+    private final Integer                            groupMulticastPort;
     /***/
-    private final ConcurrentHashMap<String, Boolean>   hostsMembership            = new ConcurrentHashMap<String, Boolean>();
+    private final ConcurrentHashMap<String, Boolean> hostsMembership            = new ConcurrentHashMap<String, Boolean>();
     /***/
-    private final ConcurrentHashMap<String, Long>      hostsTimestamp             = new ConcurrentHashMap<String, Long>();
+    private final ConcurrentHashMap<String, Long>    hostsTimestamp             = new ConcurrentHashMap<String, Long>();
     /***/
-    private final int                        MEMBERSHIP_TIMEOUT         = 2000;
+    private final int                                MEMBERSHIP_TIMEOUT         = 2000;
     /***/
-    private final int                        MEMBERSHIP_UPDATE_INTERVAL = 500;
+    private final int                                MEMBERSHIP_UPDATE_INTERVAL = 500;
     /***/
-    private MulticastReceiverProcessorThread processorThread;
+    private MulticastReceiverProcessorThread         processorThread;
     /***/
-    private MulticastReceiverThread          receiverThread;
+    private MulticastReceiverThread                  receiverThread;
 
 
     /**
@@ -181,7 +182,6 @@ public class HeartbeatReceiver {
         this.groupMulticastAddress = multicastAddress;
         this.groupMulticastPort = multicastPort;
     }
-
 
 
     /**

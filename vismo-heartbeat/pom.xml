@@ -95,12 +95,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-      			<artifactId>vismo-web</artifactId>
-      			<groupId>gr.ntua.vision</groupId>
-      			<version>1.0.7-SNAPSHOT</version>
-    		</dependency>
-
 	</dependencies>
 
 </project>

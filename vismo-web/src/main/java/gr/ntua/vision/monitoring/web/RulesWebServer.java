@@ -16,36 +16,35 @@ import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
  */
 public class RulesWebServer {
     /***/
-    private static final Logger       log             = LoggerFactory.getLogger(RulesWebServer.class);
+    private static final Logger       log        = LoggerFactory.getLogger(RulesWebServer.class);
     /***/
     private final String              BASE_URI;
     /***/
-    private final Map<String, String> initParams      = new HashMap<String, String>();    
+    private final Map<String, String> initParams = new HashMap<String, String>();
     /***/
-    private final int               serverPort;
-    
+    private final int                 serverPort;
+
 
     /**
      * we configure the system so as to use the resource package.
+     * 
      * @param resourcePackage
-     * @param serverPort 
+     * @param serverPort
      */
-    public RulesWebServer(String resourcePackage, int serverPort)
-    {
+    public RulesWebServer(final String resourcePackage, final int serverPort) {
         this.serverPort = serverPort;
-        BASE_URI= "http://localhost:"+serverPort+"/";
-        initParams.put("com.sun.jersey.config.property.packages", resourcePackage); 
+        BASE_URI = "http://localhost:" + serverPort + "/";
+        initParams.put("com.sun.jersey.config.property.packages", resourcePackage);
     }
-    
 
 
     /**
      * @throws IllegalArgumentException
      * @throws IOException
      */
-    public void start() throws IllegalArgumentException, IOException {        
-        getGrizzly();      
-        RulesWebServer.log.info("grizzly started at "+getGrizzlyPort());
+    public void start() throws IllegalArgumentException, IOException {
+        getGrizzly();
+        RulesWebServer.log.info("grizzly started at " + getGrizzlyPort());
     }
 
 
@@ -69,13 +68,14 @@ public class RulesWebServer {
         return GrizzlyWebContainerFactory.create(BASE_URI, initParams);
     }
 
+
     /**
      * @return Grizzly port
      */
-    private int getGrizzlyPort(){
-        
+    private int getGrizzlyPort() {
+
         return serverPort;
-        
+
     }
-    
+
 }
