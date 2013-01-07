@@ -69,6 +69,8 @@ public class VismoEventDispatcher implements EventDispatcher {
     }
     /***/
     private static final String      dispatchLogProperty = "dispatch.log";
+    /***/
+    private static final Logger      log                 = Logger.getLogger(VismoEventDispatcher.class.getName());
     /** the event builder. */
     private final EventBuilder       builder;
     /** the configuration object. */
@@ -79,8 +81,6 @@ public class VismoEventDispatcher implements EventDispatcher {
     private final String             originatingService;
     /** the socket to use. */
     private final VismoSocket        sock;
-    /***/
-    private static final Logger      log                 = Logger.getLogger(VismoEventDispatcher.class.getName());
 
     static {
         activateLogger();

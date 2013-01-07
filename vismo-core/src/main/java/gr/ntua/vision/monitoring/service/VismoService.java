@@ -13,7 +13,7 @@ import java.util.Timer;
 /**
  * Basic support for the various vismo services.
  */
-public class VismoService implements UDPListener, Service {
+public class VismoService implements Service, UDPListener {
     /***/
     private final VismoRulesEngine engine;
     /***/
@@ -60,7 +60,7 @@ public class VismoService implements UDPListener, Service {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.udp.UDPListener#halt()
+     * @see gr.ntua.vision.monitoring.service.Service#halt()
      */
     @Override
     public void halt() {

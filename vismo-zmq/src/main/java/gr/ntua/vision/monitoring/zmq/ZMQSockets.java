@@ -26,6 +26,14 @@ public class ZMQSockets {
 
 
     /**
+     * Release the zmq context.
+     */
+    public void destroy() {
+        ctx.destroy();
+    }
+
+
+    /**
      * @param addr
      *            the address to bind to.
      * @return a new bound pub socket.

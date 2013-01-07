@@ -15,6 +15,7 @@ import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
 import java.util.Properties;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.zeromq.ZContext;
@@ -148,6 +149,22 @@ public class VismoServiceTest {
     }
 
 
+    /***/
+    @After
+    public void tearDown() {
+        if (service != null)
+            service.halt();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        zmq.destroy();
+    }
+
+
     /**
      * @throws InterruptedException
      */
@@ -155,8 +172,8 @@ public class VismoServiceTest {
     public void vismoDeliversEventsToClient() throws InterruptedException {
         final VismoEventRegistry reg = new VismoEventRegistry(zmq, "tcp://127.0.0.1:" + conf.getConsumersPort());
 
-        reg.registerToAll(countHandler);
         service.start();
+        reg.registerToAll(countHandler);
 
         obs.sendReadEvents(NO_READ_EVENTS_TO_SEND);
         obs.sendWriteEvents(NO_WRITE_EVENTS_TO_SEND);
