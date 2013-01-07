@@ -7,13 +7,9 @@ import gr.ntua.vision.monitoring.events.Event;
  *
  */
 public class TestingRule extends Rule{
-    /**
-     * 
-     */
+    /***/
     private String name;
-    /**
-     * 
-     */
+    /***/
     private String desc;
 
     /**

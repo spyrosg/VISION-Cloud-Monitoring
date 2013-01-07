@@ -4,8 +4,6 @@ import gr.ntua.vision.monitoring.rules.AbstractRuleFactory;
 import gr.ntua.vision.monitoring.rules.PeriodicRule;
 import gr.ntua.vision.monitoring.rules.Rule;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -15,19 +13,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author tmessini
- * 
  */
 public class MessageDeliverer extends Thread implements Observer {
+    /***/
+    private final static Logger       log     = LoggerFactory.getLogger(RulesPropagationManager.class);
+    /***/
+    private final AbstractRuleFactory factory = new AbstractRuleFactory();
+    /***/
+    private RulesPropagationManager   manager;
 
-    /***/
-    private final static Logger      log = LoggerFactory.getLogger(RulesPropagationManager.class);
-    /***/
-    private HashMap<Integer, String> content;
-    /***/
-    private RulesPropagationManager  manager;
-    /***/
-    private AbstractRuleFactory factory =  new AbstractRuleFactory();
-    
 
     @Override
     public void run() {
@@ -35,36 +29,29 @@ public class MessageDeliverer extends Thread implements Observer {
         while (true)
             if (!manager.getDelQueue().isQEmpty()) {
                 deliveredMessage = manager.getDelQueue().getMessage();
-                log.info(manager.getPid() + ": message delivered: " + deliveredMessage);
-                content = deliveredMessage.getContent();
+                final String type = deliveredMessage.getType();
+                final String rule = deliveredMessage.getCommand();
+                final int ruleId = deliveredMessage.getCommandId();
 
-                String type = deliveredMessage.getType();
-                
-                final Iterator<Integer> iterator = content.keySet().iterator();
-                while (iterator.hasNext()) {
-                    
-                    System.out.println(manager.getEngine().getRulesTotalNumber());
-                    final String rule = content.get(iterator.next());
-                    
-                    System.out.println(rule);
+                String ruleName = "";
+                String rulePeriod = "";
+                String ruleDesc = "";
+
+                if (rule != null && rule.contains(":")) {
                     final String[] ruleParts = rule.split(":");
-                    String ruleName = null;
-                    String rulePeriod = null;
-                    String ruleDesc = null;
-                            
-                    if (ruleParts != null)
-                    {
-                        ruleName= ruleParts[0];
+                    if (ruleParts.length == 3) {
+                        ruleName = ruleParts[0];
                         rulePeriod = ruleParts[1];
                         ruleDesc = ruleParts[2];
                     }
-                                      
-                    Object ruleObject = 
-                            factory.createRuleFactory(ruleName).createRule(manager.getEngine(), rulePeriod, ruleName, ruleDesc);                          
-                    processObject(ruleObject, type);                                                                                  
                 }
-                    
-                    
+
+                Object ruleObject = null;
+                if (factory.createRuleFactory(ruleName) != null)
+                    ruleObject = factory.createRuleFactory(ruleName).createRule(manager.getEngine(), rulePeriod, ruleName,
+                                                                                ruleDesc);
+                if (ruleObject != null)
+                    processObject(ruleObject, type, rule, ruleId);
 
             } else
                 synchronized (this) {
@@ -75,36 +62,6 @@ public class MessageDeliverer extends Thread implements Observer {
                     }
 
                 }
-    }
-
-    /**
-     * process the rule Object
-     * @param ruleObject
-     * @param type
-     */
-    private void processObject(Object ruleObject, String type) {
-        boolean ruleO =ruleObject instanceof Rule;
-        boolean periodicRuleO = ruleObject instanceof PeriodicRule;
-        if (ruleO && type.equals("add"))
-        {
-            ((Rule) ruleObject).submitTo(manager.getEngine());
-            System.out.println(manager.getEngine().getRulesTotalNumber());
-        }
-        if (ruleO && type.equals("del"))   
-        {
-              manager.getEngine().removeRule((Rule) ruleObject);
-              System.out.println(manager.getEngine().getRulesTotalNumber());
-        }        
-        if (periodicRuleO && type.equals("add"))
-        {
-            ((PeriodicRule) ruleObject).submitTo(manager.getEngine());      
-            System.out.println(manager.getEngine().getRulesTotalNumber());
-        }
-        if (periodicRuleO && type.equals("del"))
-        {
-              manager.getEngine().removeRule((PeriodicRule) ruleObject);  
-              System.out.println(manager.getEngine().getRulesTotalNumber());
-        }                
     }
 
 
@@ -120,6 +77,52 @@ public class MessageDeliverer extends Thread implements Observer {
     public void update(final Observable o, final Object m) {
         synchronized (this) {
             notify();
+        }
+    }
+
+
+    /**
+     * checks whether the engine rules number is the same as the web interface number.
+     */
+    private void checkEngineHealth() {
+        if (manager.getEngine().getRulesTotalNumber() != manager.getRuleStore().getRulesCatalogSize())
+            MessageDeliverer.log.debug("ERROR: web rule #: " + manager.getRuleStore().getRulesCatalogSize() + " engine rule#: "
+                    + manager.getEngine().getRulesTotalNumber());
+        // TODO re-initialize the rules of the engine
+    }
+
+
+    /**
+     * process the rule Object
+     * 
+     * @param ruleObject
+     * @param type
+     * @param ruleString
+     * @param ruleId
+     */
+    private void processObject(final Object ruleObject, final String type, final String ruleString, final int ruleId) {
+        final boolean rule = ruleObject instanceof Rule;
+        final boolean periodicRule = ruleObject instanceof PeriodicRule;
+
+        if (rule && type.equals("add")) {
+            ((Rule) ruleObject).submitTo(manager.getEngine());
+            manager.getRuleStore().addRule(ruleString, ruleId);
+            checkEngineHealth();
+        }
+        if (rule && type.equals("del")) {
+            manager.getEngine().removeRule((Rule) ruleObject);
+            manager.getRuleStore().deleteRule(ruleString);
+            checkEngineHealth();
+        }
+        if (periodicRule && type.equals("add")) {
+            ((PeriodicRule) ruleObject).submitTo(manager.getEngine());
+            manager.getRuleStore().addRule(ruleString, ruleId);
+            checkEngineHealth();
+        }
+        if (periodicRule && type.equals("del")) {
+            manager.getEngine().removeRule((PeriodicRule) ruleObject);
+            manager.getRuleStore().deleteRule(ruleString);
+            checkEngineHealth();
         }
     }
 }

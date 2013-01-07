@@ -1,7 +1,6 @@
 package gr.ntua.vision.monitoring.rules.propagation;
 
 import java.io.Serializable;
-import java.util.HashMap;
 
 
 /**
@@ -9,42 +8,57 @@ import java.util.HashMap;
  */
 public class Message implements Serializable {
     /***/
-    private static final long        serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     /***/
-    private int                      commandId;
+    private int               commandId;
     /***/
-    private HashMap<Integer, String> content;
+    private int               fromId;
     /***/
-    private int                      fromId;
+    private int               groupSize;
     /***/
-    private int                      groupSize;
+    private volatile int      hashCode;
     /***/
-    private volatile int             hashCode;
+    private String            toGroup;
     /***/
-    private String                   toGroup;
-    /***/
-    private String                   type;
+    private String            type;
 
 
     @Override
-    public boolean equals(final Object o) {
-        if (o == null) {
-            return false;
-        }
-        if (o == this) {
+    public boolean equals(final Object obj) {
+        if (this == obj)
             return true;
-        }
-
-        if (!(o instanceof Message)) {
+        if (obj == null)
             return false;
-        }
+        if (getClass() != obj.getClass())
+            return false;
+        final Message other = (Message) obj;
+        if (commandId != other.commandId)
+            return false;
+        if (fromId != other.fromId)
+            return false;
+        if (groupSize != other.groupSize)
+            return false;
+        if (hashCode != other.hashCode)
+            return false;
+        if (toGroup == null) {
+            if (other.toGroup != null)
+                return false;
+        } else if (!toGroup.equals(other.toGroup))
+            return false;
+        if (type == null) {
+            if (other.type != null)
+                return false;
+        } else if (!type.equals(other.type))
+            return false;
+        return true;
+    }
 
-        final Message msg = (Message) o;
 
-        final boolean res = msg.commandId == commandId && msg.content.equals(content) && msg.fromId == fromId
-                && msg.groupSize == groupSize && msg.toGroup.equals(toGroup) && msg.type.equals(type);
-
-        return res;
+    /**
+     * @return the multicast group
+     */
+    public String getCommand() {
+        return toGroup;
     }
 
 
@@ -53,14 +67,6 @@ public class Message implements Serializable {
      */
     public int getCommandId() {
         return commandId;
-    }
-
-
-    /**
-     * @return the content of the packet.
-     */
-    public HashMap<Integer, String> getContent() {
-        return content;
     }
 
 
@@ -81,14 +87,6 @@ public class Message implements Serializable {
 
 
     /**
-     * @return the multicast group
-     */
-    public String getToGroup() {
-        return toGroup;
-    }
-
-
-    /**
      * @return the type of the message.
      */
     public String getType() {
@@ -98,19 +96,23 @@ public class Message implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = hashCode;
-
-        if (result == 0) {
-            result = 17;
-            result = 31 * result + commandId;
-            result = 31 * result + content.hashCode();
-            result = 31 * result + fromId;
-            result = 31 * result + groupSize;
-            result = 31 * result + toGroup.hashCode();
-            result = 31 * result + type.hashCode();
-        }
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + commandId;
+        result = prime * result + fromId;
+        result = prime * result + groupSize;
+        result = prime * result + hashCode;
+        result = prime * result + ((toGroup == null) ? 0 : toGroup.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
         return result;
+    }
 
+
+    /**
+     * @param toGroup
+     */
+    public void setCommand(final String toGroup) {
+        this.toGroup = toGroup;
     }
 
 
@@ -119,15 +121,6 @@ public class Message implements Serializable {
      */
     public void setCommandId(final int commandId) {
         this.commandId = commandId;
-    }
-
-
-    /**
-     * @param catalog
-     *            the content of the packet.
-     */
-    public void setContent(final HashMap<Integer, String> catalog) {
-        this.content = catalog;
     }
 
 
@@ -144,14 +137,6 @@ public class Message implements Serializable {
      */
     public void setGroupSize(final int groupSize) {
         this.groupSize = groupSize;
-    }
-
-
-    /**
-     * @param toGroup
-     */
-    public void setToGroup(final String toGroup) {
-        this.toGroup = toGroup;
     }
 
 

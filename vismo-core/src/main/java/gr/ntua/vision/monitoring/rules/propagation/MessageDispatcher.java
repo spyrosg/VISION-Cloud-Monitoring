@@ -25,8 +25,6 @@ public class MessageDispatcher extends Thread implements Observer {
         while (true)
             if (!manager.getInQueue().isQEmpty()) {
                 incomingMessage = manager.getInQueue().getMessage();
-                // log.info(manager.getPid()+": messageReceived!"+manager.getMessageCounter().getMessageValue(incomingMessage));
-                // update message timestamp
                 manager.getMessageTimestamp().updateMessageTimestamp(incomingMessage);
 
                 if (!manager.getMessageCounter().contains(incomingMessage)) {
@@ -35,10 +33,6 @@ public class MessageDispatcher extends Thread implements Observer {
                 } else {
                     manager.getMessageCounter().increaseMessageCount(incomingMessage);
                     if (manager.getMessageCounter().getMessageValue(incomingMessage) == incomingMessage.getGroupSize())
-                        // delete message counter & timestamp
-                        // manager.getMessageCounter().remove(incomingMessage);
-                        // manager.getMessageTimestamp().remove(incomingMessage);
-                        // deliver message
                         manager.getDelQueue().addMessage(incomingMessage);
                 }
             } else

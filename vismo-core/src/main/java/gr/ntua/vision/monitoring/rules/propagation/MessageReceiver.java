@@ -52,8 +52,6 @@ public class MessageReceiver extends Thread {
 
     @Override
     public final void run() {
-
-        // final ObjectInputStream o_in = new ObjectInputStream(ba_is);
         try {
             while (!stopped)
                 try {
