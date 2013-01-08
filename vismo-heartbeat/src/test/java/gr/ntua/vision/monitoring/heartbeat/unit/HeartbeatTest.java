@@ -3,11 +3,10 @@ package gr.ntua.vision.monitoring.heartbeat.unit;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatReceiver;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatSender;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -117,5 +116,4 @@ public class HeartbeatTest {
         }
 
     }
-
 }

@@ -26,14 +26,6 @@ public class RulesWebServer {
 
 
     /**
-     * @return baseUri
-     */
-    private static String getBaseURI() {
-        return "http://localhost:" + (System.getenv("PORT") != null ? System.getenv("PORT") : "9998") + "/";
-    }
-
-
-    /**
      * @throws IllegalArgumentException
      * @throws IOException
      */
@@ -70,4 +62,11 @@ public class RulesWebServer {
         return RulesWebServer.grizzlyInstance;
     }
 
+
+    /**
+     * @return baseUri
+     */
+    private static String getBaseURI() {
+        return "http://localhost:" + (System.getenv("PORT") != null ? System.getenv("PORT") : "9998") + "/";
+    }
 }

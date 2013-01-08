@@ -1,7 +1,8 @@
 package unit;
 
-import static com.eclipsesource.restfuse.Assert.assertOk;
 import static com.eclipsesource.restfuse.Assert.assertNoContent;
+import static com.eclipsesource.restfuse.Assert.assertOk;
+import gr.ntua.vision.monitoring.web.RulesWebServer;
 
 import java.io.IOException;
 
@@ -17,8 +18,6 @@ import com.eclipsesource.restfuse.Response;
 import com.eclipsesource.restfuse.annotation.Context;
 import com.eclipsesource.restfuse.annotation.HttpTest;
 
-import gr.ntua.vision.monitoring.web.RulesWebServer;
-
 
 /**
  * @author tmessini
@@ -26,32 +25,20 @@ import gr.ntua.vision.monitoring.web.RulesWebServer;
 @RunWith(HttpJUnitRunner.class)
 public class RulesManagementResourceTest {
     /***/
-    static RulesWebServer server = new RulesWebServer();
-
-
-    /**
-     * @throws IllegalArgumentException
-     * @throws IOException
-     */
-    @BeforeClass
-    public static void startServer() throws IllegalArgumentException, IOException {
-        server.start();
-    }
-
+    private static RulesWebServer server   = new RulesWebServer();
     /***/
     @Rule
-    public Destination restfuse = new Destination("http://localhost:9998");
-
+    public Destination            restfuse = new Destination("http://localhost:9998");
     /***/
     @Context
-    private Response   response;
+    private Response              response;
 
 
     /**
-     * checks the insertion of a rule
+     * checks the deletion of a rule
      */
-    @HttpTest(method = Method.PUT, path = "rules/Aggregation-default/1/The-default1-aggregation")
-    public void checkRestPutRule1() {
+    @HttpTest(method = Method.DELETE, path = "rules/1")
+    public void checkRestDeleteRule1() {
         assertOk(response);
     }
 
@@ -66,20 +53,30 @@ public class RulesManagementResourceTest {
 
 
     /**
-     * checks the deletion of a rule
-     */
-    @HttpTest(method = Method.DELETE, path = "rules/1")
-    public void checkRestDeleteRule1() {
-        assertOk(response);
-    }
-
-
-    /**
      * checks the retrieval of a rule after deletion
      */
     @HttpTest(method = Method.GET, path = "rules/1")
     public void checkRestGetRule1AfterDelete() {
         assertNoContent(response);
+    }
+
+
+    /**
+     * checks the insertion of a rule
+     */
+    @HttpTest(method = Method.PUT, path = "rules/Aggregation-default/1/The-default1-aggregation")
+    public void checkRestPutRule1() {
+        assertOk(response);
+    }
+
+
+    /**
+     * @throws IllegalArgumentException
+     * @throws IOException
+     */
+    @BeforeClass
+    public static void startServer() throws IllegalArgumentException, IOException {
+        server.start();
     }
 
 
@@ -91,5 +88,4 @@ public class RulesManagementResourceTest {
     public static void stopServer() throws IllegalArgumentException, IOException {
         server.stop();
     }
-
 }

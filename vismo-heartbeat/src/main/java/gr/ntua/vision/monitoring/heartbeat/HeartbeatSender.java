@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Random;
 
 import org.slf4j.Logger;
@@ -27,7 +25,6 @@ import org.slf4j.LoggerFactory;
  * You can also control how often the heartbeat sends by setting the interval.
  */
 public final class HeartbeatSender {
-
     /**
      * A thread which sends a multicast heartbeat
      */
@@ -44,7 +41,7 @@ public final class HeartbeatSender {
         }
 
 
-        /*
+        /**
          * @see java.lang.Thread#interrupt()
          */
         @Override
@@ -55,7 +52,7 @@ public final class HeartbeatSender {
 
 
         /**
-         * 
+         * @see java.lang.Thread#run()
          */
         @Override
         public final void run() {
@@ -115,11 +112,8 @@ public final class HeartbeatSender {
          * create the multicast packet payload containing the senderID
          * 
          * @return
-         * @throws SocketException
-         * @throws UnknownHostException
          */
-        @SuppressWarnings("javadoc")
-        private byte[] createPayload() throws UnknownHostException, SocketException {
+        private byte[] createPayload() {
             return Integer.toString(SENDER_ID).getBytes();
         }
 
@@ -171,7 +165,7 @@ public final class HeartbeatSender {
      * @param multicastPort
      * @param timeToLive
      *            See class description for the meaning of this parameter.
-     * @param id 
+     * @param id
      */
     public HeartbeatSender(final InetAddress multicastAddress, final Integer multicastPort, final Integer timeToLive,
             final Integer id) {
@@ -266,5 +260,4 @@ public final class HeartbeatSender {
     public void setSendInterval(final long sendInterval) {
         this.sendInterval = sendInterval;
     }
-
 }

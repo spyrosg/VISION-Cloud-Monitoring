@@ -29,20 +29,15 @@ public class ObjectPutGetRemoveTest {
     private static final String     CLOUDHEAD_ADDRESS = "10.0.1.103";
     /***/
     private static final Logger     log               = LoggerFactory.getLogger(ObjectPutGetRemoveTest.class);
-
     /***/
     private static final String     OBJECT_PATH       = "/vision-cloud/object-service/ntua/endtoendtest/object1";
-
     /***/
     private static final ZMQSockets zmq               = new ZMQSockets(new ZContext());
-
     /***/
     @Rule
     public Destination              restfuse          = new Destination("http://" + ObjectPutGetRemoveTest.CLOUDHEAD_ADDRESS);
-
     /***/
     final VismoEventRegistry        registry          = new VismoEventRegistry(zmq, "tcp://10.0.1.103:56430");
-
     /***/
     @Context
     private Response                response;
@@ -86,7 +81,7 @@ public class ObjectPutGetRemoveTest {
      */
     @Before
     public void createConsumer() {
-        registry.registerToAll(new FakeEventConsumer.LoggingHandler());
+        registry.registerToAll(new LoggingHandler());
     }
 
 }

@@ -29,23 +29,17 @@ import com.eclipsesource.restfuse.annotation.HttpTest;
 public class ContainerPutRemoveTest {
     /***/
     private static final String     CLOUDHEAD_ADDRESS = "10.0.1.103:8080";
-
     /***/
     private static final String     CONTAINER_PATH    = "/containers/ntua/testcontainer";
-
     /***/
     private static final Logger     log               = LoggerFactory.getLogger(ContainerPutRemoveTest.class);
-
     /***/
     private static final ZMQSockets zmq               = new ZMQSockets(new ZContext());
-
     /***/
     @Rule
     public Destination              restfuse          = new Destination("http://" + ContainerPutRemoveTest.CLOUDHEAD_ADDRESS);
-
     /***/
     final VismoEventRegistry        registry          = new VismoEventRegistry(zmq, "tcp://10.0.1.103:56430");
-
     /***/
     @Context
     private Response                response;
@@ -54,7 +48,7 @@ public class ContainerPutRemoveTest {
     /***/
     @Before
     public void createConsumer() {
-        registry.registerToAll(new FakeEventConsumer.LoggingHandler());
+        registry.registerToAll(new LoggingHandler());
     }
 
 
@@ -78,5 +72,4 @@ public class ContainerPutRemoveTest {
         ContainerPutRemoveTest.log.debug("delete container reply code: {}", response.getBody(String.class) + ".");
         Assert.assertOk(response);
     }
-
 }

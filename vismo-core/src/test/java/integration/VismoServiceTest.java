@@ -157,7 +157,7 @@ public class VismoServiceTest {
 
         try {
             Thread.sleep(1000);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             e.printStackTrace();
         }
 
