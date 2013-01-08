@@ -17,8 +17,6 @@ public class RuleStore {
     @SuppressWarnings("unused")
     private static final Logger                      log = LoggerFactory.getLogger(RulesManagementResource.class);
     /***/
-    private final ConcurrentHashMap<String, Integer> rulesCatalog;
-    /***/
     private final ConcurrentHashMap<Integer, String> rulesNum;
 
 
@@ -26,7 +24,6 @@ public class RuleStore {
      * 
      */
     public RuleStore() {
-        rulesCatalog = new ConcurrentHashMap<String, Integer>();
         rulesNum = new ConcurrentHashMap<Integer, String>();
     }
 
@@ -37,8 +34,7 @@ public class RuleStore {
      * @param rule
      * @param randomID
      */
-    public void addRule(final String rule, final int randomID) {
-        rulesCatalog.put(rule, randomID);
+    public void addRule(final String rule, final Integer randomID) {
         rulesNum.put(randomID, rule);
     }
 
@@ -57,34 +53,10 @@ public class RuleStore {
     /**
      * removes the rule.
      * 
-     * @param rule
+     * @param ruleId
      */
-    public void deleteRule(final String rule) {
-        rulesNum.remove(rulesCatalog.get(rule));
-        rulesCatalog.remove(rule);
-    }
-
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        final RuleStore other = (RuleStore) obj;
-        if (rulesCatalog == null) {
-            if (other.rulesCatalog != null)
-                return false;
-        } else if (!rulesCatalog.equals(other.rulesCatalog))
-            return false;
-        if (rulesNum == null) {
-            if (other.rulesNum != null)
-                return false;
-        } else if (!rulesNum.equals(other.rulesNum))
-            return false;
-        return true;
+    public void deleteRule(final Integer ruleId) {
+        rulesNum.remove(ruleId);
     }
 
 
@@ -105,7 +77,7 @@ public class RuleStore {
      * @return String
      */
     public String getRules() {
-        return rulesCatalog.toString();
+        return rulesNum.toString();
     }
 
 
@@ -115,17 +87,7 @@ public class RuleStore {
      * @return int
      */
     public int getRulesCatalogSize() {
-        return rulesCatalog.size();
-    }
-
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((rulesCatalog == null) ? 0 : rulesCatalog.hashCode());
-        result = prime * result + ((rulesNum == null) ? 0 : rulesNum.hashCode());
-        return result;
+        return rulesNum.size();
     }
 
 }

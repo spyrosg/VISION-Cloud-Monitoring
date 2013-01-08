@@ -31,7 +31,7 @@ public class MessageDeliverer extends Thread implements Observer {
                 deliveredMessage = manager.getDelQueue().getMessage();
                 final String type = deliveredMessage.getType();
                 final String rule = deliveredMessage.getCommand();
-                final int ruleId = deliveredMessage.getCommandId();
+                final Integer ruleId = new Integer(deliveredMessage.getCommandId());
 
                 String ruleName = "";
                 String rulePeriod = "";
@@ -111,7 +111,7 @@ public class MessageDeliverer extends Thread implements Observer {
         }
         if (rule && type.equals("del")) {
             manager.getEngine().removeRule((Rule) ruleObject);
-            manager.getRuleStore().deleteRule(ruleString);
+            manager.getRuleStore().deleteRule(ruleId);
             checkEngineHealth();
         }
         if (periodicRule && type.equals("add")) {
@@ -121,7 +121,7 @@ public class MessageDeliverer extends Thread implements Observer {
         }
         if (periodicRule && type.equals("del")) {
             manager.getEngine().removeRule((PeriodicRule) ruleObject);
-            manager.getRuleStore().deleteRule(ruleString);
+            manager.getRuleStore().deleteRule(ruleId);
             checkEngineHealth();
         }
     }

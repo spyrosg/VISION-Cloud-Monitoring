@@ -32,11 +32,9 @@ public class RulesManagementResource {
     @Produces("text/plain")
     @Path("rules/{id}")
     public String RulesConfigurationDelete(@PathParam("id") final Integer id) {
-        String rule = null;
         if (RulesManagementResource.manager.getRuleStore().getRule(id) != null) {
             RulesManagementResource.log.info("removing rule: {}", id, ".");
             final int commandId = RulesManagementResource.manager.getRandomID();
-            rule = RulesManagementResource.manager.getRuleStore().getRule(id);
             final Message m = new Message();
             m.setGroupSize(RulesManagementResource.manager.getHeartbeatReceiver().getMembers().size());
             m.setCommandId(commandId);
@@ -44,7 +42,7 @@ public class RulesManagementResource {
             m.setCommand(RulesManagementResource.manager.getRuleStore().getRule(id));
             RulesManagementResource.manager.getOutQueue().addMessage(m);
         }
-        return "removing: " + rule;
+        return "removing: " + id;
     }
 
 
