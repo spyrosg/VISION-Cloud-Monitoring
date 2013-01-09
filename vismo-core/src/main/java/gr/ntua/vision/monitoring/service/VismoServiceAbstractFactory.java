@@ -32,7 +32,7 @@ abstract class VismoServiceAbstractFactory {
         final VismoRulesEngine engine = new VismoRulesEngine(getEventSinks());
 
         sources.subscribeAll(engine);
-        //boostrap(engine);
+        boostrap(engine);
 
         final RulesPropagationManager rulesManager = new RulesPropagationManager(engine,
                 "gr.ntua.vision.monitoring.rules.propagation", 9996);
