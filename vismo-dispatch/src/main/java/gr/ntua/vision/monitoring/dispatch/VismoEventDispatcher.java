@@ -1,8 +1,8 @@
 package gr.ntua.vision.monitoring.dispatch;
 
+import gr.ntua.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.VismoVMInfo;
-import gr.ntua.vision.monitoring.zmq.VismoSocket;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import java.io.IOException;
@@ -80,7 +80,7 @@ public class VismoEventDispatcher implements EventDispatcher {
     /** the name of the service that generate events. */
     private final String             originatingService;
     /** the socket to use. */
-    private final VismoSocket        sock;
+    private final Socket             sock;
 
     static {
         activateLogger();

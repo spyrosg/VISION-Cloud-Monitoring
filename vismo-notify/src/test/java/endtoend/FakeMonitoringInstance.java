@@ -1,6 +1,6 @@
 package endtoend;
 
-import gr.ntua.vision.monitoring.zmq.VismoSocket;
+import gr.ntua.monitoring.sockets.Socket;
 
 import java.util.Random;
 import java.util.UUID;
@@ -21,7 +21,7 @@ public class FakeMonitoringInstance {
     /***/
     private final int           noEventsToSend;
     /***/
-    private final VismoSocket   sock;
+    private final Socket        sock;
     /** the list of topics for the events to generate. */
     private final String[]      topics;
 
@@ -33,7 +33,7 @@ public class FakeMonitoringInstance {
      * @param noEventsToSend
      * @param topics
      */
-    public FakeMonitoringInstance(final VismoSocket sock, final int noEventsToSend, final String[] topics) {
+    public FakeMonitoringInstance(final Socket sock, final int noEventsToSend, final String[] topics) {
         this.sock = sock;
         this.noEventsToSend = noEventsToSend;
         this.topics = topics;

@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.sinks;
 
+import gr.ntua.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.zmq.VismoSocket;
 
 import java.util.HashSet;
 
@@ -25,7 +25,7 @@ public class UniqueEventSink extends AbstractSink {
      * 
      * @param sock
      */
-    public UniqueEventSink(final VismoSocket sock) {
+    public UniqueEventSink(final Socket sock) {
         super(sock);
     }
 

@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.sinks;
 
+import gr.ntua.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.zmq.VismoSocket;
 
 import java.util.Map;
 
@@ -13,7 +13,7 @@ import org.json.simple.JSONObject;
  */
 abstract class AbstractSink implements EventSink {
     /***/
-    private final VismoSocket sock;
+    private final Socket sock;
 
 
     /**
@@ -21,7 +21,7 @@ abstract class AbstractSink implements EventSink {
      * 
      * @param sock
      */
-    public AbstractSink(final VismoSocket sock) {
+    public AbstractSink(final Socket sock) {
         this.sock = sock;
     }
 

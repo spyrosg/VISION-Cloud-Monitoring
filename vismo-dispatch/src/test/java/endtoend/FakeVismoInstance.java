@@ -1,7 +1,7 @@
 package endtoend;
 
 import static org.junit.Assert.assertEquals;
-import gr.ntua.vision.monitoring.zmq.VismoSocket;
+import gr.ntua.monitoring.sockets.Socket;
 
 import java.util.logging.Logger;
 
@@ -17,14 +17,14 @@ public class FakeVismoInstance extends Thread {
     /***/
     private int                 noReceivedEvents = 0;
     /***/
-    private final VismoSocket   sock;
+    private final Socket        sock;
 
 
     /**
      * @param sock
      * @param noExpectedEvents
      */
-    public FakeVismoInstance(final VismoSocket sock, final int noExpectedEvents) {
+    public FakeVismoInstance(final Socket sock, final int noExpectedEvents) {
         super("fake-vismo-instance");
         this.sock = sock;
         this.noExpectedEvents = noExpectedEvents;
