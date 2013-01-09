@@ -37,16 +37,6 @@ public class ZMQFactory {
     /**
      * @param addr
      *            the address to bind to.
-     * @return a new bound pub socket.
-     */
-    public VismoSocket newBoundPubSocket(final String addr) {
-        return new VismoSocket(createBoundSocket(ZMQ.PUB, addr), addr);
-    }
-
-
-    /**
-     * @param addr
-     *            the address to bind to.
      * @return a bound to the address pull socket.
      */
     public VismoSocket newBoundPullSocket(final String addr) {
@@ -86,12 +76,22 @@ public class ZMQFactory {
 
     /**
      * @param addr
+     *            the address to bind to.
+     * @return a new bound publish socket.
+     */
+    public VismoSocket newPubSocket(final String addr) {
+        return new VismoSocket(createBoundSocket(ZMQ.PUB, addr), addr);
+    }
+
+
+    /**
+     * @param addr
      *            the address to connect to.
      * @param topic
      *            the topic to subscribe to.
      * @return a connected socket, subscribed to the given topic.
      */
-    public VismoSocket newSubSocketForTopic(final String addr, final String topic) {
+    public VismoSocket newSubSocket(final String addr, final String topic) {
         final Socket sock = createConnectedSocket(ZMQ.SUB, addr);
 
         sock.subscribe(topic.getBytes());

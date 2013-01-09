@@ -44,7 +44,7 @@ public class EventSinksFactory {
      * @return an {@link EventSinks} object.
      */
     public EventSinks buildForCloudHead() {
-        return new EventSinks(new UniqueEventSink(socketFactory.newBoundPubSocket("tcp://*:" + conf.getConsumersPort())));
+        return new EventSinks(new UniqueEventSink(socketFactory.newPubSocket("tcp://*:" + conf.getConsumersPort())));
     }
 
 
@@ -54,7 +54,7 @@ public class EventSinksFactory {
      * @return an {@link EventSinks} object.
      */
     public EventSinks buildForClusterHead() {
-        final EventSink sink = new UniqueEventSink(socketFactory.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
+        final EventSink sink = new UniqueEventSink(socketFactory.newPubSocket("tcp://*:" + conf.getConsumersPort()));
         final EventSink cloudSink = new UniqueEventSink(socketFactory.newConnectedPushSocket("tcp://"
                 + conf.getCloudHeads().get(0) + ":" + conf.getCloudHeadPort()));
 

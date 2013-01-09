@@ -168,7 +168,7 @@ class EventRegistry {
      *            the handler.
      */
     public void register(final String topic, final EventHandler handler) {
-        final VismoSocket sock = socketFactory.newSubSocketForTopic(addr, topic);
+        final VismoSocket sock = socketFactory.newSubSocket(addr, topic);
 
         log.config("registering handler for topic '" + topic + "', using " + sock);
         pool.submit(new EventHandlerTask(new VismoEventFactory(), sock, handler));

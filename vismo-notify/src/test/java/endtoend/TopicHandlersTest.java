@@ -109,7 +109,7 @@ public class TopicHandlersTest {
      * @param socketFactory
      */
     private void setupFakeMonitoring(final ZMQFactory socketFactory) {
-        inst = new FakeMonitoringInstance(socketFactory.newBoundPubSocket(CONSUMERS_PORT), 10, topics);
+        inst = new FakeMonitoringInstance(socketFactory.newPubSocket(CONSUMERS_PORT), 10, topics);
     }
 
 
