@@ -19,45 +19,45 @@ import org.slf4j.LoggerFactory;
  */
 public class RulesPropagationManager extends Thread {
     /***/
-    private final static Logger             log                      = LoggerFactory.getLogger(RulesPropagationManager.class);
+    private final static Logger            log                      = LoggerFactory.getLogger(RulesPropagationManager.class);
     /***/
-    private final MessageDeliverer          deliverer                = new MessageDeliverer();
+    private final MessageDeliverer         deliverer                = new MessageDeliverer();
     /***/
-    private final MessageQueue              delQueue;
+    private final MessageQueue             delQueue;
     /***/
-    private final MessageDispatcher         dispatcher               = new MessageDispatcher();
+    private final MessageDispatcher        dispatcher               = new MessageDispatcher();
     /***/
-    private final String                    HEARTBEAT_MULTICAST_IP   = "224.0.0.1";
+    private final String                   HEARTBEAT_MULTICAST_IP   = "224.0.0.1";
     /***/
-    private final int                       HEARTBEAT_MULTICAST_PORT = 6307;
+    private final int                      HEARTBEAT_MULTICAST_PORT = 6307;
     /***/
-    private final HeartbeatReceiver         heartbeatReceiver;
+    private final HeartbeatReceiver        heartbeatReceiver;
     /***/
-    private final HeartbeatSender           heartbeatSender;
+    private final HeartbeatSender          heartbeatSender;
     /***/
-    private final MessageQueue              inputQueue;
+    private final MessageQueue             inputQueue;
     /***/
-    private final MessageMap                messageCounter           = new MessageMap();
+    private final MessageMap               messageCounter           = new MessageMap();
     /***/
-    private final MessageReceiver           messageReceiver          = new MessageReceiver();
+    private final MessageReceiver          messageReceiver          = new MessageReceiver();
     /***/
-    private final MessageSender             messageSender            = new MessageSender();
+    private final MessageSender            messageSender            = new MessageSender();
     /***/
-    private final MessageMap                messageTimestamp         = new MessageMap();
+    private final MessageMap               messageTimestamp         = new MessageMap();
     /***/
-    private final RulesPropagationWatchDog  messageWatchdog;
+    private final RulesPropagationWatchDog messageWatchdog;
     /***/
-    private final MessageQueue              outputQueue;
+    private final MessageQueue             outputQueue;
     /***/
-    private Integer                         pid;
+    private Integer                        pid;
     /***/
-    private final RulesManagementResource   resource                 = new RulesManagementResource();
+    private final RulesManagementResource  resource                 = new RulesManagementResource();
     /***/
-    private int                             size;
+    private int                            size;
     /***/
-    private final RulesWebServer webServer;
+    private final RulesWebServer           webServer;
     /***/
-    private final VismoRulesEngine vismoRulesEngine;
+    private final VismoRulesEngine         vismoRulesEngine;
 
 
     /**
@@ -66,13 +66,13 @@ public class RulesPropagationManager extends Thread {
      * @param serverPort
      * @throws IOException
      */
-    public RulesPropagationManager(VismoRulesEngine engine, final String resourcePath, final int serverPort)
-            throws IOException {
+    public RulesPropagationManager(VismoRulesEngine engine, final String resourcePath, final int serverPort) throws IOException {
         setPid();
         vismoRulesEngine = engine;
         webServer = new RulesWebServer(resourcePath, serverPort);
         heartbeatReceiver = new HeartbeatReceiver(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT);
-        heartbeatSender = new HeartbeatSender(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT, 1, getPid());
+        heartbeatSender = new HeartbeatSender(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT, 1,
+                getPid());
         messageWatchdog = new RulesPropagationWatchDog(20000);
 
         messageReceiver.setManager(this);
@@ -81,7 +81,7 @@ public class RulesPropagationManager extends Thread {
         deliverer.setManager(this);
         resource.setManager(this);
         messageWatchdog.setManager(this);
-        //heartbeatSender.setManager(this);
+        // heartbeatSender.setManager(this);
 
         inputQueue = new MessageQueue();
         outputQueue = new MessageQueue();
@@ -90,15 +90,28 @@ public class RulesPropagationManager extends Thread {
         inputQueue.addObserver(dispatcher);
         outputQueue.addObserver(messageSender);
         delQueue.addObserver(deliverer);
+    }
 
-        webServer.start();
-        messageSender.init();
-        messageReceiver.init();
-        dispatcher.start();
-        deliverer.start();
-        heartbeatReceiver.init();
-        heartbeatSender.init();
-        messageWatchdog.scheduleWith(new Timer());
+
+    /**
+     * @see java.lang.Thread#start()
+     */
+    @Override
+    public synchronized void start() {
+        try {
+            webServer.start();
+            messageSender.init();
+            messageReceiver.init();
+            dispatcher.start();
+            deliverer.start();
+            heartbeatReceiver.init();
+            heartbeatSender.init();
+            messageWatchdog.scheduleWith(new Timer());
+        } catch (Throwable x) {
+            throw new RuntimeException(x);
+        }
+
+        super.start();
     }
 
 
@@ -201,5 +214,26 @@ public class RulesPropagationManager extends Thread {
     /***/
     public void setPid() {
         pid = getRandomID();
+    }
+
+
+    /**
+     * 
+     */
+    public void halt() {
+        try {
+            webServer.stop();
+            messageSender.halt();
+            messageReceiver.halt();
+            dispatcher.halt();
+            deliverer.halt();
+            heartbeatReceiver.halt();
+            heartbeatSender.halt();
+            messageWatchdog.cancel();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

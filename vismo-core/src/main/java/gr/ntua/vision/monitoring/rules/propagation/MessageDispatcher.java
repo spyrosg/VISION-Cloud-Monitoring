@@ -19,14 +19,15 @@ public class MessageDispatcher extends Thread implements Observer {
     private RulesPropagationManager manager;
 
 
+    /**
+     * @see java.lang.Thread#run()
+     */
     @Override
     public void run() {
         Message incomingMessage;
-        while (true)
+        while (!interrupted())
             if (!manager.getInQueue().isQEmpty()) {
                 incomingMessage = manager.getInQueue().getMessage();
-                // log.info(manager.getPid()+": messageReceived!"+manager.getMessageCounter().getMessageValue(incomingMessage));
-                // update message timestamp
                 manager.getMessageTimestamp().updateMessageTimestamp(incomingMessage);
 
                 if (!manager.getMessageCounter().contains(incomingMessage)) {
@@ -35,10 +36,6 @@ public class MessageDispatcher extends Thread implements Observer {
                 } else {
                     manager.getMessageCounter().increaseMessageCount(incomingMessage);
                     if (manager.getMessageCounter().getMessageValue(incomingMessage) == incomingMessage.getGroupSize())
-                        // delete message counter & timestamp
-                        // manager.getMessageCounter().remove(incomingMessage);
-                        // manager.getMessageTimestamp().remove(incomingMessage);
-                        // deliver message
                         manager.getDelQueue().addMessage(incomingMessage);
                 }
             } else
@@ -53,6 +50,14 @@ public class MessageDispatcher extends Thread implements Observer {
 
 
     /**
+     * 
+     */
+    public void halt() {
+        interrupt();
+    }
+
+
+    /**
      * @param manager
      */
     public void setManager(final RulesPropagationManager manager) {
@@ -60,6 +65,9 @@ public class MessageDispatcher extends Thread implements Observer {
     }
 
 
+    /**
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
     @Override
     public void update(final Observable o, final Object m) {
         synchronized (this) {

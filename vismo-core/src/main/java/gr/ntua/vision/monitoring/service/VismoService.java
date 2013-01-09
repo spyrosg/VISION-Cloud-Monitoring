@@ -71,7 +71,7 @@ public class VismoService implements Service, UDPListener {
         timer.cancel();
         sources.halt();
         engine.halt();
-        // TODO: man.halt();
+        manager.halt();
     }
 
 
