@@ -40,7 +40,6 @@ public class RulesManagementResource {
             m.setType("del");
             m.setCommand(RulesManagementResource.manager.getRuleStore().getRule(id));
             RulesManagementResource.manager.getOutQueue().addMessage(m);
-            log.info(m.toString());
         }
         return "removing: " + id;
     }
