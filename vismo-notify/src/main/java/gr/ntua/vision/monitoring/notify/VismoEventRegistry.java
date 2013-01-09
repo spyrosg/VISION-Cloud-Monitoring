@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.notify;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
-import gr.ntua.vision.monitoring.zmq.ZMQSockets;
+import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import java.io.IOException;
 
@@ -19,20 +19,20 @@ public class VismoEventRegistry extends EventRegistry {
      *            the vismo configuration file.
      */
     public VismoEventRegistry(final String vismoConfigFile) {
-        this(new ZMQSockets(new ZContext()), toAddr(configWith(vismoConfigFile)));
+        this(new ZMQFactory(new ZContext()), toAddr(configWith(vismoConfigFile)));
     }
 
 
     /**
      * Constructor.
      * 
-     * @param zmq
-     *            the zmq object.
+     * @param socketFactory
+     *            the socket factory.
      * @param address
      *            the address to connect for incoming events.
      */
-    public VismoEventRegistry(final ZMQSockets zmq, final String address) {
-        super(zmq, address);
+    public VismoEventRegistry(final ZMQFactory socketFactory, final String address) {
+        super(socketFactory, address);
     }
 
 
@@ -54,7 +54,7 @@ public class VismoEventRegistry extends EventRegistry {
     /**
      * @param conf
      *            the configuration object.
-     * @return the zmq address to connect to.
+     * @return the address to connect to.
      */
     private static String toAddr(final VismoConfiguration conf) {
         return "tcp://127.0.0.1:" + conf.getConsumersPort();

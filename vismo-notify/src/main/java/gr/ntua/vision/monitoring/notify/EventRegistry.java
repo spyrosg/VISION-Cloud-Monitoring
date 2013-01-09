@@ -4,7 +4,7 @@ import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
-import gr.ntua.vision.monitoring.zmq.ZMQSockets;
+import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -38,7 +38,7 @@ class EventRegistry {
         private final EventFactory  factory;
         /** the actual handler. */
         private final EventHandler  handler;
-        /** the zmq socket. */
+        /** the socket. */
         private final VismoSocket   sock;
 
 
@@ -48,7 +48,7 @@ class EventRegistry {
          * @param factory
          *            the event factory.
          * @param sock
-         *            the zmq socket.
+         *            the socket.
          * @param handler
          *            the actual handler.
          */
@@ -137,8 +137,8 @@ class EventRegistry {
     private final String          addr;
     /** the pool of threads. Each thread corresponds to one event handler. */
     private final ExecutorService pool              = Executors.newCachedThreadPool();
-    /** the zmq object. */
-    private final ZMQSockets      zmq;
+    /** the socket factory. */
+    private final ZMQFactory      socketFactory;
 
     static {
         activateLogger();
@@ -148,13 +148,13 @@ class EventRegistry {
     /**
      * Constructor.
      * 
-     * @param zmq
-     *            the zmq object.
+     * @param socketFactory
+     *            the socket factory.
      * @param addr
      *            the address to connect to for incoming events.
      */
-    public EventRegistry(final ZMQSockets zmq, final String addr) {
-        this.zmq = zmq;
+    public EventRegistry(final ZMQFactory socketFactory, final String addr) {
+        this.socketFactory = socketFactory;
         this.addr = addr;
     }
 
@@ -168,7 +168,7 @@ class EventRegistry {
      *            the handler.
      */
     public void register(final String topic, final EventHandler handler) {
-        final VismoSocket sock = zmq.newSubSocketForTopic(addr, topic);
+        final VismoSocket sock = socketFactory.newSubSocketForTopic(addr, topic);
 
         log.config("registering handler for topic '" + topic + "', using " + sock);
         pool.submit(new EventHandlerTask(new VismoEventFactory(), sock, handler));

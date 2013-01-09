@@ -11,7 +11,7 @@ import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.service.ClusterHeadNodeFactory;
 import gr.ntua.vision.monitoring.service.Service;
-import gr.ntua.vision.monitoring.zmq.ZMQSockets;
+import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -128,8 +128,8 @@ public class VismoServiceTest {
     private FakeObjectService        obs;
     /***/
     private Service                  service;
-    /***/
-    private final ZMQSockets         zmq                     = new ZMQSockets(new ZContext());
+    /** the socket factory. */
+    private final ZMQFactory         socketFactory           = new ZMQFactory(new ZContext());
 
 
     /**
@@ -137,9 +137,9 @@ public class VismoServiceTest {
      */
     @Before
     public void setUp() throws IOException {
-        obs = new FakeObjectService(new VismoEventDispatcher("fake-obs", conf, zmq));
+        obs = new FakeObjectService(new VismoEventDispatcher("fake-obs", conf, socketFactory));
 
-        final ClusterHeadNodeFactory serviceFactory = new ClusterHeadNodeFactory(conf, zmq) {
+        final ClusterHeadNodeFactory serviceFactory = new ClusterHeadNodeFactory(conf, socketFactory) {
             @Override
             protected void boostrap(final VismoRulesEngine engine) {
                 super.boostrap(engine);
@@ -164,7 +164,7 @@ public class VismoServiceTest {
             e.printStackTrace();
         }
 
-        zmq.destroy();
+        socketFactory.destroy();
     }
 
 
@@ -173,7 +173,7 @@ public class VismoServiceTest {
      */
     @Test
     public void vismoDeliversEventsToClient() throws InterruptedException {
-        final VismoEventRegistry reg = new VismoEventRegistry(zmq, "tcp://127.0.0.1:" + conf.getConsumersPort());
+        final VismoEventRegistry reg = new VismoEventRegistry(socketFactory, "tcp://127.0.0.1:" + conf.getConsumersPort());
 
         service.start();
         reg.registerToAll(countHandler);

@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.sources;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
-import gr.ntua.vision.monitoring.zmq.ZMQSockets;
+import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import org.zeromq.ZContext;
 
@@ -13,7 +13,7 @@ public class EventSourcesFactory {
     /** the configuration object. */
     private final VismoConfiguration conf;
     /***/
-    private final ZMQSockets         zmq;
+    private final ZMQFactory         socketFactory;
 
 
     /**
@@ -23,7 +23,7 @@ public class EventSourcesFactory {
      *            the configuration object.
      */
     public EventSourcesFactory(final VismoConfiguration conf) {
-        this(conf, new ZMQSockets(new ZContext()));
+        this(conf, new ZMQFactory(new ZContext()));
     }
 
 
@@ -32,11 +32,11 @@ public class EventSourcesFactory {
      * 
      * @param conf
      *            the configuration object.
-     * @param zmq
+     * @param socketFactory
      */
-    public EventSourcesFactory(final VismoConfiguration conf, final ZMQSockets zmq) {
+    public EventSourcesFactory(final VismoConfiguration conf, final ZMQFactory socketFactory) {
         this.conf = conf;
-        this.zmq = zmq;
+        this.socketFactory = socketFactory;
     }
 
 
@@ -83,7 +83,7 @@ public class EventSourcesFactory {
      * @return the event source for given address
      */
     private VismoEventSource sourceforAddress(final String address) {
-        return new VismoEventSource(zmq.newBoundPullSocket(address), zmq.newConnectedPushSocket(address));
+        return new VismoEventSource(socketFactory.newBoundPullSocket(address), socketFactory.newConnectedPushSocket(address));
     }
 
 

@@ -9,7 +9,7 @@ import org.zeromq.ZMQ.Socket;
  * A helper object over zmq contexts and sockets. This is used mainly to encapsulate and guarantee the use of just one
  * {@link ZContext} in the entire application.
  */
-public class ZMQSockets {
+public class ZMQFactory {
     /** the context. */
     private final ZContext ctx;
 
@@ -20,7 +20,7 @@ public class ZMQSockets {
      * @param ctx
      *            the context.
      */
-    public ZMQSockets(final ZContext ctx) {
+    public ZMQFactory(final ZContext ctx) {
         this.ctx = ctx;
     }
 

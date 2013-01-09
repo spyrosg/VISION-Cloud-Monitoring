@@ -3,7 +3,7 @@ package gr.ntua.vision.monitoring.dispatch;
 import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.VismoVMInfo;
 import gr.ntua.vision.monitoring.zmq.VismoSocket;
-import gr.ntua.vision.monitoring.zmq.ZMQSockets;
+import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -94,11 +94,11 @@ public class VismoEventDispatcher implements EventDispatcher {
      *            the name of the service generating the events.
      * @param configFile
      *            the vismo configuration file.
-     * @param zmq
-     *            the zmq object.
+     * @param socketFactory
+     *            the socket factory.
      */
-    public VismoEventDispatcher(final String serviceName, final String configFile, final ZMQSockets zmq) {
-        this(serviceName, loadConfiguration(configFile), zmq);
+    public VismoEventDispatcher(final String serviceName, final String configFile, final ZMQFactory socketFactory) {
+        this(serviceName, loadConfiguration(configFile), socketFactory);
     }
 
 
@@ -109,13 +109,13 @@ public class VismoEventDispatcher implements EventDispatcher {
      *            the name of the service generating the events.
      * @param conf
      *            the configuration object.
-     * @param zmq
-     *            the zmq object.
+     * @param socketFactory
+     *            the socket factory.
      */
-    public VismoEventDispatcher(final String serviceName, final VismoConfiguration conf, final ZMQSockets zmq) {
+    public VismoEventDispatcher(final String serviceName, final VismoConfiguration conf, final ZMQFactory socketFactory) {
         this.originatingService = serviceName;
         this.conf = conf;
-        this.sock = zmq.newConnectedPushSocket(conf.getProducersPoint());
+        this.sock = socketFactory.newConnectedPushSocket(conf.getProducersPoint());
         this.ip = new VismoVMInfo().getAddress().getHostAddress();
         this.builder = new EventBuilder(this);
     }

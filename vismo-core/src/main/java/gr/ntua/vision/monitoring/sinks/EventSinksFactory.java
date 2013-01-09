@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.sinks;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
-import gr.ntua.vision.monitoring.zmq.ZMQSockets;
+import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import org.zeromq.ZContext;
 
@@ -13,7 +13,7 @@ public class EventSinksFactory {
     /** the configuration object. */
     private final VismoConfiguration conf;
     /***/
-    private final ZMQSockets         zmq;
+    private final ZMQFactory         socketFactory;
 
 
     /**
@@ -23,7 +23,7 @@ public class EventSinksFactory {
      *            the configuration object.
      */
     public EventSinksFactory(final VismoConfiguration conf) {
-        this(conf, new ZMQSockets(new ZContext()));
+        this(conf, new ZMQFactory(new ZContext()));
     }
 
 
@@ -32,11 +32,11 @@ public class EventSinksFactory {
      * 
      * @param conf
      *            the configuration object.
-     * @param zmq
+     * @param socketFactory
      */
-    public EventSinksFactory(final VismoConfiguration conf, final ZMQSockets zmq) {
+    public EventSinksFactory(final VismoConfiguration conf, final ZMQFactory socketFactory) {
         this.conf = conf;
-        this.zmq = zmq;
+        this.socketFactory = socketFactory;
     }
 
 
@@ -44,7 +44,7 @@ public class EventSinksFactory {
      * @return an {@link EventSinks} object.
      */
     public EventSinks buildForCloudHead() {
-        return new EventSinks(new UniqueEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort())));
+        return new EventSinks(new UniqueEventSink(socketFactory.newBoundPubSocket("tcp://*:" + conf.getConsumersPort())));
     }
 
 
@@ -54,9 +54,9 @@ public class EventSinksFactory {
      * @return an {@link EventSinks} object.
      */
     public EventSinks buildForClusterHead() {
-        final EventSink sink = new UniqueEventSink(zmq.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
-        final EventSink cloudSink = new UniqueEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getCloudHeads().get(0) + ":"
-                + conf.getCloudHeadPort()));
+        final EventSink sink = new UniqueEventSink(socketFactory.newBoundPubSocket("tcp://*:" + conf.getConsumersPort()));
+        final EventSink cloudSink = new UniqueEventSink(socketFactory.newConnectedPushSocket("tcp://"
+                + conf.getCloudHeads().get(0) + ":" + conf.getCloudHeadPort()));
 
         return new EventSinks(sink, cloudSink);
     }
@@ -68,7 +68,7 @@ public class EventSinksFactory {
      * @return an {@link EventSinks} object.
      */
     public EventSinks buildForWorker() {
-        return new EventSinks(new UniqueEventSink(zmq.newConnectedPushSocket("tcp://" + conf.getClusterHead() + ":"
+        return new EventSinks(new UniqueEventSink(socketFactory.newConnectedPushSocket("tcp://" + conf.getClusterHead() + ":"
                 + conf.getClusterHeadPort())));
     }
 }

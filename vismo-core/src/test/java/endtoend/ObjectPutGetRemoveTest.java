@@ -1,7 +1,7 @@
 package endtoend;
 
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
-import gr.ntua.vision.monitoring.zmq.ZMQSockets;
+import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -32,12 +32,12 @@ public class ObjectPutGetRemoveTest {
     /***/
     private static final String     OBJECT_PATH       = "/vision-cloud/object-service/ntua/endtoendtest/object1";
     /***/
-    private static final ZMQSockets zmq               = new ZMQSockets(new ZContext());
+    private static final ZMQFactory socketFactory     = new ZMQFactory(new ZContext());
     /***/
     @Rule
     public Destination              restfuse          = new Destination("http://" + ObjectPutGetRemoveTest.CLOUDHEAD_ADDRESS);
     /***/
-    final VismoEventRegistry        registry          = new VismoEventRegistry(zmq, "tcp://10.0.1.103:56430");
+    final VismoEventRegistry        registry          = new VismoEventRegistry(socketFactory, "tcp://10.0.1.103:56430");
     /***/
     @Context
     private Response                response;
