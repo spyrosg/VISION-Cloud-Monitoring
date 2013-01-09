@@ -40,6 +40,7 @@ public class RulesManagementResource {
             m.setType("del");
             m.setCommand(RulesManagementResource.manager.getRuleStore().getRule(id));
             RulesManagementResource.manager.getOutQueue().addMessage(m);
+            log.info(m.toString());
         }
         return "removing: " + id;
     }
@@ -60,15 +61,14 @@ public class RulesManagementResource {
 
 
     /**
-     * @param id
      * @return the rule.
      */
     @SuppressWarnings("static-method")
     @GET
     @Produces("text/plain")
     @Path("rules/all")
-    public String RulesConfigurationGetAll(@PathParam("id") final Integer id) {
-        RulesManagementResource.log.info("requesting rule: {}", id + ".");
+    public String RulesConfigurationGetAll() {
+        RulesManagementResource.log.info("requesting all rules");
         return RulesManagementResource.manager.getRuleStore().getRules();
     }
 
@@ -95,6 +95,7 @@ public class RulesManagementResource {
             m.setType("add");
             m.setCommand(name + ":" + period + ":" + desc);
             RulesManagementResource.manager.getOutQueue().addMessage(m);
+            log.info(m.toString());
         }
         return "adding rule: " + commandId + " " + name + ":" + period + ":" + desc;
     }

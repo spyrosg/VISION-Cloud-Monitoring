@@ -42,10 +42,7 @@ public class RulesWebServer {
      */
     public RulesWebServer(final String resourcePackage, final int serverPort) throws IllegalArgumentException, IOException {
         this.serverPort = serverPort;
-
-        System.out.println("server address:" + getAddress().toString().substring(1));
         BASE_URI = "http://" + getAddress().toString().substring(1) + ":" + serverPort + "/";
-        System.out.println("BASE_URI:" + BASE_URI);
         initParams.put("com.sun.jersey.config.property.packages", resourcePackage);
         this.selectorThread = getGrizzly();
     }
