@@ -109,10 +109,10 @@ public class Message implements Serializable {
 
 
     /**
-     * @param toGroup
+     * @param command 
      */
-    public void setCommand(final String toGroup) {
-        this.command = toGroup;
+    public void setCommand(final String command) {
+        this.command = command;
     }
 
 
