@@ -245,8 +245,6 @@ public class RulesPropagationManager extends Thread {
             messageWatchdog.cancel();
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

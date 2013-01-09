@@ -23,6 +23,8 @@ public class RulesWebServer {
     private final Map<String, String> initParams = new HashMap<String, String>();
     /***/
     private final int                 serverPort;
+    /***/
+    private final SelectorThread      selectorThread;
 
 
     /**
@@ -30,30 +32,30 @@ public class RulesWebServer {
      * 
      * @param resourcePackage
      * @param serverPort
+     * @throws IOException
+     * @throws IllegalArgumentException
      */
-    public RulesWebServer(final String resourcePackage, final int serverPort) {
+    public RulesWebServer(final String resourcePackage, final int serverPort) throws IllegalArgumentException, IOException {
         this.serverPort = serverPort;
         BASE_URI = "http://localhost:" + serverPort + "/";
         initParams.put("com.sun.jersey.config.property.packages", resourcePackage);
+        this.selectorThread = getGrizzly();
     }
 
 
     /**
      * @throws IllegalArgumentException
-     * @throws IOException
      */
-    public void start() throws IllegalArgumentException, IOException {
-        getGrizzly();
+    public void start() throws IllegalArgumentException {
         RulesWebServer.log.info("grizzly started at " + getGrizzlyPort());
     }
 
 
     /**
      * @throws IllegalArgumentException
-     * @throws IOException
      */
-    public void stop() throws IllegalArgumentException, IOException {
-        getGrizzly().stopEndpoint();
+    public void stop() throws IllegalArgumentException {
+        selectorThread.stopEndpoint();
         RulesWebServer.log.info("grizzly stopped");
 
     }
