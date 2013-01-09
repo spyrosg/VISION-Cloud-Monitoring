@@ -1,18 +1,18 @@
 package gr.ntua.vision.monitoring.zmq;
 
-import gr.ntua.vision.monitoring.MonitoringSocket;
+import gr.ntua.monitoring.sockets.Socket;
 
-import org.zeromq.ZMQ.Socket;
+import org.zeromq.ZMQ;
 
 
 /**
  * 
  */
-public class VismoSocket implements MonitoringSocket {
+class ZMQSocket implements Socket {
     /** the address used. */
-    private final String addr;
+    private final String     addr;
     /** the actual zmq socket. */
-    private final Socket sock;
+    private final ZMQ.Socket sock;
 
 
     /**
@@ -23,14 +23,14 @@ public class VismoSocket implements MonitoringSocket {
      * @param addr
      *            the address used.
      */
-    VismoSocket(final Socket sock, final String addr) {
+    ZMQSocket(final ZMQ.Socket sock, final String addr) {
         this.sock = sock;
         this.addr = addr;
     }
 
 
     /**
-     * Close the socket.
+     * @see gr.ntua.monitoring.sockets.Socket#close()
      */
     @Override
     public void close() {
@@ -39,7 +39,7 @@ public class VismoSocket implements MonitoringSocket {
 
 
     /**
-     * @return the message received, or <code>null</code> on io error.
+     * @see gr.ntua.monitoring.sockets.Socket#receive()
      */
     @Override
     public String receive() {
@@ -53,11 +53,7 @@ public class VismoSocket implements MonitoringSocket {
 
 
     /**
-     * Send the message.
-     * 
-     * @param message
-     *            the message to send.
-     * @return <code>true</code> on success, <code>false</code> otherwise.
+     * @see gr.ntua.monitoring.sockets.Socket#send(java.lang.String)
      */
     @Override
     public boolean send(final String message) {
@@ -79,7 +75,7 @@ public class VismoSocket implements MonitoringSocket {
      *            the socket.
      * @return the socket type.
      */
-    private static String getType(final Socket sock) {
+    private static String getType(final ZMQ.Socket sock) {
         switch (sock.getType()){
             case 0:
                 return "PAIR";

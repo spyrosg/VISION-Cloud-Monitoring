@@ -17,6 +17,12 @@
 
   <dependencies>
     <dependency>
+      <artifactId>vismo-sockets</artifactId>
+      <groupId>gr.ntua.vision</groupId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.zeromq</groupId>
       <artifactId>jzmq-all</artifactId>
       <version>1.0.0</version>

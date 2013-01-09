@@ -1,8 +1,10 @@
 package gr.ntua.vision.monitoring.zmq;
 
+import gr.ntua.monitoring.sockets.Socket;
+import gr.ntua.monitoring.sockets.SocketFactory;
+
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 
 
@@ -10,7 +12,7 @@ import org.zeromq.ZMQException;
  * A helper object over zmq contexts and sockets. This is used mainly to encapsulate and guarantee the use of just one
  * {@link ZContext} in the entire application.
  */
-public class ZMQFactory {
+public class ZMQFactory implements SocketFactory {
     /** the context. */
     private final ZContext ctx;
 
@@ -35,68 +37,60 @@ public class ZMQFactory {
 
 
     /**
-     * @param addr
-     *            the address to bind to.
-     * @return a bound to the address pull socket.
+     * @see gr.ntua.monitoring.sockets.SocketFactory#newBoundPullSocket(java.lang.String)
      */
-    public VismoSocket newBoundPullSocket(final String addr) {
-        return new VismoSocket(createBoundSocket(ZMQ.PULL, addr), addr);
+    @Override
+    public Socket newBoundPullSocket(final String addr) {
+        return new ZMQSocket(createBoundSocket(ZMQ.PULL, addr), addr);
     }
 
 
     /**
-     * @param addr
-     *            the address to bind to.
-     * @return a bound to the address pull socket.
+     * @see gr.ntua.monitoring.sockets.SocketFactory#newBoundPushSocket(java.lang.String)
      */
-    public VismoSocket newBoundPushSocket(final String addr) {
-        return new VismoSocket(createBoundSocket(ZMQ.PUSH, addr), addr);
+    @Override
+    public Socket newBoundPushSocket(final String addr) {
+        return new ZMQSocket(createBoundSocket(ZMQ.PUSH, addr), addr);
     }
 
 
     /**
-     * @param addr
-     *            the address to connect to.
-     * @return a connected to the address push socket.
+     * @see gr.ntua.monitoring.sockets.SocketFactory#newConnectedPullSocket(java.lang.String)
      */
-    public VismoSocket newConnectedPullSocket(final String addr) {
-        return new VismoSocket(createConnectedSocket(ZMQ.PULL, addr), addr);
+    @Override
+    public Socket newConnectedPullSocket(final String addr) {
+        return new ZMQSocket(createConnectedSocket(ZMQ.PULL, addr), addr);
     }
 
 
     /**
-     * @param addr
-     *            the address to connect to.
-     * @return a connected to the address push socket.
+     * @see gr.ntua.monitoring.sockets.SocketFactory#newConnectedPushSocket(java.lang.String)
      */
-    public VismoSocket newConnectedPushSocket(final String addr) {
-        return new VismoSocket(createConnectedSocket(ZMQ.PUSH, addr), addr);
+    @Override
+    public Socket newConnectedPushSocket(final String addr) {
+        return new ZMQSocket(createConnectedSocket(ZMQ.PUSH, addr), addr);
     }
 
 
     /**
-     * @param addr
-     *            the address to bind to.
-     * @return a new bound publish socket.
+     * @see gr.ntua.monitoring.sockets.SocketFactory#newPubSocket(java.lang.String)
      */
-    public VismoSocket newPubSocket(final String addr) {
-        return new VismoSocket(createBoundSocket(ZMQ.PUB, addr), addr);
+    @Override
+    public Socket newPubSocket(final String addr) {
+        return new ZMQSocket(createBoundSocket(ZMQ.PUB, addr), addr);
     }
 
 
     /**
-     * @param addr
-     *            the address to connect to.
-     * @param topic
-     *            the topic to subscribe to.
-     * @return a connected socket, subscribed to the given topic.
+     * @see gr.ntua.monitoring.sockets.SocketFactory#newSubSocket(java.lang.String, java.lang.String)
      */
-    public VismoSocket newSubSocket(final String addr, final String topic) {
-        final Socket sock = createConnectedSocket(ZMQ.SUB, addr);
+    @Override
+    public Socket newSubSocket(final String addr, final String topic) {
+        final ZMQ.Socket sock = createConnectedSocket(ZMQ.SUB, addr);
 
         sock.subscribe(topic.getBytes());
 
-        return new VismoSocket(sock, addr);
+        return new ZMQSocket(sock, addr);
     }
 
 
@@ -109,8 +103,8 @@ public class ZMQFactory {
      *            the address to bind.
      * @return a zmq socket.
      */
-    private Socket createBoundSocket(final int type, final String addr) {
-        final Socket sock = ctx.createSocket(type);
+    private ZMQ.Socket createBoundSocket(final int type, final String addr) {
+        final ZMQ.Socket sock = ctx.createSocket(type);
 
         sock.setLinger(0);
         sock.setSendTimeOut(0);
@@ -134,8 +128,8 @@ public class ZMQFactory {
      *            the address to bind.
      * @return a zmq socket.
      */
-    private Socket createConnectedSocket(final int type, final String addr) {
-        final Socket sock = ctx.createSocket(type);
+    private ZMQ.Socket createConnectedSocket(final int type, final String addr) {
+        final ZMQ.Socket sock = ctx.createSocket(type);
 
         sock.setLinger(0);
         sock.setSendTimeOut(0);
