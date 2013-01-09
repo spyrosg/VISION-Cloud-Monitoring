@@ -1,5 +1,8 @@
 package gr.ntua.vision.monitoring.rules;
 
+import gr.ntua.vision.monitoring.events.Event;
+
+
 /**
  * @author tmessini
  */
@@ -11,5 +14,5 @@ public interface RuleFactory {
      * @param desc
      * @return rule
      */
-    public Object createRule(VismoRulesEngine vismoRulesEngine, String period, String name, String desc);
+    public RuleProc<Event> createRule(VismoRulesEngine vismoRulesEngine, String period, String name, String desc);
 }
