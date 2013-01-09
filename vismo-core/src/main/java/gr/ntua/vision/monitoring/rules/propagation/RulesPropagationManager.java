@@ -98,28 +98,6 @@ public class RulesPropagationManager extends Thread {
 
 
     /**
-     * @see java.lang.Thread#start()
-     */
-    @Override
-    public synchronized void start() {
-        try {
-            webServer.start();
-            messageSender.init();
-            messageReceiver.init();
-            dispatcher.start();
-            deliverer.start();
-            heartbeatReceiver.init();
-            heartbeatSender.init();
-            messageWatchdog.scheduleWith(new Timer());
-        } catch (Throwable x) {
-            throw new RuntimeException(x);
-        }
-
-        super.start();
-    }
-
-
-    /**
      * @return the deleted queue
      */
     public MessageQueue getDelQueue() {
@@ -212,6 +190,25 @@ public class RulesPropagationManager extends Thread {
     }
 
 
+    /**
+     * 
+     */
+    public void halt() {
+        try {
+            webServer.stop();
+            messageSender.halt();
+            messageReceiver.halt();
+            dispatcher.halt();
+            deliverer.halt();
+            heartbeatReceiver.halt();
+            heartbeatSender.halt();
+            messageWatchdog.cancel();
+        } catch (final IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     @Override
     public void run() {
         while (true) {
@@ -230,21 +227,25 @@ public class RulesPropagationManager extends Thread {
         pid = getRandomID();
     }
 
+
     /**
-     * 
+     * @see java.lang.Thread#start()
      */
-    public void halt() {
+    @Override
+    public synchronized void start() {
         try {
-            webServer.stop();
-            messageSender.halt();
-            messageReceiver.halt();
-            dispatcher.halt();
-            deliverer.halt();
-            heartbeatReceiver.halt();
-            heartbeatSender.halt();
-            messageWatchdog.cancel();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            webServer.start();
+            messageSender.init();
+            messageReceiver.init();
+            dispatcher.start();
+            deliverer.start();
+            heartbeatReceiver.init();
+            heartbeatSender.init();
+            messageWatchdog.scheduleWith(new Timer());
+        } catch (final Throwable x) {
+            throw new RuntimeException(x);
         }
+
+        super.start();
     }
 }

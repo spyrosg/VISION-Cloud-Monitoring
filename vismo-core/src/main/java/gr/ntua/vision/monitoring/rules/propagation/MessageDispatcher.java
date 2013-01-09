@@ -20,6 +20,14 @@ public class MessageDispatcher extends Thread implements Observer {
 
 
     /**
+     * 
+     */
+    public void halt() {
+        interrupt();
+    }
+
+
+    /**
      * @see java.lang.Thread#run()
      */
     @Override
@@ -46,14 +54,6 @@ public class MessageDispatcher extends Thread implements Observer {
                         e.printStackTrace();
                     }
                 }
-    }
-
-
-    /**
-     * 
-     */
-    public void halt() {
-        interrupt();
     }
 
 

@@ -22,9 +22,9 @@ public class RulesWebServer {
     /***/
     private final Map<String, String> initParams = new HashMap<String, String>();
     /***/
-    private final int                 serverPort;
-    /***/
     private final SelectorThread      selectorThread;
+    /***/
+    private final int                 serverPort;
 
 
     /**

@@ -30,7 +30,6 @@ public class RulesPropagationTest {
      * @throws IOException
      */
     public static void main(final String[] args) throws IOException {
-                       
 
         final VismoRulesEngine engine1 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest.store)));
         engine1.registerToSource(RulesPropagationTest.source);
