@@ -3,6 +3,7 @@ package gr.ntua.vision.monitoring.zmq;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
+import org.zeromq.ZMQException;
 
 
 /**
@@ -39,13 +40,7 @@ public class ZMQFactory {
      * @return a new bound pub socket.
      */
     public VismoSocket newBoundPubSocket(final String addr) {
-        final Socket sock = ctx.createSocket(ZMQ.PUB);
-
-        sock.setLinger(0);
-        sock.setSendTimeOut(0);
-        sock.bind(addr);
-
-        return new VismoSocket(sock, addr);
+        return new VismoSocket(createBoundSocket(ZMQ.PUB, addr), addr);
     }
 
 
@@ -55,12 +50,7 @@ public class ZMQFactory {
      * @return a bound to the address pull socket.
      */
     public VismoSocket newBoundPullSocket(final String addr) {
-        final Socket sock = ctx.createSocket(ZMQ.PULL);
-
-        sock.setLinger(0);
-        sock.bind(addr);
-
-        return new VismoSocket(sock, addr);
+        return new VismoSocket(createBoundSocket(ZMQ.PULL, addr), addr);
     }
 
 
@@ -70,12 +60,7 @@ public class ZMQFactory {
      * @return a bound to the address pull socket.
      */
     public VismoSocket newBoundPushSocket(final String addr) {
-        final Socket sock = ctx.createSocket(ZMQ.PUSH);
-
-        sock.setLinger(0);
-        sock.bind(addr);
-
-        return new VismoSocket(sock, addr);
+        return new VismoSocket(createBoundSocket(ZMQ.PUSH, addr), addr);
     }
 
 
@@ -85,12 +70,7 @@ public class ZMQFactory {
      * @return a connected to the address push socket.
      */
     public VismoSocket newConnectedPullSocket(final String addr) {
-        final Socket sock = ctx.createSocket(ZMQ.PULL);
-
-        sock.setLinger(0);
-        sock.connect(addr);
-
-        return new VismoSocket(sock, addr);
+        return new VismoSocket(createConnectedSocket(ZMQ.PULL, addr), addr);
     }
 
 
@@ -100,12 +80,7 @@ public class ZMQFactory {
      * @return a connected to the address push socket.
      */
     public VismoSocket newConnectedPushSocket(final String addr) {
-        final Socket sock = ctx.createSocket(ZMQ.PUSH);
-
-        sock.setLinger(0);
-        sock.connect(addr);
-
-        return new VismoSocket(sock, addr);
+        return new VismoSocket(createConnectedSocket(ZMQ.PUSH, addr), addr);
     }
 
 
@@ -117,12 +92,60 @@ public class ZMQFactory {
      * @return a connected socket, subscribed to the given topic.
      */
     public VismoSocket newSubSocketForTopic(final String addr, final String topic) {
-        final Socket sock = ctx.createSocket(ZMQ.SUB);
+        final Socket sock = createConnectedSocket(ZMQ.SUB, addr);
 
-        sock.setLinger(0);
-        sock.connect(addr);
         sock.subscribe(topic.getBytes());
 
         return new VismoSocket(sock, addr);
+    }
+
+
+    /**
+     * Return a zmq socket, connected to given address. The socket's send/receive return immediately and won't linger.
+     * 
+     * @param type
+     *            the type of the socket.
+     * @param addr
+     *            the address to bind.
+     * @return a zmq socket.
+     */
+    private Socket createBoundSocket(final int type, final String addr) {
+        final Socket sock = ctx.createSocket(type);
+
+        sock.setLinger(0);
+        sock.setSendTimeOut(0);
+
+        try {
+            sock.bind(addr);
+        } catch (final ZMQException e) {
+            throw new RuntimeException("cannot bind to '" + addr + "'", e);
+        }
+
+        return sock;
+    }
+
+
+    /**
+     * Return a zmq socket, bound to given address. The socket's send/receive return immediately and won't linger.
+     * 
+     * @param type
+     *            the type of the socket.
+     * @param addr
+     *            the address to bind.
+     * @return a zmq socket.
+     */
+    private Socket createConnectedSocket(final int type, final String addr) {
+        final Socket sock = ctx.createSocket(type);
+
+        sock.setLinger(0);
+        sock.setSendTimeOut(0);
+
+        try {
+            sock.connect(addr);
+        } catch (final ZMQException e) {
+            throw new RuntimeException("cannot connect to '" + addr + "'", e);
+        }
+
+        return sock;
     }
 }
