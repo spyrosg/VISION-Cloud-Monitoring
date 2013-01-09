@@ -128,7 +128,7 @@ public class RulesPropagationManager extends Thread {
 
 
     /**
-     * @return vismo service engine
+     * @return vision monitoring rules engine
      */
     public VismoRulesEngine getEngine() {
         return vismoRulesEngine;
@@ -137,7 +137,7 @@ public class RulesPropagationManager extends Thread {
 
 
     /**
-     * @return the Heartbeat receiver
+     * @return the  heart beat receiver
      */
     public HeartbeatReceiver getHeartbeatReceiver() {
         return heartbeatReceiver;
@@ -177,7 +177,8 @@ public class RulesPropagationManager extends Thread {
 
 
     /**
-     * @return pid.
+     * returns the unique id of the node
+     * @return id
      */
     public Integer getPid() {
         return pid;

@@ -18,7 +18,7 @@ public class Message implements Serializable {
     /***/
     private volatile int      hashCode;
     /***/
-    private String            toGroup;
+    private String            command;
     /***/
     private String            type;
 
@@ -40,10 +40,10 @@ public class Message implements Serializable {
             return false;
         if (hashCode != other.hashCode)
             return false;
-        if (toGroup == null) {
-            if (other.toGroup != null)
+        if (command == null) {
+            if (other.command != null)
                 return false;
-        } else if (!toGroup.equals(other.toGroup))
+        } else if (!command.equals(other.command))
             return false;
         if (type == null) {
             if (other.type != null)
@@ -58,7 +58,7 @@ public class Message implements Serializable {
      * @return the multicast group
      */
     public String getCommand() {
-        return toGroup;
+        return command;
     }
 
 
@@ -102,7 +102,7 @@ public class Message implements Serializable {
         result = prime * result + fromId;
         result = prime * result + groupSize;
         result = prime * result + hashCode;
-        result = prime * result + ((toGroup == null) ? 0 : toGroup.hashCode());
+        result = prime * result + ((command == null) ? 0 : command.hashCode());
         result = prime * result + ((type == null) ? 0 : type.hashCode());
         return result;
     }
@@ -112,7 +112,7 @@ public class Message implements Serializable {
      * @param toGroup
      */
     public void setCommand(final String toGroup) {
-        this.toGroup = toGroup;
+        this.command = toGroup;
     }
 
 
@@ -151,7 +151,7 @@ public class Message implements Serializable {
 
     @Override
     public String toString() {
-        final String str = "fromId=" + fromId + "toGroup=" + toGroup + "type=" + type + "commandId=" + commandId + "groupSize="
+        final String str = "fromId=" + fromId + "command=" + command + "type=" + type + "commandId=" + commandId + "groupSize="
                 + groupSize;
 
         return str;

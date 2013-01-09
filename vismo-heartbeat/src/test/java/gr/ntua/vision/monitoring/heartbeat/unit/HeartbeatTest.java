@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Iterator;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.Assert;
 import org.junit.Test;

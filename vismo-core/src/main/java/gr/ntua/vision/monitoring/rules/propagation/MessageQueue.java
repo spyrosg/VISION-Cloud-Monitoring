@@ -31,8 +31,8 @@ public class MessageQueue extends Observable {
 
     /**
      * This method notifies all interested parties that a new message has been added. In our case, the inQueue notifies the
-     * Dispatcher and the outQueue notifies the sender. This binding of queues to threads takes place in the initialization of the
-     * monitor.
+     * MessageDispatcher, outQueue notifies the MessageSender and delQueue notifies the MessageDeliverer. This binding of queues
+     * to threads takes place in the initialization of the manager.
      * 
      * @param m
      */
