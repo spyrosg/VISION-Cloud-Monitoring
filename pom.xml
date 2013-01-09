@@ -22,6 +22,7 @@
     <module>vismo-zmq</module>
     <module>vismo-web</module>
     <module>vismo-heartbeat</module>
+    <module>vismo-sockets</module>
   </modules>
 
   <properties>
