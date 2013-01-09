@@ -4,7 +4,6 @@ import gr.ntua.vision.monitoring.heartbeat.HeartbeatReceiver;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatSender;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.web.RulesWebServer;
-import gr.ntua.vision.monitoring.rules.propagation.RuleStore;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -20,47 +19,47 @@ import org.slf4j.LoggerFactory;
  */
 public class RulesPropagationManager extends Thread {
     /***/
-    private final static Logger             log                      = LoggerFactory.getLogger(RulesPropagationManager.class);
+    private final static Logger            log                      = LoggerFactory.getLogger(RulesPropagationManager.class);
     /***/
-    private final MessageDeliverer          deliverer                = new MessageDeliverer();
+    private final MessageDeliverer         deliverer                = new MessageDeliverer();
     /***/
-    private final MessageQueue              delQueue;
+    private final MessageQueue             delQueue;
     /***/
-    private final MessageDispatcher         dispatcher               = new MessageDispatcher();
+    private final MessageDispatcher        dispatcher               = new MessageDispatcher();
     /***/
-    private final String                    HEARTBEAT_MULTICAST_IP   = "224.0.0.1";
+    private final String                   HEARTBEAT_MULTICAST_IP   = "224.0.0.1";
     /***/
-    private final int                       HEARTBEAT_MULTICAST_PORT = 6307;
+    private final int                      HEARTBEAT_MULTICAST_PORT = 6307;
     /***/
-    private final HeartbeatReceiver         heartbeatReceiver;
+    private final HeartbeatReceiver        heartbeatReceiver;
     /***/
-    private final HeartbeatSender           heartbeatSender;
+    private final HeartbeatSender          heartbeatSender;
     /***/
-    private final MessageQueue              inputQueue;
+    private final MessageQueue             inputQueue;
     /***/
-    private final MessageMap                messageCounter           = new MessageMap();
+    private final MessageMap               messageCounter           = new MessageMap();
     /***/
-    private final MessageReceiver           messageReceiver          = new MessageReceiver();
+    private final MessageReceiver          messageReceiver          = new MessageReceiver();
     /***/
-    private final MessageSender             messageSender            = new MessageSender();
+    private final MessageSender            messageSender            = new MessageSender();
     /***/
-    private final MessageMap                messageTimestamp         = new MessageMap();
+    private final MessageMap               messageTimestamp         = new MessageMap();
     /***/
-    private final RulesPropagationWatchDog  messageWatchdog;
+    private final RulesPropagationWatchDog messageWatchdog;
     /***/
-    private final MessageQueue              outputQueue;
+    private final MessageQueue             outputQueue;
     /***/
-    private Integer                         pid;
+    private Integer                        pid;
     /***/
-    private final RulesManagementResource   resource                 = new RulesManagementResource();
+    private final RulesManagementResource  resource                 = new RulesManagementResource();
     /***/
-    private int                             size;
+    private final RuleStore                ruleStore;
     /***/
-    private final RulesWebServer webServer;
+    private int                            size;
     /***/
-    private final VismoRulesEngine vismoRulesEngine;
+    private final VismoRulesEngine         vismoRulesEngine;
     /***/
-    private RuleStore ruleStore;
+    private final RulesWebServer           webServer;
 
 
     /**
@@ -69,15 +68,16 @@ public class RulesPropagationManager extends Thread {
      * @param serverPort
      * @throws IOException
      */
-    public RulesPropagationManager(VismoRulesEngine engine, final String resourcePath, final int serverPort)
+    public RulesPropagationManager(final VismoRulesEngine engine, final String resourcePath, final int serverPort)
             throws IOException {
         setPid();
         vismoRulesEngine = engine;
-        ruleStore= new RuleStore();
+        ruleStore = new RuleStore();
         System.out.println(ruleStore);
         webServer = new RulesWebServer(resourcePath, serverPort);
         heartbeatReceiver = new HeartbeatReceiver(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT);
-        heartbeatSender = new HeartbeatSender(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT, 1, getPid());
+        heartbeatSender = new HeartbeatSender(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT, 1,
+                getPid());
         messageWatchdog = new RulesPropagationWatchDog(20000);
 
         messageReceiver.setManager(this);
@@ -106,14 +106,6 @@ public class RulesPropagationManager extends Thread {
     }
 
 
-    /**
-     * common place to store rules
-     * @return ruleStore
-     */
-    public RuleStore getRuleStore(){
-        return ruleStore;
-    }
-    
     /**
      * @return the deleted queue
      */
@@ -186,6 +178,16 @@ public class RulesPropagationManager extends Thread {
     public Integer getRandomID() {
         final Random randomGenerator = new Random();
         return Integer.valueOf(randomGenerator.nextInt(100000) + 100000);
+    }
+
+
+    /**
+     * common place to store rules
+     * 
+     * @return ruleStore
+     */
+    public RuleStore getRuleStore() {
+        return ruleStore;
     }
 
 

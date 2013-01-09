@@ -33,7 +33,7 @@ public class RulesManagementResource {
     @Path("rules/{id}")
     public String RulesConfigurationDelete(@PathParam("id") final Integer id) {
         if (RulesManagementResource.manager.getRuleStore().getRule(id) != null) {
-            RulesManagementResource.log.info("removing rule: {}", id, ".");           
+            RulesManagementResource.log.info("removing rule: {}", id, ".");
             final Message m = new Message();
             m.setGroupSize(RulesManagementResource.manager.getHeartbeatReceiver().getMembers().size());
             m.setCommandId(id);

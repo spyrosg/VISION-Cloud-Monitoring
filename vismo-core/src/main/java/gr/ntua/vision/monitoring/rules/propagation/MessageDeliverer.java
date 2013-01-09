@@ -23,6 +23,9 @@ public class MessageDeliverer extends Thread implements Observer {
     private RulesPropagationManager   manager;
 
 
+    /**
+     * @see java.lang.Thread#run()
+     */
     @Override
     public void run() {
         Message deliveredMessage;
@@ -73,6 +76,9 @@ public class MessageDeliverer extends Thread implements Observer {
     }
 
 
+    /**
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
     @Override
     public void update(final Observable o, final Object m) {
         synchronized (this) {
