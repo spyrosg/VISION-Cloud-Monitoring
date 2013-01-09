@@ -1,9 +1,9 @@
 package gr.ntua.vision.monitoring.policy;
 
-import java.io.IOException;
-
 import gr.ntua.vision.monitoring.VMInfo;
 import gr.ntua.vision.monitoring.service.Service;
+
+import java.io.IOException;
 
 
 /**
@@ -15,6 +15,7 @@ public interface NodePolicy {
      * 
      * @param vminfo
      * @return a configured {@link Service} ready to run.
+     * @throws IOException
      */
-    Service build(final VMInfo vminfo);
+    Service build(final VMInfo vminfo) throws IOException;
 }

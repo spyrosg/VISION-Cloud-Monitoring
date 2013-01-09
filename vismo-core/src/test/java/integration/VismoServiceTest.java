@@ -13,6 +13,7 @@ import gr.ntua.vision.monitoring.service.ClusterHeadNodeFactory;
 import gr.ntua.vision.monitoring.service.Service;
 import gr.ntua.vision.monitoring.zmq.ZMQSockets;
 
+import java.io.IOException;
 import java.util.Properties;
 
 import org.junit.After;
@@ -131,9 +132,11 @@ public class VismoServiceTest {
     private final ZMQSockets         zmq                     = new ZMQSockets(new ZContext());
 
 
-    /***/
+    /**
+     * @throws IOException
+     */
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         obs = new FakeObjectService(new VismoEventDispatcher("fake-obs", conf, zmq));
 
         final ClusterHeadNodeFactory serviceFactory = new ClusterHeadNodeFactory(conf, zmq) {
