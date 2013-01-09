@@ -127,19 +127,15 @@ public class MessageSender extends Thread implements Observer {
                 socket = new MulticastSocket(groupMulticastPort.intValue());
                 socket.setTimeToLive(getTimeToLive());
                 socket.joinGroup(getGroupMulticastAddress());
-
                 final ByteArrayOutputStream ba_os = new ByteArrayOutputStream();
                 final ObjectOutputStream o_os = new ObjectOutputStream(ba_os);
                 o_os.writeObject(m);
                 final byte[] b = ba_os.toByteArray();
-
                 final DatagramPacket datagram = new DatagramPacket(b, b.length, getGroupMulticastAddress(),
                         groupMulticastPort.intValue());
                 socket.send(datagram);
-
                 socket.close();
                 return true;
-
             } catch (final Exception e) {
                 e.printStackTrace();
             }

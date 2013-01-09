@@ -16,8 +16,6 @@ public class RulesPropagationWatchDog extends PeriodicTask {
     /***/
     private final long              maxtime = 10000;
     /***/
-    // private final static Logger log = LoggerFactory.getLogger(RulesPropagationWatchDog.class);
-    /***/
     private final long              period;
 
 
@@ -32,8 +30,7 @@ public class RulesPropagationWatchDog extends PeriodicTask {
 
 
     @Override
-    public void run() {// import org.slf4j.Logger;
-        // import org.slf4j.LoggerFactory;
+    public void run() {
         updateMessageMembership(maxtime);
     }
 
@@ -81,29 +78,13 @@ public class RulesPropagationWatchDog extends PeriodicTask {
      * @param maxtime
      */
     private void updateMessageMembership(final long maxtime) {
-        // log.info("timestamp size: "+manager.getMessageTimestamp().getSize());
         if (manager.getMessageTimestamp() != null) {
             final Iterator<Message> iterator = manager.getMessageTimestamp().keys().iterator();
             while (iterator.hasNext()) {
                 final Message msg = iterator.next();
                 if (!isActive(maxtime, msg)) {
-                    // log.info("watchdog activated!");
-
-                    /*
-                    log.info(manager.getPid() 
-                             +": message with commandId: " 
-                             + msg.getCommandId() 
-                             + " inactive for: "
-                             + getTimestampDelta(msg)
-                             + " > dropped!");
-                     */
-                    // log.info(manager.getMessageCounter().getMessageValue(msg).toString());
-
                     manager.getMessageTimestamp().remove(msg);
                     manager.getMessageCounter().remove(msg);
-
-                    // trim size of Arrays
-                    // log.info(manager.getPid()+" trim queues sizes!");
                     manager.getOutQueue().trimSize();
                     manager.getInQueue().trimSize();
                     manager.getDelQueue().trimSize();

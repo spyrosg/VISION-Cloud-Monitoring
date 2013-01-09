@@ -13,6 +13,8 @@ public class PeriodicRuleFactory implements RuleFactory {
             final String desc) {
         if (name.equals("AccountingRule"))
             return new AccountingRule(vismoRulesEngine, Long.valueOf(period));
+        if (name.equals("CTORule"))
+            return new CTORule(vismoRulesEngine, desc, Long.valueOf(period));
         return null;
 
     }

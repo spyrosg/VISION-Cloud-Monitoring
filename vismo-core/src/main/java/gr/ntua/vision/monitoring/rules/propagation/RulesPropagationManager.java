@@ -53,11 +53,13 @@ public class RulesPropagationManager extends Thread {
     /***/
     private final RulesManagementResource  resource                 = new RulesManagementResource();
     /***/
+    private final RuleStore                ruleStore;
+    /***/
     private int                            size;
     /***/
-    private final RulesWebServer           webServer;
-    /***/
     private final VismoRulesEngine         vismoRulesEngine;
+    /***/
+    private final RulesWebServer           webServer;
 
 
     /**
@@ -66,9 +68,12 @@ public class RulesPropagationManager extends Thread {
      * @param serverPort
      * @throws IOException
      */
-    public RulesPropagationManager(VismoRulesEngine engine, final String resourcePath, final int serverPort) throws IOException {
+    public RulesPropagationManager(final VismoRulesEngine engine, final String resourcePath, final int serverPort)
+            throws IOException {
         setPid();
         vismoRulesEngine = engine;
+        ruleStore = new RuleStore();
+        System.out.println(ruleStore);
         webServer = new RulesWebServer(resourcePath, serverPort);
         heartbeatReceiver = new HeartbeatReceiver(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT);
         heartbeatSender = new HeartbeatSender(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT, 1,
@@ -81,7 +86,6 @@ public class RulesPropagationManager extends Thread {
         deliverer.setManager(this);
         resource.setManager(this);
         messageWatchdog.setManager(this);
-        // heartbeatSender.setManager(this);
 
         inputQueue = new MessageQueue();
         outputQueue = new MessageQueue();
@@ -191,6 +195,16 @@ public class RulesPropagationManager extends Thread {
 
 
     /**
+     * common place to store rules
+     * 
+     * @return ruleStore
+     */
+    public RuleStore getRuleStore() {
+        return ruleStore;
+    }
+
+
+    /**
      * @return size.
      */
     public int getSize() {
@@ -215,7 +229,6 @@ public class RulesPropagationManager extends Thread {
     public void setPid() {
         pid = getRandomID();
     }
-
 
     /**
      * 

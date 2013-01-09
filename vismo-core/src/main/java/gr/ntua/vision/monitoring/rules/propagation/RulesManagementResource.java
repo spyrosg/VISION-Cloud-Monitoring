@@ -1,7 +1,5 @@
 package gr.ntua.vision.monitoring.rules.propagation;
 
-import java.util.HashMap;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -19,38 +17,31 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/")
 public class RulesManagementResource {
-
-    /**
-     * 
-     */
-    private static final HashMap<Integer, String> catalog = new HashMap<Integer, String>();
-    /**
-     * 
-     */
-    private static final Logger                   log     = LoggerFactory.getLogger(RulesManagementResource.class);
     /***/
-    private static RulesPropagationManager        manager;
+    private static final Logger            log = LoggerFactory.getLogger(RulesManagementResource.class);
+    /***/
+    private static RulesPropagationManager manager;
 
 
     /**
      * @param id
-     * @return the result of the remove.
+     * @return rule to be removed.
      */
     @SuppressWarnings("static-method")
     @DELETE
     @Produces("text/plain")
     @Path("rules/{id}")
     public String RulesConfigurationDelete(@PathParam("id") final Integer id) {
-        RulesManagementResource.log.info("removed rule: {}", id, ".");
-        final String reply = RulesManagementResource.catalog.remove(id);
-        final Message m = new Message();
-        m.setGroupSize(RulesManagementResource.manager.getHeartbeatReceiver().getMembers().size());
-        m.setCommandId(RulesManagementResource.manager.getRandomID());
-        m.setType("multicast");
-        m.setToGroup("all");
-        m.setContent(RulesManagementResource.catalog);
-        RulesManagementResource.manager.getOutQueue().addMessage(m);
-        return reply;
+        if (RulesManagementResource.manager.getRuleStore().getRule(id) != null) {
+            RulesManagementResource.log.info("removing rule: {}", id, ".");
+            final Message m = new Message();
+            m.setGroupSize(RulesManagementResource.manager.getHeartbeatReceiver().getMembers().size());
+            m.setCommandId(id);
+            m.setType("del");
+            m.setCommand(RulesManagementResource.manager.getRuleStore().getRule(id));
+            RulesManagementResource.manager.getOutQueue().addMessage(m);
+        }
+        return "removing: " + id;
     }
 
 
@@ -64,7 +55,21 @@ public class RulesManagementResource {
     @Path("rules/{id}")
     public String RulesConfigurationGet(@PathParam("id") final Integer id) {
         RulesManagementResource.log.info("requesting rule: {}", id + ".");
-        return RulesManagementResource.catalog.get(id);
+        return RulesManagementResource.manager.getRuleStore().getRule(id);
+    }
+
+
+    /**
+     * @param id
+     * @return the rule.
+     */
+    @SuppressWarnings("static-method")
+    @GET
+    @Produces("text/plain")
+    @Path("rules/all")
+    public String RulesConfigurationGetAll(@PathParam("id") final Integer id) {
+        RulesManagementResource.log.info("requesting rule: {}", id + ".");
+        return RulesManagementResource.manager.getRuleStore().getRules();
     }
 
 
@@ -74,23 +79,24 @@ public class RulesManagementResource {
      * @param desc
      * @return the size.
      */
-    @SuppressWarnings("static-method")
     @PUT
     @Path("rules/{name}/{period}/{desc}")
     @Consumes("text/plain")
     public String RulesConfigurationPut(@PathParam("name") final String name, @PathParam("period") final Integer period,
             @PathParam("desc") final String desc) {
-        RulesManagementResource.log.info("configuring new rule: {}", name, ".");
-        RulesManagementResource.catalog.put(RulesManagementResource.catalog.size() + 1, name + ":" + period + ":" + desc);
-        final Message m = new Message();
-        m.setGroupSize(RulesManagementResource.manager.getHeartbeatReceiver().getMembers().size());
-        m.setCommandId(RulesManagementResource.manager.getRandomID());
-        m.setType("multicast");
-        m.setToGroup("all");
-        m.setContent(RulesManagementResource.catalog);
-        RulesManagementResource.manager.getOutQueue().addMessage(m);
-        return RulesManagementResource.catalog.get(RulesManagementResource.catalog.size());
-
+        int commandId = 0;
+        if (checkValidRule(name)
+                && !RulesManagementResource.manager.getRuleStore().containsRule(name + ":" + period + ":" + desc)) {
+            commandId = RulesManagementResource.manager.getRandomID();
+            RulesManagementResource.log.info("configuring new rule: {}", name, ".");
+            final Message m = new Message();
+            m.setGroupSize(RulesManagementResource.manager.getHeartbeatReceiver().getMembers().size());
+            m.setCommandId(commandId);
+            m.setType("add");
+            m.setCommand(name + ":" + period + ":" + desc);
+            RulesManagementResource.manager.getOutQueue().addMessage(m);
+        }
+        return "adding rule: " + commandId + " " + name + ":" + period + ":" + desc;
     }
 
 
@@ -100,6 +106,21 @@ public class RulesManagementResource {
     @SuppressWarnings("static-access")
     public void setManager(final RulesPropagationManager manager) {
         this.manager = manager;
+    }
+
+
+    /**
+     * checks the validity of the rule name
+     * 
+     * @param name
+     * @return true/false
+     */
+    @SuppressWarnings("static-method")
+    private boolean checkValidRule(final String name) {
+        if (name.equals("TestingRule") || name.equals("PassThroughRule") || name.equals("AccountingRule")
+                || name.equals("CTORule"))
+            return true;
+        return false;
     }
 
 }

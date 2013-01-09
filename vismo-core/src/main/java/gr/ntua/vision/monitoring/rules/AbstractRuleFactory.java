@@ -12,9 +12,9 @@ public class AbstractRuleFactory {
      */
     @SuppressWarnings("static-method")
     public RuleFactory createRuleFactory(final String type) {
-        if (type.equals("TestingRule") || type.equals("PassThroughRule"))
+        if (type.equals("TestingRule"))
             return new NonPeriodicRuleFactory();
-        if (type.equals("AccountingRule"))
+        if (type.equals("AccountingRule") || type.equals("CTORule"))
             return new PeriodicRuleFactory();
         return null;
     }
