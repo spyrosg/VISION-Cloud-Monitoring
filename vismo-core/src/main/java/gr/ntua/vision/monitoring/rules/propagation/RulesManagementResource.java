@@ -95,7 +95,6 @@ public class RulesManagementResource {
             m.setType("add");
             m.setCommand(name + ":" + period + ":" + desc);
             RulesManagementResource.manager.getOutQueue().addMessage(m);
-            log.info(m.toString());
         }
         return "adding rule: " + commandId + " " + name + ":" + period + ":" + desc;
     }
