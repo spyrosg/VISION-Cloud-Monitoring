@@ -73,7 +73,6 @@ public class RulesPropagationManager extends Thread {
         setPid();
         vismoRulesEngine = engine;
         ruleStore = new RuleStore();
-        System.out.println(ruleStore);
         webServer = new RulesWebServer(resourcePath, serverPort);
         heartbeatReceiver = new HeartbeatReceiver(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT);
         heartbeatSender = new HeartbeatSender(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT, 1,
