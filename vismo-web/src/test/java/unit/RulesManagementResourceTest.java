@@ -25,13 +25,13 @@ import com.eclipsesource.restfuse.annotation.HttpTest;
 @RunWith(HttpJUnitRunner.class)
 public class RulesManagementResourceTest {
     /***/
-    private static RulesWebServer server   = new RulesWebServer();
+    static RulesWebServer server   = new RulesWebServer("gr.ntua.vision.monitoring.web.resources", 9998);
     /***/
     @Rule
-    public Destination            restfuse = new Destination("http://localhost:9998");
+    public Destination    restfuse = new Destination("http://localhost:9998");
     /***/
     @Context
-    private Response              response;
+    private Response      response;
 
 
     /**

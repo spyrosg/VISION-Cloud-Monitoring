@@ -164,7 +164,6 @@ public final class HeartbeatSender {
      * @param multicastAddress
      * @param multicastPort
      * @param timeToLive
-     *            See class description for the meaning of this parameter.
      * @param id
      */
     public HeartbeatSender(final InetAddress multicastAddress, final Integer multicastPort, final Integer timeToLive,
@@ -260,4 +259,5 @@ public final class HeartbeatSender {
     public void setSendInterval(final long sendInterval) {
         this.sendInterval = sendInterval;
     }
+
 }

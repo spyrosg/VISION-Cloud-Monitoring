@@ -51,6 +51,7 @@ public class HeartbeatReceiver {
                     HeartbeatReceiver.log.debug("Multicast Processor Thread sleep interrupted");
                 }
                 updateHostsMembership(MEMBERSHIP_TIMEOUT);
+                // log.info("Memberlist: " + getMembers().toString());
             }
         }
 
