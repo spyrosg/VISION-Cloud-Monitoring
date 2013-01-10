@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring.resources;
+package integration;
 
 import java.util.HashMap;
 
