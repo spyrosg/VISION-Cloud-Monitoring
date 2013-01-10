@@ -44,13 +44,13 @@ public class HeartbeatReceiver {
         @Override
         public final void run() {
             while (!stopped) {
-
                 try {
                     Thread.sleep(MEMBERSHIP_UPDATE_INTERVAL);
                 } catch (final InterruptedException e) {
                     HeartbeatReceiver.log.debug("Multicast Processor Thread sleep interrupted");
                 }
                 updateHostsMembership(MEMBERSHIP_TIMEOUT);
+                updateClusterElectedHost();
             }
         }
 
@@ -65,6 +65,33 @@ public class HeartbeatReceiver {
         private boolean isActive(final long maxtime, final String host) {
             final long delta = System.currentTimeMillis() - getHostsTimestamp().get(host);
             return delta < maxtime;
+        }
+
+
+        /**
+         * This method updates the elected member per heart beat receiver. The idea used for elections is the member with the
+         * highest id will be the elected member.
+         */
+        private void updateClusterElectedHost() {
+            String electedHost = "";
+            int electedHostID = 0;
+            final Iterator<String> iterator = getMembers().keySet().iterator();
+            while (iterator.hasNext()) {
+                final String addressID = iterator.next().toString();
+                if (addressID.contains(":")) {
+                    final String[] temp = addressID.split(":");
+                    if (electedHost.equals("")) {
+                        electedHost = addressID;
+                        electedHostID = Integer.parseInt(temp[1]);
+                    } else if (Integer.parseInt(temp[1]) > electedHostID) {
+                        electedHost = addressID;
+                        electedHostID = Integer.parseInt(temp[1]);
+                    }
+
+                }
+
+            }
+            setClusterElectedHost(electedHost);
         }
 
 
@@ -153,6 +180,8 @@ public class HeartbeatReceiver {
     /***/
     volatile boolean                                 stopped                    = false;
     /***/
+    private String                                   clusterElectedHost;
+    /***/
     private final InetAddress                        groupMulticastAddress;
     /***/
     private final Integer                            groupMulticastPort;
@@ -188,6 +217,16 @@ public class HeartbeatReceiver {
      */
     public final void clearMembership() {
         getMembers().clear();
+    }
+
+
+    /**
+     * returns the cluster elected host based on pid.
+     * 
+     * @return string
+     */
+    public String getClusterElectedHost() {
+        return clusterElectedHost;
     }
 
 
@@ -238,6 +277,16 @@ public class HeartbeatReceiver {
         processorThread = new MulticastReceiverProcessorThread();
         processorThread.start();
 
+    }
+
+
+    /**
+     * @param clusterElectedHost
+     */
+    public void setClusterElectedHost(final String clusterElectedHost) {
+        if(!clusterElectedHost.equals(this.clusterElectedHost) && !clusterElectedHost.equals(""))
+        log.debug("cluster elected host changed to: {}",clusterElectedHost);
+        this.clusterElectedHost = clusterElectedHost;        
     }
 
 }

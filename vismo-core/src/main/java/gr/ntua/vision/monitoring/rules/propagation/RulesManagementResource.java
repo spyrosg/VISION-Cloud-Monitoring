@@ -18,28 +18,37 @@ import org.slf4j.LoggerFactory;
 @Path("/")
 public class RulesManagementResource {
     /***/
-    private static final Logger            log = LoggerFactory.getLogger(RulesManagementResource.class);
+    private static final Logger     log = LoggerFactory.getLogger(RulesManagementResource.class);
     /***/
-    private static RulesPropagationManager manager;
+    private  final RulesPropagationManager manager;
+    
+
+    /**
+     * Constructor.
+     *
+     * @param manager
+     */
+    public RulesManagementResource(RulesPropagationManager manager) {
+        this.manager = manager;
+    }
 
 
     /**
      * @param id
      * @return rule to be removed.
      */
-    @SuppressWarnings("static-method")
     @DELETE
     @Produces("text/plain")
     @Path("rules/{id}")
     public String RulesConfigurationDelete(@PathParam("id") final Integer id) {
-        if (RulesManagementResource.manager.getRuleStore().getRule(id) != null) {
+        if (manager.getRuleStore().getRule(id) != null) {
             RulesManagementResource.log.info("removing rule: {}", id, ".");
             final Message m = new Message();
-            m.setGroupSize(RulesManagementResource.manager.getHeartbeatReceiver().getMembers().size());
+            m.setGroupSize(manager.getHeartbeatReceiver().getMembers().size());
             m.setCommandId(id);
             m.setType("del");
-            m.setCommand(RulesManagementResource.manager.getRuleStore().getRule(id));
-            RulesManagementResource.manager.getOutQueue().addMessage(m);
+            m.setCommand(manager.getRuleStore().getRule(id));
+            manager.getOutQueue().addMessage(m);
         }
         return "removing: " + id;
     }
@@ -49,27 +58,24 @@ public class RulesManagementResource {
      * @param id
      * @return the rule.
      */
-    @SuppressWarnings("static-method")
     @GET
     @Produces("text/plain")
     @Path("rules/{id}")
     public String RulesConfigurationGet(@PathParam("id") final Integer id) {
         RulesManagementResource.log.info("requesting rule: {}", id + ".");
-        return RulesManagementResource.manager.getRuleStore().getRule(id);
+        return manager.getRuleStore().getRule(id);
     }
 
 
     /**
-     * @param id
      * @return the rule.
      */
-    @SuppressWarnings("static-method")
     @GET
     @Produces("text/plain")
     @Path("rules/all")
-    public String RulesConfigurationGetAll(@PathParam("id") final Integer id) {
-        RulesManagementResource.log.info("requesting rule: {}", id + ".");
-        return RulesManagementResource.manager.getRuleStore().getRules();
+    public String RulesConfigurationGetAll() {
+        RulesManagementResource.log.info("requesting all rules");
+        return manager.getRuleStore().getRules();
     }
 
 
@@ -85,28 +91,19 @@ public class RulesManagementResource {
     public String RulesConfigurationPut(@PathParam("name") final String name, @PathParam("period") final Integer period,
             @PathParam("desc") final String desc) {
         int commandId = 0;
-        if (checkValidRule(name)
-                && !RulesManagementResource.manager.getRuleStore().containsRule(name + ":" + period + ":" + desc)) {
-            commandId = RulesManagementResource.manager.getRandomID();
+        if (checkValidRule(name) && !manager.getRuleStore().containsRule(name + ":" + period + ":" + desc)) {
+            commandId = manager.getRandomID();
             RulesManagementResource.log.info("configuring new rule: {}", name, ".");
             final Message m = new Message();
-            m.setGroupSize(RulesManagementResource.manager.getHeartbeatReceiver().getMembers().size());
+            m.setGroupSize(manager.getHeartbeatReceiver().getMembers().size());
             m.setCommandId(commandId);
             m.setType("add");
             m.setCommand(name + ":" + period + ":" + desc);
-            RulesManagementResource.manager.getOutQueue().addMessage(m);
+            manager.getOutQueue().addMessage(m);
         }
         return "adding rule: " + commandId + " " + name + ":" + period + ":" + desc;
     }
 
-
-    /**
-     * @param manager
-     */
-    @SuppressWarnings("static-access")
-    public void setManager(final RulesPropagationManager manager) {
-        this.manager = manager;
-    }
 
 
     /**
@@ -115,7 +112,6 @@ public class RulesManagementResource {
      * @param name
      * @return true/false
      */
-    @SuppressWarnings("static-method")
     private boolean checkValidRule(final String name) {
         if (name.equals("TestingRule") || name.equals("PassThroughRule") || name.equals("AccountingRule")
                 || name.equals("CTORule"))

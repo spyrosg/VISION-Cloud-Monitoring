@@ -15,7 +15,7 @@ public class RuleStore {
 
     /***/
     @SuppressWarnings("unused")
-    private static final Logger                      log = LoggerFactory.getLogger(RulesManagementResource.class);
+    private static final Logger                      log = LoggerFactory.getLogger(RuleStore.class);
     /***/
     private final ConcurrentHashMap<Integer, String> rulesNum;
 

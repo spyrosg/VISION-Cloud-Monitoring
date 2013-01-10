@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RulesPropagationManager extends Thread {
     /***/
+    @SuppressWarnings("unused")
     private final static Logger            log                      = LoggerFactory.getLogger(RulesPropagationManager.class);
     /***/
     private final MessageDeliverer         deliverer                = new MessageDeliverer();
@@ -51,8 +52,6 @@ public class RulesPropagationManager extends Thread {
     /***/
     private Integer                        pid;
     /***/
-    private final RulesManagementResource  resource                 = new RulesManagementResource();
-    /***/
     private final RuleStore                ruleStore;
     /***/
     private int                            size;
@@ -73,7 +72,6 @@ public class RulesPropagationManager extends Thread {
         setPid();
         vismoRulesEngine = engine;
         ruleStore = new RuleStore();
-        System.out.println(ruleStore);
         webServer = new WebServer(serverPort);
         heartbeatReceiver = new HeartbeatReceiver(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT);
         heartbeatSender = new HeartbeatSender(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT, 1,
@@ -84,7 +82,6 @@ public class RulesPropagationManager extends Thread {
         messageSender.setManager(this);
         dispatcher.setManager(this);
         deliverer.setManager(this);
-        resource.setManager(this);
         messageWatchdog.setManager(this);
 
         inputQueue = new MessageQueue();
@@ -106,7 +103,7 @@ public class RulesPropagationManager extends Thread {
 
 
     /**
-     * @return vismo service engine
+     * @return vision monitoring rules engine
      */
     public VismoRulesEngine getEngine() {
         return vismoRulesEngine;
@@ -115,7 +112,7 @@ public class RulesPropagationManager extends Thread {
 
 
     /**
-     * @return the Heartbeat receiver
+     * @return the  heart beat receiver
      */
     public HeartbeatReceiver getHeartbeatReceiver() {
         return heartbeatReceiver;
@@ -155,7 +152,8 @@ public class RulesPropagationManager extends Thread {
 
 
     /**
-     * @return pid.
+     * returns the unique id of the node
+     * @return id
      */
     public Integer getPid() {
         return pid;
@@ -219,7 +217,7 @@ public class RulesPropagationManager extends Thread {
             } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
-            RulesPropagationManager.log.info("....");
+            //TODO           
         }
     }
 
@@ -236,6 +234,7 @@ public class RulesPropagationManager extends Thread {
     @Override
     public synchronized void start() {
         try {
+            webServer.withResource(new RulesManagementResource(this));
             webServer.start();
             messageSender.init();
             messageReceiver.init();

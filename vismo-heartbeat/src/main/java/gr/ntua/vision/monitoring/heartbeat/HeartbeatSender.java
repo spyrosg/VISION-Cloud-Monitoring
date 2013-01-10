@@ -111,7 +111,7 @@ public final class HeartbeatSender {
         /**
          * create the multicast packet payload containing the senderID
          * 
-         * @return
+         * @return payload.
          */
         private byte[] createPayload() {
             return Integer.toString(SENDER_ID).getBytes();

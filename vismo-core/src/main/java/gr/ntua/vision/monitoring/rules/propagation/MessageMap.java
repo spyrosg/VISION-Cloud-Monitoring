@@ -72,7 +72,7 @@ public class MessageMap {
     public synchronized void increaseMessageCount(final Message m) {
         long temp = 0;
         if (messages.get(m) == null)
-            messages.put(m, (long) 1);
+            messages.put(m, (long) 0);
         else {
             temp = messages.get(m) + 1;
             messages.put(m, temp);
