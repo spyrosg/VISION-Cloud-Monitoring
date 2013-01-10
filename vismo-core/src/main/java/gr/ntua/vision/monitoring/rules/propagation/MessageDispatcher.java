@@ -14,7 +14,7 @@ public class MessageDispatcher extends Thread implements Observer {
 
     /***/
     @SuppressWarnings("unused")
-    private final static Logger     log = LoggerFactory.getLogger(RulesPropagationManager.class);
+    private final static Logger     log = LoggerFactory.getLogger(MessageDispatcher.class);
     /***/
     private RulesPropagationManager manager;
 

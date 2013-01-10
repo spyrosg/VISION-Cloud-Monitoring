@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MessageDeliverer extends Thread implements Observer {
     /***/
-    private final static Logger       log     = LoggerFactory.getLogger(RulesPropagationManager.class);
+    private final static Logger       log     = LoggerFactory.getLogger(MessageDeliverer.class);
     /***/
     private final AbstractRuleFactory factory = new AbstractRuleFactory();
     /***/
