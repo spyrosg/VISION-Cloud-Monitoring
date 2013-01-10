@@ -28,17 +28,6 @@ public class WebServerTest {
     private final WebServer     server   = new WebServer(PORT);
 
 
-    /**
-     * checks the insertion of a rule
-     */
-    @Test
-    public void checkRestPutRule1() {
-        final ClientResponse res = root().path("rules").path("foo-rule").path("10").path("foo desc").put(ClientResponse.class);
-
-        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
-    }
-
-
     /***/
     @Test
     public void getBarResource() {
@@ -65,7 +54,6 @@ public class WebServerTest {
     @Before
     public void setUp() throws Exception {
         server.withResource(new FooResource("foo")).withResource(new BarResource("bar"));
-
         server.start();
     }
 
