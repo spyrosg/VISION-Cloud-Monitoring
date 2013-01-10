@@ -3,7 +3,7 @@ package gr.ntua.vision.monitoring.rules.propagation;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatReceiver;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatSender;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
-import gr.ntua.vision.monitoring.web.RulesWebServer;
+import gr.ntua.vision.monitoring.web.WebServer;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -59,7 +59,7 @@ public class RulesPropagationManager extends Thread {
     /***/
     private final VismoRulesEngine         vismoRulesEngine;
     /***/
-    private final RulesWebServer           webServer;
+    private final WebServer           webServer;
 
 
     /**
@@ -74,7 +74,7 @@ public class RulesPropagationManager extends Thread {
         vismoRulesEngine = engine;
         ruleStore = new RuleStore();
         System.out.println(ruleStore);
-        webServer = new RulesWebServer(resourcePath, serverPort);
+        webServer = new WebServer(serverPort);
         heartbeatReceiver = new HeartbeatReceiver(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT);
         heartbeatSender = new HeartbeatSender(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT, 1,
                 getPid());
@@ -204,6 +204,8 @@ public class RulesPropagationManager extends Thread {
             heartbeatSender.halt();
             messageWatchdog.cancel();
         } catch (final IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
