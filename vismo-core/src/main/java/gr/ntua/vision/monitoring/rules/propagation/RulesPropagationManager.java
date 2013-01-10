@@ -3,7 +3,7 @@ package gr.ntua.vision.monitoring.rules.propagation;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatReceiver;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatSender;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
-import gr.ntua.vision.monitoring.web.RulesWebServer;
+import gr.ntua.vision.monitoring.web.WebServer;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -52,15 +52,13 @@ public class RulesPropagationManager extends Thread {
     /***/
     private Integer                        pid;
     /***/
-    private final RulesManagementResource  resource                 = new RulesManagementResource();
-    /***/
     private final RuleStore                ruleStore;
     /***/
     private int                            size;
     /***/
     private final VismoRulesEngine         vismoRulesEngine;
     /***/
-    private final RulesWebServer           webServer;
+    private final WebServer           webServer;
 
 
     /**
@@ -74,7 +72,7 @@ public class RulesPropagationManager extends Thread {
         setPid();
         vismoRulesEngine = engine;
         ruleStore = new RuleStore();
-        webServer = new RulesWebServer(resourcePath, serverPort);
+        webServer = new WebServer(serverPort);
         heartbeatReceiver = new HeartbeatReceiver(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT);
         heartbeatSender = new HeartbeatSender(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT, 1,
                 getPid());
@@ -84,7 +82,6 @@ public class RulesPropagationManager extends Thread {
         messageSender.setManager(this);
         dispatcher.setManager(this);
         deliverer.setManager(this);
-        resource.setManager(this);
         messageWatchdog.setManager(this);
 
         inputQueue = new MessageQueue();
@@ -94,28 +91,6 @@ public class RulesPropagationManager extends Thread {
         inputQueue.addObserver(dispatcher);
         outputQueue.addObserver(messageSender);
         delQueue.addObserver(deliverer);
-    }
-
-
-    /**
-     * @see java.lang.Thread#start()
-     */
-    @Override
-    public synchronized void start() {
-        try {
-            webServer.start();
-            messageSender.init();
-            messageReceiver.init();
-            dispatcher.start();
-            deliverer.start();
-            heartbeatReceiver.init();
-            heartbeatSender.init();
-            messageWatchdog.scheduleWith(new Timer());
-        } catch (Throwable x) {
-            throw new RuntimeException(x);
-        }
-
-        super.start();
     }
 
 
@@ -213,6 +188,27 @@ public class RulesPropagationManager extends Thread {
     }
 
 
+    /**
+     * 
+     */
+    public void halt() {
+        try {
+            webServer.stop();
+            messageSender.halt();
+            messageReceiver.halt();
+            dispatcher.halt();
+            deliverer.halt();
+            heartbeatReceiver.halt();
+            heartbeatSender.halt();
+            messageWatchdog.cancel();
+        } catch (final IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     @Override
     public void run() {
         while (true) {
@@ -231,21 +227,26 @@ public class RulesPropagationManager extends Thread {
         pid = getRandomID();
     }
 
+
     /**
-     * 
+     * @see java.lang.Thread#start()
      */
-    public void halt() {
+    @Override
+    public synchronized void start() {
         try {
-            webServer.stop();
-            messageSender.halt();
-            messageReceiver.halt();
-            dispatcher.halt();
-            deliverer.halt();
-            heartbeatReceiver.halt();
-            heartbeatSender.halt();
-            messageWatchdog.cancel();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            webServer.withResource(new RulesManagementResource(this));
+            webServer.start();
+            messageSender.init();
+            messageReceiver.init();
+            dispatcher.start();
+            deliverer.start();
+            heartbeatReceiver.init();
+            heartbeatSender.init();
+            messageWatchdog.scheduleWith(new Timer());
+        } catch (final Throwable x) {
+            throw new RuntimeException(x);
         }
+
+        super.start();
     }
 }

@@ -20,7 +20,17 @@ public class RulesManagementResource {
     /***/
     private static final Logger     log = LoggerFactory.getLogger(RulesManagementResource.class);
     /***/
-    private RulesPropagationManager manager;
+    private  final RulesPropagationManager manager;
+    
+
+    /**
+     * Constructor.
+     *
+     * @param manager
+     */
+    public RulesManagementResource(RulesPropagationManager manager) {
+        this.manager = manager;
+    }
 
 
     /**
@@ -94,13 +104,6 @@ public class RulesManagementResource {
         return "adding rule: " + commandId + " " + name + ":" + period + ":" + desc;
     }
 
-
-    /**
-     * @param manager
-     */
-    public void setManager(final RulesPropagationManager manager) {
-        this.manager = manager;
-    }
 
 
     /**

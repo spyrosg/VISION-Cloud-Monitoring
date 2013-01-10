@@ -5,7 +5,7 @@ import gr.ntua.vision.monitoring.sinks.EventSinks;
 import gr.ntua.vision.monitoring.sinks.EventSinksFactory;
 import gr.ntua.vision.monitoring.sources.EventSources;
 import gr.ntua.vision.monitoring.sources.EventSourcesFactory;
-import gr.ntua.vision.monitoring.zmq.ZMQSockets;
+import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,16 +20,16 @@ public class WorkerNodeFactory extends CommonServiceFactory {
     /** the configuration object. */
     private final VismoConfiguration conf;
     /***/
-    private final ZMQSockets         zmq;
+    private final ZMQFactory         socketFactory;
 
 
     /**
      * @param conf
-     * @param zmq
+     * @param socketFactory
      */
-    public WorkerNodeFactory(final VismoConfiguration conf, final ZMQSockets zmq) {
+    public WorkerNodeFactory(final VismoConfiguration conf, final ZMQFactory socketFactory) {
         this.conf = conf;
-        this.zmq = zmq;
+        this.socketFactory = socketFactory;
     }
 
 
@@ -38,7 +38,7 @@ public class WorkerNodeFactory extends CommonServiceFactory {
      */
     @Override
     protected EventSinks getEventSinks() {
-        return new EventSinksFactory(conf, zmq).buildForWorker();
+        return new EventSinksFactory(conf, socketFactory).buildForWorker();
     }
 
 
@@ -47,6 +47,6 @@ public class WorkerNodeFactory extends CommonServiceFactory {
      */
     @Override
     protected EventSources getEventSources() {
-        return new EventSourcesFactory(conf, zmq).buildForWorker();
+        return new EventSourcesFactory(conf, socketFactory).buildForWorker();
     }
 }

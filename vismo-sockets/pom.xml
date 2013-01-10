@@ -11,22 +11,8 @@
     <relativePath>..</relativePath>
   </parent>
 
-  <artifactId>vismo-zmq</artifactId>
-  <name>Vismo Zmq</name>
-  <description>a utility library over jzmq.</description>
-
-  <dependencies>
-    <dependency>
-      <artifactId>vismo-sockets</artifactId>
-      <groupId>gr.ntua.vision</groupId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.zeromq</groupId>
-      <artifactId>jzmq-all</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-  </dependencies>
+  <artifactId>vismo-sockets</artifactId>
+  <name>Vismo Sockets</name>
+  <description>An interface to the sockets infrastructure used by vismo.</description>
 
 </project>

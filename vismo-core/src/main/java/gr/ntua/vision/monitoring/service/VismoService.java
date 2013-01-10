@@ -16,15 +16,15 @@ import java.util.Timer;
  */
 public class VismoService implements Service, UDPListener {
     /***/
-    private final VismoRulesEngine engine;
-    /***/
-    private final EventSources     sources;
-    /** the timer object. */
-    private final Timer            timer = new Timer();
-    /***/
-    private final VMInfo           vminfo;
+    private final VismoRulesEngine        engine;
     /***/
     private final RulesPropagationManager manager;
+    /***/
+    private final EventSources            sources;
+    /** the timer object. */
+    private final Timer                   timer = new Timer();
+    /***/
+    private final VMInfo                  vminfo;
 
 
     /**
@@ -33,9 +33,10 @@ public class VismoService implements Service, UDPListener {
      * @param vminfo
      * @param sources
      * @param engine
-     * @param manager 
+     * @param manager
      */
-    public VismoService(final VMInfo vminfo, final EventSources sources, final VismoRulesEngine engine, final RulesPropagationManager manager) {
+    public VismoService(final VMInfo vminfo, final EventSources sources, final VismoRulesEngine engine,
+            final RulesPropagationManager manager) {
         this.vminfo = vminfo;
         this.sources = sources;
         this.engine = engine;

@@ -8,7 +8,7 @@ import gr.ntua.vision.monitoring.sinks.EventSinks;
 import gr.ntua.vision.monitoring.sinks.EventSinksFactory;
 import gr.ntua.vision.monitoring.sources.EventSources;
 import gr.ntua.vision.monitoring.sources.EventSourcesFactory;
-import gr.ntua.vision.monitoring.zmq.ZMQSockets;
+import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 
 /**
@@ -18,16 +18,16 @@ public class ClusterHeadNodeFactory extends CommonServiceFactory {
     /***/
     private final VismoConfiguration conf;
     /***/
-    private final ZMQSockets         zmq;
+    private final ZMQFactory         socketFactory;
 
 
     /**
      * @param conf
-     * @param zmq
+     * @param socketFactory
      */
-    public ClusterHeadNodeFactory(final VismoConfiguration conf, final ZMQSockets zmq) {
+    public ClusterHeadNodeFactory(final VismoConfiguration conf, final ZMQFactory socketFactory) {
         this.conf = conf;
-        this.zmq = zmq;
+        this.socketFactory = socketFactory;
     }
 
 
@@ -46,7 +46,7 @@ public class ClusterHeadNodeFactory extends CommonServiceFactory {
      */
     @Override
     protected EventSinks getEventSinks() {
-        return new EventSinksFactory(conf, zmq).buildForClusterHead();
+        return new EventSinksFactory(conf, socketFactory).buildForClusterHead();
     }
 
 
@@ -55,7 +55,7 @@ public class ClusterHeadNodeFactory extends CommonServiceFactory {
      */
     @Override
     protected EventSources getEventSources() {
-        return new EventSourcesFactory(conf, zmq).buildForClusterHead();
+        return new EventSourcesFactory(conf, socketFactory).buildForClusterHead();
     }
 
 

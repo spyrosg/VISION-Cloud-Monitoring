@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
-import gr.ntua.vision.monitoring.zmq.ZMQSockets;
+import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import org.junit.After;
 import org.junit.Before;
@@ -90,10 +90,10 @@ public class TopicHandlersTest {
     /***/
     @Before
     public void setUp() {
-        final ZMQSockets zmq = new ZMQSockets(new ZContext());
+        final ZMQFactory socketFactory = new ZMQFactory(new ZContext());
 
-        setupFakeMonitoring(zmq);
-        setupRegistry(zmq);
+        setupFakeMonitoring(socketFactory);
+        setupRegistry(socketFactory);
     }
 
 
@@ -106,18 +106,18 @@ public class TopicHandlersTest {
 
 
     /**
-     * @param zmq
+     * @param socketFactory
      */
-    private void setupFakeMonitoring(final ZMQSockets zmq) {
-        inst = new FakeMonitoringInstance(zmq.newBoundPubSocket(CONSUMERS_PORT), 10, topics);
+    private void setupFakeMonitoring(final ZMQFactory socketFactory) {
+        inst = new FakeMonitoringInstance(socketFactory.newPubSocket(CONSUMERS_PORT), 10, topics);
     }
 
 
     /**
-     * @param zmq
+     * @param socketFactory
      */
-    private void setupRegistry(final ZMQSockets zmq) {
-        registry = new VismoEventRegistry(zmq, CONSUMERS_PORT);
+    private void setupRegistry(final ZMQFactory socketFactory) {
+        registry = new VismoEventRegistry(socketFactory, CONSUMERS_PORT);
     }
 
 

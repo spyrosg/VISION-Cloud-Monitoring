@@ -24,6 +24,14 @@ public class MessageDeliverer extends Thread implements Observer {
 
 
     /**
+     * 
+     */
+    public void halt() {
+        interrupt();
+    }
+
+
+    /**
      * @see java.lang.Thread#run()
      */
     @Override
@@ -117,13 +125,5 @@ public class MessageDeliverer extends Thread implements Observer {
             manager.getRuleStore().deleteRule(ruleId);
             checkEngineHealth();
         }
-    }
-
-
-    /**
-     * 
-     */
-    public void halt() {
-        interrupt();
     }
 }

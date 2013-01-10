@@ -1,10 +1,10 @@
 package gr.ntua.vision.monitoring.sources;
 
+import gr.ntua.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.threading.StoppableTask;
-import gr.ntua.vision.monitoring.zmq.VismoSocket;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -23,7 +23,7 @@ public class VismoEventSource extends StoppableTask implements EventSource {
     /***/
     private static final String                  SHUTDOWN  = "shutdown!";
     /** the socket used to receive events from outside the system. */
-    private final VismoSocket                    eventSock;
+    private final Socket                         eventSock;
     /***/
     private final EventFactory                   factory   = new VismoEventFactory();
     /** the listeners lists. */
@@ -31,7 +31,7 @@ public class VismoEventSource extends StoppableTask implements EventSource {
     /** the log target. */
     private final Logger                         log       = LoggerFactory.getLogger(VismoEventSource.class);
     /** this is used to shutdown the thread. */
-    private final VismoSocket                    shutdownSocket;
+    private final Socket                         shutdownSocket;
 
 
     /**
@@ -42,7 +42,7 @@ public class VismoEventSource extends StoppableTask implements EventSource {
      * @param shutdownSocket
      *            this is used to shutdown the thread.
      */
-    public VismoEventSource(final VismoSocket eventSock, final VismoSocket shutdownSocket) {
+    public VismoEventSource(final Socket eventSock, final Socket shutdownSocket) {
         super("vismo-event-source");
         this.eventSock = eventSock;
         this.shutdownSocket = shutdownSocket;
