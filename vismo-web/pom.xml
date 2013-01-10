@@ -64,39 +64,34 @@
     </dependency>
 
     <dependency>
-      <groupId>com.restfuse</groupId>
-      <artifactId>com.eclipsesource.restfuse</artifactId>
-      <version>1.1.1</version>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-server</artifactId>
+      <version>1.16</version>
     </dependency>
 
     <dependency>
       <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-grizzly</artifactId>
-      <version>1.9.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.sun.grizzly</groupId>
-      <artifactId>grizzly-servlet-webserver</artifactId>
-      <version>1.9.18-i</version>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>${logback.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.yammer.dropwizard</groupId>
-      <artifactId>dropwizard-core</artifactId>
-      <version>0.5.1</version>
+      <artifactId>jersey-servlet</artifactId>
+      <version>1.16</version>
     </dependency>
 
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-eventsource-servlet</artifactId>
-      <version>1.0.0</version>
+      <artifactId>jetty-server</artifactId>
+      <version>8.1.8.v20121106</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
+      <version>8.1.8.v20121106</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-client</artifactId>
+      <version>1.16</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
