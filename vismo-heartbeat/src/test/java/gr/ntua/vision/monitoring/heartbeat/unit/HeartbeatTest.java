@@ -77,11 +77,12 @@ public class HeartbeatTest {
         final HeartbeatReceiver receiver = new HeartbeatReceiver(InetAddress.getByName(MULTICAST_IP), MULTICAST_PORT);
         receiver.clearMembership();
         final HeartbeatSender sender1 = new HeartbeatSender(InetAddress.getByName(MULTICAST_IP), MULTICAST_PORT, TTL);
-        sender1.setHeartBeatInterval(10000);
+        sender1.setHeartBeatInterval(100000);
+        
 
         receiver.init();
         sender1.init();
-        sleep(4000);
+        sleep(8000);
         Assert.assertEquals("We expect membership to be invalid", false, checkMembership(receiver.getMembers()));
         sender1.halt();
         receiver.halt();
