@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring.heartbeat.unit;
+package unit.tests;
 
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatReceiver;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatSender;
