@@ -1,9 +1,12 @@
 package integration;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.rules.PeriodicRule;
 import gr.ntua.vision.monitoring.rules.Rule;
+import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sinks.EventSinks;
@@ -116,6 +119,39 @@ public class VismoRulesEngineTest {
         public IncRule(final VismoRulesEngine engine, final String key) {
             super(engine);
             this.key = key;
+        }
+
+
+        /**
+         * @see java.lang.Object#equals(java.lang.Object)
+         */
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            final IncRule other = (IncRule) obj;
+            if (key == null) {
+                if (other.key != null)
+                    return false;
+            } else if (!key.equals(other.key))
+                return false;
+            return true;
+        }
+
+
+        /**
+         * @see java.lang.Object#hashCode()
+         */
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((key == null) ? 0 : key.hashCode());
+            return result;
         }
 
 
@@ -311,10 +347,42 @@ public class VismoRulesEngineTest {
 
     /** the object under test. */
     private VismoRulesEngine          engine;
-    /***/
-    private final InMemoryEventSource source = new InMemoryEventSource();
     /** this is where the events should end up. */
-    private final ArrayList<Event>    store  = new ArrayList<Event>();
+    private final ArrayList<Event>    eventsStore = new ArrayList<Event>();
+    /***/
+    private final RulesStore          rulesStore  = new RulesStore();
+    /***/
+    private final InMemoryEventSource source      = new InMemoryEventSource();
+
+
+    /***/
+    @Test
+    public void canRemoveRule() {
+        final IncRule r1 = new IncRule(engine, "foo");
+        final IncRule r2 = new IncRule(engine, "foo");
+        final IntSumRule r3 = new IntSumRule(engine, 10, "foo");
+
+        r1.submit();
+        r2.submit();
+        r3.submit();
+
+        assertEquals(2, rulesStore.size());
+
+        engine.removeRule(r1);
+        assertFalse(rulesStore.contains(r1));
+        assertFalse(rulesStore.contains(r2));
+        assertTrue(rulesStore.contains(r3));
+    }
+
+
+    /***/
+    @Test
+    public void canSubmitRule() {
+        final IncRule rule = new IncRule(engine, "foo");
+
+        rule.submit();
+        assertTrue(rulesStore.contains(rule));
+    }
 
 
     /***/
@@ -330,9 +398,9 @@ public class VismoRulesEngineTest {
         source.triggerRuleEvaluationWith(new DummyEvent(KEY, VAL1));
         source.triggerRuleEvaluationWith(new DummyEvent(KEY, VAL2));
 
-        assertEquals(0, store.size());
+        assertEquals(0, eventsStore.size());
         waitTimerToTriggerRuleAggregation(TIMEOUT);
-        assertEquals(1, store.size());
+        assertEquals(1, eventsStore.size());
 
         final Event d = lastEvent();
 
@@ -349,7 +417,7 @@ public class VismoRulesEngineTest {
         new IncRule(engine, KEY).submit();
         source.triggerRuleEvaluationWith(new DummyEvent(KEY, VAL));
 
-        assertEquals(1, store.size());
+        assertEquals(1, eventsStore.size());
 
         final Event d = lastEvent();
 
@@ -362,7 +430,7 @@ public class VismoRulesEngineTest {
      */
     @Before
     public void setUp() {
-        engine = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(store)));
+        engine = new VismoRulesEngine(rulesStore, new EventSinks(new InMemoryEventSink(eventsStore)));
         engine.registerToSource(source);
     }
 
@@ -371,7 +439,7 @@ public class VismoRulesEngineTest {
      * @return the last event from the store.
      */
     private Event lastEvent() {
-        return store.get(store.size() - 1);
+        return eventsStore.get(eventsStore.size() - 1);
     }
 
 

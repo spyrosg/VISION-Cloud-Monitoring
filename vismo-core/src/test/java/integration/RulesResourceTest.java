@@ -33,24 +33,24 @@ public class RulesResourceTest {
 
     /***/
     @Test
-    public void getRule() {
-        final String RULE_ID = "10";
-
-        root().path("rules").path("foo-rule").path(RULE_ID).path("foo description").put();
-
-        final ClientResponse res = root().path("rules").path(RULE_ID).get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
-    }
-
-
-    /***/
-    @Test
     public void deleteRule() {
         final String RULE_ID = "10";
 
         root().path("rules").path("foo-rule").path(RULE_ID).path("foo description").put();
 
         final ClientResponse res = root().path("rules").path(RULE_ID).delete(ClientResponse.class);
+        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
+    }
+
+
+    /***/
+    @Test
+    public void getRule() {
+        final String RULE_ID = "10";
+
+        root().path("rules").path("foo-rule").path(RULE_ID).path("foo description").put();
+
+        final ClientResponse res = root().path("rules").path(RULE_ID).get(ClientResponse.class);
         assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
     }
 

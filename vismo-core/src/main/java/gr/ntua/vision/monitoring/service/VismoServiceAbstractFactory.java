@@ -1,6 +1,7 @@
 package gr.ntua.vision.monitoring.service;
 
 import gr.ntua.vision.monitoring.VMInfo;
+import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
 import gr.ntua.vision.monitoring.sinks.EventSinks;
@@ -29,7 +30,8 @@ abstract class VismoServiceAbstractFactory {
      */
     public Service build(final VMInfo vminfo) throws IOException {
         final EventSources sources = getEventSources();
-        final VismoRulesEngine engine = new VismoRulesEngine(getEventSinks());
+        final RulesStore store = new RulesStore();
+        final VismoRulesEngine engine = new VismoRulesEngine(store, getEventSinks());
 
         sources.subscribeAll(engine);
         boostrap(engine);

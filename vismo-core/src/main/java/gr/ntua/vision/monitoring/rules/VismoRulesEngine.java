@@ -5,7 +5,6 @@ import gr.ntua.vision.monitoring.sinks.EventSinks;
 import gr.ntua.vision.monitoring.sources.EventSource;
 import gr.ntua.vision.monitoring.sources.EventSourceListener;
 
-import java.util.ArrayList;
 import java.util.Timer;
 
 import org.slf4j.Logger;
@@ -20,22 +19,24 @@ import org.slf4j.LoggerFactory;
  */
 public class VismoRulesEngine implements EventSourceListener {
     /***/
-    private static final Logger              log   = LoggerFactory.getLogger(VismoRulesEngine.class);
+    private static final Logger log   = LoggerFactory.getLogger(VismoRulesEngine.class);
     /***/
-    private final ArrayList<RuleProc<Event>> rules = new ArrayList<RuleProc<Event>>();
+    private final EventSinks    sinks;
     /***/
-    private final EventSinks                 sinks;
+    private final RulesStore    store;
     /***/
-    private final Timer                      timer = new Timer(true);
+    private final Timer         timer = new Timer(true);
 
 
     /**
      * Constructor.
      * 
+     * @param store
      * @param sinks
      */
-    public VismoRulesEngine(final EventSinks sinks) {
+    public VismoRulesEngine(final RulesStore store, final EventSinks sinks) {
         log.debug("using {}", sinks);
+        this.store = store;
         this.sinks = sinks;
     }
 
@@ -44,7 +45,7 @@ public class VismoRulesEngine implements EventSourceListener {
      * @return number of rules
      */
     public int getRulesTotalNumber() {
-        return rules.size();
+        return store.size();
 
     }
 
@@ -54,7 +55,7 @@ public class VismoRulesEngine implements EventSourceListener {
      */
     public void halt() {
         timer.cancel();
-        rules.clear();
+        store.clear();
     }
 
 
@@ -87,7 +88,7 @@ public class VismoRulesEngine implements EventSourceListener {
      */
     public void removeRule(final RuleProc<Event> rule) {
         log.debug("removing {}", rule);
-        rules.remove(rule);
+        store.remove(rule);
     }
 
 
@@ -125,7 +126,7 @@ public class VismoRulesEngine implements EventSourceListener {
      */
     private void add(final RuleProc<Event> r) {
         log.debug("submitting {}", r);
-        rules.add(r);
+        store.add(r);
     }
 
 
@@ -136,8 +137,12 @@ public class VismoRulesEngine implements EventSourceListener {
      *            the event.
      */
     private void evaluateRulesAgainst(final Event e) {
-        for (final RuleProc<Event> r : rules)
-            r.performWith(e);
+        store.forEach(new RuleOperation() {
+            @Override
+            public void run(final RuleProc<Event> r) {
+                r.performWith(e);
+            }
+        });
     }
 
 

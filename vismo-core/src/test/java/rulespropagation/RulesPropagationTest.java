@@ -1,6 +1,7 @@
 package rulespropagation;
 
 import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
 import gr.ntua.vision.monitoring.sinks.EventSink;
@@ -31,49 +32,64 @@ public class RulesPropagationTest {
      */
     public static void main(final String[] args) throws IOException {
 
-        final VismoRulesEngine engine1 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest.store)));
+        final VismoRulesEngine engine1 = new VismoRulesEngine(new RulesStore(), new EventSinks(new InMemoryEventSink(
+                RulesPropagationTest.store)));
         engine1.registerToSource(RulesPropagationTest.source);
 
-        final VismoRulesEngine engine2 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest.store)));
+        final VismoRulesEngine engine2 = new VismoRulesEngine(new RulesStore(), new EventSinks(new InMemoryEventSink(
+                RulesPropagationTest.store)));
         engine2.registerToSource(RulesPropagationTest.source);
 
-        final VismoRulesEngine engine3 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest.store)));
+        final VismoRulesEngine engine3 = new VismoRulesEngine(new RulesStore(), new EventSinks(new InMemoryEventSink(
+                RulesPropagationTest.store)));
         engine3.registerToSource(RulesPropagationTest.source);
 
-        final VismoRulesEngine engine4 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest.store)));
+        final VismoRulesEngine engine4 = new VismoRulesEngine(new RulesStore(), new EventSinks(new InMemoryEventSink(
+                RulesPropagationTest.store)));
         engine4.registerToSource(RulesPropagationTest.source);
 
-        final VismoRulesEngine engine5 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest.store)));
+        final VismoRulesEngine engine5 = new VismoRulesEngine(new RulesStore(), new EventSinks(new InMemoryEventSink(
+                RulesPropagationTest.store)));
         engine5.registerToSource(RulesPropagationTest.source);
 
-        final VismoRulesEngine engine6 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest.store)));
+        final VismoRulesEngine engine6 = new VismoRulesEngine(new RulesStore(), new EventSinks(new InMemoryEventSink(
+                RulesPropagationTest.store)));
         engine6.registerToSource(RulesPropagationTest.source);
 
-        final VismoRulesEngine engine7 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest.store)));
+        final VismoRulesEngine engine7 = new VismoRulesEngine(new RulesStore(), new EventSinks(new InMemoryEventSink(
+                RulesPropagationTest.store)));
         engine7.registerToSource(RulesPropagationTest.source);
 
-        final VismoRulesEngine engine8 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest.store)));
+        final VismoRulesEngine engine8 = new VismoRulesEngine(new RulesStore(), new EventSinks(new InMemoryEventSink(
+                RulesPropagationTest.store)));
         engine8.registerToSource(RulesPropagationTest.source);
 
-        final VismoRulesEngine engine9 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest.store)));
+        final VismoRulesEngine engine9 = new VismoRulesEngine(new RulesStore(), new EventSinks(new InMemoryEventSink(
+                RulesPropagationTest.store)));
         engine9.registerToSource(RulesPropagationTest.source);
 
-        final VismoRulesEngine engine10 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest.store)));
+        final VismoRulesEngine engine10 = new VismoRulesEngine(new RulesStore(), new EventSinks(new InMemoryEventSink(
+                RulesPropagationTest.store)));
         engine10.registerToSource(RulesPropagationTest.source);
 
-        final VismoRulesEngine engine11 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest.store)));
+        final VismoRulesEngine engine11 = new VismoRulesEngine(new RulesStore(), new EventSinks(new InMemoryEventSink(
+                RulesPropagationTest.store)));
         engine11.registerToSource(RulesPropagationTest.source);
 
-        final VismoRulesEngine engine12 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest.store)));
+        final VismoRulesEngine engine12 = new VismoRulesEngine(new RulesStore(), new EventSinks(new InMemoryEventSink(
+                RulesPropagationTest.store)));
         engine12.registerToSource(RulesPropagationTest.source);
 
-        final VismoRulesEngine engine13 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest.store)));
+        final VismoRulesEngine engine13 = new VismoRulesEngine(new RulesStore(), new EventSinks(new InMemoryEventSink(
+                RulesPropagationTest.store)));
         engine13.registerToSource(RulesPropagationTest.source);
 
-        final VismoRulesEngine engine14 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest.store)));
+        final VismoRulesEngine engine14 = new VismoRulesEngine(new RulesStore(), new EventSinks(new InMemoryEventSink(
+                RulesPropagationTest.store)));
         engine14.registerToSource(RulesPropagationTest.source);
 
-        final VismoRulesEngine engine15 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest.store)));
+        final VismoRulesEngine engine15 = new VismoRulesEngine(new RulesStore(), new EventSinks(new InMemoryEventSink(
+                RulesPropagationTest.store)));
         engine15.registerToSource(RulesPropagationTest.source);
 
         final RulesPropagationManager rulesManager1 = new RulesPropagationManager(engine1,
