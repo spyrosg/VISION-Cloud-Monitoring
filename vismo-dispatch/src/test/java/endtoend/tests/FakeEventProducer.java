@@ -1,4 +1,4 @@
-package endtoend;
+package endtoend.tests;
 
 import gr.ntua.vision.monitoring.dispatch.VismoEventDispatcher;
 

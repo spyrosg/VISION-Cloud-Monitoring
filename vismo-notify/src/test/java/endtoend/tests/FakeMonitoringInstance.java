@@ -1,4 +1,4 @@
-package endtoend;
+package endtoend.tests;
 
 import gr.ntua.monitoring.sockets.Socket;
 

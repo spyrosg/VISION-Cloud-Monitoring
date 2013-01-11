@@ -1,4 +1,4 @@
-package endtoend;
+package endtoend.tests;
 
 import static org.junit.Assert.assertEquals;
 import gr.ntua.monitoring.sockets.Socket;
