@@ -1,4 +1,4 @@
-package integration;
+package integration.tests;
 
 import static org.junit.Assert.assertEquals;
 import gr.ntua.vision.monitoring.VismoConfiguration;

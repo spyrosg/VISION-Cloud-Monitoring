@@ -1,4 +1,4 @@
-package integration;
+package integration.tests;
 
 import gr.ntua.vision.monitoring.udp.UDPClient;
 import gr.ntua.vision.monitoring.udp.UDPFactory;

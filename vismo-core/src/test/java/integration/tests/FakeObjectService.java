@@ -1,4 +1,4 @@
-package integration;
+package integration.tests;
 
 import gr.ntua.vision.monitoring.dispatch.VismoEventDispatcher;
 
