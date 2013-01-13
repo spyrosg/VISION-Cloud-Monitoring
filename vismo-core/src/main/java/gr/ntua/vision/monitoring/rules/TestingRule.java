@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.rules;
 
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 
 /**
@@ -59,7 +59,7 @@ public class TestingRule extends Rule {
 
 
     @Override
-    public void performWith(final Event e) {
+    public void performWith(final MonitoringEvent e) {
         // TODO Auto-generated method stub
 
     }

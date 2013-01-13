@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.sinks;
 
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 
 /**
@@ -13,5 +13,5 @@ public interface EventSink {
      * @param e
      *            the event to transmit.
      */
-    void send(Event e);
+    void send(MonitoringEvent e);
 }

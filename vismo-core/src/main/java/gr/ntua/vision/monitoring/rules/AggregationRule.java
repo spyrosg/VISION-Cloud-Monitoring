@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.rules;
 
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +60,7 @@ abstract class AggregationRule extends PeriodicRule {
      * @param field
      * @return the value of the given field as a double number.
      */
-    protected static Double getFieldValueAsDouble(final Event e, final String field) {
+    protected static Double getFieldValueAsDouble(final MonitoringEvent e, final String field) {
         final Object val = e.get(field);
 
         if (val == null) {
@@ -92,7 +92,7 @@ abstract class AggregationRule extends PeriodicRule {
      * @param field
      * @return the value of the given field as a long number.
      */
-    protected static Long getFieldValueAsLong(final Event e, final String field) {
+    protected static Long getFieldValueAsLong(final MonitoringEvent e, final String field) {
         final Object val = e.get(field);
 
         if (val == null) {
@@ -127,7 +127,7 @@ abstract class AggregationRule extends PeriodicRule {
      *            the event.
      * @return <code>true</code> iff the
      */
-    protected static boolean isCompleteObsEvent(final Event e) {
+    protected static boolean isCompleteObsEvent(final MonitoringEvent e) {
         return e.get(OBS_FIELD) != null;
     }
 
@@ -139,7 +139,7 @@ abstract class AggregationRule extends PeriodicRule {
      *            the event.
      * @return <code>true</code> iff the
      */
-    protected static boolean isStorletEngineEvent(final Event e) {
+    protected static boolean isStorletEngineEvent(final MonitoringEvent e) {
         return SRE_SERVICE.equals(e.originatingService()) && e.get(STORLET_KEY) != null;
     }
 
@@ -148,7 +148,7 @@ abstract class AggregationRule extends PeriodicRule {
      * @param eventList
      * @return the list of delete events.
      */
-    protected static ArrayList<Event> selectDeleteEvents(final List< ? extends Event> eventList) {
+    protected static ArrayList<MonitoringEvent> selectDeleteEvents(final List< ? extends MonitoringEvent> eventList) {
         return selectEventsByOperation(eventList, DELETE_OPERATION);
     }
 
@@ -158,10 +158,11 @@ abstract class AggregationRule extends PeriodicRule {
      * @param field
      * @return the list of events that contain the given field.
      */
-    protected static ArrayList<Event> selectEventsByField(final List< ? extends Event> eventList, final String field) {
-        final ArrayList<Event> list = new ArrayList<Event>();
+    protected static ArrayList<MonitoringEvent> selectEventsByField(final List< ? extends MonitoringEvent> eventList,
+            final String field) {
+        final ArrayList<MonitoringEvent> list = new ArrayList<MonitoringEvent>();
 
-        for (final Event e : eventList)
+        for (final MonitoringEvent e : eventList)
             if (e.get(field) != null)
                 list.add(e);
 
@@ -173,7 +174,7 @@ abstract class AggregationRule extends PeriodicRule {
      * @param eventList
      * @return the list of read events.
      */
-    protected static ArrayList<Event> selectReadEvents(final List< ? extends Event> eventList) {
+    protected static ArrayList<MonitoringEvent> selectReadEvents(final List< ? extends MonitoringEvent> eventList) {
         return selectEventsByOperation(eventList, GET_OPERATION);
     }
 
@@ -182,10 +183,10 @@ abstract class AggregationRule extends PeriodicRule {
      * @param eventList
      * @return the list of events that match only the given operation.
      */
-    protected static ArrayList<Event> selectStorletEngineEvents(final List< ? extends Event> eventList) {
-        final ArrayList<Event> newList = new ArrayList<Event>(eventList.size());
+    protected static ArrayList<MonitoringEvent> selectStorletEngineEvents(final List< ? extends MonitoringEvent> eventList) {
+        final ArrayList<MonitoringEvent> newList = new ArrayList<MonitoringEvent>(eventList.size());
 
-        for (final Event e : eventList)
+        for (final MonitoringEvent e : eventList)
             if (isStorletEngineEvent(e))
                 newList.add(e);
 
@@ -199,7 +200,7 @@ abstract class AggregationRule extends PeriodicRule {
      * @param eventList
      * @return the list of write events.
      */
-    protected static ArrayList<Event> selectWriteEvents(final List< ? extends Event> eventList) {
+    protected static ArrayList<MonitoringEvent> selectWriteEvents(final List< ? extends MonitoringEvent> eventList) {
         return selectEventsByOperation(eventList, PUT_OPERATION);
     }
 
@@ -209,10 +210,11 @@ abstract class AggregationRule extends PeriodicRule {
      * @param operation
      * @return the list of events that match only the given operation.
      */
-    private static ArrayList<Event> selectEventsByOperation(final List< ? extends Event> eventList, final String operation) {
-        final ArrayList<Event> newList = new ArrayList<Event>(eventList.size());
+    private static ArrayList<MonitoringEvent> selectEventsByOperation(final List< ? extends MonitoringEvent> eventList,
+            final String operation) {
+        final ArrayList<MonitoringEvent> newList = new ArrayList<MonitoringEvent>(eventList.size());
 
-        for (final Event e : eventList) {
+        for (final MonitoringEvent e : eventList) {
             final String val = (String) e.get(OPERATION_FIELD);
 
             log.trace("event op={}", val);

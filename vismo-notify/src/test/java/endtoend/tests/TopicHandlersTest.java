@@ -2,7 +2,7 @@ package endtoend.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
@@ -36,10 +36,10 @@ public class TopicHandlersTest {
 
 
         /**
-         * @see gr.ntua.vision.monitoring.notify.EventHandler#handle(gr.ntua.vision.monitoring.events.Event)
+         * @see gr.ntua.vision.monitoring.notify.EventHandler#handle(gr.ntua.vision.monitoring.events.MonitoringEvent)
          */
         @Override
-        public void handle(final Event e) {
+        public void handle(final MonitoringEvent e) {
             receivedEventWithExpectedTopic((String) e.get("topic"));
             receivedEvents = true;
         }

@@ -1,6 +1,6 @@
 package endtoend.tests;
 
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.events.VismoEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 
@@ -21,10 +21,10 @@ public class LoggingHandler implements EventHandler {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.notify.EventHandler#handle(gr.ntua.vision.monitoring.events.Event)
+     * @see gr.ntua.vision.monitoring.notify.EventHandler#handle(gr.ntua.vision.monitoring.events.MonitoringEvent)
      */
     @Override
-    public void handle(final Event e) {
+    public void handle(final MonitoringEvent e) {
         try {
             @SuppressWarnings("rawtypes")
             final Map dict = ((VismoEvent) e).dict();

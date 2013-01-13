@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.rules;
 
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,15 +8,15 @@ import java.util.TimerTask;
 
 
 /**
- * This class provides for the low level responsibilities for a rule that runs periodically, over a list of events.
+ * This class provides for the low level responsibilities for a rule that runs periodically, over a list of monitoringEvents.
  */
-public abstract class PeriodicRule extends TimerTask implements RuleProc<Event> {
+public abstract class PeriodicRule extends TimerTask implements RuleProc<MonitoringEvent> {
     /***/
-    private final VismoRulesEngine engine;
+    private final VismoRulesEngine           engine;
     /***/
-    private final ArrayList<Event> events = new ArrayList<Event>();
+    private final ArrayList<MonitoringEvent> monitoringEvents = new ArrayList<MonitoringEvent>();
     /** the rule's period, in milliseconds. */
-    private final long             period;
+    private final long                       period;
 
 
     /**
@@ -46,10 +46,10 @@ public abstract class PeriodicRule extends TimerTask implements RuleProc<Event> 
                 return false;
         } else if (!engine.equals(other.engine))
             return false;
-        if (events == null) {
-            if (other.events != null)
+        if (monitoringEvents == null) {
+            if (other.monitoringEvents != null)
                 return false;
-        } else if (!events.equals(other.events))
+        } else if (!monitoringEvents.equals(other.monitoringEvents))
             return false;
         if (period != other.period)
             return false;
@@ -62,7 +62,7 @@ public abstract class PeriodicRule extends TimerTask implements RuleProc<Event> 
         final int prime = 31;
         int result = 1;
         result = prime * result + ((engine == null) ? 0 : engine.hashCode());
-        result = prime * result + ((events == null) ? 0 : events.hashCode());
+        result = prime * result + ((monitoringEvents == null) ? 0 : monitoringEvents.hashCode());
         result = prime * result + (int) (period ^ (period >>> 32));
         return result;
     }
@@ -77,21 +77,21 @@ public abstract class PeriodicRule extends TimerTask implements RuleProc<Event> 
 
 
     /**
-     * Run the aggregation method over all collected events. The result of the aggregation if not <code>null</code> will be passed
-     * back to the rules engine. Upon completion, the event list will be cleared.
+     * Run the aggregation method over all collected monitoringEvents. The result of the aggregation if not <code>null</code> will
+     * be passed back to the rules engine. Upon completion, the event list will be cleared.
      * 
      * @see java.util.TimerTask#run()
      */
     @Override
     public void run() {
         try {
-            final Event result = aggregate(events);
+            final MonitoringEvent result = aggregate(monitoringEvents);
 
-            // TODO: move this desision (send or drop) to Event.
+            // TODO: move this desision (send or drop) to MonitoringEvent.
             if (result != null)
                 send(result);
         } finally {
-            events.clear();
+            monitoringEvents.clear();
         }
     }
 
@@ -109,24 +109,24 @@ public abstract class PeriodicRule extends TimerTask implements RuleProc<Event> 
      * This is called at the end of each period.
      * 
      * @param eventList
-     *            the list of events to aggregate over.
+     *            the list of monitoringEvents to aggregate over.
      * @return the aggregation result, if any.
      */
-    protected abstract Event aggregate(final List<Event> eventList);
+    protected abstract MonitoringEvent aggregate(final List<MonitoringEvent> eventList);
 
 
     /**
      * @param e
      */
-    protected void collect(final Event e) {
-        events.add(e);
+    protected void collect(final MonitoringEvent e) {
+        monitoringEvents.add(e);
     }
 
 
     /**
      * @param e
      */
-    protected void send(final Event e) {
+    protected void send(final MonitoringEvent e) {
         engine.send(e);
     }
 }

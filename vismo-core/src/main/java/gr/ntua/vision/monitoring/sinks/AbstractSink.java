@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.sinks;
 
 import gr.ntua.monitoring.sockets.Socket;
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.events.VismoEvent;
 
 import java.util.Map;
@@ -54,7 +54,7 @@ abstract class AbstractSink implements EventSink {
      *            the event.
      * @return a string representation for the event.
      */
-    protected static String serialize(final Event e) {
+    protected static String serialize(final MonitoringEvent e) {
         @SuppressWarnings("rawtypes")
         final Map dict = ((VismoEvent) e).dict();
 

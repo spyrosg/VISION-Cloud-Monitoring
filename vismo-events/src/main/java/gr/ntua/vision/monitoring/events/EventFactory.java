@@ -9,7 +9,7 @@ public interface EventFactory {
      * 
      * @param str
      *            a string that contains a serialized event.
-     * @return on success, a new {@link Event}, <code>null</code> otherwise.
+     * @return on success, a new {@link MonitoringEvent}, <code>null</code> otherwise.
      */
-    Event createEvent(final String str);
+    MonitoringEvent createEvent(final String str);
 }

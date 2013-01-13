@@ -3,7 +3,7 @@ package integration.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.rules.PeriodicRule;
 import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.RulesStore;
@@ -34,7 +34,7 @@ public class VismoRulesEngineTest {
     /**
      * A minimal event implementation, with one just key/value pair.
      */
-    private static class DummyEvent implements Event {
+    private static class DummyEvent implements MonitoringEvent {
         /***/
         private final String key;
         /***/
@@ -54,7 +54,7 @@ public class VismoRulesEngineTest {
 
 
         /**
-         * @see gr.ntua.vision.monitoring.events.Event#get(java.lang.String)
+         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#get(java.lang.String)
          */
         @Override
         public Object get(final String k) {
@@ -66,7 +66,7 @@ public class VismoRulesEngineTest {
 
 
         /**
-         * @see gr.ntua.vision.monitoring.events.Event#originatingIP()
+         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#originatingIP()
          */
         @Override
         public InetAddress originatingIP() throws UnknownHostException {
@@ -75,7 +75,7 @@ public class VismoRulesEngineTest {
 
 
         /**
-         * @see gr.ntua.vision.monitoring.events.Event#originatingService()
+         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#originatingService()
          */
         @Override
         public String originatingService() {
@@ -84,7 +84,7 @@ public class VismoRulesEngineTest {
 
 
         /**
-         * @see gr.ntua.vision.monitoring.events.Event#timestamp()
+         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#timestamp()
          */
         @Override
         public long timestamp() {
@@ -93,7 +93,7 @@ public class VismoRulesEngineTest {
 
 
         /**
-         * @see gr.ntua.vision.monitoring.events.Event#topic()
+         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#topic()
          */
         @Override
         public String topic() {
@@ -159,7 +159,7 @@ public class VismoRulesEngineTest {
          * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
          */
         @Override
-        public void performWith(final Event e) {
+        public void performWith(final MonitoringEvent e) {
             final int val = (Integer) e.get(key);
 
             send(new DummyEvent(key, val + 1));
@@ -181,7 +181,7 @@ public class VismoRulesEngineTest {
      */
     private static class InMemoryEventSink implements EventSink {
         /***/
-        private final ArrayList<Event> eventStore;
+        private final ArrayList<MonitoringEvent> eventStore;
 
 
         /**
@@ -189,16 +189,16 @@ public class VismoRulesEngineTest {
          * 
          * @param eventStore
          */
-        public InMemoryEventSink(final ArrayList<Event> eventStore) {
+        public InMemoryEventSink(final ArrayList<MonitoringEvent> eventStore) {
             this.eventStore = eventStore;
         }
 
 
         /**
-         * @see gr.ntua.vision.monitoring.sinks.EventSink#send(gr.ntua.vision.monitoring.events.Event)
+         * @see gr.ntua.vision.monitoring.sinks.EventSink#send(gr.ntua.vision.monitoring.events.MonitoringEvent)
          */
         @Override
-        public void send(final Event e) {
+        public void send(final MonitoringEvent e) {
             eventStore.add(e);
         }
 
@@ -250,7 +250,7 @@ public class VismoRulesEngineTest {
         /**
          * @param e
          */
-        public void triggerRuleEvaluationWith(final Event e) {
+        public void triggerRuleEvaluationWith(final MonitoringEvent e) {
             for (final EventSourceListener listener : listeners)
                 listener.receive(e);
         }
@@ -282,7 +282,7 @@ public class VismoRulesEngineTest {
          * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
          */
         @Override
-        public void performWith(final Event e) {
+        public void performWith(final MonitoringEvent e) {
             if (matches(e))
                 collect(e);
         }
@@ -301,7 +301,7 @@ public class VismoRulesEngineTest {
          * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List)
          */
         @Override
-        protected Event aggregate(final List<Event> eventList) {
+        protected MonitoringEvent aggregate(final List<MonitoringEvent> eventList) {
             if (eventList.size() == 0)
                 return null;
 
@@ -316,8 +316,8 @@ public class VismoRulesEngineTest {
          * @param intList
          * @param eventList
          */
-        private void extract(final ArrayList<Integer> intList, final List<Event> eventList) {
-            for (final Event e : eventList)
+        private void extract(final ArrayList<Integer> intList, final List<MonitoringEvent> eventList) {
+            for (final MonitoringEvent e : eventList)
                 intList.add((Integer) e.get(key));
         }
 
@@ -326,7 +326,7 @@ public class VismoRulesEngineTest {
          * @param e
          * @return <code>true</code> if the event contains the specified key.
          */
-        private boolean matches(final Event e) {
+        private boolean matches(final MonitoringEvent e) {
             return e.get(key) != null;
         }
 
@@ -346,13 +346,13 @@ public class VismoRulesEngineTest {
     }
 
     /** the object under test. */
-    private VismoRulesEngine          engine;
+    private VismoRulesEngine                 engine;
     /** this is where the events should end up. */
-    private final ArrayList<Event>    eventsStore = new ArrayList<Event>();
+    private final ArrayList<MonitoringEvent> eventsStore = new ArrayList<MonitoringEvent>();
     /***/
-    private final RulesStore          rulesStore  = new RulesStore();
+    private final RulesStore                 rulesStore  = new RulesStore();
     /***/
-    private final InMemoryEventSource source      = new InMemoryEventSource();
+    private final InMemoryEventSource        source      = new InMemoryEventSource();
 
 
     /***/
@@ -402,7 +402,7 @@ public class VismoRulesEngineTest {
         waitTimerToTriggerRuleAggregation(TIMEOUT);
         assertEquals(1, eventsStore.size());
 
-        final Event d = lastEvent();
+        final MonitoringEvent d = lastEvent();
 
         assertEquals(VAL1 + VAL2, d.get(KEY));
     }
@@ -419,7 +419,7 @@ public class VismoRulesEngineTest {
 
         assertEquals(1, eventsStore.size());
 
-        final Event d = lastEvent();
+        final MonitoringEvent d = lastEvent();
 
         assertEquals(VAL + 1, d.get(KEY));
     }
@@ -438,7 +438,7 @@ public class VismoRulesEngineTest {
     /**
      * @return the last event from the store.
      */
-    private Event lastEvent() {
+    private MonitoringEvent lastEvent() {
         return eventsStore.get(eventsStore.size() - 1);
     }
 

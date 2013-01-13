@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.rules;
 
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.sinks.EventSinks;
 import gr.ntua.vision.monitoring.sources.EventSource;
 import gr.ntua.vision.monitoring.sources.EventSourceListener;
@@ -60,10 +60,10 @@ public class VismoRulesEngine implements EventSourceListener {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.sources.EventSourceListener#receive(gr.ntua.vision.monitoring.events.Event)
+     * @see gr.ntua.vision.monitoring.sources.EventSourceListener#receive(gr.ntua.vision.monitoring.events.MonitoringEvent)
      */
     @Override
-    public void receive(final Event e) {
+    public void receive(final MonitoringEvent e) {
         evaluateRulesAgainst(e);
     }
 
@@ -86,7 +86,7 @@ public class VismoRulesEngine implements EventSourceListener {
      * @param rule
      *            the rule.
      */
-    public void removeRule(final RuleProc<Event> rule) {
+    public void removeRule(final RuleProc<MonitoringEvent> rule) {
         log.debug("removing {}", rule);
         store.remove(rule);
     }
@@ -95,7 +95,7 @@ public class VismoRulesEngine implements EventSourceListener {
     /**
      * @param e
      */
-    public void send(final Event e) {
+    public void send(final MonitoringEvent e) {
         sinks.push(e);
     }
 
@@ -124,7 +124,7 @@ public class VismoRulesEngine implements EventSourceListener {
     /**
      * @param r
      */
-    private void add(final RuleProc<Event> r) {
+    private void add(final RuleProc<MonitoringEvent> r) {
         log.debug("submitting {}", r);
         store.add(r);
     }
@@ -136,10 +136,10 @@ public class VismoRulesEngine implements EventSourceListener {
      * @param e
      *            the event.
      */
-    private void evaluateRulesAgainst(final Event e) {
+    private void evaluateRulesAgainst(final MonitoringEvent e) {
         store.forEach(new RuleOperation() {
             @Override
-            public void run(final RuleProc<Event> r) {
+            public void run(final RuleProc<MonitoringEvent> r) {
                 r.performWith(e);
             }
         });

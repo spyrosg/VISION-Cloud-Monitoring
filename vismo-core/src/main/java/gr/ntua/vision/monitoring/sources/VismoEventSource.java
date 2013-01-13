@@ -1,8 +1,8 @@
 package gr.ntua.vision.monitoring.sources;
 
 import gr.ntua.monitoring.sockets.Socket;
-import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventFactory;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.threading.StoppableTask;
 
@@ -90,7 +90,7 @@ public class VismoEventSource extends StoppableTask implements EventSource {
                 break;
 
             try {
-                final Event e = factory.createEvent(message);
+                final MonitoringEvent e = factory.createEvent(message);
 
                 notifyAll(e);
             } catch (final Throwable x) {
@@ -118,7 +118,7 @@ public class VismoEventSource extends StoppableTask implements EventSource {
      * @param e
      *            the event received.
      */
-    private void notifyAll(final Event e) {
+    private void notifyAll(final MonitoringEvent e) {
         for (final EventSourceListener listener : listeners)
             listener.receive(e);
     }

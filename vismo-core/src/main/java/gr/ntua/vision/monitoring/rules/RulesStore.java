@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.rules;
 
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,14 +11,14 @@ import java.util.Set;
  */
 public class RulesStore {
     /** the rule-set. */
-    private final Set<RuleProc<Event>> set;
+    private final Set<RuleProc<MonitoringEvent>> set;
 
 
     /**
      * Constructor.
      */
     public RulesStore() {
-        this(new HashSet<RuleProc<Event>>());
+        this(new HashSet<RuleProc<MonitoringEvent>>());
     }
 
 
@@ -28,7 +28,7 @@ public class RulesStore {
      * @param set
      *            the rule set.
      */
-    public RulesStore(final Set<RuleProc<Event>> set) {
+    public RulesStore(final Set<RuleProc<MonitoringEvent>> set) {
         this.set = set;
     }
 
@@ -39,7 +39,7 @@ public class RulesStore {
      * @param rule
      *            the rule.
      */
-    public void add(final RuleProc<Event> rule) {
+    public void add(final RuleProc<MonitoringEvent> rule) {
         set.add(rule);
     }
 
@@ -59,7 +59,7 @@ public class RulesStore {
      *            the rule.
      * @return <code>true</code> iff the rule is in the store, <code>false</code> otherwise.
      */
-    public boolean contains(final RuleProc<Event> rule) {
+    public boolean contains(final RuleProc<MonitoringEvent> rule) {
         return set.contains(rule);
     }
 
@@ -71,7 +71,7 @@ public class RulesStore {
      *            the operation.
      */
     public void forEach(final RuleOperation op) {
-        for (final RuleProc<Event> rule : set)
+        for (final RuleProc<MonitoringEvent> rule : set)
             op.run(rule);
     }
 
@@ -82,7 +82,7 @@ public class RulesStore {
      * @param rule
      *            the rule.
      */
-    public void remove(final RuleProc<Event> rule) {
+    public void remove(final RuleProc<MonitoringEvent> rule) {
         set.remove(rule);
     }
 

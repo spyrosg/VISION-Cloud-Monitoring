@@ -9,7 +9,7 @@ import org.json.simple.parser.ParseException;
 
 
 /**
- * This is used to deserialize events received from the wire, to actual java objects of type {@link Event}.
+ * This is used to deserialize events received from the wire, to actual java objects of type {@link MonitoringEvent}.
  */
 public class VismoEventFactory implements EventFactory {
     /** the log target. */
@@ -22,7 +22,7 @@ public class VismoEventFactory implements EventFactory {
      * @see gr.ntua.vision.monitoring.events.EventFactory#createEvent(java.lang.String)
      */
     @Override
-    public Event createEvent(final String str) {
+    public MonitoringEvent createEvent(final String str) {
         @SuppressWarnings("rawtypes")
         final Map dict = parse(str);
 

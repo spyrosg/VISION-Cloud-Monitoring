@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.rules.propagation;
 
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.rules.AbstractRuleFactory;
 import gr.ntua.vision.monitoring.rules.RuleProc;
 
@@ -57,7 +57,7 @@ public class MessageDeliverer extends Thread implements Observer {
                     }
                 }
 
-                RuleProc<Event> ruleObject = null;
+                RuleProc<MonitoringEvent> ruleObject = null;
                 if (factory.createRuleFactory(ruleName) != null)
                     ruleObject = factory.createRuleFactory(ruleName).createRule(manager.getEngine(), rulePeriod, ruleName,
                                                                                 ruleDesc);
@@ -114,7 +114,8 @@ public class MessageDeliverer extends Thread implements Observer {
      * @param ruleString
      * @param ruleId
      */
-    private void processObject(final RuleProc<Event> ruleObject, final String type, final String ruleString, final int ruleId) {
+    private void processObject(final RuleProc<MonitoringEvent> ruleObject, final String type, final String ruleString,
+            final int ruleId) {
         if (type.equals("add")) {
             ruleObject.submit();
             manager.getRuleStore().addRule(ruleString, ruleId);

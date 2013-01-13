@@ -1,6 +1,6 @@
 package rulespropagation;
 
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
@@ -19,9 +19,9 @@ import java.util.ArrayList;
 public class RulesPropagationTest {
 
     /***/
-    private final static InMemoryEventSource source = new InMemoryEventSource();
+    private final static InMemoryEventSource        source = new InMemoryEventSource();
     /** this is where the events should end up. */
-    private final static ArrayList<Event>    store  = new ArrayList<Event>();
+    private final static ArrayList<MonitoringEvent> store  = new ArrayList<MonitoringEvent>();
 
 
     /**
@@ -149,7 +149,7 @@ public class RulesPropagationTest {
  */
 class InMemoryEventSink implements EventSink {
     /***/
-    private final ArrayList<Event> eventStore;
+    private final ArrayList<MonitoringEvent> eventStore;
 
 
     /**
@@ -157,16 +157,16 @@ class InMemoryEventSink implements EventSink {
      * 
      * @param eventStore
      */
-    public InMemoryEventSink(final ArrayList<Event> eventStore) {
+    public InMemoryEventSink(final ArrayList<MonitoringEvent> eventStore) {
         this.eventStore = eventStore;
     }
 
 
     /**
-     * @see gr.ntua.vision.monitoring.sinks.EventSink#send(gr.ntua.vision.monitoring.events.Event)
+     * @see gr.ntua.vision.monitoring.sinks.EventSink#send(gr.ntua.vision.monitoring.events.MonitoringEvent)
      */
     @Override
-    public void send(final Event e) {
+    public void send(final MonitoringEvent e) {
         eventStore.add(e);
     }
 
@@ -218,7 +218,7 @@ class InMemoryEventSource implements EventSource {
     /**
      * @param e
      */
-    public void triggerRuleEvaluationWith(final Event e) {
+    public void triggerRuleEvaluationWith(final MonitoringEvent e) {
         for (final EventSourceListener listener : listeners)
             listener.receive(e);
     }

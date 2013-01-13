@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * An implementation of vismo events based on {@link Map}s.
  */
-public class VismoEvent implements Event {
+public class VismoEvent implements MonitoringEvent {
     /** the dictionary of key/values. */
     @SuppressWarnings("rawtypes")
     private final Map dict;
@@ -35,7 +35,7 @@ public class VismoEvent implements Event {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.events.Event#get(java.lang.String)
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#get(java.lang.String)
      */
     @Override
     public Object get(final String key) {
@@ -45,7 +45,7 @@ public class VismoEvent implements Event {
 
     /**
      * @throws UnknownHostException
-     * @see gr.ntua.vision.monitoring.events.Event#originatingIP()
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#originatingIP()
      */
     @Override
     public InetAddress originatingIP() throws UnknownHostException {
@@ -54,7 +54,7 @@ public class VismoEvent implements Event {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.events.Event#originatingService()
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#originatingService()
      */
     @Override
     public String originatingService() {
@@ -74,7 +74,7 @@ public class VismoEvent implements Event {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.events.Event#timestamp()
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#timestamp()
      */
     @Override
     public long timestamp() {
@@ -83,7 +83,7 @@ public class VismoEvent implements Event {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.events.Event#topic()
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#topic()
      */
     @Override
     public String topic() {

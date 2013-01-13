@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.VismoVMInfo;
 import gr.ntua.vision.monitoring.dispatch.VismoEventDispatcher;
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
 import gr.ntua.vision.monitoring.rules.Rule;
@@ -42,10 +42,10 @@ public class VismoServiceTest {
 
 
         /**
-         * @see gr.ntua.vision.monitoring.notify.EventHandler#handle(gr.ntua.vision.monitoring.events.Event)
+         * @see gr.ntua.vision.monitoring.notify.EventHandler#handle(gr.ntua.vision.monitoring.events.MonitoringEvent)
          */
         @Override
-        public void handle(final Event e) {
+        public void handle(final MonitoringEvent e) {
             if (e != null)
                 ++counter;
         }
@@ -90,7 +90,7 @@ public class VismoServiceTest {
          * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
          */
         @Override
-        public void performWith(final Event e) {
+        public void performWith(final MonitoringEvent e) {
             if (e != null)
                 ++counter;
         }

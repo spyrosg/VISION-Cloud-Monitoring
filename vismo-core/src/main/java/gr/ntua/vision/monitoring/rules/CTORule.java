@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.rules;
 
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -29,12 +29,12 @@ public class CTORule extends AggregationRule {
     /**
      * 
      */
-    public class TimestampComparator implements Comparator<Event> {
+    public class TimestampComparator implements Comparator<MonitoringEvent> {
         /**
          * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
          */
         @Override
-        public int compare(final Event e1, final Event e2) {
+        public int compare(final MonitoringEvent e1, final MonitoringEvent e2) {
             final long time1 = (Long) e1.get("timestamp");
             final long time2 = (Long) e2.get("timestamp");
 
@@ -70,7 +70,7 @@ public class CTORule extends AggregationRule {
      * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
      */
     @Override
-    public void performWith(final Event e) {
+    public void performWith(final MonitoringEvent e) {
         if (matches(e))
             collect(e);
     }
@@ -81,7 +81,7 @@ public class CTORule extends AggregationRule {
      */
     @SuppressWarnings("unchecked")
     @Override
-    protected Event aggregate(final List<Event> eventList) {
+    protected MonitoringEvent aggregate(final List<MonitoringEvent> eventList) {
         if (eventList.size() == 0)
             return null;
 
@@ -96,7 +96,7 @@ public class CTORule extends AggregationRule {
      * @param eventList
      * @return the aggregated stats over all tenants.
      */
-    private static ArrayList<HashMap<String, Object>> aggregate1(final List< ? extends Event> eventList) {
+    private static ArrayList<HashMap<String, Object>> aggregate1(final List< ? extends MonitoringEvent> eventList) {
         final HashMap<ContainerRequest, RequestCTOStats> requestsByUser = aggregateOverUsers(eventList);
         final ArrayList<HashMap<String, Object>> containerList = aggregateOverContainers(requestsByUser);
 
@@ -188,11 +188,11 @@ public class CTORule extends AggregationRule {
      * @param eventList
      * @return the aggregated stats per user.
      */
-    private static HashMap<ContainerRequest, RequestCTOStats> aggregateOverUsers(final List< ? extends Event> eventList) {
+    private static HashMap<ContainerRequest, RequestCTOStats> aggregateOverUsers(final List< ? extends MonitoringEvent> eventList) {
         final HashMap<ContainerRequest, RequestCTOStats> requests = new HashMap<ContainerRequest, RequestCTOStats>();
-        Event prev = null;
+        MonitoringEvent prev = null;
 
-        for (final Event e : eventList) {
+        for (final MonitoringEvent e : eventList) {
             final ContainerRequest cu = new ContainerRequest((String) e.get("tenant"), (String) e.get("container"),
                     (String) e.get("user"));
             final Long contentSize = getFieldValueAsLong(e, CONTENT_SIZE_FIELD);
@@ -229,7 +229,8 @@ public class CTORule extends AggregationRule {
      * @param curr
      * @param rs
      */
-    private static void calculateUserProcessingTime(final Event prev, final Event curr, final RequestCTOStats rs) {
+    private static void calculateUserProcessingTime(final MonitoringEvent prev, final MonitoringEvent curr,
+            final RequestCTOStats rs) {
         if (prev == null) // nothing to do on the first element
             return;
 
@@ -268,9 +269,9 @@ public class CTORule extends AggregationRule {
      * @param topic
      * @return the cto stats object.
      */
-    private static HashMap<String, Object> getCTOEvent(final List< ? extends Event> eventList, final String topic) {
-        final List<Event> readEventList = selectReadEvents(eventList);
-        final List<Event> writeEventList = selectWriteEvents(eventList);
+    private static HashMap<String, Object> getCTOEvent(final List< ? extends MonitoringEvent> eventList, final String topic) {
+        final List<MonitoringEvent> readEventList = selectReadEvents(eventList);
+        final List<MonitoringEvent> writeEventList = selectWriteEvents(eventList);
         final HashMap<String, Object> reads = new HashMap<String, Object>();
         final HashMap<String, Object> writes = new HashMap<String, Object>();
         final HashMap<String, Object> dict = new HashMap<String, Object>();
@@ -318,7 +319,7 @@ public class CTORule extends AggregationRule {
      * @param e
      * @return <code>true</code> iff the event is an obs event.
      */
-    private static boolean matches(final Event e) {
+    private static boolean matches(final MonitoringEvent e) {
         // FIXME: add a field to events coming from vismo_dispatch
         return isCompleteObsEvent(e);
     }
