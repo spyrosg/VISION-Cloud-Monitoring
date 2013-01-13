@@ -4,21 +4,9 @@ import gr.ntua.vision.monitoring.events.Event;
 
 
 /**
- * 
+ * An {@link AggregationResult} is an event that corresponds to a period of time, the <em>aggregation</em> period.
  */
 public interface AggregationResult extends Event {
-    /**
-     * @param t
-     */
-    void puttEnd(final long t);
-
-
-    /**
-     * @param t
-     */
-    void puttStart(final long t);
-
-
     /**
      * @return the time end period of the aggregation.
      */
