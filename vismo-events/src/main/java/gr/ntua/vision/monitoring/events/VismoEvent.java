@@ -6,14 +6,12 @@ import java.util.Map;
 
 
 /**
- * An implementation of vismo events.
+ * An implementation of vismo events based on {@link Map}s.
  */
-class VismoEvent implements Event {
-    /** this is used to get a hold of the whole dict, for serialization reasons. */
-    private static final String DICT_KEY = "!dict";
+public class VismoEvent implements Event {
     /** the dictionary of key/values. */
     @SuppressWarnings("rawtypes")
-    private final Map           dict;
+    private final Map dict;
 
 
     /**
@@ -22,8 +20,17 @@ class VismoEvent implements Event {
      * @param dict
      *            a dictionary of key/values.
      */
-    VismoEvent(@SuppressWarnings("rawtypes") final Map dict) {
+    protected VismoEvent(@SuppressWarnings("rawtypes") final Map dict) {
         this.dict = dict;
+    }
+
+
+    /**
+     * @return the underlying dictionary.
+     */
+    @SuppressWarnings("rawtypes")
+    public Map dict() {
+        return dict;
     }
 
 
@@ -32,9 +39,6 @@ class VismoEvent implements Event {
      */
     @Override
     public Object get(final String key) {
-        if (key.equals(DICT_KEY))
-            return dict;
-
         return dict.get(key);
     }
 

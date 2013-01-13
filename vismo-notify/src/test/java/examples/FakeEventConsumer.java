@@ -1,6 +1,7 @@
 package examples;
 
 import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.VismoEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
@@ -25,7 +26,7 @@ public class FakeEventConsumer {
         public void handle(final Event e) {
             try {
                 @SuppressWarnings("rawtypes")
-                final Map dict = (Map) e.get("!dict");
+                final Map dict = ((VismoEvent) e).dict();
                 final Object special = e.get(FakeEventConsumer.SPECIAL_FIELD);
 
                 if (special != null)

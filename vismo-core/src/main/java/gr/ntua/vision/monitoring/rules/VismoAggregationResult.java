@@ -1,5 +1,7 @@
 package gr.ntua.vision.monitoring.rules;
 
+import gr.ntua.vision.monitoring.events.VismoEvent;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
