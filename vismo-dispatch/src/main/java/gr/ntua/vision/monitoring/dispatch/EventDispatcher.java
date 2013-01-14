@@ -5,13 +5,15 @@ package gr.ntua.vision.monitoring.dispatch;
  */
 public interface EventDispatcher {
     /**
+     * Prepare to send an event.
+     * 
+     * @return a helper object that can produce events.
+     */
+    EventBuilder newEvent();
+
+
+    /**
      * Send the event.
      */
     void send();
-    
-    /**
-     * Prepare to send an event.
-     * @return
-     */
-    VismoEventBuilder newEvent();
 }

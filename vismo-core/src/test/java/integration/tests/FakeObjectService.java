@@ -1,6 +1,6 @@
 package integration.tests;
 
-import gr.ntua.vision.monitoring.dispatch.VismoEventBuilder;
+import gr.ntua.vision.monitoring.dispatch.EventBuilder;
 import gr.ntua.vision.monitoring.dispatch.EventDispatcher;
 
 import java.util.Random;
@@ -78,7 +78,7 @@ public class FakeObjectService {
      * @param object
      * @return an obs delete event.
      */
-    public VismoEventBuilder delEvent(final String tenant, final String user, final String container, final String object) {
+    public EventBuilder delEvent(final String tenant, final String user, final String container, final String object) {
         return randomEvent(Operation.DELETE, tenant, user, container, object, Status.SUCCESS);
     }
 
@@ -90,7 +90,7 @@ public class FakeObjectService {
      * @param object
      * @return an obs get event
      */
-    public VismoEventBuilder getEvent(final String tenant, final String user, final String container, final String object) {
+    public EventBuilder getEvent(final String tenant, final String user, final String container, final String object) {
         return randomEvent(Operation.GET, tenant, user, container, object, Status.SUCCESS);
     }
 
@@ -102,7 +102,7 @@ public class FakeObjectService {
      * @param object
      * @return an obs put event
      */
-    public VismoEventBuilder putEvent(final String tenant, final String user, final String container, final String object) {
+    public EventBuilder putEvent(final String tenant, final String user, final String container, final String object) {
         return randomEvent(Operation.PUT, tenant, user, container, object, Status.SUCCESS);
     }
 
@@ -125,7 +125,7 @@ public class FakeObjectService {
      * @param st
      * @return an event
      */
-    private VismoEventBuilder randomEvent(final Operation op, final String tenant, final String user, final String container,
+    private EventBuilder randomEvent(final Operation op, final String tenant, final String user, final String container,
             final String object, final Status st) {
         final int contentSize = rand(MAX_SIZE);
         final int duration = rand(MAX_DURATION);
