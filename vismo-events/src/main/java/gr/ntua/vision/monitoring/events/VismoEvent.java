@@ -63,17 +63,6 @@ public class VismoEvent implements MonitoringEvent {
 
 
     /**
-     * @param key
-     * @param value
-     * @see java.util.Map#put(java.lang.Object, java.lang.Object)
-     */
-    @SuppressWarnings("unchecked")
-    public void put(final Object key, final Object value) {
-        dict.put(key, value);
-    }
-
-
-    /**
      * @see gr.ntua.vision.monitoring.events.MonitoringEvent#timestamp()
      */
     @Override
@@ -97,5 +86,16 @@ public class VismoEvent implements MonitoringEvent {
     @Override
     public String toString() {
         return "vismo-event";
+    }
+
+
+    /**
+     * @param key
+     * @param value
+     * @see java.util.Map#put(java.lang.Object, java.lang.Object)
+     */
+    @SuppressWarnings("unchecked")
+    protected void put(final Object key, final Object value) {
+        dict.put(key, value);
     }
 }
