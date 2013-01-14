@@ -24,7 +24,7 @@ import org.json.simple.JSONValue;
 
 
 /**
- * This is the basic implementation of an {@link EventDispatcher}. Under the hood it uses a helper object ({@link EventBuilder})
+ * This is the basic implementation of an {@link EventDispatcher}. Under the hood it uses a helper object ({@link VismoEventBuilder})
  * to provide a fluent interface to sending events.
  */
 public class VismoEventDispatcher implements EventDispatcher {
@@ -72,7 +72,7 @@ public class VismoEventDispatcher implements EventDispatcher {
     /***/
     private static final Logger      log                 = Logger.getLogger(VismoEventDispatcher.class.getName());
     /** the event builder. */
-    private final EventBuilder       builder;
+    private final VismoEventBuilder       builder;
     /** the configuration object. */
     private final VismoConfiguration conf;
     /** the machine's external ip address. */
@@ -117,16 +117,16 @@ public class VismoEventDispatcher implements EventDispatcher {
         this.conf = conf;
         this.sock = socketFactory.newConnectedPushSocket(conf.getProducersPoint());
         this.ip = new VismoVMInfo().getAddress().getHostAddress();
-        this.builder = new EventBuilder(this);
+        this.builder = new VismoEventBuilder(this);
     }
 
 
     /**
-     * Prepare to send an event. The {@link EventBuilder} object is used to keep track of the event fields.
+     * Prepare to send an event. The {@link VismoEventBuilder} object is used to keep track of the event fields.
      * 
-     * @return an {@link EventBuilder} object.
+     * @return an {@link VismoEventBuilder} object.
      */
-    public EventBuilder newEvent() {
+    public VismoEventBuilder newEvent() {
         return builder;
     }
 

@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * This is a convenience object helping generate events.
  */
-public class EventBuilder {
+public class VismoEventBuilder {
     /** this is used to keep track of the event fields. */
     private final Map<String, Object>  dict = new HashMap<String, Object>();
     /** the event dispatcher object. */
@@ -20,7 +20,7 @@ public class EventBuilder {
      * @param dispatcher
      *            the event dispatcher object.
      */
-    EventBuilder(final VismoEventDispatcher dispatcher) {
+    VismoEventBuilder(final VismoEventDispatcher dispatcher) {
         this.dispatcher = dispatcher;
     }
 
@@ -34,7 +34,7 @@ public class EventBuilder {
      *            the value.
      * @return <code>this</code>.
      */
-    public EventBuilder field(final String key, final Object value) {
+    public VismoEventBuilder field(final String key, final Object value) {
         dict.put(key, value);
         return this;
     }

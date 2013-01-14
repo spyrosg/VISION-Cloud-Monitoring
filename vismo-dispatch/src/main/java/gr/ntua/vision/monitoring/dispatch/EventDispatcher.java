@@ -8,4 +8,10 @@ public interface EventDispatcher {
      * Send the event.
      */
     void send();
+    
+    /**
+     * Prepare to send an event.
+     * @return
+     */
+    VismoEventBuilder newEvent();
 }

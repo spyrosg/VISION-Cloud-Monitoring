@@ -1,7 +1,7 @@
 package integration.tests;
 
-import gr.ntua.vision.monitoring.dispatch.EventBuilder;
-import gr.ntua.vision.monitoring.dispatch.VismoEventDispatcher;
+import gr.ntua.vision.monitoring.dispatch.VismoEventBuilder;
+import gr.ntua.vision.monitoring.dispatch.EventDispatcher;
 
 import java.util.Random;
 
@@ -42,13 +42,13 @@ public class FakeObjectService {
     }
 
     /** the max request/response duration (in seconds). */
-    private static final int           MAX_DURATION = 100;
+    private static final int      MAX_DURATION = 100;
     /** the max request content size (in bytes). */
-    private static final int           MAX_SIZE     = 1000000;
+    private static final int      MAX_SIZE     = 1000000;
     /***/
-    private final VismoEventDispatcher dispatcher;
+    private final EventDispatcher dispatcher;
     /***/
-    private final Random               rng;
+    private final Random          rng;
 
 
     /**
@@ -56,7 +56,7 @@ public class FakeObjectService {
      * 
      * @param dispatcher
      */
-    public FakeObjectService(final VismoEventDispatcher dispatcher) {
+    public FakeObjectService(final EventDispatcher dispatcher) {
         this(dispatcher, new Random());
     }
 
@@ -65,7 +65,7 @@ public class FakeObjectService {
      * @param dispatcher
      * @param rng
      */
-    public FakeObjectService(final VismoEventDispatcher dispatcher, final Random rng) {
+    public FakeObjectService(final EventDispatcher dispatcher, final Random rng) {
         this.dispatcher = dispatcher;
         this.rng = rng;
     }
@@ -78,7 +78,7 @@ public class FakeObjectService {
      * @param object
      * @return an obs delete event.
      */
-    public EventBuilder delEvent(final String tenant, final String user, final String container, final String object) {
+    public VismoEventBuilder delEvent(final String tenant, final String user, final String container, final String object) {
         return randomEvent(Operation.DELETE, tenant, user, container, object, Status.SUCCESS);
     }
 
@@ -90,7 +90,7 @@ public class FakeObjectService {
      * @param object
      * @return an obs get event
      */
-    public EventBuilder getEvent(final String tenant, final String user, final String container, final String object) {
+    public VismoEventBuilder getEvent(final String tenant, final String user, final String container, final String object) {
         return randomEvent(Operation.GET, tenant, user, container, object, Status.SUCCESS);
     }
 
@@ -102,7 +102,7 @@ public class FakeObjectService {
      * @param object
      * @return an obs put event
      */
-    public EventBuilder putEvent(final String tenant, final String user, final String container, final String object) {
+    public VismoEventBuilder putEvent(final String tenant, final String user, final String container, final String object) {
         return randomEvent(Operation.PUT, tenant, user, container, object, Status.SUCCESS);
     }
 
@@ -125,7 +125,7 @@ public class FakeObjectService {
      * @param st
      * @return an event
      */
-    private EventBuilder randomEvent(final Operation op, final String tenant, final String user, final String container,
+    private VismoEventBuilder randomEvent(final Operation op, final String tenant, final String user, final String container,
             final String object, final Status st) {
         final int contentSize = rand(MAX_SIZE);
         final int duration = rand(MAX_DURATION);
