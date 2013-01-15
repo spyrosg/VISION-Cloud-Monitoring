@@ -5,9 +5,9 @@ package gr.ntua.vision.monitoring.dispatch;
  */
 public interface EventDispatcher {
     /**
-     * Prepare to send an event.
+     * Prepare to send an event. The {@link EventBuilder} object is used to keep track of the event fields.
      * 
-     * @return a helper object that can produce events.
+     * @return an {@link EventBuilder} object.
      */
     EventBuilder newEvent();
 

@@ -122,12 +122,10 @@ public class VismoEventDispatcher implements EventDispatcher {
 
 
     /**
-     * Prepare to send an event. The {@link VismoEventBuilder} object is used to keep track of the event fields.
-     * 
-     * @return an {@link VismoEventBuilder} object.
+     * @see gr.ntua.vision.monitoring.dispatch.EventDispatcher#newEvent()
      */
     @Override
-    public VismoEventBuilder newEvent() {
+    public EventBuilder newEvent() {
         return builder;
     }
 
@@ -162,6 +160,7 @@ public class VismoEventDispatcher implements EventDispatcher {
      *            the event as represented with a {@link Map}.
      */
     private void addBasicFields(final Map<String, Object> map) {
+        // TODO: replace with {@link VismoEvent}
         map.put("timestamp", System.currentTimeMillis());
         map.put("originating-machine", ip);
         map.put("originating-service", originatingService);
