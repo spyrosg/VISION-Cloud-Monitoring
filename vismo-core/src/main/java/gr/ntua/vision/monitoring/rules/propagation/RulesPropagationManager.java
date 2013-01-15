@@ -58,17 +58,15 @@ public class RulesPropagationManager extends Thread {
     /***/
     private final VismoRulesEngine         vismoRulesEngine;
     /***/
-    private final WebServer           webServer;
+    private final WebServer                webServer;
 
 
     /**
      * @param engine
-     * @param resourcePath
      * @param serverPort
      * @throws IOException
      */
-    public RulesPropagationManager(final VismoRulesEngine engine, final String resourcePath, final int serverPort)
-            throws IOException {
+    public RulesPropagationManager(final VismoRulesEngine engine, final int serverPort) throws IOException {
         setPid();
         vismoRulesEngine = engine;
         ruleStore = new RuleStore();
@@ -112,7 +110,7 @@ public class RulesPropagationManager extends Thread {
 
 
     /**
-     * @return the  heart beat receiver
+     * @return the heart beat receiver
      */
     public HeartbeatReceiver getHeartbeatReceiver() {
         return heartbeatReceiver;
@@ -153,6 +151,7 @@ public class RulesPropagationManager extends Thread {
 
     /**
      * returns the unique id of the node
+     * 
      * @return id
      */
     public Integer getPid() {
@@ -203,7 +202,7 @@ public class RulesPropagationManager extends Thread {
             messageWatchdog.cancel();
         } catch (final IllegalArgumentException e) {
             e.printStackTrace();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
     }
@@ -211,14 +210,13 @@ public class RulesPropagationManager extends Thread {
 
     @Override
     public void run() {
-        while (true) {
+        while (true)
             try {
                 Thread.sleep(100000);
             } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
-            //TODO           
-        }
+        // TODO
     }
 
 
