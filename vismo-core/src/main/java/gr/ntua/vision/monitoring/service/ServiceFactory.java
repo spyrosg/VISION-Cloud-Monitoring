@@ -8,7 +8,7 @@ import java.io.IOException;
 /**
  * This is used to build up a service instance.
  */
-public interface VismoServiceFactory {
+public interface ServiceFactory {
     /**
      * This maybe used by client code to further configure the service.
      * 

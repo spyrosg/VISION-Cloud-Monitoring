@@ -16,13 +16,13 @@ import org.slf4j.LoggerFactory;
 /**
  * This is used to build up the vismo instance. Such an instance requires event sources, event sinks and a rules' engine.
  */
-abstract class VismoServiceAbstractFactory implements VismoServiceFactory {
+abstract class VismoServiceAbstractFactory implements ServiceFactory {
     /***/
     private static final Logger log = LoggerFactory.getLogger(VismoServiceAbstractFactory.class);
 
 
     /**
-     * @see gr.ntua.vision.monitoring.service.VismoServiceFactory#build(gr.ntua.vision.monitoring.VMInfo)
+     * @see gr.ntua.vision.monitoring.service.ServiceFactory#build(gr.ntua.vision.monitoring.VMInfo)
      */
     @Override
     public Service build(final VMInfo vminfo) throws IOException {

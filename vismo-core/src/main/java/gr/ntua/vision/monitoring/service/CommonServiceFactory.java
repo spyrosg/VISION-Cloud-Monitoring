@@ -12,7 +12,7 @@ public abstract class CommonServiceFactory extends VismoServiceAbstractFactory {
     /**
      * Schedule default tasks.
      * 
-     * @see gr.ntua.vision.monitoring.service.VismoServiceFactory#bootstrap(gr.ntua.vision.monitoring.service.Service)
+     * @see gr.ntua.vision.monitoring.service.ServiceFactory#bootstrap(gr.ntua.vision.monitoring.service.Service)
      */
     @Override
     public void bootstrap(final Service service) {
