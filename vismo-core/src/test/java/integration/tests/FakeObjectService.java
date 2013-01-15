@@ -112,7 +112,7 @@ public class FakeObjectService {
      * @return a rnd.
      */
     private int rand(final int maxSize) {
-        return rng.nextInt(maxSize);
+        return rng.nextInt(maxSize + 1);
     }
 
 
