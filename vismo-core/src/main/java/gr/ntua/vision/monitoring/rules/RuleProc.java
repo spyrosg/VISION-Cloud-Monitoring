@@ -6,13 +6,14 @@ package gr.ntua.vision.monitoring.rules;
  * checked against varying conditions that might match a rule, which will consequently trigger the accompanying action.
  * 
  * @param <C>
- *            This stands for the type of the condition that might trigger a rule.
+ *            This stands for the type of the condition under which the run is evaluated.
  */
 public interface RuleProc<C> {
     /**
-     * @param e
+     * @param c
+     *            the condition.
      */
-    void performWith(final C e);
+    void performWith(final C c);
 
 
     /**

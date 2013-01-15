@@ -26,7 +26,7 @@ public abstract class Rule implements RuleProc<MonitoringEvent> {
      */
     @Override
     public void submit() {
-        this.engine.submitRule(this);
+        engine.submitRule(this);
     }
 
 
