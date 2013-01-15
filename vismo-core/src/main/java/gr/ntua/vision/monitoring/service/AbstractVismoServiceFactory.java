@@ -26,19 +26,29 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
      */
     @Override
     public Service build(final VMInfo vminfo) throws IOException {
-        final EventSources sources = getEventSources();
-        final RulesStore store = new RulesStore();
-        final VismoRulesEngine engine = new VismoRulesEngine(store, getEventSinks());
+        log.info("building service...");
 
+        final EventSources sources = getEventSources();
+
+        log.info("with {}", sources);
+
+        final EventSinks sinks = getEventSinks();
+
+        log.info("with {}", sinks);
+
+        final VismoRulesEngine engine = new VismoRulesEngine(new RulesStore(), sinks);
+
+        log.info("subscribing sources to rules engine");
         sources.subscribeAll(engine);
+        log.info("bootstrapping rules engine");
         boostrap(engine);
 
-        final RulesPropagationManager rulesManager = new RulesPropagationManager(engine,
-                "gr.ntua.vision.monitoring.rules.propagation", 9996);
-
+        final RulesPropagationManager rulesManager = new RulesPropagationManager(engine, 9996);
         final VismoService service = new VismoService(vminfo, sources, engine, rulesManager);
 
+        log.info("bootstrapping {}", service);
         bootstrap(service);
+        log.info("take it from here");
 
         return service;
     }

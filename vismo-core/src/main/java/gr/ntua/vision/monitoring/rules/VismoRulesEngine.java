@@ -101,6 +101,15 @@ public class VismoRulesEngine implements EventSourceListener {
 
 
     /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "#<VismoRulesEngine>";
+    }
+
+
+    /**
      * @param rule
      */
     void submitRule(final PeriodicRule rule) {

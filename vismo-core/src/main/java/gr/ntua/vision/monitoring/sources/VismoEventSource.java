@@ -54,6 +54,7 @@ public class VismoEventSource extends StoppableTask implements EventSource {
      */
     @Override
     public void add(final EventSourceListener listener) {
+        log.debug("registering listener {}", listener);
         listeners.add(listener);
     }
 

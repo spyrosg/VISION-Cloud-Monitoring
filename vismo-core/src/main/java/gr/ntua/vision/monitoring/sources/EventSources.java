@@ -85,4 +85,13 @@ public class EventSources {
         for (final EventSource source : sources)
             source.add(listener);
     }
+
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "#<EventSources: " + sources + ">";
+    }
 }

@@ -10,11 +10,16 @@ import gr.ntua.vision.monitoring.udp.UDPListener;
 import java.util.List;
 import java.util.Timer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
- * Basic support for the various vismo services.
+ * This is used to start and halt the various subsystems.
  */
 public class VismoService implements Service, UDPListener {
+    /***/
+    private static final Logger           log   = LoggerFactory.getLogger(VismoService.class);
     /***/
     private final VismoRulesEngine        engine;
     /***/
@@ -69,6 +74,7 @@ public class VismoService implements Service, UDPListener {
      */
     @Override
     public void halt() {
+        log.debug("halting subsystems");
         timer.cancel();
         sources.halt();
         engine.halt();
@@ -81,7 +87,18 @@ public class VismoService implements Service, UDPListener {
      */
     @Override
     public void start() {
+        log.info("this is {} with pid {}", this, vminfo.getPID());
+        log.debug("starting subsystems");
         sources.start();
         manager.start();
+    }
+
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "#<VismoService @ " + vminfo.getAddress().getHostAddress() + ">";
     }
 }
