@@ -158,9 +158,6 @@ public class AccountingRule extends AggregationRule {
     @SuppressWarnings("unchecked")
     @Override
     protected MonitoringEvent aggregate(final List<MonitoringEvent> eventList) {
-        if (eventList.size() == 0)
-            return null;
-
         @SuppressWarnings("rawtypes")
         final HashMap dict = getAccountingEventObject(eventList);
 

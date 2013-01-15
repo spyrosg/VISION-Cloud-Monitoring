@@ -44,11 +44,7 @@ public abstract class PeriodicRule extends TimerTask implements RuleProc<Monitor
             return;
 
         try {
-            final MonitoringEvent result = aggregate(eventsList);
-
-            // TODO: move this desision (send or drop) to MonitoringEvent.
-            if (result != null)
-                send(result);
+            send(aggregate(eventsList));
         } finally {
             eventsList.clear();
         }

@@ -302,9 +302,6 @@ public class VismoRulesEngineTest {
          */
         @Override
         protected MonitoringEvent aggregate(final List<MonitoringEvent> eventList) {
-            if (eventList.size() == 0)
-                return null;
-
             final ArrayList<Integer> intList = new ArrayList<Integer>(eventList.size());
             extract(intList, eventList);
 

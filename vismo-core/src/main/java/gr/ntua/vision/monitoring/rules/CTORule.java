@@ -82,9 +82,6 @@ public class CTORule extends AggregationRule {
     @SuppressWarnings("unchecked")
     @Override
     protected MonitoringEvent aggregate(final List<MonitoringEvent> eventList) {
-        if (eventList.size() == 0)
-            return null;
-
         @SuppressWarnings("rawtypes")
         final Map dict = getCTOEvent(eventList, topic);
 
