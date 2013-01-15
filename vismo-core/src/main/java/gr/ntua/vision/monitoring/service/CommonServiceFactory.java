@@ -8,7 +8,7 @@ import gr.ntua.vision.monitoring.threading.JVMStatusReportTask;
 /**
  * This is used to factor out common functionality for all services.
  */
-public abstract class CommonServiceFactory extends VismoServiceAbstractFactory {
+public abstract class CommonServiceFactory extends AbstractVismoServiceFactory {
     /**
      * Schedule default tasks.
      * 
@@ -25,7 +25,7 @@ public abstract class CommonServiceFactory extends VismoServiceAbstractFactory {
     /**
      * Submitting default rules.
      * 
-     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#boostrap(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
+     * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#boostrap(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
      */
     @Override
     protected void boostrap(final VismoRulesEngine engine) {

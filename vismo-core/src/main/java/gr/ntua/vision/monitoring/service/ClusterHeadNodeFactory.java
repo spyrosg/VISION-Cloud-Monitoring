@@ -32,7 +32,7 @@ public class ClusterHeadNodeFactory extends CommonServiceFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#boostrap(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
+     * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#boostrap(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
      */
     @Override
     protected void boostrap(final VismoRulesEngine engine) {
@@ -42,7 +42,7 @@ public class ClusterHeadNodeFactory extends CommonServiceFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#getEventSinks()
+     * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#getEventSinks()
      */
     @Override
     protected EventSinks getEventSinks() {
@@ -51,7 +51,7 @@ public class ClusterHeadNodeFactory extends CommonServiceFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#getEventSources()
+     * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#getEventSources()
      */
     @Override
     protected EventSources getEventSources() {

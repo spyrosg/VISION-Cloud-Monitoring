@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 /**
  * This is used to build up the vismo instance. Such an instance requires event sources, event sinks and a rules' engine.
  */
-abstract class VismoServiceAbstractFactory implements ServiceFactory {
+abstract class AbstractVismoServiceFactory implements ServiceFactory {
     /***/
-    private static final Logger log = LoggerFactory.getLogger(VismoServiceAbstractFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractVismoServiceFactory.class);
 
 
     /**

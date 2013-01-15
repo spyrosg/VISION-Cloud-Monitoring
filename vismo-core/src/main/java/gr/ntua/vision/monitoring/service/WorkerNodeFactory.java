@@ -34,7 +34,7 @@ public class WorkerNodeFactory extends CommonServiceFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#getEventSinks()
+     * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#getEventSinks()
      */
     @Override
     protected EventSinks getEventSinks() {
@@ -43,7 +43,7 @@ public class WorkerNodeFactory extends CommonServiceFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#getEventSources()
+     * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#getEventSources()
      */
     @Override
     protected EventSources getEventSources() {
