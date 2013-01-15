@@ -16,18 +16,15 @@ import org.slf4j.LoggerFactory;
 /**
  * This is used to build up the vismo instance. Such an instance requires event sources, event sinks and a rules' engine.
  */
-abstract class VismoServiceAbstractFactory {
+abstract class VismoServiceAbstractFactory implements VismoServiceFactory {
     /***/
     private static final Logger log = LoggerFactory.getLogger(VismoServiceAbstractFactory.class);
 
 
     /**
-     * Build and configure the {@link VismoService} instance.
-     * 
-     * @param vminfo
-     * @return the {@link VismoService} object ready to run.
-     * @throws IOException
+     * @see gr.ntua.vision.monitoring.service.VismoServiceFactory#build(gr.ntua.vision.monitoring.VMInfo)
      */
+    @Override
     public Service build(final VMInfo vminfo) throws IOException {
         final EventSources sources = getEventSources();
         final RulesStore store = new RulesStore();
@@ -54,15 +51,6 @@ abstract class VismoServiceAbstractFactory {
      *            the rules' engine.
      */
     protected abstract void boostrap(VismoRulesEngine engine);
-
-
-    /**
-     * This is used to further configure the vismo service just before it's run.
-     * 
-     * @param service
-     *            the vismo service.
-     */
-    protected abstract void bootstrap(VismoService service);
 
 
     /**
