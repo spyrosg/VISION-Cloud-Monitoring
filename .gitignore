@@ -4,5 +4,6 @@ target/
 .settings/
 *.pyc
 .project
+vismo-core/src/main/resources/git.properties
 
 .DS_Store
