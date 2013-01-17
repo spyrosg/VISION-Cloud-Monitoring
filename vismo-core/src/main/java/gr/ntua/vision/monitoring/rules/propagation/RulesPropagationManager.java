@@ -28,6 +28,8 @@ public class RulesPropagationManager extends Thread {
     /***/
     private final MessageDispatcher        dispatcher               = new MessageDispatcher();
     /***/
+    private final RulesClusterSynchronizer synchronizer     = new RulesClusterSynchronizer();
+    /***/
     private final String                   HEARTBEAT_MULTICAST_IP   = "224.0.0.1";
     /***/
     private final int                      HEARTBEAT_MULTICAST_PORT = 6307;
@@ -50,6 +52,8 @@ public class RulesPropagationManager extends Thread {
     /***/
     private final MessageQueue             outputQueue;
     /***/
+    private final MessageQueue             rulesResolutionQueue;
+    /***/
     private Integer                        pid;
     /***/
     private final RuleStore                ruleStore;
@@ -59,6 +63,8 @@ public class RulesPropagationManager extends Thread {
     private final VismoRulesEngine         vismoRulesEngine;
     /***/
     private final WebServer           webServer;
+    /***/
+    private final Elector elector;
 
 
     /**
@@ -76,21 +82,27 @@ public class RulesPropagationManager extends Thread {
         heartbeatReceiver = new HeartbeatReceiver(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT);
         heartbeatSender = new HeartbeatSender(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT, 1,
                 getPid());
-        messageWatchdog = new RulesPropagationWatchDog(20000);
+        messageWatchdog = new RulesPropagationWatchDog(10000);
 
         messageReceiver.setManager(this);
         messageSender.setManager(this);
         dispatcher.setManager(this);
         deliverer.setManager(this);
         messageWatchdog.setManager(this);
+        synchronizer.setManager(this);
+
 
         inputQueue = new MessageQueue();
         outputQueue = new MessageQueue();
         delQueue = new MessageQueue();
+        rulesResolutionQueue = new MessageQueue();
 
         inputQueue.addObserver(dispatcher);
         outputQueue.addObserver(messageSender);
         delQueue.addObserver(deliverer);
+        rulesResolutionQueue.addObserver(synchronizer);
+        
+        elector = new  Elector(this);
     }
 
 
@@ -124,6 +136,14 @@ public class RulesPropagationManager extends Thread {
      */
     public MessageQueue getInQueue() {
         return inputQueue;
+    }
+
+
+    /**
+     * @return the queue
+     */
+    public MessageQueue getRulesResolutionQueue() {
+        return rulesResolutionQueue;
     }
 
 
@@ -169,6 +189,14 @@ public class RulesPropagationManager extends Thread {
         return Integer.valueOf(randomGenerator.nextInt(100000) + 100000);
     }
 
+    /**
+     * returns whether pid is elected
+     * @return whether the node is elected
+     */
+    public boolean isElected()
+    {
+        return elector.isElected();
+    }
 
     /**
      * common place to store rules
@@ -177,6 +205,13 @@ public class RulesPropagationManager extends Thread {
      */
     public RuleStore getRuleStore() {
         return ruleStore;
+    }
+    
+    /**
+     * @return synchronizer
+     */
+    public RulesClusterSynchronizer getRulesClusterSynchronizer(){
+        return synchronizer;
     }
 
 
@@ -201,6 +236,8 @@ public class RulesPropagationManager extends Thread {
             heartbeatReceiver.halt();
             heartbeatSender.halt();
             messageWatchdog.cancel();
+            elector.cancel();
+            synchronizer.halt();
         } catch (final IllegalArgumentException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -243,6 +280,8 @@ public class RulesPropagationManager extends Thread {
             heartbeatReceiver.init();
             heartbeatSender.init();
             messageWatchdog.scheduleWith(new Timer());
+            elector.scheduleWith(new Timer());
+            synchronizer.start();
         } catch (final Throwable x) {
             throw new RuntimeException(x);
         }

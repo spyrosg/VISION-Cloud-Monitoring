@@ -21,6 +21,7 @@ public class MessageDeliverer extends Thread implements Observer {
     private final AbstractRuleFactory factory = new AbstractRuleFactory();
     /***/
     private RulesPropagationManager   manager;
+    /***/
 
 
     /**
@@ -38,32 +39,10 @@ public class MessageDeliverer extends Thread implements Observer {
     public void run() {
         Message deliveredMessage;
         while (!isInterrupted())
-            if (!manager.getDelQueue().isQEmpty()) {
+            if (!manager.getDelQueue().isQEmpty()) {                                
                 deliveredMessage = manager.getDelQueue().getMessage();
-                final String type = deliveredMessage.getType();
-                final String rule = deliveredMessage.getCommand();
-                final Integer ruleId = new Integer(deliveredMessage.getCommandId());
-
-                String ruleName = "";
-                String rulePeriod = "";
-                String ruleDesc = "";
-
-                if (rule != null && rule.contains(":")) {
-                    final String[] ruleParts = rule.split(":");
-                    if (ruleParts.length == 3) {
-                        ruleName = ruleParts[0];
-                        rulePeriod = ruleParts[1];
-                        ruleDesc = ruleParts[2];
-                    }
-                }
-
-                RuleProc<Event> ruleObject = null;
-                if (factory.createRuleFactory(ruleName) != null)
-                    ruleObject = factory.createRuleFactory(ruleName).createRule(manager.getEngine(), rulePeriod, ruleName,
-                                                                                ruleDesc);
-                if (ruleObject != null)
-                    processObject(ruleObject, type, rule, ruleId);
-
+                //log.info(deliveredMessage.toString());
+                processDeliveredMessage(deliveredMessage);
             } else
                 synchronized (this) {
                     try {
@@ -71,7 +50,6 @@ public class MessageDeliverer extends Thread implements Observer {
                     } catch (final InterruptedException e) {
                         e.printStackTrace();
                     }
-
                 }
     }
 
@@ -102,28 +80,78 @@ public class MessageDeliverer extends Thread implements Observer {
         if (manager.getEngine().getRulesTotalNumber() != manager.getRuleStore().getRulesCatalogSize())
             MessageDeliverer.log.debug("ERROR: web rule #: " + manager.getRuleStore().getRulesCatalogSize() + " engine rule#: "
                     + manager.getEngine().getRulesTotalNumber());
-        // TODO re-initialize the rules of the engine
     }
 
 
     /**
-     * process the rule Object
+     * process the delivered Message
      * 
-     * @param ruleObject
-     * @param type
-     * @param ruleString
-     * @param ruleId
+     * @param deliveredMessage
      */
-    private void processObject(final RuleProc<Event> ruleObject, final String type, final String ruleString, final int ruleId) {
-        if (type.equals("add")) {
+    private void processDeliveredMessage(final Message deliveredMessage) {
+        final MessageType type = deliveredMessage.getType();
+        final String rule = deliveredMessage.getCommand();
+        final Integer ruleId = new Integer(deliveredMessage.getCommandId());
+    
+        if (type.equals(MessageType.ADD_RULE)) {
+            RuleProc<Event> ruleObject = getRule(rule);
+            if (ruleObject != null){
             ruleObject.submit();
-            manager.getRuleStore().addRule(ruleString, ruleId);
+            manager.getRuleStore().addRule(rule, ruleId);
             checkEngineHealth();
+            }
         }
-        if (type.equals("del")) {
+        if (type.equals(MessageType.DELETE_RULE)) {
+            RuleProc<Event> ruleObject = getRule(rule);
+            if (ruleObject != null){
             manager.getEngine().removeRule(ruleObject);
             manager.getRuleStore().deleteRule(ruleId);
             checkEngineHealth();
+            }
         }
+        
+        if (type.equals(MessageType.GET_RULES)) {
+            final Message m = new Message();
+            m.setGroupSize(1);
+            m.setCommandId(ruleId);
+            m.setType(MessageType.RULES);
+            m.setCommand(manager.getRuleStore().getRules());
+            m.setUpdateDiff(manager.getRuleStore().getLastChangedDiff());
+            manager.getOutQueue().addMessage(m);                          
+        }
+        
+        if (type.equals(MessageType.RULES)&& manager.isElected()) {
+            manager.getRulesResolutionQueue().addMessage(deliveredMessage);                                      
+        }
+        
+        
     }
+    
+    /**
+     * creates the rule object
+     * 
+     * @param rule
+     * @return rule object
+     */
+    private RuleProc<Event> getRule(String rule)
+    {
+        String ruleName = "";
+        String rulePeriod = "";
+        String ruleDesc = "";
+        
+        if (rule != null && rule.contains(":")) {
+            final String[] ruleParts = rule.split(":");
+            if (ruleParts.length == 3) {
+                ruleName = ruleParts[0];
+                rulePeriod = ruleParts[1];
+                ruleDesc = ruleParts[2];
+            }
+        }
+        RuleProc<Event> ruleObject = null;
+        if (factory.createRuleFactory(ruleName) != null)
+            ruleObject = factory.createRuleFactory(ruleName).createRule(manager.getEngine(), rulePeriod, ruleName,
+                                                                        ruleDesc);
+        return ruleObject;
+    }
+    
 }

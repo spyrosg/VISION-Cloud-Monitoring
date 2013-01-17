@@ -6,11 +6,17 @@ import java.util.Iterator;
 import java.util.Timer;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 /**
  * @author tmessini
  */
 public class RulesPropagationWatchDog extends PeriodicTask {
 
+    /***/
+    final Logger                                   log = LoggerFactory.getLogger(RulesPropagationWatchDog.class);
     /***/
     private RulesPropagationManager manager;
     /***/
@@ -31,7 +37,29 @@ public class RulesPropagationWatchDog extends PeriodicTask {
 
     @Override
     public void run() {
-        updateMessageMembership(maxtime);
+        startRulesSynchronization();
+        discardMessages(maxtime);
+    }
+
+    /**
+     * 
+     */    
+    private void startRulesSynchronization() {               
+        if (manager.isElected()) {
+            log.info("send get-rules " +
+            		"message");
+            manager.getRulesResolutionQueue().clear();
+            manager.getRulesClusterSynchronizer().clearRuleSet();            
+            if(manager.getRulesResolutionQueue().isQEmpty())
+            {
+            final Message m = new Message();
+            m.setGroupSize(1);
+            m.setCommandId(manager.getRandomID());
+            m.setType(MessageType.GET_RULES);
+            m.setCommand("");
+            manager.getOutQueue().addMessage(m);
+            }
+        }        
     }
 
 
@@ -77,7 +105,14 @@ public class RulesPropagationWatchDog extends PeriodicTask {
      * 
      * @param maxtime
      */
-    private void updateMessageMembership(final long maxtime) {
+    private void discardMessages(final long maxtime) {
+        /*
+        log.info("message timestamp size: {}",manager.getMessageTimestamp().getSize());
+        log.info("message timestamp counter: {}",manager.getMessageCounter().getSize());
+        log.info("message timestamp outqueue: {}",manager.getOutQueue().getSize());
+        log.info("message timestamp size: {}",manager.getInQueue().getSize());
+        log.info("message timestamp size: {}",manager.getDelQueue().getSize());
+        */
         if (manager.getMessageTimestamp() != null) {
             final Iterator<Message> iterator = manager.getMessageTimestamp().keys().iterator();
             while (iterator.hasNext()) {
@@ -88,9 +123,7 @@ public class RulesPropagationWatchDog extends PeriodicTask {
                     manager.getOutQueue().trimSize();
                     manager.getInQueue().trimSize();
                     manager.getDelQueue().trimSize();
-
                 }
-
             }
         }
 

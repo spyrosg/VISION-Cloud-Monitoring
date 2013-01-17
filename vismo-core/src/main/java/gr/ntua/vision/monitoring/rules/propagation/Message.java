@@ -10,6 +10,8 @@ public class Message implements Serializable {
     /***/
     private static final long serialVersionUID = 1L;
     /***/
+    private String            command;
+    /***/
     private int               commandId;
     /***/
     private int               fromId;
@@ -18,20 +20,42 @@ public class Message implements Serializable {
     /***/
     private volatile int      hashCode;
     /***/
-    private String            command;
+    private MessageType       type;
     /***/
-    private String            type;
+    private long              lastUpdate;
+
+
 
 
     @Override
-    public boolean equals(final Object obj) {
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((command == null) ? 0 : command.hashCode());
+        result = prime * result + commandId;
+        result = prime * result + fromId;
+        result = prime * result + groupSize;
+        result = prime * result + hashCode;
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        result = prime * result + (int) (lastUpdate ^ (lastUpdate >>> 32));
+        return result;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final Message other = (Message) obj;
+        Message other = (Message) obj;
+        if (command == null) {
+            if (other.command != null)
+                return false;
+        } else if (!command.equals(other.command))
+            return false;
         if (commandId != other.commandId)
             return false;
         if (fromId != other.fromId)
@@ -40,15 +64,9 @@ public class Message implements Serializable {
             return false;
         if (hashCode != other.hashCode)
             return false;
-        if (command == null) {
-            if (other.command != null)
-                return false;
-        } else if (!command.equals(other.command))
+        if (type != other.type)
             return false;
-        if (type == null) {
-            if (other.type != null)
-                return false;
-        } else if (!type.equals(other.type))
+        if (lastUpdate != other.lastUpdate)
             return false;
         return true;
     }
@@ -89,27 +107,16 @@ public class Message implements Serializable {
     /**
      * @return the type of the message.
      */
-    public String getType() {
+    public MessageType getType() {
         return type;
     }
 
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + commandId;
-        result = prime * result + fromId;
-        result = prime * result + groupSize;
-        result = prime * result + hashCode;
-        result = prime * result + ((command == null) ? 0 : command.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
-        return result;
-    }
+
 
 
     /**
-     * @param command 
+     * @param command
      */
     public void setCommand(final String command) {
         this.command = command;
@@ -141,11 +148,11 @@ public class Message implements Serializable {
 
 
     /**
-     * @param type
+     * @param addRule
      *            sets the type of the message
      */
-    public void setType(final String type) {
-        this.type = type;
+    public void setType(final MessageType addRule) {
+        this.type = addRule;
     }
 
 
@@ -155,6 +162,22 @@ public class Message implements Serializable {
                 + groupSize;
 
         return str;
+    }
+
+    /***
+     * 
+     * @return long
+     */
+    public long getUpdateDiff() {
+        return lastUpdate;
+    }
+
+    /***
+     * 
+     * @param updateDiff
+     */
+    public void setUpdateDiff(long updateDiff) {
+        this.lastUpdate = updateDiff;
     }
 
 }

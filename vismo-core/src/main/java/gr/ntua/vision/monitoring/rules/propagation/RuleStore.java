@@ -18,6 +18,8 @@ public class RuleStore {
     private static final Logger                      log = LoggerFactory.getLogger(RuleStore.class);
     /***/
     private final ConcurrentHashMap<Integer, String> rulesNum;
+    /***/
+    private long lastChanged=0;
 
 
     /**
@@ -36,6 +38,7 @@ public class RuleStore {
      */
     public void addRule(final String rule, final Integer randomID) {
         rulesNum.put(randomID, rule);
+        setLastChanged(Long.valueOf(System.currentTimeMillis()));
     }
 
 
@@ -57,6 +60,7 @@ public class RuleStore {
      */
     public void deleteRule(final Integer ruleId) {
         rulesNum.remove(ruleId);
+        setLastChanged(Long.valueOf(System.currentTimeMillis()));
     }
 
 
@@ -90,4 +94,21 @@ public class RuleStore {
         return rulesNum.size();
     }
 
+    /**
+     * returns the difference timestamp of current 
+     * with the previous change
+     * @return along number of last change
+     */
+    public long getLastChangedDiff() {
+        return System.currentTimeMillis()-lastChanged;
+    }
+
+    /**
+     * changes the lastChanged
+     * @param lastChanged
+     */
+    public void setLastChanged(long lastChanged) {
+        this.lastChanged = lastChanged;
+    }
+    
 }

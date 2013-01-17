@@ -18,14 +18,14 @@ import org.slf4j.LoggerFactory;
 @Path("/")
 public class RulesManagementResource {
     /***/
-    private static final Logger     log = LoggerFactory.getLogger(RulesManagementResource.class);
+    private static final Logger           log = LoggerFactory.getLogger(RulesManagementResource.class);
     /***/
-    private  final RulesPropagationManager manager;
-    
+    private final RulesPropagationManager manager;
+
 
     /**
      * Constructor.
-     *
+     * 
      * @param manager
      */
     public RulesManagementResource(RulesPropagationManager manager) {
@@ -46,7 +46,7 @@ public class RulesManagementResource {
             final Message m = new Message();
             m.setGroupSize(manager.getHeartbeatReceiver().getMembers().size());
             m.setCommandId(id);
-            m.setType("del");
+            m.setType(MessageType.DELETE_RULE);
             m.setCommand(manager.getRuleStore().getRule(id));
             manager.getOutQueue().addMessage(m);
         }
@@ -97,13 +97,12 @@ public class RulesManagementResource {
             final Message m = new Message();
             m.setGroupSize(manager.getHeartbeatReceiver().getMembers().size());
             m.setCommandId(commandId);
-            m.setType("add");
+            m.setType(MessageType.ADD_RULE);
             m.setCommand(name + ":" + period + ":" + desc);
             manager.getOutQueue().addMessage(m);
         }
         return "adding rule: " + commandId + " " + name + ":" + period + ":" + desc;
     }
-
 
 
     /**
