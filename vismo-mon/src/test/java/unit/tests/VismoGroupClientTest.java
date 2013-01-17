@@ -13,12 +13,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * 
  */
 public class VismoGroupClientTest {
+    /***/
+    static final Logger         log                  = LoggerFactory.getLogger(VismoGroupClientTest.class);
     /***/
     private static final String GROUP_ADDRESS        = "228.5.6.7";
     /***/
@@ -64,24 +68,24 @@ public class VismoGroupClientTest {
                 final MulticastSocket sock = new MulticastSocket(new InetSocketAddress(GROUP_PORT));
                 final InetAddress addr = InetAddress.getByName(GROUP_ADDRESS);
 
-                System.err.println("joining group");
+                log.debug("joining group");
                 sock.joinGroup(addr);
 
                 while (!Thread.currentThread().isInterrupted()) {
                     final byte buf[] = new byte[256];
                     final DatagramPacket pack = new DatagramPacket(buf, buf.length);
 
-                    System.err.println("waiting to receive...");
+                    log.debug("receiving...");
                     sock.receive(pack);
 
                     final String message = new String(pack.getData(), 0, pack.getLength());
-                    System.err.println("received " + message);
+                    log.debug("got " + message);
 
                     if (NOTE.equals(message))
                         receivedNotification.set(true);
                 }
 
-                System.err.println("leaving group");
+                log.debug("leaving group");
                 sock.leaveGroup(addr);
             }
         }, "waiting-notifications");
