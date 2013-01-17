@@ -1,6 +1,6 @@
 package endtoend.tests;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 import gr.ntua.monitoring.mon.VismoGroupClient;
 import gr.ntua.monitoring.mon.VismoGroupServer;
 
@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.LinkedHashSet;
 
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +19,57 @@ import org.junit.Test;
  * 
  */
 public class VismoGroupTest {
+    /**
+     * A hamcrest matcher for comparing in order arrays.
+     * 
+     * @param <T>
+     *            the type of the elements of the sequence.
+     */
+    public static class ArrayInOrderMatcher<T> extends TypeSafeMatcher<Iterable<T>> {
+        /***/
+        private final T[] arr;
+
+
+        /**
+         * @param arr
+         */
+        public ArrayInOrderMatcher(final T... arr) {
+            this.arr = arr;
+        }
+
+
+        /**
+         * @see org.hamcrest.SelfDescribing#describeTo(org.hamcrest.Description)
+         */
+        @Override
+        public void describeTo(final Description desc) {
+            desc.appendValue(arr);
+        }
+
+
+        /**
+         * @see org.junit.matchers.TypeSafeMatcher#matchesSafely(java.lang.Object)
+         */
+        @Override
+        public boolean matchesSafely(final Iterable<T> iter) {
+            int i = 0;
+
+            for (final T t : iter)
+                if (!arr[i++].equals(t))
+                    return false;
+
+            return true;
+        }
+
+
+        /**
+         * @param arr
+         * @return an {@link ArrayInOrderMatcher}.
+         */
+        public static <T> ArrayInOrderMatcher<T> contains(final T... arr) {
+            return new ArrayInOrderMatcher<T>(arr);
+        }
+    }
     /***/
     private static final String         GROUP_ADDRESS = "235.1.1.1";
     /***/
@@ -27,6 +80,7 @@ public class VismoGroupTest {
     private final LinkedHashSet<String> notifications = new LinkedHashSet<String>();
     /***/
     private VismoGroupServer            server;
+
     /***/
     private Thread                      t;
 
@@ -42,7 +96,7 @@ public class VismoGroupTest {
         for (int i = 0; i < clients.length; ++i)
             clients[i].notifyGroup("ohai-" + i);
 
-        Thread.sleep(1000); // wait for all notifications to arrive.
+        Thread.sleep(100); // wait for all notifications to arrive.
         assertThatServerReceivedNotificationsAsTheyComeIn();
     }
 
@@ -72,24 +126,6 @@ public class VismoGroupTest {
 
     /***/
     private void assertThatServerReceivedNotificationsAsTheyComeIn() {
-        assertTrue(containsInOrder(notifications, "ohai-0", "ohai-1", "ohai-2"));
-    }
-
-
-    /**
-     * Assert that iterable contains in order the elements in the array.
-     * 
-     * @param iter
-     * @param arr
-     * @return <code>true</code> iff iter has the same elements in order with array, <code>false</code> otherwise.
-     */
-    private static <T> boolean containsInOrder(final Iterable<T> iter, final T... arr) {
-        int i = 0;
-
-        for (final T t : iter)
-            if (!arr[i++].equals(t))
-                return false;
-
-        return true;
+        assertThat(notifications, ArrayInOrderMatcher.contains("ohai-0", "ohai-1", "ohai-2"));
     }
 }
