@@ -1,7 +1,7 @@
 package endtoend.tests;
 
 import static org.junit.Assert.assertThat;
-import gr.ntua.monitoring.mon.VismoGroupClient;
+import gr.ntua.monitoring.mon.GroupClient;
 import gr.ntua.monitoring.mon.VismoGroupServer;
 
 import java.io.IOException;
@@ -75,7 +75,7 @@ public class VismoGroupTest {
     /***/
     private static final int            GROUP_PORT    = 12346;
     /***/
-    private final VismoGroupClient[]    clients       = new VismoGroupClient[3];
+    private final GroupClient[]         clients       = new GroupClient[3];
     /***/
     private final LinkedHashSet<String> notifications = new LinkedHashSet<String>();
     /***/
@@ -107,7 +107,7 @@ public class VismoGroupTest {
     @Before
     public void setUp() throws UnknownHostException {
         for (int i = 0; i < clients.length; ++i)
-            clients[i] = new VismoGroupClient(GROUP_ADDRESS, GROUP_PORT);
+            clients[i] = new GroupClient(GROUP_ADDRESS, GROUP_PORT);
 
         server = new VismoGroupServer(GROUP_ADDRESS, GROUP_PORT, notifications);
         t = new Thread(server, "vismo-group-server");

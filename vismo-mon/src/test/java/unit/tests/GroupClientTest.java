@@ -1,7 +1,7 @@
 package unit.tests;
 
 import static org.junit.Assert.assertTrue;
-import gr.ntua.monitoring.mon.VismoGroupClient;
+import gr.ntua.monitoring.mon.GroupClient;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -20,9 +20,9 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  */
-public class VismoGroupClientTest {
+public class GroupClientTest {
     /***/
-    static final Logger         log                  = LoggerFactory.getLogger(VismoGroupClientTest.class);
+    static final Logger         log                  = LoggerFactory.getLogger(GroupClientTest.class);
     /***/
     private static final String GROUP_ADDRESS        = "228.5.6.7";
     /***/
@@ -41,7 +41,7 @@ public class VismoGroupClientTest {
      */
     @Test
     public void notificationShouldBeReceivedByGroup() throws IOException, InterruptedException {
-        final VismoGroupClient client = new VismoGroupClient(GROUP_ADDRESS, GROUP_PORT);
+        final GroupClient client = new GroupClient(GROUP_ADDRESS, GROUP_PORT);
 
         Thread.sleep(100); // spin thread
         client.notifyGroup(NOTE);

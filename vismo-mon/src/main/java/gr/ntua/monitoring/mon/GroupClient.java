@@ -13,9 +13,9 @@ import org.slf4j.LoggerFactory;
 /**
  * This is used to send notifications to the vismo (multicast) group.
  */
-public class VismoGroupClient {
+public class GroupClient {
     /** the log target. */
-    private static final Logger log = LoggerFactory.getLogger(VismoGroupClient.class);
+    private static final Logger log = LoggerFactory.getLogger(GroupClient.class);
     /** the group address. */
     private final InetAddress   groupAddress;
     /** the group port. */
@@ -31,7 +31,7 @@ public class VismoGroupClient {
      *            the group port.
      * @throws UnknownHostException
      */
-    public VismoGroupClient(final String groupAddress, final int port) throws UnknownHostException {
+    public GroupClient(final String groupAddress, final int port) throws UnknownHostException {
         this.groupAddress = InetAddress.getByName(groupAddress);
         this.port = port;
     }
