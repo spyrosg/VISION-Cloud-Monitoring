@@ -22,11 +22,15 @@ public class RulesPropagationManager extends Thread {
     @SuppressWarnings("unused")
     private final static Logger            log                      = LoggerFactory.getLogger(RulesPropagationManager.class);
     /***/
+    private final ClusterRuleStore         clusterRuleStore;
+    /***/
     private final MessageDeliverer         deliverer                = new MessageDeliverer();
     /***/
     private final MessageQueue             delQueue;
     /***/
     private final MessageDispatcher        dispatcher               = new MessageDispatcher();
+    /***/
+    private final Elector                  elector;
     /***/
     private final String                   HEARTBEAT_MULTICAST_IP   = "224.0.0.1";
     /***/
@@ -52,17 +56,13 @@ public class RulesPropagationManager extends Thread {
     /***/
     private Integer                        pid;
     /***/
-    private final NodeRuleStore                ruleStore;
-    /***/
-    private final ClusterRuleStore              clusterRuleStore;
+    private final NodeRuleStore            ruleStore;
     /***/
     private int                            size;
     /***/
     private final VismoRulesEngine         vismoRulesEngine;
     /***/
-    private final WebServer           webServer;
-    /***/
-    private final Elector elector;
+    private final WebServer                webServer;
 
 
     /**
@@ -89,8 +89,6 @@ public class RulesPropagationManager extends Thread {
         deliverer.setManager(this);
         messageWatchdog.setManager(this);
 
-
-
         inputQueue = new MessageQueue();
         outputQueue = new MessageQueue();
         delQueue = new MessageQueue();
@@ -98,8 +96,18 @@ public class RulesPropagationManager extends Thread {
         inputQueue.addObserver(dispatcher);
         outputQueue.addObserver(messageSender);
         delQueue.addObserver(deliverer);
-        
-        elector = new  Elector(this);
+
+        elector = new Elector(this);
+    }
+
+
+    /**
+     * common place to store cluster rules
+     * 
+     * @return ruleStore
+     */
+    public ClusterRuleStore getClusterRuleStore() {
+        return clusterRuleStore;
     }
 
 
@@ -121,7 +129,7 @@ public class RulesPropagationManager extends Thread {
 
 
     /**
-     * @return the  heart beat receiver
+     * @return the heart beat receiver
      */
     public HeartbeatReceiver getHeartbeatReceiver() {
         return heartbeatReceiver;
@@ -134,9 +142,6 @@ public class RulesPropagationManager extends Thread {
     public MessageQueue getInQueue() {
         return inputQueue;
     }
-
-
-
 
 
     /**
@@ -165,6 +170,7 @@ public class RulesPropagationManager extends Thread {
 
     /**
      * returns the unique id of the node
+     * 
      * @return id
      */
     public Integer getPid() {
@@ -181,14 +187,6 @@ public class RulesPropagationManager extends Thread {
         return Integer.valueOf(randomGenerator.nextInt(100000) + 100000);
     }
 
-    /**
-     * returns whether pid is elected
-     * @return whether the node is elected
-     */
-    public boolean isElected()
-    {
-        return elector.isElected();
-    }
 
     /**
      * common place to store rules
@@ -197,15 +195,6 @@ public class RulesPropagationManager extends Thread {
      */
     public NodeRuleStore getRuleStore() {
         return ruleStore;
-    }
-
-    /**
-     * common place to store cluster rules
-     * 
-     * @return ruleStore
-     */
-    public ClusterRuleStore getClusterRuleStore() {
-        return clusterRuleStore;
     }
 
 
@@ -233,22 +222,31 @@ public class RulesPropagationManager extends Thread {
             elector.cancel();
         } catch (final IllegalArgumentException e) {
             e.printStackTrace();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
     }
 
 
+    /**
+     * returns whether pid is elected
+     * 
+     * @return whether the node is elected
+     */
+    public boolean isElected() {
+        return elector.isElected();
+    }
+
+
     @Override
     public void run() {
-        while (true) {
+        while (true)
             try {
                 Thread.sleep(100000);
             } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
-            //TODO           
-        }
+        // TODO
     }
 
 

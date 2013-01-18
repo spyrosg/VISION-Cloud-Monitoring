@@ -3,14 +3,17 @@ package gr.ntua.vision.monitoring.rules.propagation;
 import java.util.Observable;
 import java.util.concurrent.ConcurrentHashMap;
 
+
 /**
  * this class stores the rules catalog.
  * 
  * @author tmessini
  */
-public class ClusterRuleStore  extends Observable {     
+public class ClusterRuleStore extends Observable {
     /***/
     private final ConcurrentHashMap<ConcurrentHashMap<Integer, String>, Long> clusterRulesSetTimestamped;
+
+
     /***/
     public ClusterRuleStore() {
         clusterRulesSetTimestamped = new ConcurrentHashMap<ConcurrentHashMap<Integer, String>, Long>();
