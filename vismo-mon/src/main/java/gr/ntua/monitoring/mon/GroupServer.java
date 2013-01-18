@@ -15,9 +15,9 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  */
-public class VismoGroupServer implements Runnable {
+public class GroupServer implements Runnable {
     /** the log target. */
-    private static final Logger      log = LoggerFactory.getLogger(VismoGroupServer.class);
+    private static final Logger      log = LoggerFactory.getLogger(GroupServer.class);
     /** the group address. */
     private final InetAddress        groupAddress;
     /** notifications received. */
@@ -37,7 +37,7 @@ public class VismoGroupServer implements Runnable {
      *            notifications received.
      * @throws UnknownHostException
      */
-    public VismoGroupServer(final String groupAddress, final int port, final Collection<String> notifications)
+    public GroupServer(final String groupAddress, final int port, final Collection<String> notifications)
             throws UnknownHostException {
         this.groupAddress = InetAddress.getByName(groupAddress);
         this.port = port;

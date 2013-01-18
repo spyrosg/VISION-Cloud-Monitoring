@@ -2,7 +2,7 @@ package endtoend.tests;
 
 import static org.junit.Assert.assertThat;
 import gr.ntua.monitoring.mon.GroupClient;
-import gr.ntua.monitoring.mon.VismoGroupServer;
+import gr.ntua.monitoring.mon.GroupServer;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -26,7 +26,7 @@ public class VismoGroupTest {
     /***/
     private final LinkedHashSet<String> notifications = new LinkedHashSet<String>();
     /***/
-    private VismoGroupServer            server;
+    private GroupServer                 server;
     /***/
     private Thread                      t;
 
@@ -55,7 +55,7 @@ public class VismoGroupTest {
         for (int i = 0; i < clients.length; ++i)
             clients[i] = new GroupClient(GROUP_ADDRESS, GROUP_PORT);
 
-        server = new VismoGroupServer(GROUP_ADDRESS, GROUP_PORT, notifications);
+        server = new GroupServer(GROUP_ADDRESS, GROUP_PORT, notifications);
         t = new Thread(server, "vismo-group-server");
         t.setDaemon(true);
         t.start();
