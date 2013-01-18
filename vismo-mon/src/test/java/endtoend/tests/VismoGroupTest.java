@@ -2,6 +2,7 @@ package endtoend.tests;
 
 import static org.junit.Assert.assertThat;
 import gr.ntua.monitoring.mon.GroupClient;
+import gr.ntua.monitoring.mon.GroupNotificationListener;
 import gr.ntua.monitoring.mon.GroupServer;
 
 import java.io.IOException;
@@ -18,17 +19,24 @@ import org.junit.Test;
  */
 public class VismoGroupTest {
     /***/
-    private static final String         GROUP_ADDRESS = "235.1.1.1";
+    private static final String             GROUP_ADDRESS = "235.1.1.1";
     /***/
-    private static final int            GROUP_PORT    = 12346;
+    private static final int                GROUP_PORT    = 12346;
     /***/
-    private final GroupClient[]         clients       = new GroupClient[3];
+    final LinkedHashSet<String>             notifications = new LinkedHashSet<String>();
     /***/
-    private final LinkedHashSet<String> notifications = new LinkedHashSet<String>();
+    private final GroupClient[]             clients       = new GroupClient[3];
     /***/
-    private GroupServer                 server;
+    private final GroupNotificationListener listener      = new GroupNotificationListener() {
+                                                              @Override
+                                                              public void pass(final String note) {
+                                                                  notifications.add(note);
+                                                              }
+                                                          };
     /***/
-    private Thread                      t;
+    private GroupServer                     server;
+    /***/
+    private Thread                          t;
 
 
     /**
@@ -55,7 +63,8 @@ public class VismoGroupTest {
         for (int i = 0; i < clients.length; ++i)
             clients[i] = new GroupClient(GROUP_ADDRESS, GROUP_PORT);
 
-        server = new GroupServer(GROUP_ADDRESS, GROUP_PORT, notifications);
+        server = new GroupServer(GROUP_ADDRESS, GROUP_PORT);
+        server.register(listener);
         t = new Thread(server, "vismo-group-server");
         t.setDaemon(true);
         t.start();

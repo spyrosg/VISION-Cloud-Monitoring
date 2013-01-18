@@ -6,7 +6,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
-import java.util.Collection;
+import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,13 +17,13 @@ import org.slf4j.LoggerFactory;
  */
 public class GroupServer implements Runnable {
     /** the log target. */
-    private static final Logger      log = LoggerFactory.getLogger(GroupServer.class);
+    private static final Logger                        log       = LoggerFactory.getLogger(GroupServer.class);
     /** the group address. */
-    private final InetAddress        groupAddress;
-    /** notifications received. */
-    private final Collection<String> notifications;
+    private final InetAddress                          groupAddress;
+    /** the listeners to notify. */
+    private final ArrayList<GroupNotificationListener> listeners = new ArrayList<GroupNotificationListener>();
     /** the group port. */
-    private final int                port;
+    private final int                                  port;
 
 
     /**
@@ -33,15 +33,22 @@ public class GroupServer implements Runnable {
      *            the group port.
      * @param groupAddress
      *            the group address.
-     * @param notifications
-     *            notifications received.
      * @throws UnknownHostException
      */
-    public GroupServer(final String groupAddress, final int port, final Collection<String> notifications)
-            throws UnknownHostException {
+    public GroupServer(final String groupAddress, final int port) throws UnknownHostException {
         this.groupAddress = InetAddress.getByName(groupAddress);
         this.port = port;
-        this.notifications = notifications;
+    }
+
+
+    /**
+     * Register a listener to the group notifications.
+     * 
+     * @param listener
+     *            the listener.
+     */
+    public void register(final GroupNotificationListener listener) {
+        listeners.add(listener);
     }
 
 
@@ -72,12 +79,23 @@ public class GroupServer implements Runnable {
             final String message = new String(pack.getData(), 0, pack.getLength());
 
             log.trace("<< '{}'", message);
-            notifications.add(message);
+            notifyAll(message);
         }
 
         log.debug("leaving group {}", groupAddress.getHostAddress());
         tryLeaveGroup(sock);
         sock.close();
+    }
+
+
+    /**
+     * Notify all registered listeners.
+     * 
+     * @param notification
+     */
+    private void notifyAll(final String notification) {
+        for (final GroupNotificationListener listener : listeners)
+            listener.pass(notification);
     }
 
 
