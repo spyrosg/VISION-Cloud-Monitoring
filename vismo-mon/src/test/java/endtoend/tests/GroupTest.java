@@ -2,7 +2,6 @@ package endtoend.tests;
 
 import static org.junit.Assert.assertThat;
 import gr.ntua.monitoring.mon.GroupClient;
-import gr.ntua.monitoring.mon.GroupNotificationListener;
 import gr.ntua.monitoring.mon.GroupServer;
 
 import java.io.IOException;
@@ -19,24 +18,17 @@ import org.junit.Test;
  */
 public class GroupTest {
     /***/
-    private static final String             GROUP_ADDRESS = "235.1.1.1";
+    private static final String GROUP_ADDRESS = "235.1.1.1";
     /***/
-    private static final int                GROUP_PORT    = 12346;
+    private static final int    GROUP_PORT    = 12346;
     /***/
-    final LinkedHashSet<String>             notifications = new LinkedHashSet<String>();
+    final LinkedHashSet<String> notifications = new LinkedHashSet<String>();
     /***/
-    private final GroupClient[]             clients       = new GroupClient[3];
+    private final GroupClient[] clients       = new GroupClient[3];
     /***/
-    private final GroupNotificationListener listener      = new GroupNotificationListener() {
-                                                              @Override
-                                                              public void pass(final String note) {
-                                                                  notifications.add(note);
-                                                              }
-                                                          };
+    private GroupServer         server;
     /***/
-    private GroupServer                     server;
-    /***/
-    private Thread                          t;
+    private Thread              t;
 
 
     /**
@@ -63,8 +55,12 @@ public class GroupTest {
         for (int i = 0; i < clients.length; ++i)
             clients[i] = new GroupClient(GROUP_ADDRESS, GROUP_PORT);
 
-        server = new GroupServer(GROUP_ADDRESS, GROUP_PORT);
-        server.register(listener);
+        server = new GroupServer(GROUP_ADDRESS, GROUP_PORT) {
+            @Override
+            protected void notify(final String notification) {
+                notifications.add(notification);
+            }
+        };
         t = new Thread(server, "vismo-group-server");
         t.setDaemon(true);
         t.start();
