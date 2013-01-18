@@ -17,7 +17,7 @@ import org.junit.Test;
 /**
  * 
  */
-public class VismoGroupTest {
+public class GroupTest {
     /***/
     private static final String             GROUP_ADDRESS = "235.1.1.1";
     /***/
