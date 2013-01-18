@@ -1,5 +1,7 @@
 package endtoend.tests;
 
+import java.util.Collection;
+
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 
@@ -10,7 +12,7 @@ import org.hamcrest.TypeSafeMatcher;
  * @param <T>
  *            the type of the elements of the sequence.
  */
-public class ArrayInOrderMatcher<T> extends TypeSafeMatcher<Iterable<T>> {
+public class ArrayInOrderMatcher<T> extends TypeSafeMatcher<Collection<T>> {
     /***/
     private final T[] arr;
 
@@ -36,10 +38,13 @@ public class ArrayInOrderMatcher<T> extends TypeSafeMatcher<Iterable<T>> {
      * @see org.junit.matchers.TypeSafeMatcher#matchesSafely(java.lang.Object)
      */
     @Override
-    public boolean matchesSafely(final Iterable<T> iter) {
+    public boolean matchesSafely(final Collection<T> coll) {
+        if (coll.size() != arr.length)
+            return false;
+
         int i = 0;
 
-        for (final T t : iter)
+        for (final T t : coll)
             if (!arr[i++].equals(t))
                 return false;
 
