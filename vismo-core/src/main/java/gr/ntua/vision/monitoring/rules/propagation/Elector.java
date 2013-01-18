@@ -61,8 +61,7 @@ public class Elector extends PeriodicTask {
             int currentMulticastGroupSize = manager.getHeartbeatReceiver().getMembers().size();
             
             if (electedPid.equals(manager.getPid()) && getPreviousElectedPid().equals(electedPid) && currentMulticastGroupSize == getPreviousMulticastGroupSize()){ 
-                setElected(true); 
-                //log.info(manager.getPid().toString()+ "->"+currentMulticastGroupSize);
+                setElected(true);                
             } else {
                 setElected(false);               
                 setPreviousElectedPid(electedPid);                

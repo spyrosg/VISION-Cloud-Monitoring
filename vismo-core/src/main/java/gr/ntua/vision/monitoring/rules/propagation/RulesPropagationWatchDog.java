@@ -5,7 +5,6 @@ import gr.ntua.vision.monitoring.threading.PeriodicTask;
 import java.util.Iterator;
 import java.util.Timer;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +15,7 @@ import org.slf4j.LoggerFactory;
 public class RulesPropagationWatchDog extends PeriodicTask {
 
     /***/
-    final Logger                                   log = LoggerFactory.getLogger(RulesPropagationWatchDog.class);
+    final Logger                    log     = LoggerFactory.getLogger(RulesPropagationWatchDog.class);
     /***/
     private RulesPropagationManager manager;
     /***/
@@ -41,27 +40,6 @@ public class RulesPropagationWatchDog extends PeriodicTask {
         discardMessages(maxtime);
     }
 
-    /**
-     * 
-     */    
-    private void startRulesSynchronization() {               
-        if (manager.isElected()) {
-            log.info("send get-rules " +
-            		"message");
-            manager.getRulesResolutionQueue().clear();
-            manager.getRulesClusterSynchronizer().clearRuleSet();            
-            if(manager.getRulesResolutionQueue().isQEmpty())
-            {
-            final Message m = new Message();
-            m.setGroupSize(1);
-            m.setCommandId(manager.getRandomID());
-            m.setType(MessageType.GET_RULES);
-            m.setCommand("");
-            manager.getOutQueue().addMessage(m);
-            }
-        }        
-    }
-
 
     @Override
     public void scheduleWith(final Timer timer) {
@@ -74,29 +52,6 @@ public class RulesPropagationWatchDog extends PeriodicTask {
      */
     public void setManager(final RulesPropagationManager manager) {
         this.manager = manager;
-    }
-
-
-    /**
-     * @param msg
-     * @return long
-     */
-    private long getTimestampDelta(final Message msg) {
-        final long delta = System.currentTimeMillis() - manager.getMessageTimestamp().getMessageValue(msg);
-        return delta;
-    }
-
-
-    /**
-     * Decide whether the message is active based on previous received timestamps.
-     * 
-     * @param maxtime
-     * @param msg
-     * @return if the host is still active.
-     */
-    private boolean isActive(final long maxtime, final Message msg) {
-        return getTimestampDelta(msg) < maxtime;
-
     }
 
 
@@ -127,6 +82,48 @@ public class RulesPropagationWatchDog extends PeriodicTask {
             }
         }
 
+    }
+
+
+    /**
+     * @param msg
+     * @return long
+     */
+    private long getTimestampDelta(final Message msg) {
+        final long delta = System.currentTimeMillis() - manager.getMessageTimestamp().getMessageValue(msg);
+        return delta;
+    }
+
+
+    /**
+     * Decide whether the message is active based on previous received timestamps.
+     * 
+     * @param maxtime
+     * @param msg
+     * @return if the host is still active.
+     */
+    private boolean isActive(final long maxtime, final Message msg) {
+        return getTimestampDelta(msg) < maxtime;
+
+    }
+
+
+    /**
+     * 
+     */
+    private void startRulesSynchronization() {
+        if (manager.isElected()) {
+
+            // we empty clusterStore before resolution attempt!
+            manager.getClusterRuleStore().clearClusterRuleStore();
+
+            final Message m = new Message();
+            m.setGroupSize(manager.getHeartbeatReceiver().getMembers().size());
+            m.setCommandId(manager.getRandomID());
+            m.setType(MessageType.GET_RULES);
+            m.setCommand("");
+            manager.getOutQueue().addMessage(m);
+        }
     }
 
 }

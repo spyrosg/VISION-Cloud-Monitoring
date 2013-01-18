@@ -1,6 +1,7 @@
 package gr.ntua.vision.monitoring.rules.propagation;
 
 import java.io.Serializable;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -8,49 +9,34 @@ import java.io.Serializable;
  */
 public class Message implements Serializable {
     /***/
-    private static final long serialVersionUID = 1L;
+    private static final long                  serialVersionUID = 1L;
     /***/
-    private String            command;
+    private String                             command;
     /***/
-    private int               commandId;
+    private int                                commandId;
     /***/
-    private int               fromId;
+    private int                                fromId;
     /***/
-    private int               groupSize;
+    private int                                groupSize;
     /***/
-    private volatile int      hashCode;
+    private volatile int                       hashCode;
     /***/
-    private MessageType       type;
+    private long                               lastUpdate;
     /***/
-    private long              lastUpdate;
-
-
-
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((command == null) ? 0 : command.hashCode());
-        result = prime * result + commandId;
-        result = prime * result + fromId;
-        result = prime * result + groupSize;
-        result = prime * result + hashCode;
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
-        result = prime * result + (int) (lastUpdate ^ (lastUpdate >>> 32));
-        return result;
-    }
+    private ConcurrentHashMap<Integer, String> nodeRuleSet      = null;
+    /***/
+    private MessageType                        type;
 
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Message other = (Message) obj;
+        final Message other = (Message) obj;
         if (command == null) {
             if (other.command != null)
                 return false;
@@ -64,9 +50,14 @@ public class Message implements Serializable {
             return false;
         if (hashCode != other.hashCode)
             return false;
-        if (type != other.type)
-            return false;
         if (lastUpdate != other.lastUpdate)
+            return false;
+        if (nodeRuleSet == null) {
+            if (other.nodeRuleSet != null)
+                return false;
+        } else if (!nodeRuleSet.equals(other.nodeRuleSet))
+            return false;
+        if (type != other.type)
             return false;
         return true;
     }
@@ -105,6 +96,16 @@ public class Message implements Serializable {
 
 
     /**
+     * returns the rules that runs one the node.
+     * 
+     * @return concurrentHashMap
+     */
+    public ConcurrentHashMap<Integer, String> getRuleSet() {
+        return nodeRuleSet;
+    }
+
+
+    /**
      * @return the type of the message.
      */
     public MessageType getType() {
@@ -112,7 +113,28 @@ public class Message implements Serializable {
     }
 
 
+    /***
+     * @return long
+     */
+    public long getUpdateDiff() {
+        return lastUpdate;
+    }
 
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((command == null) ? 0 : command.hashCode());
+        result = prime * result + commandId;
+        result = prime * result + fromId;
+        result = prime * result + groupSize;
+        result = prime * result + hashCode;
+        result = prime * result + (int) (lastUpdate ^ (lastUpdate >>> 32));
+        result = prime * result + ((nodeRuleSet == null) ? 0 : nodeRuleSet.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        return result;
+    }
 
 
     /**
@@ -148,11 +170,28 @@ public class Message implements Serializable {
 
 
     /**
+     * @param map
+     */
+    public void setRuleSet(final ConcurrentHashMap<Integer, String> map) {
+        this.nodeRuleSet = map;
+    }
+
+
+    /**
+     * adds the MessageType
+     * 
      * @param addRule
-     *            sets the type of the message
      */
     public void setType(final MessageType addRule) {
         this.type = addRule;
+    }
+
+
+    /***
+     * @param updateDiff
+     */
+    public void setUpdateDiff(final long updateDiff) {
+        this.lastUpdate = updateDiff;
     }
 
 
@@ -162,22 +201,6 @@ public class Message implements Serializable {
                 + groupSize;
 
         return str;
-    }
-
-    /***
-     * 
-     * @return long
-     */
-    public long getUpdateDiff() {
-        return lastUpdate;
-    }
-
-    /***
-     * 
-     * @param updateDiff
-     */
-    public void setUpdateDiff(long updateDiff) {
-        this.lastUpdate = updateDiff;
     }
 
 }

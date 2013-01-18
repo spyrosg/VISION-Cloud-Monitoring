@@ -28,7 +28,7 @@ public class RulesManagementResource {
      * 
      * @param manager
      */
-    public RulesManagementResource(RulesPropagationManager manager) {
+    public RulesManagementResource(final RulesPropagationManager manager) {
         this.manager = manager;
     }
 

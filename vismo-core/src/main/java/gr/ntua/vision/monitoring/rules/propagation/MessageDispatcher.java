@@ -33,7 +33,7 @@ public class MessageDispatcher extends Thread implements Observer {
     @Override
     public void run() {
         Message incomingMessage;
-        while (!interrupted())
+        while (!Thread.interrupted())
             if (!manager.getInQueue().isQEmpty()) {
                 incomingMessage = manager.getInQueue().getMessage();
                 manager.getMessageTimestamp().updateMessageTimestamp(incomingMessage);

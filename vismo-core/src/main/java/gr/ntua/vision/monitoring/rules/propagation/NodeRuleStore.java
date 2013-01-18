@@ -11,21 +11,21 @@ import org.slf4j.LoggerFactory;
  * 
  * @author tmessini
  */
-public class RuleStore {
+public class NodeRuleStore {
 
     /***/
     @SuppressWarnings("unused")
-    private static final Logger                      log = LoggerFactory.getLogger(RuleStore.class);
+    private static final Logger                      log         = LoggerFactory.getLogger(NodeRuleStore.class);
+    /***/
+    private long                                     lastChanged = 0;
     /***/
     private final ConcurrentHashMap<Integer, String> rulesNum;
-    /***/
-    private long lastChanged=0;
 
 
     /**
      * 
      */
-    public RuleStore() {
+    public NodeRuleStore() {
         rulesNum = new ConcurrentHashMap<Integer, String>();
     }
 
@@ -65,6 +65,16 @@ public class RuleStore {
 
 
     /**
+     * returns the difference timestamp of current with the previous change
+     * 
+     * @return along number of last change
+     */
+    public long getLastChangedDiff() {
+        return System.currentTimeMillis() - lastChanged;
+    }
+
+
+    /**
      * returns the String of rules.
      * 
      * @param id
@@ -78,7 +88,7 @@ public class RuleStore {
     /**
      * returns all values as string
      * 
-     * @return String
+     * @return string
      */
     public String getRules() {
         return rulesNum.toString();
@@ -94,21 +104,22 @@ public class RuleStore {
         return rulesNum.size();
     }
 
+
     /**
-     * returns the difference timestamp of current 
-     * with the previous change
-     * @return along number of last change
+     * @return the map of rules
      */
-    public long getLastChangedDiff() {
-        return System.currentTimeMillis()-lastChanged;
+    public ConcurrentHashMap<Integer, String> getRulesMap() {
+        return rulesNum;
     }
+
 
     /**
      * changes the lastChanged
+     * 
      * @param lastChanged
      */
-    public void setLastChanged(long lastChanged) {
+    public void setLastChanged(final long lastChanged) {
         this.lastChanged = lastChanged;
     }
-    
+
 }

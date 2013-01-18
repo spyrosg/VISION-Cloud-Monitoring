@@ -21,7 +21,7 @@ public class MessageDeliverer extends Thread implements Observer {
     private final AbstractRuleFactory factory = new AbstractRuleFactory();
     /***/
     private RulesPropagationManager   manager;
-    /***/
+    
 
 
     /**
@@ -110,19 +110,25 @@ public class MessageDeliverer extends Thread implements Observer {
             }
         }
         
-        if (type.equals(MessageType.GET_RULES)) {
+        if (type.equals(MessageType.GET_RULES)) {            
             final Message m = new Message();
-            m.setGroupSize(1);
+            m.setGroupSize(manager.getHeartbeatReceiver().getMembers().size());
             m.setCommandId(ruleId);
             m.setType(MessageType.RULES);
-            m.setCommand(manager.getRuleStore().getRules());
+            m.setRuleSet(manager.getRuleStore().getRulesMap());
             m.setUpdateDiff(manager.getRuleStore().getLastChangedDiff());
             manager.getOutQueue().addMessage(m);                          
         }
         
         if (type.equals(MessageType.RULES)&& manager.isElected()) {
-            manager.getRulesResolutionQueue().addMessage(deliveredMessage);                                      
+            if(deliveredMessage.getRuleSet()!=null)
+            manager.getClusterRuleStore().addNodeRuleSet(deliveredMessage.getRuleSet(), deliveredMessage.getUpdateDiff());
         }
+        
+        if (type.equals(MessageType.SET_RULES)) {
+            log.info(deliveredMessage.toString());                                      
+        }
+        
         
         
     }
