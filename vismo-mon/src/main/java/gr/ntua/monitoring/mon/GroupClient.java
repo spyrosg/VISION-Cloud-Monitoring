@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * This is used to send notifications to the vismo (multicast) group.
+ * This supports one way communication to a multi-cast group.
  */
 public class GroupClient {
     /** the log target. */

@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * 
+ * This is used to collect notifications from a multi-cast group.
  */
 public class GroupServer implements Runnable {
     /** the log target. */
