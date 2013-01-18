@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * This is used to collect notifications from a multi-cast group.
+ * This is used to collect notifications from a multi-cast group. No response is sent back.
  */
 public abstract class GroupServer implements Runnable {
     /** the log target. */
