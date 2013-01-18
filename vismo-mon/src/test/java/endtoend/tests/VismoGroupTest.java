@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.LinkedHashSet;
 
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,57 +17,6 @@ import org.junit.Test;
  * 
  */
 public class VismoGroupTest {
-    /**
-     * A hamcrest matcher for comparing in order arrays.
-     * 
-     * @param <T>
-     *            the type of the elements of the sequence.
-     */
-    public static class ArrayInOrderMatcher<T> extends TypeSafeMatcher<Iterable<T>> {
-        /***/
-        private final T[] arr;
-
-
-        /**
-         * @param arr
-         */
-        public ArrayInOrderMatcher(final T... arr) {
-            this.arr = arr;
-        }
-
-
-        /**
-         * @see org.hamcrest.SelfDescribing#describeTo(org.hamcrest.Description)
-         */
-        @Override
-        public void describeTo(final Description desc) {
-            desc.appendValue(arr);
-        }
-
-
-        /**
-         * @see org.junit.matchers.TypeSafeMatcher#matchesSafely(java.lang.Object)
-         */
-        @Override
-        public boolean matchesSafely(final Iterable<T> iter) {
-            int i = 0;
-
-            for (final T t : iter)
-                if (!arr[i++].equals(t))
-                    return false;
-
-            return true;
-        }
-
-
-        /**
-         * @param arr
-         * @return an {@link ArrayInOrderMatcher}.
-         */
-        public static <T> ArrayInOrderMatcher<T> contains(final T... arr) {
-            return new ArrayInOrderMatcher<T>(arr);
-        }
-    }
     /***/
     private static final String         GROUP_ADDRESS = "235.1.1.1";
     /***/
@@ -80,7 +27,6 @@ public class VismoGroupTest {
     private final LinkedHashSet<String> notifications = new LinkedHashSet<String>();
     /***/
     private VismoGroupServer            server;
-
     /***/
     private Thread                      t;
 
