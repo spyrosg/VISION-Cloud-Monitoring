@@ -27,7 +27,7 @@ public class VismoService implements Service, UDPListener {
     /***/
     private final EventSources            sources;
     /** the timer object. */
-    private final Timer                   timer = new Timer();
+    private final Timer                   timer = new Timer(true);
     /***/
     private final VMInfo                  vminfo;
 
