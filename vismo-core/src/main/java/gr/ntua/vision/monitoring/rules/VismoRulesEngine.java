@@ -87,6 +87,7 @@ public class VismoRulesEngine implements EventSourceListener {
      *            the rule.
      */
     public void removeRule(final RuleProc<MonitoringEvent> rule) {
+        // FIXME: periodic rules aren't removed from the timer
         log.debug("removing {}", rule);
         store.remove(rule);
     }

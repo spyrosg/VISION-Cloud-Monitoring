@@ -240,7 +240,7 @@ public class RulesPropagationManager extends Thread {
             deliverer.start();
             heartbeatReceiver.init();
             heartbeatSender.init();
-            messageWatchdog.scheduleWith(new Timer());
+            messageWatchdog.scheduleWith(new Timer()); // FIXME: this should use VismoService#addTask
         } catch (final Throwable x) {
             throw new RuntimeException(x);
         }
