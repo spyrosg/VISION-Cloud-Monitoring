@@ -36,7 +36,6 @@ public class VismoGroupServiceFactory {
         final GroupMembership mship = new GroupMembership();
 
         server.register(new AddGroupMember(new GroupElementFactory(), mship));
-        t.setDaemon(true);
 
         return new VismoGroupService(t, new PrintGroupTask(mship));
     }
