@@ -37,7 +37,7 @@ public class GroupTest {
      */
     @Test
     public void serverShouldPickUpNewNotificationsAsTheyComeIn() throws IOException, InterruptedException {
-        Thread.sleep(100); // spin thread
+        Thread.sleep(100); // spin server thread
 
         for (int i = 0; i < clients.length; ++i)
             clients[i].notifyGroup("ohai-" + i);

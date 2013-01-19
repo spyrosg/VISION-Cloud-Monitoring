@@ -43,7 +43,7 @@ public class GroupClientTest {
     public void notificationShouldBeReceivedByGroup() throws IOException, InterruptedException {
         final GroupClient client = new GroupClient(GROUP_ADDRESS, GROUP_PORT);
 
-        Thread.sleep(100); // spin thread
+        Thread.sleep(100); // spin runnable's thread
         client.notifyGroup(NOTE);
         Thread.sleep(100); // wait for notification to arrive
         assertTrue(receivedNotification.get());

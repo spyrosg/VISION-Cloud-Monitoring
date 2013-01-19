@@ -37,12 +37,16 @@ public class GroupMembership {
 
 
     /**
-     * Add an element to the group.
+     * Add an element to the group. If an identical element is already contained, it is replaced with the new one, by the
+     * assumption that the new one in the most up-to-date.
      * 
      * @param elem
      *            the element to add.
      */
     public void add(final GroupElement elem) {
+        if (members.contains(elem))
+            members.remove(elem);
+
         log.debug("adding new member: {}", elem);
         members.add(elem);
     }
@@ -69,5 +73,13 @@ public class GroupMembership {
     public void forEach(final GroupProc action) {
         for (final GroupElement member : members)
             action.performWith(member);
+    }
+
+
+    /**
+     * @return the no of members in this group.
+     */
+    public int size() {
+        return members.size();
     }
 }
