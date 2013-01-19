@@ -1,4 +1,4 @@
-package gr.ntua.monitoring.mon;
+package gr.ntua.vision.monitoring.mon;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
 
@@ -38,7 +38,7 @@ public class VismoGroupServer extends GroupServer {
 
 
     /**
-     * @see gr.ntua.monitoring.mon.GroupServer#notify(java.lang.String)
+     * @see gr.ntua.vision.monitoring.mon.GroupServer#notify(java.lang.String)
      */
     @Override
     protected void notify(final String notification) {

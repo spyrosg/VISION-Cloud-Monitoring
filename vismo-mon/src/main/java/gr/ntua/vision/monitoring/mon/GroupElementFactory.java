@@ -1,4 +1,4 @@
-package gr.ntua.monitoring.mon;
+package gr.ntua.vision.monitoring.mon;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

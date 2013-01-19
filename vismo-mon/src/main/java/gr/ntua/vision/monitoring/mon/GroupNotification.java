@@ -1,4 +1,4 @@
-package gr.ntua.monitoring.mon;
+package gr.ntua.vision.monitoring.mon;
 
 /**
  * Interface to be implemented by anyone interested in receiving group notifications.

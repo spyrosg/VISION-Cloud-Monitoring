@@ -1,8 +1,8 @@
 package endtoend.tests;
 
 import static org.junit.Assert.assertThat;
-import gr.ntua.monitoring.mon.GroupClient;
-import gr.ntua.monitoring.mon.GroupServer;
+import gr.ntua.vision.monitoring.mon.GroupClient;
+import gr.ntua.vision.monitoring.mon.GroupServer;
 
 import java.io.IOException;
 import java.net.UnknownHostException;

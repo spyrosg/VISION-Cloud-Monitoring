@@ -1,4 +1,4 @@
-package gr.ntua.monitoring.mon;
+package gr.ntua.vision.monitoring.mon;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

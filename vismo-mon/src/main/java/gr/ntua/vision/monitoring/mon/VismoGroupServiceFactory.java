@@ -1,4 +1,4 @@
-package gr.ntua.monitoring.mon;
+package gr.ntua.vision.monitoring.mon;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
 

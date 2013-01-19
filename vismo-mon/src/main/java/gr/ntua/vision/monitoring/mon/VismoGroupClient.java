@@ -1,4 +1,4 @@
-package gr.ntua.monitoring.mon;
+package gr.ntua.vision.monitoring.mon;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
 
@@ -26,7 +26,7 @@ public class VismoGroupClient {
     /**
      * @param note
      * @throws IOException
-     * @see gr.ntua.monitoring.mon.GroupClient#notifyGroup(java.lang.String)
+     * @see gr.ntua.vision.monitoring.mon.GroupClient#notifyGroup(java.lang.String)
      */
     public void notifyGroup(final String note) throws IOException {
         client.notifyGroup(note);

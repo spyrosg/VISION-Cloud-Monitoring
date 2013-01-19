@@ -1,4 +1,4 @@
-package gr.ntua.monitoring.mon;
+package gr.ntua.vision.monitoring.mon;
 
 import java.net.UnknownHostException;
 
@@ -26,7 +26,7 @@ class AddGroupMember implements GroupNotification {
 
 
     /**
-     * @see gr.ntua.monitoring.mon.GroupNotification#pass(java.lang.String)
+     * @see gr.ntua.vision.monitoring.mon.GroupNotification#pass(java.lang.String)
      */
     @Override
     public void pass(final String notification) {

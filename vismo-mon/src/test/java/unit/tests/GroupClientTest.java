@@ -1,7 +1,7 @@
 package unit.tests;
 
 import static org.junit.Assert.assertTrue;
-import gr.ntua.monitoring.mon.GroupClient;
+import gr.ntua.vision.monitoring.mon.GroupClient;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

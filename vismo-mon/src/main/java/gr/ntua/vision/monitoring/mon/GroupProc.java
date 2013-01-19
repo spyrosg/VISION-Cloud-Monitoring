@@ -1,4 +1,4 @@
-package gr.ntua.monitoring.mon;
+package gr.ntua.vision.monitoring.mon;
 
 /**
  * An abstraction for doing stuff on each member of a {@link GroupMembership}.
