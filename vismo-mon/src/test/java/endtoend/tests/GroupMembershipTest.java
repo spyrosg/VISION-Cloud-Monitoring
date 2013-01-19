@@ -30,12 +30,12 @@ public class GroupMembershipTest {
     @Test
     public void membershipShouldMaintainOnlyTheMostRecentlyUpdatedMembers() throws UnknownHostException, InterruptedException {
         final String ID = "id1";
-        final GroupElement m1 = new GroupElement(ID, InetAddress.getLocalHost());
-        final GroupElement m2 = new GroupElement(ID, InetAddress.getLocalHost());
+        final GroupElement m1;
+        final GroupElement m2;
 
-        mship.add(m1);
+        mship.add(m1 = new GroupElement(ID, InetAddress.getLocalHost()));
         Thread.sleep(100); // wait for newer identical entry to come in.
-        mship.add(m2);
+        mship.add(m2 = new GroupElement(ID, InetAddress.getLocalHost()));
 
         assertEquals(1, mship.size());
         assertTrue("m2 should be a member since is a more up-to-date", mship.contains(m2));

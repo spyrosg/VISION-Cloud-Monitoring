@@ -5,14 +5,15 @@ import java.util.Date;
 
 
 /**
- * 
+ * A {@link GroupElement} maybe member of a {@link GroupMembership}. The <code>id</code> is the only discriminating property of
+ * elements.
  */
 public class GroupElement {
-    /***/
+    /** the address. */
     private final InetAddress addr;
-    /***/
+    /** the id. */
     private final String      id;
-    /***/
+    /** the time-stamp of last sent ping. */
     private final long        lastUpdated;
 
 
@@ -20,7 +21,9 @@ public class GroupElement {
      * Constructor.
      * 
      * @param id
+     *            the id.
      * @param addr
+     *            the address.
      */
     public GroupElement(final String id, final InetAddress addr) {
         this(id, addr, System.currentTimeMillis());
@@ -31,8 +34,11 @@ public class GroupElement {
      * Constructor.
      * 
      * @param id
+     *            the id.
      * @param addr
+     *            the address.
      * @param lastUpdated
+     *            the time-stamp of last sent ping.
      */
     public GroupElement(final String id, final InetAddress addr, final long lastUpdated) {
         this.id = id;
@@ -91,7 +97,7 @@ public class GroupElement {
      */
     @Override
     public String toString() {
-        return "#<GroupElement: " + id + " @ " + addr + " (updated = " + toDate(lastUpdated) + ")>";
+        return "#<GroupElement: " + id + " @ " + addr + " (updated " + toDate(lastUpdated) + ")>";
     }
 
 
