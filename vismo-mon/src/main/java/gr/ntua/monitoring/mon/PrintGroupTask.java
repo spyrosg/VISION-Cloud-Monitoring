@@ -1,5 +1,6 @@
 package gr.ntua.monitoring.mon;
 
+import java.util.Date;
 import java.util.TimerTask;
 
 
@@ -26,7 +27,7 @@ public class PrintGroupTask extends TimerTask {
      */
     @Override
     public void run() {
-        System.out.println("group members:");
+        System.out.println(new Date() + " group members:");
 
         mship.forEach(new GroupProc() {
             @Override

@@ -13,7 +13,7 @@ public class VismoGroupService {
     /** the task to schedule. */
     private final TimerTask task;
     /** the timer object. */
-    private final Timer     timer = new Timer();
+    private final Timer     timer = new Timer(true);
 
 
     /**
@@ -32,7 +32,7 @@ public class VismoGroupService {
      * Start the service.
      */
     public void start() {
-        timer.schedule(task, 0, 5 * 1000);
+        timer.schedule(task, 2 * 1000, 10 * 1000);
         t.start();
     }
 }
