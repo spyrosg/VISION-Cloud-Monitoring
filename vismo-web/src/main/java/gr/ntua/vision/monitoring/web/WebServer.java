@@ -15,6 +15,7 @@ import org.eclipse.jetty.util.resource.Resource;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 
@@ -111,6 +112,7 @@ public class WebServer {
         final ServletContextHandler ctxHandler = new ServletContextHandler();
         final ResourceConfig rc = new DefaultResourceConfig();
 
+        rc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
         rc.getSingletons().addAll(singletons);
         ctxHandler.addServlet(new ServletHolder(new ServletContainer(rc)), "/*");
 
