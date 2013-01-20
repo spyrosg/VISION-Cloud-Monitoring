@@ -1,4 +1,4 @@
-package endtoend.tests;
+package integration.tests;
 
 import java.util.Collection;
 

@@ -1,4 +1,4 @@
-package endtoend.tests;
+package integration.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -38,7 +38,7 @@ public class GroupMembershipTest {
         mship.add(m2 = new GroupElement(ID, InetAddress.getLocalHost()));
 
         assertEquals(1, mship.size());
-        assertTrue("m2 should be a member since is a more up-to-date", mship.contains(m2));
+        assertTrue("m2 should be a member since is more up-to-date", mship.contains(m2));
     }
 
 

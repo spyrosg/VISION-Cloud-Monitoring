@@ -1,4 +1,4 @@
-package endtoend.tests;
+package integration.tests;
 
 import static org.junit.Assert.assertThat;
 import gr.ntua.vision.monitoring.mon.GroupClient;
