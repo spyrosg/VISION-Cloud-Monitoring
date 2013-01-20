@@ -13,6 +13,7 @@ import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.Resource;
 
+import com.sun.jersey.api.container.filter.LoggingFilter;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
@@ -111,6 +112,9 @@ public class WebServer {
     private ServletContextHandler jerseyResourcesHandler() {
         final ServletContextHandler ctxHandler = new ServletContextHandler();
         final ResourceConfig rc = new DefaultResourceConfig();
+
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, new LoggingFilter());
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, new LoggingFilter());
 
         rc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
         rc.getSingletons().addAll(singletons);
