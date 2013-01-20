@@ -4,7 +4,6 @@ import java.util.HashSet;
 
 import javax.ws.rs.core.Application;
 
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.servlet.DefaultServlet;
@@ -25,13 +24,11 @@ import com.sun.jersey.spi.container.servlet.ServletContainer;
  */
 public class WebServer {
     /***/
-    private String                path;
-    /***/
-    private Resource              resource;
+    private final ContextHandlerCollection coll       = new ContextHandlerCollection();
     /** the actual server. */
-    private final Server          server;
+    private final Server                   server;
     /** the set of resource to serve. */
-    private final HashSet<Object> singletons = new HashSet<Object>();
+    private final HashSet<Object>          singletons = new HashSet<Object>();
 
 
     /**
@@ -85,8 +82,7 @@ public class WebServer {
      * @return <code>this</code>.
      */
     public WebServer withStaticResourceTo(final Resource resPath, final String pathSpec) {
-        this.resource = resPath;
-        this.path = pathSpec;
+        coll.addHandler(staticResourcesHandler(resPath, pathSpec));
 
         return this;
     }
@@ -99,10 +95,8 @@ public class WebServer {
         if (singletons.isEmpty())
             throw new IllegalStateException("you should specify at least one resource");
 
-        if (resource != null && path != null)
-            setServerHandlers(staticResourcesHandler(), jerseyResourcesHandler());
-        else
-            setServerHandlers(jerseyResourcesHandler());
+        coll.addHandler(jerseyResourcesHandler());
+        setServerHandlers();
     }
 
 
@@ -125,27 +119,26 @@ public class WebServer {
 
 
     /**
-     * @param handlers
+     * 
      */
-    private void setServerHandlers(final Handler... handlers) {
-        final ContextHandlerCollection coll = new ContextHandlerCollection();
-
-        coll.setHandlers(handlers);
+    private void setServerHandlers() {
         server.setHandler(coll);
     }
 
 
     /**
+     * @param pathSpec
+     * @param resPath
      * @return a {@link ServletContextHandler} for static resources.
      */
-    private ServletContextHandler staticResourcesHandler() {
+    private static ServletContextHandler staticResourcesHandler(final Resource resPath, final String pathSpec) {
         final ServletContextHandler ctxHandler = new ServletContextHandler();
         final ServletHandler handler = new ServletHandler();
 
         handler.addServletWithMapping(new ServletHolder(new DefaultServlet()), "/*");
         ctxHandler.setServletHandler(handler);
-        ctxHandler.setContextPath(path);
-        ctxHandler.setBaseResource(resource);
+        ctxHandler.setContextPath(pathSpec);
+        ctxHandler.setBaseResource(resPath);
 
         return ctxHandler;
     }
