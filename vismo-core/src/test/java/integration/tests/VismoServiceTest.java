@@ -116,6 +116,9 @@ public class VismoServiceTest {
                                                            setProperty("cluster.head.port", "56432");
 
                                                            setProperty("cloud.head.port", "56433");
+
+                                                           setProperty("mon.group.addr", "228.5.6.7");
+                                                           setProperty("mon.group.port", "12345");
                                                        }
                                                    };
     /***/
