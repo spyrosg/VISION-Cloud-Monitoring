@@ -2,8 +2,8 @@ package gr.ntua.vision.monitoring.mon;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.UnknownHostException;
 
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ public class GroupClient {
      * @throws IOException
      */
     public void notifyGroup(final String note) throws IOException {
-        final DatagramSocket sock = new DatagramSocket();
+        final MulticastSocket sock = new MulticastSocket();
         final byte[] buf = note.getBytes();
         final DatagramPacket p = new DatagramPacket(buf, buf.length, groupAddress, port);
 
