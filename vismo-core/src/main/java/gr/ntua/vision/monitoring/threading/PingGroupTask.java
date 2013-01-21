@@ -46,6 +46,8 @@ public class PingGroupTask extends PeriodicTask {
      */
     @Override
     public void run() {
+        log.debug("contacting group");
+
         try {
             client.notifyGroup("foo" + ":" + vminfo.getAddress().getHostAddress());
         } catch (final IOException e) {
@@ -60,5 +62,14 @@ public class PingGroupTask extends PeriodicTask {
     @Override
     public void scheduleWith(final Timer timer) {
         timer.schedule(this, 0, period);
+    }
+
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "#<PingGroupTask, running every " + period / 1000 + " seconds>";
     }
 }
