@@ -14,20 +14,13 @@ import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 /**
  *
  */
-public class CloudHeadNodeFactory extends CommonServiceFactory {
-    /***/
-    private final VismoConfiguration conf;
-    /***/
-    private final ZMQFactory         socketFactory;
-
-
+public class CloudHeadNodeFactory extends AbstractVismoServiceFactory {
     /**
      * @param conf
      * @param socketFactory
      */
     public CloudHeadNodeFactory(final VismoConfiguration conf, final ZMQFactory socketFactory) {
-        this.conf = conf;
-        this.socketFactory = socketFactory;
+        super(conf, socketFactory);
     }
 
 
