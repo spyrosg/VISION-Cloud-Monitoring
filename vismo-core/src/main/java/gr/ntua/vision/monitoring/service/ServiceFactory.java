@@ -10,15 +10,6 @@ import java.io.IOException;
  */
 public interface ServiceFactory {
     /**
-     * This maybe used by client code to further configure the service.
-     * 
-     * @param service
-     *            the service.
-     */
-    void bootstrap(Service service);
-
-
-    /**
      * Build and setup a {@link Service} instance.
      * 
      * @param vminfo

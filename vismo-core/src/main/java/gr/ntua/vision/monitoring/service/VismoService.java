@@ -56,6 +56,7 @@ public class VismoService implements Service, UDPListener {
      *            the task.
      */
     public void addTask(final PeriodicTask task) {
+        log.debug("scheduling {}", task);
         task.scheduleWith(timer);
     }
 
