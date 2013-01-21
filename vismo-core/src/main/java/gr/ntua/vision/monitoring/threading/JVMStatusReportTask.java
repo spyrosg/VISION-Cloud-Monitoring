@@ -2,7 +2,6 @@ package gr.ntua.vision.monitoring.threading;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import java.util.Timer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +29,6 @@ public class JVMStatusReportTask extends PeriodicTask {
     private static final RuntimeMXBean         runbean     = ManagementFactory.getRuntimeMXBean();
     /***/
     private static final Runtime               runtime     = Runtime.getRuntime();
-    /** the task's running period. */
-    private final long                         period;
     /** the vm's process time in milliseconds on latest access. */
     private long                               processTime = 0;
     /** the vm's uptime in milliseconds on latest access. */
@@ -48,7 +45,7 @@ public class JVMStatusReportTask extends PeriodicTask {
      * @param period
      */
     public JVMStatusReportTask(final long period) {
-        this.period = period;
+        super(period);
     }
 
 
@@ -59,24 +56,6 @@ public class JVMStatusReportTask extends PeriodicTask {
     public void run() {
         reportFreeMemoryPercent();
         reportCPUUsage();
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.threading.PeriodicTask#scheduleWith(java.util.Timer)
-     */
-    @Override
-    public void scheduleWith(final Timer timer) {
-        timer.schedule(this, 0, period);
-    }
-
-
-    /**
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return "#<JVMStatusReportTask, running every " + period / 1000 + " seconds>";
     }
 
 
