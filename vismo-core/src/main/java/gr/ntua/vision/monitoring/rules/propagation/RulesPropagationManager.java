@@ -3,6 +3,7 @@ package gr.ntua.vision.monitoring.rules.propagation;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatReceiver;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatSender;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
+import gr.ntua.vision.monitoring.threading.RulesPropagationWatchDog;
 import gr.ntua.vision.monitoring.web.WebServer;
 
 import java.io.IOException;

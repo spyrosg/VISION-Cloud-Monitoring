@@ -38,6 +38,6 @@ public abstract class PeriodicTask extends TimerTask {
      */
     @Override
     public String toString() {
-        return "<" + getClass() + ", running every " + period / 1000 + " seconds>";
+        return "<" + getClass().getSimpleName() + ", running every " + period / 1000 + " seconds>";
     }
 }

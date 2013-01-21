@@ -1,6 +1,7 @@
-package gr.ntua.vision.monitoring.rules.propagation;
+package gr.ntua.vision.monitoring.threading;
 
-import gr.ntua.vision.monitoring.threading.PeriodicTask;
+import gr.ntua.vision.monitoring.rules.propagation.Message;
+import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
 
 import java.util.Iterator;
 
@@ -9,7 +10,6 @@ import java.util.Iterator;
  * @author tmessini
  */
 public class RulesPropagationWatchDog extends PeriodicTask {
-
     /***/
     private RulesPropagationManager manager;
     /***/
@@ -26,6 +26,9 @@ public class RulesPropagationWatchDog extends PeriodicTask {
     }
 
 
+    /**
+     * @see java.util.TimerTask#run()
+     */
     @Override
     public void run() {
         updateMessageMembership(maxtime);
