@@ -10,7 +10,7 @@ import com.sun.management.OperatingSystemMXBean;
 
 
 /**
- * 
+ * This is used to calculate and report the memory and cpu usage of this process.
  */
 @SuppressWarnings("restriction")
 public class JVMStatusReportTask extends PeriodicTask {
@@ -43,6 +43,7 @@ public class JVMStatusReportTask extends PeriodicTask {
      * Constructor.
      * 
      * @param period
+     *            the period's task.
      */
     public JVMStatusReportTask(final long period) {
         super(period);

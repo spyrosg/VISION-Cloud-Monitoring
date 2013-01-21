@@ -12,12 +12,12 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * 
+ * This is used to periodically contact the vismo group.
  */
 public class PingGroupTask extends PeriodicTask {
-    /***/
+    /** the log target. */
     private static final Logger    log = LoggerFactory.getLogger(PingGroupTask.class);
-    /***/
+    /** the vismo group client. */
     private final VismoGroupClient client;
     /***/
     private final VMInfo           vminfo;
@@ -27,8 +27,10 @@ public class PingGroupTask extends PeriodicTask {
      * Constructor.
      * 
      * @param conf
+     *            the configuration object.
      * @param vminfo
      * @param period
+     *            the task's period.
      * @throws UnknownHostException
      */
     public PingGroupTask(final VismoConfiguration conf, final VMInfo vminfo, final long period) throws UnknownHostException {
