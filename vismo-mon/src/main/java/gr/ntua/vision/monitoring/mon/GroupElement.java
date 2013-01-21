@@ -97,7 +97,7 @@ public class GroupElement {
      */
     @Override
     public String toString() {
-        return "#<GroupElement: " + id + " @ " + addr + " (updated " + toDate(lastUpdated) + ")>";
+        return "#<GroupElement: " + id + " @ " + addr.getHostAddress() + " (updated " + toDate(lastUpdated) + ")>";
     }
 
 

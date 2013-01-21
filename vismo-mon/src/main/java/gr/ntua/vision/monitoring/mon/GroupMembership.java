@@ -44,11 +44,14 @@ public class GroupMembership {
      *            the element to add.
      */
     public void add(final GroupElement elem) {
-        if (members.contains(elem))
+        if (members.contains(elem)) {
+            log.debug("updating member: {}", elem);
             members.remove(elem);
-
-        log.debug("adding new member: {}", elem);
-        members.add(elem);
+            members.add(elem);
+        } else {
+            log.debug("adding new member: {}", elem);
+            members.add(elem);
+        }
     }
 
 
