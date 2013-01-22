@@ -3,6 +3,7 @@ package gr.ntua.vision.monitoring.mon;
 import gr.ntua.vision.monitoring.VismoConfiguration;
 
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -11,6 +12,8 @@ import java.net.UnknownHostException;
 public class VismoGroupServiceFactory {
     /** the configuration object. */
     private final VismoConfiguration conf;
+    /** expiration period in milliseconds */
+    private final long               expirationPeriod = TimeUnit.SECONDS.convert(90, TimeUnit.SECONDS);
 
 
     /**
@@ -33,7 +36,7 @@ public class VismoGroupServiceFactory {
     public VismoGroupService build() throws UnknownHostException {
         final VismoGroupServer server = new VismoGroupServer(conf);
         final Thread t = new Thread(server, "group-server");
-        final GroupMembership mship = new GroupMembership();
+        final GroupMembership mship = new GroupMembership(expirationPeriod);
 
         server.register(new AddGroupMember(new GroupElementFactory(), mship));
 
