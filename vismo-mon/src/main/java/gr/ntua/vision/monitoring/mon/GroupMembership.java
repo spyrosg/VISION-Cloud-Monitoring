@@ -2,37 +2,51 @@ package gr.ntua.vision.monitoring.mon;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 /**
- * This is used to keep in memory the members of a group.
+ * This is used to keep in memory the members of a group. {@link GroupMembership}s behave like sets with two main differences:
+ * <ol>
+ * <li>Each member has an expiration period, after which it gets evicted.</li>
+ * <li>When inserting an already present member, that member is updated.</li>
+ * </ol>
  */
 public class GroupMembership {
     /** the log target. */
-    private static final Logger     log = LoggerFactory.getLogger(GroupMembership.class);
+    private static final Logger     log   = LoggerFactory.getLogger(GroupMembership.class);
+    /** the expiration period for the group membership. */
+    private final long              expirationPeriod;
     /** the actual members. */
-    private final Set<GroupElement> members;
+    private final Set<GroupElement> set;
+    /** the timer used to schedule removals. */
+    private final Timer             timer = new Timer(true);
 
 
     /**
      * Constructor.
+     * 
+     * @param expirationPeriod
      */
-    public GroupMembership() {
-        this.members = new LinkedHashSet<GroupElement>();
+    public GroupMembership(final long expirationPeriod) {
+        this(expirationPeriod, new LinkedHashSet<GroupElement>());
     }
 
 
     /**
      * Constructor.
      * 
+     * @param expirationPeriod
      * @param members
      *            the initial set of members.
      */
-    public GroupMembership(final Set<GroupElement> members) {
-        this.members = members;
+    public GroupMembership(final long expirationPeriod, final Set<GroupElement> members) {
+        this.expirationPeriod = expirationPeriod;
+        this.set = members;
     }
 
 
@@ -40,30 +54,12 @@ public class GroupMembership {
      * Add an element to the group. If an identical element is already contained, it is replaced with the new one, by the
      * assumption that the new one in the most up-to-date.
      * 
-     * @param elem
+     * @param e
      *            the element to add.
      */
-    public void add(final GroupElement elem) {
-        if (members.contains(elem)) {
-            log.debug("updating member: {}", elem);
-            members.remove(elem);
-            members.add(elem);
-        } else {
-            log.debug("adding new member: {}", elem);
-            members.add(elem);
-        }
-    }
-
-
-    /**
-     * Check whether the element is a member of <code>this</code>.
-     * 
-     * @param elem
-     *            the element.
-     * @return <code>true</code> iff <code>member</code> is member of <code>this</code> group, <code>false</code> otherwise.
-     */
-    public boolean contains(final GroupElement elem) {
-        return members.contains(elem);
+    public void add(final GroupElement e) {
+        log.debug("adding new member: {}", e);
+        addElement(e);
     }
 
 
@@ -74,15 +70,37 @@ public class GroupMembership {
      *            the action to perform.
      */
     public void forEach(final GroupProc action) {
-        for (final GroupElement member : members)
+        for (final GroupElement member : set)
             action.performWith(member);
     }
 
 
     /**
-     * @return the no of members in this group.
+     * @param elem
      */
-    public int size() {
-        return members.size();
+    void removeElement(final GroupElement elem) {
+        set.remove(elem);
+    }
+
+
+    /**
+     * @param elem
+     */
+    private void addElement(final GroupElement elem) {
+        set.add(elem);
+        scheduleForRemoval(elem);
+    }
+
+
+    /**
+     * @param elem
+     */
+    private void scheduleForRemoval(final GroupElement elem) {
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                removeElement(elem);
+            }
+        }, expirationPeriod);
     }
 }

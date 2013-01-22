@@ -5,15 +5,15 @@ import java.util.Date;
 
 
 /**
- * A {@link GroupElement} maybe member of a {@link GroupMembership}. The <code>id</code> is the only discriminating property of
- * elements.
+ * A {@link GroupElement} may be member of a {@link GroupMembership}. Each element can be distinguished by its inet address, its
+ * identifier and its time-stamp.
  */
 public class GroupElement {
     /** the address. */
     private final InetAddress addr;
     /** the id. */
     private final String      id;
-    /** the time-stamp of last sent ping. */
+    /** when was this element last updated (in milliseconds since the epoch)? */
     private final long        lastUpdated;
 
 
@@ -38,24 +38,12 @@ public class GroupElement {
      * @param addr
      *            the address.
      * @param lastUpdated
-     *            the time-stamp of last sent ping.
+     *            when was this element last updated (in milliseconds since the epoch)?
      */
     public GroupElement(final String id, final InetAddress addr, final long lastUpdated) {
         this.id = id;
         this.addr = addr;
         this.lastUpdated = lastUpdated;
-    }
-
-
-    /**
-     * Check whether <code>this</code> belongs to the group.
-     * 
-     * @param mship
-     *            the group to check membership.
-     * @return <code>true</code> iff <code>this</code> is a member of the group, <code>false</code> otherwise.
-     */
-    public boolean belongsTo(final GroupMembership mship) {
-        return mship.contains(this);
     }
 
 
@@ -68,13 +56,20 @@ public class GroupElement {
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof GroupElement))
+        if (getClass() != obj.getClass())
             return false;
         final GroupElement other = (GroupElement) obj;
+        if (addr == null) {
+            if (other.addr != null)
+                return false;
+        } else if (!addr.equals(other.addr))
+            return false;
         if (id == null) {
             if (other.id != null)
                 return false;
         } else if (!id.equals(other.id))
+            return false;
+        if (lastUpdated != other.lastUpdated)
             return false;
         return true;
     }
@@ -87,7 +82,9 @@ public class GroupElement {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((addr == null) ? 0 : addr.hashCode());
         result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + (int) (lastUpdated ^ (lastUpdated >>> 32));
         return result;
     }
 
