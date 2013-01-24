@@ -36,10 +36,11 @@ public class VismoGroupServiceFactory {
     public VismoGroupService build() throws UnknownHostException {
         final VismoGroupServer server = new VismoGroupServer(conf);
         final Thread t = new Thread(server, "group-server");
-        final GroupMembership mship = new GroupMembership(expirationPeriod);
+        // final GroupMembership mship = new GroupMembership(expirationPeriod);
 
-        server.register(new AddGroupMember(new GroupElementFactory(), mship));
+        // server.register(new AddGroupMember(new GroupElementFactory(), mship));
 
-        return new VismoGroupService(t, new PrintGroupTask(mship));
+        // return new VismoGroupService(t, new PrintGroupTask(mship));
+        return null;
     }
 }
