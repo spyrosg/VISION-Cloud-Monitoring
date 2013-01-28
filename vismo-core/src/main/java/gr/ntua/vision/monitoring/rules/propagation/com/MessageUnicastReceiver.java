@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Basic Message Unicast Receiver Thread
+ * 
  * @author tmessini
  */
 public class MessageUnicastReceiver extends Thread {
@@ -24,18 +25,19 @@ public class MessageUnicastReceiver extends Thread {
     /***/
     volatile boolean                stopped    = false;
     /***/
+    private Socket                  clientSocket;
+    /***/
     private RulesPropagationManager manager;
     /***/
+    private final int               serverPort = 10150;
+    /***/
     private ServerSocket            serverSocket;
-    /***/
-    private int                     serverPort = 10150;
-    /***/
-    private Socket                  clientSocket;
 
 
     /**
      * Shutdown the message receiver.
-     * @throws IOException 
+     * 
+     * @throws IOException
      */
     public final void halt() throws IOException {
         stopped = true;
@@ -60,7 +62,7 @@ public class MessageUnicastReceiver extends Thread {
             try {
                 clientSocket = serverSocket.accept();
                 clientSocket.setSoTimeout(500);
-                InputStream in = clientSocket.getInputStream();
+                final InputStream in = clientSocket.getInputStream();
                 final ObjectInputStream o_in = new ObjectInputStream(in);
                 final Message msg = (Message) o_in.readObject();
                 manager.getInQueue().addMessage(msg);
@@ -68,7 +70,8 @@ public class MessageUnicastReceiver extends Thread {
                 o_in.close();
             } catch (final Exception e) {
                 if (!stopped)
-                    log.debug("Error receiving message. " + e.getMessage() + ". Initial cause was " + e.getMessage(), e);
+                    MessageUnicastReceiver.log.debug("Error receiving message. " + e.getMessage() + ". Initial cause was "
+                                                             + e.getMessage(), e);
             }
     }
 

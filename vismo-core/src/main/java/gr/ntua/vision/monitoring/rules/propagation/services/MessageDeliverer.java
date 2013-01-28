@@ -46,7 +46,6 @@ public class MessageDeliverer extends Thread implements Observer {
         while (!isInterrupted())
             if (!manager.getDelQueue().isQEmpty()) {
                 deliveredMessage = manager.getDelQueue().getMessage();
-                // log.info(deliveredMessage.toString());
                 processDeliveredMessage(deliveredMessage);
             } else
                 synchronized (this) {
@@ -148,58 +147,9 @@ public class MessageDeliverer extends Thread implements Observer {
         if (type.equals(MessageType.RULES))
             if (manager.isElected())
                 manager.getClusterRuleStore().addNodeRuleSet(deliveredMessage.getRuleSet(), deliveredMessage.getUpdateDiff());
-        // log.info("rules message received from:"+deliveredMessage.getFromId()+":"+ ruleId);
 
         if (type.equals(MessageType.SET_RULES)) {
-            // /System.out.println(deliveredMessage.toString());
-            /*
-            if(deliveredMessage.getRuleSet()!=null)
-            if (deliveredMessage.getRuleSet().equals(manager.getRuleStore().getRulesMap()))
-            {
-                
-            }
-                //log.info(manager.getPid() + ": rules are synchronized with cluster");
-            else {
-                // we start the synchronization process
-                // remove what is inside
-                Iterator<Integer> iterDel = manager.getRuleStore().getRulesMap().keySet().iterator();
-                while (iterDel.hasNext()) {
-                    Integer key = iterDel.next();
-                    RuleProc<Event> ruleObject = getRule(manager.getRuleStore().getRule(key));
-                    if (ruleObject != null) {
-                        manager.getEngine().removeRule(ruleObject);
-                        manager.getRuleStore().deleteRule(key);
-                        checkEngineHealth();
-                    }
-                }
-                // make sure is empty
-                if (manager.getRuleStore().getRulesMap().size() == 0) {
-                    // put the rule set from elected host
-                    manager.getRuleStore().setRulesMap(deliveredMessage.getRuleSet());
-
-                    Iterator<Integer> iterPut = manager.getRuleStore().getRulesMap().keySet().iterator();
-                    while (iterPut.hasNext()) {
-                        Integer key = iterPut.next();
-
-                        RuleProc<Event> ruleObject = getRule(manager.getRuleStore().getRule(key));
-                        if (ruleObject != null) {
-                            ruleObject.submit();
-                            manager.getRuleStore().addRule(manager.getRuleStore().getRule(key), key);
-                            checkEngineHealth();
-                        }
-
-                    }
-                    
-                    //we try to synchronize the update
-                    manager.getRuleStore().setLastChanged(System.currentTimeMillis() - deliveredMessage.getUpdateDiff());
-                    
-                    //log.info(manager.getPid()+":Rules just Synchronized!");
-
-                }
-
-
-            }
-            */
+            // TODO
         }
 
     }

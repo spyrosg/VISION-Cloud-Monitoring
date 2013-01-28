@@ -1,4 +1,3 @@
-
 package gr.ntua.vision.monitoring.rules.propagation.com;
 
 import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;

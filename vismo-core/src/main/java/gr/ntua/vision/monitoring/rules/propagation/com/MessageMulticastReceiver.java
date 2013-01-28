@@ -71,11 +71,11 @@ public class MessageMulticastReceiver extends Thread {
                 } catch (final IOException e) {
                     if (!stopped)
                         MessageMulticastReceiver.log.debug("Error receiving message. " + e.getMessage() + ". Initial cause was "
-                                                          + e.getMessage(), e);
+                                + e.getMessage(), e);
                 }
         } catch (final Throwable t) {
-            MessageMulticastReceiver.log
-                    .debug("Message receiver thread caught throwable. Cause was " + t.getMessage() + ". Continuing...");
+            MessageMulticastReceiver.log.debug("Message receiver thread caught throwable. Cause was " + t.getMessage()
+                    + ". Continuing...");
         }
     }
 

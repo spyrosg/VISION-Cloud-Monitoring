@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-
 /**
  * @author tmessini
  */
@@ -22,14 +21,11 @@ public class MessageUnicastSender extends Thread implements Observer {
 
     /***/
     @SuppressWarnings("unused")
-    private final static Logger     log                   = LoggerFactory.getLogger(MessageUnicastSender.class);
+    private final static Logger     log     = LoggerFactory.getLogger(MessageUnicastSender.class);
     /***/
-    volatile boolean                stopped               = false;
+    volatile boolean                stopped = false;
     /***/
     private RulesPropagationManager manager;
-
-
-
 
 
     /**
@@ -51,10 +47,9 @@ public class MessageUnicastSender extends Thread implements Observer {
     @Override
     public void run() {
         while (!stopped)
-            if (!manager.getOutUnicastQueue().isQEmpty()) {
+            if (!manager.getOutUnicastQueue().isQEmpty())
                 sendMessage(manager.getOutQueue().getMessage());
-                   
-            } else
+            else
                 synchronized (this) {
                     try {
                         wait();
@@ -81,28 +76,26 @@ public class MessageUnicastSender extends Thread implements Observer {
     }
 
 
-
-
     /**
      * @param m
      */
     @SuppressWarnings("static-method")
-    private void sendMessage(final Message m) {   
-            try {                
-                Socket soc = new Socket();
-              
-                OutputStream os = soc.getOutputStream();
-                final ObjectOutputStream o_os = new ObjectOutputStream(os);
-                o_os.writeObject(m);
-                os.flush();
-                o_os.close();
-                os.close();
-                soc.close();
+    private void sendMessage(final Message m) {
+        try {
+            final Socket soc = new Socket();
 
-            } catch (final Exception e) {
-                e.printStackTrace();
-            }
-   
+            final OutputStream os = soc.getOutputStream();
+            final ObjectOutputStream o_os = new ObjectOutputStream(os);
+            o_os.writeObject(m);
+            os.flush();
+            o_os.close();
+            os.close();
+            soc.close();
+
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

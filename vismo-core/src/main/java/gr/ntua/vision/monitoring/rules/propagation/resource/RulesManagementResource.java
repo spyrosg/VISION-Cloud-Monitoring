@@ -26,7 +26,8 @@ public class RulesManagementResource {
     /***/
     private final RulesPropagationManager manager;
     /***/
-    private final MessageFactory messageFactory;
+    private final MessageFactory          messageFactory;
+
 
     /**
      * Constructor.
@@ -50,7 +51,7 @@ public class RulesManagementResource {
     public String RulesConfigurationDelete(@PathParam("id") final Integer id) {
         if (manager.getRuleStore().getRule(id) != null) {
             RulesManagementResource.log.info("removing rule: {}", id, ".");
-            messageFactory.createMessage(MessageType.DELETE_RULE, id);          
+            messageFactory.createMessage(MessageType.DELETE_RULE, id);
             manager.getOutQueue().addMessage(messageFactory.createMessage(MessageType.DELETE_RULE, id));
         }
         return "removing: " + id;
@@ -95,9 +96,10 @@ public class RulesManagementResource {
             @PathParam("desc") final String desc) {
         int commandId = 0;
         if (checkValidRule(name) && !manager.getRuleStore().containsRule(name + ":" + period + ":" + desc)) {
-            commandId=manager.getRandomID();
-            RulesManagementResource.log.info("configuring new rule: {}", name, ".");                                  
-            manager.getOutQueue().addMessage(messageFactory.createMessage(MessageType.ADD_RULE, commandId, name + ":" + period + ":" + desc));
+            commandId = manager.getRandomID();
+            RulesManagementResource.log.info("configuring new rule: {}", name, ".");
+            manager.getOutQueue().addMessage(messageFactory.createMessage(MessageType.ADD_RULE, commandId, name + ":" + period
+                                                     + ":" + desc));
         }
         return "adding rule: " + commandId + " " + name + ":" + period + ":" + desc;
     }
