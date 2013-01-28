@@ -1,22 +1,19 @@
-package gr.ntua.vision.monitoring.rules.propagation;
+package gr.ntua.vision.monitoring.threading;
 
-import gr.ntua.vision.monitoring.threading.PeriodicTask;
+import gr.ntua.vision.monitoring.rules.propagation.Message;
+import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
 
 import java.util.Iterator;
-import java.util.Timer;
 
 
 /**
  * @author tmessini
  */
 public class RulesPropagationWatchDog extends PeriodicTask {
-
     /***/
     private RulesPropagationManager manager;
     /***/
     private final long              maxtime = 10000;
-    /***/
-    private final long              period;
 
 
     /**
@@ -25,19 +22,16 @@ public class RulesPropagationWatchDog extends PeriodicTask {
      * @param period
      */
     public RulesPropagationWatchDog(final long period) {
-        this.period = period;
+        super(period);
     }
 
 
+    /**
+     * @see java.util.TimerTask#run()
+     */
     @Override
     public void run() {
         updateMessageMembership(maxtime);
-    }
-
-
-    @Override
-    public void scheduleWith(final Timer timer) {
-        timer.schedule(this, 0, period);
     }
 
 
