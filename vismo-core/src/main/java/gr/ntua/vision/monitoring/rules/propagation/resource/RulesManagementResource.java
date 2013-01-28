@@ -51,7 +51,6 @@ public class RulesManagementResource {
     public String RulesConfigurationDelete(@PathParam("id") final Integer id) {
         if (manager.getRuleStore().getRule(id) != null) {
             RulesManagementResource.log.info("removing rule: {}", id, ".");
-            messageFactory.createMessage(MessageType.DELETE_RULE, id);
             manager.getOutQueue().addMessage(messageFactory.createMessage(MessageType.DELETE_RULE, id));
         }
         return "removing: " + id;

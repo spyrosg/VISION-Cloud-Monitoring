@@ -38,7 +38,6 @@ public class WatchDog extends PeriodicTask {
 
     @Override
     public void run() {
-        // rulesSynchronization();
         discardMessages(maxtime);
     }
 
@@ -63,13 +62,6 @@ public class WatchDog extends PeriodicTask {
      * @param maxtime
      */
     private void discardMessages(final long maxtime) {
-        /*
-        log.info("message timestamp size: {}",manager.getMessageTimestamp().getSize());
-        log.info("message timestamp counter: {}",manager.getMessageCounter().getSize());
-        log.info("message timestamp outqueue: {}",manager.getOutQueue().getSize());
-        log.info("message timestamp size: {}",manager.getInQueue().getSize());
-        log.info("message timestamp size: {}",manager.getDelQueue().getSize());
-        */
         if (manager.getMessageTimestamp() != null) {
             final Iterator<Message> iterator = manager.getMessageTimestamp().keys().iterator();
             while (iterator.hasNext()) {
