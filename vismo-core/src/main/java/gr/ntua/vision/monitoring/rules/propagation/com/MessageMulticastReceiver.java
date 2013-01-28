@@ -1,4 +1,7 @@
-package gr.ntua.vision.monitoring.rules.propagation;
+package gr.ntua.vision.monitoring.rules.propagation.com;
+
+import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
+import gr.ntua.vision.monitoring.rules.propagation.message.Message;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -14,10 +17,10 @@ import org.slf4j.LoggerFactory;
 /**
  * @author tmessini
  */
-public class MessageReceiver extends Thread {
+public class MessageMulticastReceiver extends Thread {
 
     /***/
-    private final static Logger     log                   = LoggerFactory.getLogger(MessageReceiver.class);
+    private final static Logger     log                   = LoggerFactory.getLogger(MessageMulticastReceiver.class);
     /***/
     volatile boolean                stopped               = false;
     /***/
@@ -61,17 +64,17 @@ public class MessageReceiver extends Thread {
                     socket.receive(datagram);
                     final ObjectInputStream o_in = new ObjectInputStream(ba_is);
                     final Message msg = (Message) o_in.readObject();
-                    manager.getInQueue().addMessage(msg);
+                    manager.getDelQueue().addMessage(msg);
                     ba_is.close();
                     o_in.close();
 
                 } catch (final IOException e) {
                     if (!stopped)
-                        MessageReceiver.log.debug("Error receiving message. " + e.getMessage() + ". Initial cause was "
+                        MessageMulticastReceiver.log.debug("Error receiving message. " + e.getMessage() + ". Initial cause was "
                                                           + e.getMessage(), e);
                 }
         } catch (final Throwable t) {
-            MessageReceiver.log
+            MessageMulticastReceiver.log
                     .debug("Message receiver thread caught throwable. Cause was " + t.getMessage() + ". Continuing...");
         }
     }

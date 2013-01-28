@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring.rules.propagation;
+package gr.ntua.vision.monitoring.rules.propagation.message;
 
 /**
  * @author tmessini

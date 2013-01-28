@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring.rules.propagation;
+package gr.ntua.vision.monitoring.rules.propagation.message;
 
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -198,7 +198,7 @@ public class Message implements Serializable {
     @Override
     public String toString() {
         final String str = "fromId=" + fromId + "command=" + command + "type=" + type + "commandId=" + commandId + "groupSize="
-                + groupSize;
+                + groupSize+"nodeRuleSet:"+nodeRuleSet.toString();
 
         return str;
     }

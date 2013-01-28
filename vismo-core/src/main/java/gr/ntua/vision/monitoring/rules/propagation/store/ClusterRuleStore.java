@@ -1,7 +1,10 @@
-package gr.ntua.vision.monitoring.rules.propagation;
+package gr.ntua.vision.monitoring.rules.propagation.store;
 
-import java.util.Observable;
+
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -9,12 +12,19 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  * @author tmessini
  */
-public class ClusterRuleStore extends Observable {
+public class ClusterRuleStore {
+    /***/
+    @SuppressWarnings("unused")
+    private final static Logger                                               log = LoggerFactory
+                                                                                         .getLogger(ClusterRuleStore.class);
     /***/
     private final ConcurrentHashMap<ConcurrentHashMap<Integer, String>, Long> clusterRulesSetTimestamped;
 
 
-    /***/
+
+    /**
+     * Constructor
+     */
     public ClusterRuleStore() {
         clusterRulesSetTimestamped = new ConcurrentHashMap<ConcurrentHashMap<Integer, String>, Long>();
     }
@@ -25,12 +35,13 @@ public class ClusterRuleStore extends Observable {
      * @param updateDiff
      */
     public void addNodeRuleSet(final ConcurrentHashMap<Integer, String> nodeRuleSet, final long updateDiff) {
-        if (clusterRulesSetTimestamped.get(nodeRuleSet) == null)
+        if (clusterRulesSetTimestamped.get(nodeRuleSet) == null) {
             clusterRulesSetTimestamped.put(nodeRuleSet, updateDiff);
-        else {
+        } else {
             final long diff = clusterRulesSetTimestamped.get(nodeRuleSet);
-            if (updateDiff < diff)
+            if (updateDiff < diff) {
                 clusterRulesSetTimestamped.put(nodeRuleSet, updateDiff);
+            }
         }
     }
 
@@ -41,5 +52,15 @@ public class ClusterRuleStore extends Observable {
     public void clearClusterRuleStore() {
         clusterRulesSetTimestamped.clear();
     }
+    
+
+    /**
+     * @return clusterRulesSetTimestamped
+     */
+    public ConcurrentHashMap<ConcurrentHashMap<Integer, String>, Long> getClusterRuleStore(){
+        return clusterRulesSetTimestamped;
+    }
+
+
 
 }

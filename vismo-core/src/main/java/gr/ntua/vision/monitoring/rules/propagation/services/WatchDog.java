@@ -1,5 +1,7 @@
-package gr.ntua.vision.monitoring.rules.propagation;
+package gr.ntua.vision.monitoring.rules.propagation.services;
 
+import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
+import gr.ntua.vision.monitoring.rules.propagation.message.Message;
 import gr.ntua.vision.monitoring.threading.PeriodicTask;
 
 import java.util.Iterator;
@@ -12,10 +14,10 @@ import org.slf4j.LoggerFactory;
 /**
  * @author tmessini
  */
-public class RulesPropagationWatchDog extends PeriodicTask {
+public class WatchDog extends PeriodicTask {
 
     /***/
-    final Logger                    log     = LoggerFactory.getLogger(RulesPropagationWatchDog.class);
+    final Logger                    log     = LoggerFactory.getLogger(WatchDog.class);
     /***/
     private RulesPropagationManager manager;
     /***/
@@ -29,14 +31,14 @@ public class RulesPropagationWatchDog extends PeriodicTask {
      * 
      * @param period
      */
-    public RulesPropagationWatchDog(final long period) {
+    public WatchDog(final long period) {
         this.period = period;
     }
 
 
     @Override
     public void run() {
-        startRulesSynchronization();
+        // rulesSynchronization();
         discardMessages(maxtime);
     }
 
@@ -81,7 +83,6 @@ public class RulesPropagationWatchDog extends PeriodicTask {
                 }
             }
         }
-
     }
 
 
@@ -105,25 +106,6 @@ public class RulesPropagationWatchDog extends PeriodicTask {
     private boolean isActive(final long maxtime, final Message msg) {
         return getTimestampDelta(msg) < maxtime;
 
-    }
-
-
-    /**
-     * 
-     */
-    private void startRulesSynchronization() {
-        if (manager.isElected()) {
-
-            // we empty clusterStore before resolution attempt!
-            manager.getClusterRuleStore().clearClusterRuleStore();
-
-            final Message m = new Message();
-            m.setGroupSize(manager.getHeartbeatReceiver().getMembers().size());
-            m.setCommandId(manager.getRandomID());
-            m.setType(MessageType.GET_RULES);
-            m.setCommand("");
-            manager.getOutQueue().addMessage(m);
-        }
     }
 
 }

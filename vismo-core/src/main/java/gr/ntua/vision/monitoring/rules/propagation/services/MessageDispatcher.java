@@ -1,4 +1,7 @@
-package gr.ntua.vision.monitoring.rules.propagation;
+package gr.ntua.vision.monitoring.rules.propagation.services;
+
+import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
+import gr.ntua.vision.monitoring.rules.propagation.message.Message;
 
 import java.util.Observable;
 import java.util.Observer;

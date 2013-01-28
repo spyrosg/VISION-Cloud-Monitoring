@@ -1,4 +1,8 @@
-package gr.ntua.vision.monitoring.rules.propagation;
+package gr.ntua.vision.monitoring.rules.propagation.resource;
+
+import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
+import gr.ntua.vision.monitoring.rules.propagation.message.MessageFactory;
+import gr.ntua.vision.monitoring.rules.propagation.message.MessageType;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -21,7 +25,8 @@ public class RulesManagementResource {
     private static final Logger           log = LoggerFactory.getLogger(RulesManagementResource.class);
     /***/
     private final RulesPropagationManager manager;
-
+    /***/
+    private final MessageFactory messageFactory;
 
     /**
      * Constructor.
@@ -30,6 +35,8 @@ public class RulesManagementResource {
      */
     public RulesManagementResource(final RulesPropagationManager manager) {
         this.manager = manager;
+        messageFactory = new MessageFactory(manager);
+
     }
 
 
@@ -43,12 +50,8 @@ public class RulesManagementResource {
     public String RulesConfigurationDelete(@PathParam("id") final Integer id) {
         if (manager.getRuleStore().getRule(id) != null) {
             RulesManagementResource.log.info("removing rule: {}", id, ".");
-            final Message m = new Message();
-            m.setGroupSize(manager.getHeartbeatReceiver().getMembers().size());
-            m.setCommandId(id);
-            m.setType(MessageType.DELETE_RULE);
-            m.setCommand(manager.getRuleStore().getRule(id));
-            manager.getOutQueue().addMessage(m);
+            messageFactory.createMessage(MessageType.DELETE_RULE, id);          
+            manager.getOutQueue().addMessage(messageFactory.createMessage(MessageType.DELETE_RULE, id));
         }
         return "removing: " + id;
     }
@@ -92,14 +95,9 @@ public class RulesManagementResource {
             @PathParam("desc") final String desc) {
         int commandId = 0;
         if (checkValidRule(name) && !manager.getRuleStore().containsRule(name + ":" + period + ":" + desc)) {
-            commandId = manager.getRandomID();
-            RulesManagementResource.log.info("configuring new rule: {}", name, ".");
-            final Message m = new Message();
-            m.setGroupSize(manager.getHeartbeatReceiver().getMembers().size());
-            m.setCommandId(commandId);
-            m.setType(MessageType.ADD_RULE);
-            m.setCommand(name + ":" + period + ":" + desc);
-            manager.getOutQueue().addMessage(m);
+            commandId=manager.getRandomID();
+            RulesManagementResource.log.info("configuring new rule: {}", name, ".");                                  
+            manager.getOutQueue().addMessage(messageFactory.createMessage(MessageType.ADD_RULE, commandId, name + ":" + period + ":" + desc));
         }
         return "adding rule: " + commandId + " " + name + ":" + period + ":" + desc;
     }

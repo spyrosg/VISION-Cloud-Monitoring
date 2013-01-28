@@ -1,4 +1,8 @@
-package gr.ntua.vision.monitoring.rules.propagation;
+
+package gr.ntua.vision.monitoring.rules.propagation.com;
+
+import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
+import gr.ntua.vision.monitoring.rules.propagation.message.Message;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,10 +21,10 @@ import org.slf4j.LoggerFactory;
 /**
  * @author tmessini
  */
-public class MessageSender extends Thread implements Observer {
+public class MessageMulticastSender extends Thread implements Observer {
 
     /***/
-    private final static Logger     log                   = LoggerFactory.getLogger(MessageSender.class);
+    private final static Logger     log                   = LoggerFactory.getLogger(MessageMulticastSender.class);
     /***/
     volatile boolean                stopped               = false;
     /***/
@@ -78,7 +82,7 @@ public class MessageSender extends Thread implements Observer {
         while (!stopped)
             if (!manager.getOutQueue().isQEmpty()) {
                 if (!BMulticastMessage(manager.getOutQueue().getMessage()))
-                    MessageSender.log.info("ID#" + manager.getPid() + "\tMULTICAST\t" + "FAILED");
+                    MessageMulticastSender.log.info("ID#" + manager.getPid() + "\tMULTICAST\t" + "FAILED");
             } else
                 synchronized (this) {
                     try {

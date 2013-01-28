@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring.rules.propagation;
+package gr.ntua.vision.monitoring.rules.propagation.store;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,7 +19,7 @@ public class NodeRuleStore {
     /***/
     private long                                     lastChanged = 0;
     /***/
-    private final ConcurrentHashMap<Integer, String> rulesNum;
+    private ConcurrentHashMap<Integer, String> rulesNum;
 
 
     /**
@@ -80,7 +80,7 @@ public class NodeRuleStore {
      * @param id
      * @return String
      */
-    public String getRule(final int id) {
+    public String getRule(final Integer id) {
         return rulesNum.get(id);
     }
 
@@ -110,6 +110,14 @@ public class NodeRuleStore {
      */
     public ConcurrentHashMap<Integer, String> getRulesMap() {
         return rulesNum;
+    }
+    
+
+    /**
+     * @param map
+     */
+    public  void setRulesMap(ConcurrentHashMap<Integer, String> map ) {
+        rulesNum=map;
     }
 
 

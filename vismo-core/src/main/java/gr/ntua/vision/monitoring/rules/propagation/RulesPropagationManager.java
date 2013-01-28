@@ -3,6 +3,18 @@ package gr.ntua.vision.monitoring.rules.propagation;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatReceiver;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatSender;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
+import gr.ntua.vision.monitoring.rules.propagation.com.MessageMulticastReceiver;
+import gr.ntua.vision.monitoring.rules.propagation.com.MessageMulticastSender;
+import gr.ntua.vision.monitoring.rules.propagation.message.MessageMap;
+import gr.ntua.vision.monitoring.rules.propagation.message.MessageQueue;
+import gr.ntua.vision.monitoring.rules.propagation.resource.RulesManagementResource;
+import gr.ntua.vision.monitoring.rules.propagation.services.ClusterRulesResolver;
+import gr.ntua.vision.monitoring.rules.propagation.services.Elector;
+import gr.ntua.vision.monitoring.rules.propagation.services.MessageDeliverer;
+import gr.ntua.vision.monitoring.rules.propagation.services.MessageDispatcher;
+import gr.ntua.vision.monitoring.rules.propagation.services.WatchDog;
+import gr.ntua.vision.monitoring.rules.propagation.store.ClusterRuleStore;
+import gr.ntua.vision.monitoring.rules.propagation.store.NodeRuleStore;
 import gr.ntua.vision.monitoring.web.WebServer;
 
 import java.io.IOException;
@@ -22,15 +34,11 @@ public class RulesPropagationManager extends Thread {
     @SuppressWarnings("unused")
     private final static Logger            log                      = LoggerFactory.getLogger(RulesPropagationManager.class);
     /***/
-    private final ClusterRuleStore         clusterRuleStore;
-    /***/
     private final MessageDeliverer         deliverer                = new MessageDeliverer();
     /***/
     private final MessageQueue             delQueue;
     /***/
     private final MessageDispatcher        dispatcher               = new MessageDispatcher();
-    /***/
-    private final Elector                  elector;
     /***/
     private final String                   HEARTBEAT_MULTICAST_IP   = "224.0.0.1";
     /***/
@@ -44,26 +52,34 @@ public class RulesPropagationManager extends Thread {
     /***/
     private final MessageMap               messageCounter           = new MessageMap();
     /***/
-    private final MessageReceiver          messageReceiver          = new MessageReceiver();
+    private final MessageMulticastReceiver          messageReceiver          = new MessageMulticastReceiver();
     /***/
-    private final MessageSender            messageSender            = new MessageSender();
+    private final MessageMulticastSender            messageSender            = new MessageMulticastSender();
     /***/
     private final MessageMap               messageTimestamp         = new MessageMap();
     /***/
-    private final RulesPropagationWatchDog messageWatchdog;
+    private final WatchDog messageWatchdog;
     /***/
-    private final MessageQueue             outputQueue;
+    private final MessageQueue             outQueue;
+    /***/
+    private final MessageQueue             outUnicastQueue;
     /***/
     private Integer                        pid;
     /***/
-    private final NodeRuleStore            ruleStore;
+    private final NodeRuleStore                ruleStore;
+    /***/
+    private final ClusterRuleStore              clusterRuleStore;
     /***/
     private int                            size;
     /***/
     private final VismoRulesEngine         vismoRulesEngine;
     /***/
-    private final WebServer                webServer;
-
+    private final WebServer           webServer;
+    /***/
+    private final Elector elector;
+    /***/
+    private final ClusterRulesResolver clusterRulesResolver = new ClusterRulesResolver(20000, this);
+    
 
     /**
      * @param engine
@@ -81,7 +97,7 @@ public class RulesPropagationManager extends Thread {
         heartbeatReceiver = new HeartbeatReceiver(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT);
         heartbeatSender = new HeartbeatSender(InetAddress.getByName(HEARTBEAT_MULTICAST_IP), HEARTBEAT_MULTICAST_PORT, 1,
                 getPid());
-        messageWatchdog = new RulesPropagationWatchDog(10000);
+        messageWatchdog = new WatchDog(10000);
 
         messageReceiver.setManager(this);
         messageSender.setManager(this);
@@ -89,25 +105,18 @@ public class RulesPropagationManager extends Thread {
         deliverer.setManager(this);
         messageWatchdog.setManager(this);
 
+
+
         inputQueue = new MessageQueue();
-        outputQueue = new MessageQueue();
+        outQueue = new MessageQueue();
         delQueue = new MessageQueue();
+        outUnicastQueue = new MessageQueue();
 
         inputQueue.addObserver(dispatcher);
-        outputQueue.addObserver(messageSender);
+        outQueue.addObserver(messageSender);
         delQueue.addObserver(deliverer);
-
-        elector = new Elector(this);
-    }
-
-
-    /**
-     * common place to store cluster rules
-     * 
-     * @return ruleStore
-     */
-    public ClusterRuleStore getClusterRuleStore() {
-        return clusterRuleStore;
+        
+        elector = new  Elector(this);
     }
 
 
@@ -129,12 +138,18 @@ public class RulesPropagationManager extends Thread {
 
 
     /**
-     * @return the heart beat receiver
+     * @return the  heart beat receiver
      */
     public HeartbeatReceiver getHeartbeatReceiver() {
         return heartbeatReceiver;
     }
 
+    /**
+     * @return resolver
+     */
+    public ClusterRulesResolver getClusterRulesResolver(){
+        return clusterRulesResolver;
+    }
 
     /**
      * @return the input queue.
@@ -142,6 +157,9 @@ public class RulesPropagationManager extends Thread {
     public MessageQueue getInQueue() {
         return inputQueue;
     }
+
+
+
 
 
     /**
@@ -164,13 +182,12 @@ public class RulesPropagationManager extends Thread {
      * @return the output queue.
      */
     public MessageQueue getOutQueue() {
-        return outputQueue;
+        return outQueue;
     }
 
 
     /**
      * returns the unique id of the node
-     * 
      * @return id
      */
     public Integer getPid() {
@@ -187,6 +204,14 @@ public class RulesPropagationManager extends Thread {
         return Integer.valueOf(randomGenerator.nextInt(100000) + 100000);
     }
 
+    /**
+     * returns whether pid is elected
+     * @return whether the node is elected
+     */
+    public boolean isElected()
+    {
+        return elector.isElected();
+    }
 
     /**
      * common place to store rules
@@ -195,6 +220,15 @@ public class RulesPropagationManager extends Thread {
      */
     public NodeRuleStore getRuleStore() {
         return ruleStore;
+    }
+
+    /**
+     * common place to store cluster rules
+     * 
+     * @return ruleStore
+     */
+    public ClusterRuleStore getClusterRuleStore() {
+        return clusterRuleStore;
     }
 
 
@@ -220,33 +254,25 @@ public class RulesPropagationManager extends Thread {
             heartbeatSender.halt();
             messageWatchdog.cancel();
             elector.cancel();
+            clusterRulesResolver.cancel();
         } catch (final IllegalArgumentException e) {
             e.printStackTrace();
-        } catch (final Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
 
-    /**
-     * returns whether pid is elected
-     * 
-     * @return whether the node is elected
-     */
-    public boolean isElected() {
-        return elector.isElected();
-    }
-
-
     @Override
     public void run() {
-        while (true)
+        while (true) {
             try {
                 Thread.sleep(100000);
             } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
-        // TODO
+            //TODO           
+        }
     }
 
 
@@ -272,10 +298,19 @@ public class RulesPropagationManager extends Thread {
             heartbeatSender.init();
             messageWatchdog.scheduleWith(new Timer());
             elector.scheduleWith(new Timer());
+            clusterRulesResolver.scheduleWith(new Timer());
         } catch (final Throwable x) {
             throw new RuntimeException(x);
         }
 
         super.start();
+    }
+
+
+    /**
+     * @return messageQueue
+     */
+    public MessageQueue getOutUnicastQueue() {
+        return outUnicastQueue;
     }
 }
