@@ -197,9 +197,10 @@ public class Message implements Serializable {
 
     @Override
     public String toString() {
-        final String str = "fromId=" + fromId + "command=" + command + "type=" + type + "commandId=" + commandId + "groupSize="
-                + groupSize+"nodeRuleSet:"+nodeRuleSet.toString();
-
+        String str = "fromId=" + fromId + "command=" + command + "type=" + type + "commandId=" + commandId+ "groupSize="
+                + groupSize;
+        if (nodeRuleSet!=null)
+            str = str +"nodeRuleSet:"+nodeRuleSet.toString();
         return str;
     }
 
