@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 
 /**
- *
+ * This is used to pass notifications received from the vismo group to registered listeners.
  */
 public class VismoGroupServer extends GroupServer {
     /** the listeners to notify. */

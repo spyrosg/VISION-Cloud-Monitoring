@@ -5,7 +5,10 @@ package gr.ntua.vision.monitoring.mon;
  */
 public interface GroupProc {
     /**
+     * Apply the operation to the member.
+     * 
      * @param member
+     *            the member.
      */
-    void performWith(final GroupElement member);
+    void applyTo(GroupElement member);
 }
