@@ -8,6 +8,7 @@ import gr.ntua.vision.monitoring.rules.propagation.message.Message;
 import gr.ntua.vision.monitoring.rules.propagation.message.MessageFactory;
 import gr.ntua.vision.monitoring.rules.propagation.message.MessageType;
 
+import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -30,7 +31,7 @@ public class MessageDeliverer extends Thread implements Observer {
 
 
     /**
-     * 
+     * stopping the thread
      */
     public void halt() {
         interrupt();
@@ -147,11 +148,29 @@ public class MessageDeliverer extends Thread implements Observer {
         if (type.equals(MessageType.RULES))
             if (manager.isElected())
                 manager.getClusterRuleStore().addNodeRuleSet(deliveredMessage.getRuleSet(), deliveredMessage.getUpdateDiff());
-
-        if (type.equals(MessageType.SET_RULES)) {
-            // TODO
-        }
-
+        if (type.equals(MessageType.SET_RULES))
+            if (deliveredMessage.getRuleSet() != null)
+                if (!deliveredMessage.getRuleSet().equals(manager.getRuleStore().getRulesMap())) {
+                    final Iterator<Integer> iterDel = manager.getRuleStore().getRulesMap().keySet().iterator();
+                    while (iterDel.hasNext()) {
+                        final Integer key = iterDel.next();
+                        final RuleProc<Event> ruleObject = getRule(manager.getRuleStore().getRule(key));
+                        if (ruleObject != null) {
+                            manager.getEngine().removeRule(ruleObject);
+                            manager.getRuleStore().deleteRule(key, false);
+                            checkEngineHealth();
+                        }
+                    }
+                    manager.getRuleStore().setRulesMap(deliveredMessage.getRuleSet());
+                    final Iterator<Integer> iterPut = deliveredMessage.getRuleSet().keySet().iterator();
+                    while (iterPut.hasNext()) {
+                        final Integer key = iterPut.next();
+                        final RuleProc<Event> ruleObject = getRule(manager.getRuleStore().getRule(key));
+                        if (ruleObject != null) {
+                            ruleObject.submit();
+                            checkEngineHealth();
+                        }
+                    }
+                }
     }
-
 }

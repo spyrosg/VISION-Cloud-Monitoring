@@ -15,9 +15,9 @@ public class NodeRuleStore {
 
     /***/
     @SuppressWarnings("unused")
-    private static final Logger                      log         = LoggerFactory.getLogger(NodeRuleStore.class);
+    private static final Logger                log         = LoggerFactory.getLogger(NodeRuleStore.class);
     /***/
-    private long                                     lastChanged = 0;
+    private long                               lastChanged = 0;
     /***/
     private ConcurrentHashMap<Integer, String> rulesNum;
 
@@ -43,6 +43,20 @@ public class NodeRuleStore {
 
 
     /**
+     * stores the rule.
+     * 
+     * @param rule
+     * @param randomID
+     * @param updateTimestamp
+     */
+    public void addRule(final String rule, final Integer randomID, final boolean updateTimestamp) {
+        rulesNum.put(randomID, rule);
+        if (updateTimestamp)
+            setLastChanged(Long.valueOf(System.currentTimeMillis()));
+    }
+
+
+    /**
      * return if the rule is there or not
      * 
      * @param rule
@@ -61,6 +75,20 @@ public class NodeRuleStore {
     public void deleteRule(final Integer ruleId) {
         rulesNum.remove(ruleId);
         setLastChanged(Long.valueOf(System.currentTimeMillis()));
+    }
+
+
+    /**
+     * removes the rule.
+     * 
+     * @param ruleId
+     *           
+     * @param updateTimestamp 
+     */
+    public void deleteRule(final Integer ruleId, final boolean updateTimestamp) {
+        rulesNum.remove(ruleId);
+        if (updateTimestamp)
+            setLastChanged(Long.valueOf(System.currentTimeMillis()));
     }
 
 
@@ -111,14 +139,6 @@ public class NodeRuleStore {
     public ConcurrentHashMap<Integer, String> getRulesMap() {
         return rulesNum;
     }
-    
-
-    /**
-     * @param map
-     */
-    public  void setRulesMap(ConcurrentHashMap<Integer, String> map ) {
-        rulesNum=map;
-    }
 
 
     /**
@@ -128,6 +148,14 @@ public class NodeRuleStore {
      */
     public void setLastChanged(final long lastChanged) {
         this.lastChanged = lastChanged;
+    }
+
+
+    /**
+     * @param map
+     */
+    public void setRulesMap(final ConcurrentHashMap<Integer, String> map) {
+        rulesNum = map;
     }
 
 }
