@@ -1,32 +1,33 @@
 package gr.ntua.vision.monitoring.mon;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 
 /**
- * A {@link GroupMembership} is just a collection of {@link GroupElement}s, where these elements are maintained for a predefined
- * period of time before being removed.
+ * A {@link GroupMembership} is just a collection of {@link GroupElement}s, where there are maintained for a predefined period,
+ * before being removed. If a newer (more up-to-date) element comes in where an older one exists, the older one is removed and its
+ * place taken by the new arrival.
  */
 public class GroupMembership {
-    /** the expiration period for group membership. */
-    private final long              expirationPeriod;
+    /** the expiration period for group membership, specified in millies. */
+    private final long                         expirationPeriod;
     /** the actual group. */
-    private final Set<GroupElement> set;
+    private final Map<GroupElement, TimerTask> members;
     /** the timer used to schedule removals */
-    private final Timer             timer = new Timer(true);
+    private final Timer                        timer = new Timer(true);
 
 
     /**
      * Constructor.
      * 
      * @param expirationPeriod
-     *            the expiration period for group membership.
+     *            the expiration period for group membership, specified in millies.
      */
     public GroupMembership(final long expirationPeriod) {
-        this(expirationPeriod, new LinkedHashSet<GroupElement>());
+        this(expirationPeriod, new HashMap<GroupElement, TimerTask>());
     }
 
 
@@ -34,25 +35,29 @@ public class GroupMembership {
      * Constructor.
      * 
      * @param expirationPeriod
-     *            the expiration period for group membership.
-     * @param set
-     *            a group elements set.
+     *            the expiration period for group membership, specified in millies.
+     * @param members
+     *            a group's members.
      */
-    public GroupMembership(final long expirationPeriod, final Set<GroupElement> set) {
+    public GroupMembership(final long expirationPeriod, final Map<GroupElement, TimerTask> members) {
         this.expirationPeriod = expirationPeriod;
-        this.set = set;
+        this.members = members;
     }
 
 
     /**
-     * Add an element to the group, if it is not already contained in the group.
+     * Add an element to the group. If an identical already exists, this is an update operation (i.e. it removes the old element
+     * and adds the new one).
      * 
      * @param elem
      *            the element.
      */
     public void add(final GroupElement elem) {
-        if (set.add(elem))
-            scheduleRemoval(elem);
+        if (members.containsKey(elem)) { // an identical element already exists
+            removeById(elem);
+            addById(elem);
+        } else
+            addById(elem);
     }
 
 
@@ -64,28 +69,53 @@ public class GroupMembership {
      *            the action to apply.
      */
     public void forEach(final GroupProc proc) {
-        for (final GroupElement member : set)
+        for (final GroupElement member : members.keySet())
             proc.applyTo(member);
     }
 
 
     /**
-     * @param elem
+     * Remove the member from the group. Cancel its timer.
+     * 
+     * @param member
+     *            the member.
      */
-    void remove(final GroupElement elem) {
-        set.remove(elem);
+    void removeById(final GroupElement member) {
+        final TimerTask task = members.remove(member);
+
+        task.cancel();
     }
 
 
     /**
+     * Add a new member to the group. Schedule its removal.
+     * 
      * @param elem
+     *            the element.
      */
-    private void scheduleRemoval(final GroupElement elem) {
-        timer.schedule(new TimerTask() {
+    private void addById(final GroupElement elem) {
+        final TimerTask task = removalTask(members, elem);
+
+        members.put(elem, task);
+        timer.schedule(task, expirationPeriod);
+    }
+
+
+    /**
+     * Get a timer task for removing an element from a map.
+     * 
+     * @param map
+     *            the map to remove from.
+     * @param elem
+     *            the element to remove.
+     * @return a {@link TimerTask}.
+     */
+    private static TimerTask removalTask(final Map<GroupElement, TimerTask> map, final GroupElement elem) {
+        return new TimerTask() {
             @Override
             public void run() {
-                remove(elem);
+                map.remove(elem);
             }
-        }, expirationPeriod);
+        };
     }
 }
