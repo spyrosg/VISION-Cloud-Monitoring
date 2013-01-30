@@ -84,6 +84,18 @@ public abstract class PropertiesConfiguration {
 
 
     /**
+     * Get the value for the given property name as a long.
+     * 
+     * @param name
+     *            the property name.
+     * @return the value of the property name.
+     */
+    protected long getAsLong(final String name) {
+        return Long.valueOf(get(name));
+    }
+
+
+    /**
      * Update the value for the given property name.
      * 
      * @param name
