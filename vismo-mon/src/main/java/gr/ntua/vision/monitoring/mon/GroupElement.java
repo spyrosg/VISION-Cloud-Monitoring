@@ -5,14 +5,12 @@ import java.util.Date;
 
 
 /**
- * A {@link GroupElement} may be member of a {@link GroupMembership}. Each element can be distinguished by its inet address, its
- * identifier and its time-stamp.
+ * A {@link GroupElement} may be member of a {@link GroupMembership}. Elements are value objects that can be uniquely identified
+ * by their inet address.
  */
 public class GroupElement {
-    /** the address. */
+    /** the element's address. */
     private final InetAddress addr;
-    /** the id. */
-    private final String      id;
     /** when was this element last updated (in milliseconds since the epoch)? */
     private final long        lastUpdated;
 
@@ -20,28 +18,23 @@ public class GroupElement {
     /**
      * Constructor.
      * 
-     * @param id
-     *            the id.
      * @param addr
-     *            the address.
+     *            the element's address.
      */
-    public GroupElement(final String id, final InetAddress addr) {
-        this(id, addr, System.currentTimeMillis());
+    public GroupElement(final InetAddress addr) {
+        this(addr, System.currentTimeMillis());
     }
 
 
     /**
      * Constructor.
      * 
-     * @param id
-     *            the id.
      * @param addr
      *            the address.
      * @param lastUpdated
-     *            when was this element last updated (in milliseconds since the epoch)?
+     *            when was this element last updated? (in milliseconds since the epoch)
      */
-    public GroupElement(final String id, final InetAddress addr, final long lastUpdated) {
-        this.id = id;
+    public GroupElement(final InetAddress addr, final long lastUpdated) {
         this.addr = addr;
         this.lastUpdated = lastUpdated;
     }
@@ -56,20 +49,13 @@ public class GroupElement {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof GroupElement))
             return false;
         final GroupElement other = (GroupElement) obj;
         if (addr == null) {
             if (other.addr != null)
                 return false;
         } else if (!addr.equals(other.addr))
-            return false;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        if (lastUpdated != other.lastUpdated)
             return false;
         return true;
     }
@@ -83,8 +69,6 @@ public class GroupElement {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((addr == null) ? 0 : addr.hashCode());
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + (int) (lastUpdated ^ (lastUpdated >>> 32));
         return result;
     }
 
@@ -94,7 +78,7 @@ public class GroupElement {
      */
     @Override
     public String toString() {
-        return "#<GroupElement: " + id + " @ " + addr.getHostAddress() + " (updated " + toDate(lastUpdated) + ")>";
+        return "#<GroupElement: " + addr.getHostAddress() + " (updated " + toDate(lastUpdated) + ")>";
     }
 
 

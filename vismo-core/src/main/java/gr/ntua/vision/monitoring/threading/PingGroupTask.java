@@ -43,12 +43,11 @@ public class PingGroupTask extends PeriodicTask {
      */
     @Override
     public void run() {
-        log.debug("contacting group");
-
         try {
-            client.notifyGroup(this + ":" + vminfo.getAddress().getHostAddress());
+            client.notifyGroup(vminfo.getAddress().getHostAddress());
         } catch (final IOException e) {
             log.error("unable to contact group", e);
+            // move on
         }
     }
 }

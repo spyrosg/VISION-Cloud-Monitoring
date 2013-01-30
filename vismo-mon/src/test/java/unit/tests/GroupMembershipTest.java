@@ -31,7 +31,7 @@ public class GroupMembershipTest {
      */
     @Test
     public void afterExpirationMemberShouldBeenRemoved() throws UnknownHostException {
-        final GroupElement m = new GroupElement("1", InetAddress.getLocalHost(), System.currentTimeMillis());
+        final GroupElement m = new GroupElement(InetAddress.getLocalHost());
 
         mship.add(m);
         assertEquals(1, set.size());
@@ -44,7 +44,7 @@ public class GroupMembershipTest {
      */
     @Test
     public void membershipShouldSupportUniqueMembers() throws UnknownHostException, InterruptedException {
-        final GroupElement m = new GroupElement("1", InetAddress.getLocalHost(), System.currentTimeMillis());
+        final GroupElement m = new GroupElement(InetAddress.getLocalHost());
 
         mship.add(m);
         mship.add(m);

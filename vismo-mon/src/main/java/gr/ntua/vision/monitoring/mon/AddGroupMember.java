@@ -28,19 +28,6 @@ public class AddGroupMember implements GroupNotification {
 
 
     /**
-     * @param s
-     * @return a {@link GroupElement}.
-     * @throws UnknownHostException
-     */
-    @SuppressWarnings("static-method")
-    public GroupElement buildFromString(final String s) throws UnknownHostException {
-        final String[] fields = s.split(":");
-
-        return new GroupElement(fields[0], InetAddress.getByName(fields[1]));
-    }
-
-
-    /**
      * @see gr.ntua.vision.monitoring.mon.GroupNotification#pass(java.lang.String)
      */
     @Override
@@ -52,5 +39,16 @@ public class AddGroupMember implements GroupNotification {
         } catch (final UnknownHostException e) {
             log.error("cannot parse notification: " + str, e);
         }
+    }
+
+
+    /**
+     * @param s
+     * @return a {@link GroupElement}.
+     * @throws UnknownHostException
+     */
+    @SuppressWarnings("static-method")
+    private GroupElement buildFromString(final String s) throws UnknownHostException {
+        return new GroupElement(InetAddress.getByName(s));
     }
 }
