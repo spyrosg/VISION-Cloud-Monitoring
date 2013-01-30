@@ -85,7 +85,7 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
     protected void addDefaultServiceTasks(final VismoService service, final VMInfo vminfo) throws UnknownHostException {
         log.debug("adding default tasks");
         service.addTask(new JVMStatusReportTask(ONE_MINUTE));
-        service.addTask(new PingGroupTask(conf, vminfo, ONE_MINUTE));
+        service.addTask(new PingGroupTask(conf, vminfo));
     }
 
 

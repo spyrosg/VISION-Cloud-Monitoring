@@ -29,12 +29,10 @@ public class PingGroupTask extends PeriodicTask {
      * @param conf
      *            the configuration object.
      * @param vminfo
-     * @param period
-     *            the task's period.
      * @throws UnknownHostException
      */
-    public PingGroupTask(final VismoConfiguration conf, final VMInfo vminfo, final long period) throws UnknownHostException {
-        super(period);
+    public PingGroupTask(final VismoConfiguration conf, final VMInfo vminfo) throws UnknownHostException {
+        super(conf.getMonPingPeriod());
         this.client = new VismoGroupClient(conf);
         this.vminfo = vminfo;
     }
