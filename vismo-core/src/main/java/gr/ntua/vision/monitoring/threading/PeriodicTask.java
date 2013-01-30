@@ -8,7 +8,7 @@ import java.util.TimerTask;
  * This task represents calculations that happen periodically.
  */
 public abstract class PeriodicTask extends TimerTask {
-    /** the task's period. */
+    /** the task's period, specified in millies. */
     private final long period;
 
 
@@ -16,7 +16,7 @@ public abstract class PeriodicTask extends TimerTask {
      * Constructor.
      * 
      * @param period
-     *            the task's period.
+     *            the task's period, in millies.
      */
     public PeriodicTask(final long period) {
         this.period = period;

@@ -131,7 +131,7 @@ public class VismoConfiguration extends PropertiesConfiguration {
 
 
     /**
-     * @return the multicast group ping period.
+     * @return the multicast group ping period, in millies.
      */
     public long getMonPingPeriod() {
         return getAsLong(MON_PING_PERIOD_PROPERTY);
