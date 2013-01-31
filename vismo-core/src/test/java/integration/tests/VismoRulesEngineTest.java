@@ -8,7 +8,6 @@ import gr.ntua.vision.monitoring.rules.PeriodicRule;
 import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
-import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sinks.EventSinks;
 import gr.ntua.vision.monitoring.sources.EventSource;
 import gr.ntua.vision.monitoring.sources.EventSourceListener;
@@ -172,43 +171,6 @@ public class VismoRulesEngineTest {
         @Override
         public String toString() {
             return "#<IncRule: " + key + ">";
-        }
-    }
-
-
-    /**
-     * 
-     */
-    private static class InMemoryEventSink implements EventSink {
-        /***/
-        private final ArrayList<MonitoringEvent> eventStore;
-
-
-        /**
-         * Constructor.
-         * 
-         * @param eventStore
-         */
-        public InMemoryEventSink(final ArrayList<MonitoringEvent> eventStore) {
-            this.eventStore = eventStore;
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.sinks.EventSink#send(gr.ntua.vision.monitoring.events.MonitoringEvent)
-         */
-        @Override
-        public void send(final MonitoringEvent e) {
-            eventStore.add(e);
-        }
-
-
-        /**
-         * @see java.lang.Object#toString()
-         */
-        @Override
-        public String toString() {
-            return "#<InMemoryEventSink: " + eventStore + ">";
         }
     }
 
