@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring.events;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -10,8 +11,7 @@ import java.util.Map;
  */
 public class VismoEvent implements MonitoringEvent {
     /** the dictionary of key/values. */
-    @SuppressWarnings("rawtypes")
-    private final Map dict;
+    private final Map<String, Object> dict;
 
 
     /**
@@ -20,8 +20,9 @@ public class VismoEvent implements MonitoringEvent {
      * @param dict
      *            a dictionary of key/values.
      */
+    @SuppressWarnings("unchecked")
     protected VismoEvent(@SuppressWarnings("rawtypes") final Map dict) {
-        this.dict = dict;
+        this.dict = new HashMap<String, Object>(dict);
     }
 
 
@@ -90,12 +91,12 @@ public class VismoEvent implements MonitoringEvent {
 
 
     /**
+     * Update the key with given value in the event.
+     * 
      * @param key
      * @param value
-     * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
-    @SuppressWarnings("unchecked")
-    protected void put(final Object key, final Object value) {
+    protected void put(final String key, final Object value) {
         dict.put(key, value);
     }
 }
