@@ -54,7 +54,7 @@ public class MessageDispatcher extends Thread implements Observer {
                     try {
                         wait();
                     } catch (final InterruptedException e) {
-                        e.printStackTrace();
+                        // TODO
                     }
                 }
     }
