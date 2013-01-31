@@ -4,74 +4,145 @@ import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
 import gr.ntua.vision.monitoring.sinks.EventSinks;
+import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
+import gr.ntua.vision.monitoring.sources.InMemoryEventSource;
 
-import java.io.IOException;
 import java.util.ArrayList;
+
+import javax.ws.rs.core.MediaType;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 
 
 /**
  * @author tmessini
  */
-public class RulesPropagationTest1 {
+public class RulesPropagationSimpleTest {
 
     /***/
-    private final static InMemoryEventSource source = new InMemoryEventSource();
+    private static final int                 PORT     = 9998;
+    /***/
+    private static final String              ROOT_URL = "http://localhost:" + RulesPropagationSimpleTest.PORT;
+    /***/
+    private final static InMemoryEventSource source   = new InMemoryEventSource();
     /** this is where the events should end up. */
-    private final static ArrayList<Event>    store  = new ArrayList<Event>();
+    private final static ArrayList<Event>    store    = new ArrayList<Event>();
+    /***/
+    final VismoRulesEngine                   engine1  = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(
+                                                              RulesPropagationSimpleTest.store)));
+    /***/
+    final VismoRulesEngine                   engine10 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(
+                                                              RulesPropagationSimpleTest.store)));
+    /***/
+    final VismoRulesEngine                   engine11 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(
+                                                              RulesPropagationSimpleTest.store)));
+    /***/
+    final VismoRulesEngine                   engine12 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(
+                                                              RulesPropagationSimpleTest.store)));
+    /***/
+    final VismoRulesEngine                   engine13 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(
+                                                              RulesPropagationSimpleTest.store)));
+    /***/
+    final VismoRulesEngine                   engine14 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(
+                                                              RulesPropagationSimpleTest.store)));
+    /***/
+    final VismoRulesEngine                   engine15 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(
+                                                              RulesPropagationSimpleTest.store)));
+    /***/
+    final VismoRulesEngine                   engine2  = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(
+                                                              RulesPropagationSimpleTest.store)));
+    /***/
+    final VismoRulesEngine                   engine3  = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(
+                                                              RulesPropagationSimpleTest.store)));
+    /***/
+    final VismoRulesEngine                   engine4  = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(
+                                                              RulesPropagationSimpleTest.store)));
+    /***/
+    final VismoRulesEngine                   engine5  = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(
+                                                              RulesPropagationSimpleTest.store)));
+    /***/
+    final VismoRulesEngine                   engine6  = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(
+                                                              RulesPropagationSimpleTest.store)));
+    /***/
+    final VismoRulesEngine                   engine7  = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(
+                                                              RulesPropagationSimpleTest.store)));
+    /***/
+    final VismoRulesEngine                   engine8  = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(
+                                                              RulesPropagationSimpleTest.store)));
+    /***/
+    final VismoRulesEngine                   engine9  = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(
+                                                              RulesPropagationSimpleTest.store)));
+    /***/
+    RulesPropagationManager                  rulesManager1;
+    /***/
+    RulesPropagationManager                  rulesManager10;
+    /***/
+    RulesPropagationManager                  rulesManager11;
+    /***/
+    RulesPropagationManager                  rulesManager12;
+    /***/
+    RulesPropagationManager                  rulesManager13;
+    /***/
+    RulesPropagationManager                  rulesManager14;
+    /***/
+    RulesPropagationManager                  rulesManager15;
+    /***/
+    RulesPropagationManager                  rulesManager2;
+    /***/
+    RulesPropagationManager                  rulesManager3;
+    /***/
+    RulesPropagationManager                  rulesManager4;
+    /***/
+    RulesPropagationManager                  rulesManager5;
+    /***/
+    RulesPropagationManager                  rulesManager6;
+    /***/
+    RulesPropagationManager                  rulesManager7;
+    /***/
+    RulesPropagationManager                  rulesManager8;
+    /***/
+    RulesPropagationManager                  rulesManager9;
+    /***/
+    private final Client                     client   = new Client();
+
+
+    /***/
+    @Test
+    public void insertRule() {
+        final ClientResponse res = root().path("rules/AccountintRule/10000/@").accept(MediaType.TEXT_PLAIN)
+                .get(ClientResponse.class);
+        Assert.assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
+        System.out.println(res.getEntity(String.class));
+    }
 
 
     /**
-     * testing the functionality.
-     * 
-     * @param args
-     * @throws IOException
+     * @throws Exception
      */
-    public static void main(final String[] args) throws IOException {
-
-        final VismoRulesEngine engine1 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest1.store)));
-        engine1.registerToSource(RulesPropagationTest1.source);
-
-        final VismoRulesEngine engine2 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest1.store)));
-        engine2.registerToSource(RulesPropagationTest1.source);
-
-        final VismoRulesEngine engine3 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest1.store)));
-        engine3.registerToSource(RulesPropagationTest1.source);
-
-        final VismoRulesEngine engine4 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest1.store)));
-        engine4.registerToSource(RulesPropagationTest1.source);
-
-        final VismoRulesEngine engine5 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest1.store)));
-        engine5.registerToSource(RulesPropagationTest1.source);
-
-        final VismoRulesEngine engine6 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest1.store)));
-        engine6.registerToSource(RulesPropagationTest1.source);
-
-        final VismoRulesEngine engine7 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest1.store)));
-        engine7.registerToSource(RulesPropagationTest1.source);
-
-        final VismoRulesEngine engine8 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest1.store)));
-        engine8.registerToSource(RulesPropagationTest1.source);
-
-        final VismoRulesEngine engine9 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest1.store)));
-        engine9.registerToSource(RulesPropagationTest1.source);
-
-        final VismoRulesEngine engine10 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest1.store)));
-        engine10.registerToSource(RulesPropagationTest1.source);
-
-        final VismoRulesEngine engine11 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest1.store)));
-        engine11.registerToSource(RulesPropagationTest1.source);
-
-        final VismoRulesEngine engine12 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest1.store)));
-        engine12.registerToSource(RulesPropagationTest1.source);
-
-        final VismoRulesEngine engine13 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest1.store)));
-        engine13.registerToSource(RulesPropagationTest1.source);
-
-        final VismoRulesEngine engine14 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest1.store)));
-        engine14.registerToSource(RulesPropagationTest1.source);
-
-        final VismoRulesEngine engine15 = new VismoRulesEngine(new EventSinks(new InMemoryEventSink(RulesPropagationTest1.store)));
-        engine15.registerToSource(RulesPropagationTest1.source);
+    @Before
+    public void setUp() throws Exception {
+        engine1.registerToSource(RulesPropagationSimpleTest.source);
+        engine2.registerToSource(RulesPropagationSimpleTest.source);
+        engine3.registerToSource(RulesPropagationSimpleTest.source);
+        engine4.registerToSource(RulesPropagationSimpleTest.source);
+        engine5.registerToSource(RulesPropagationSimpleTest.source);
+        engine6.registerToSource(RulesPropagationSimpleTest.source);
+        engine7.registerToSource(RulesPropagationSimpleTest.source);
+        engine8.registerToSource(RulesPropagationSimpleTest.source);
+        engine9.registerToSource(RulesPropagationSimpleTest.source);
+        engine10.registerToSource(RulesPropagationSimpleTest.source);
+        engine11.registerToSource(RulesPropagationSimpleTest.source);
+        engine12.registerToSource(RulesPropagationSimpleTest.source);
+        engine13.registerToSource(RulesPropagationSimpleTest.source);
+        engine14.registerToSource(RulesPropagationSimpleTest.source);
+        engine15.registerToSource(RulesPropagationSimpleTest.source);
 
         final RulesPropagationManager rulesManager1 = new RulesPropagationManager(engine1,
                 "gr.ntua.vision.monitoring.rules.propagation", 9996);
@@ -83,7 +154,6 @@ public class RulesPropagationTest1 {
                 "gr.ntua.vision.monitoring.rules.propagation", 9999);
         final RulesPropagationManager rulesManager5 = new RulesPropagationManager(engine5,
                 "gr.ntua.vision.monitoring.rules.propagation", 10000);
-
         final RulesPropagationManager rulesManager6 = new RulesPropagationManager(engine6,
                 "gr.ntua.vision.monitoring.rules.propagation", 10001);
         final RulesPropagationManager rulesManager7 = new RulesPropagationManager(engine7,
@@ -110,7 +180,6 @@ public class RulesPropagationTest1 {
         rulesManager3.start();
         rulesManager4.start();
         rulesManager5.start();
-
         rulesManager6.start();
         rulesManager7.start();
         rulesManager8.start();
@@ -124,4 +193,34 @@ public class RulesPropagationTest1 {
 
     }
 
+
+    /**
+     * @throws Exception
+     */
+    @After
+    public void tearDown() throws Exception {
+        rulesManager1.halt();
+        rulesManager2.halt();
+        rulesManager3.halt();
+        rulesManager4.halt();
+        rulesManager5.halt();
+        rulesManager6.halt();
+        rulesManager7.halt();
+        rulesManager8.halt();
+        rulesManager9.halt();
+        rulesManager10.halt();
+        rulesManager11.halt();
+        rulesManager12.halt();
+        rulesManager13.halt();
+        rulesManager14.halt();
+        rulesManager15.halt();
+    }
+
+
+    /**
+     * @return a web resource pointing to the server's root.
+     */
+    private WebResource root() {
+        return client.resource(RulesPropagationSimpleTest.ROOT_URL);
+    }
 }
