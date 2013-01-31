@@ -155,11 +155,9 @@ public class AccountingRule extends AggregationRule {
     /**
      * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List)
      */
-    @SuppressWarnings("unchecked")
     @Override
     protected MonitoringEvent aggregate(final List<MonitoringEvent> eventList) {
-        @SuppressWarnings("rawtypes")
-        final HashMap dict = getAccountingEventObject(eventList);
+        final HashMap<String, Object> dict = getAccountingEventObject(eventList);
 
         return new VismoAggregationResult(dict);
     }

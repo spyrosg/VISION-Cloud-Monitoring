@@ -11,6 +11,7 @@ import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSinks;
 import gr.ntua.vision.monitoring.sources.EventSource;
 import gr.ntua.vision.monitoring.sources.EventSourceListener;
+import helpers.InMemoryEventSink;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
