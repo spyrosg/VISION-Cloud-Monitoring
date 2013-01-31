@@ -1,7 +1,6 @@
-package rulespropagation;
+package gr.ntua.vision.monitoring.sinks;
 
 import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.sinks.EventSink;
 
 import java.util.ArrayList;
 
@@ -9,7 +8,7 @@ import java.util.ArrayList;
 /**
  * 
  */
-class InMemoryEventSink implements EventSink {
+public class InMemoryEventSink implements EventSink {
     /***/
     private final ArrayList<Event> eventStore;
 

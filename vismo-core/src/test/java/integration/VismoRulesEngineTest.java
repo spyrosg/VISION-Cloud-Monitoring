@@ -7,8 +7,10 @@ import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sinks.EventSinks;
+import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
 import gr.ntua.vision.monitoring.sources.EventSource;
 import gr.ntua.vision.monitoring.sources.EventSourceListener;
+import gr.ntua.vision.monitoring.sources.InMemoryEventSource;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -136,87 +138,6 @@ public class VismoRulesEngineTest {
         @Override
         public String toString() {
             return "#<IncRule: " + key + ">";
-        }
-    }
-
-
-    /**
-     * 
-     */
-    private static class InMemoryEventSink implements EventSink {
-        /***/
-        private final ArrayList<Event> eventStore;
-
-
-        /**
-         * Constructor.
-         * 
-         * @param eventStore
-         */
-        public InMemoryEventSink(final ArrayList<Event> eventStore) {
-            this.eventStore = eventStore;
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.sinks.EventSink#send(gr.ntua.vision.monitoring.events.Event)
-         */
-        @Override
-        public void send(final Event e) {
-            eventStore.add(e);
-        }
-
-
-        /**
-         * @see java.lang.Object#toString()
-         */
-        @Override
-        public String toString() {
-            return "#<InMemoryEventSink: " + eventStore + ">";
-        }
-    }
-
-
-    /**
-     * 
-     */
-    private static class InMemoryEventSource implements EventSource {
-        /***/
-        private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
-
-
-        /**
-         * Constructor.
-         */
-        public InMemoryEventSource() {
-            // NOP
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.sources.EventSource#add(gr.ntua.vision.monitoring.sources.EventSourceListener)
-         */
-        @Override
-        public void add(final EventSourceListener listener) {
-            listeners.add(listener);
-        }
-
-
-        /**
-         * @see java.lang.Object#toString()
-         */
-        @Override
-        public String toString() {
-            return "#<InMemoryEventSource>";
-        }
-
-
-        /**
-         * @param e
-         */
-        public void triggerRuleEvaluationWith(final Event e) {
-            for (final EventSourceListener listener : listeners)
-                listener.receive(e);
         }
     }
 

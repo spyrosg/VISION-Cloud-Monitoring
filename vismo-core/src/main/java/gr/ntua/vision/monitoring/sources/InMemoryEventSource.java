@@ -1,8 +1,6 @@
-package rulespropagation;
+package gr.ntua.vision.monitoring.sources;
 
 import gr.ntua.vision.monitoring.events.Event;
-import gr.ntua.vision.monitoring.sources.EventSource;
-import gr.ntua.vision.monitoring.sources.EventSourceListener;
 
 import java.util.ArrayList;
 
@@ -10,7 +8,7 @@ import java.util.ArrayList;
 /**
  * @author tmessini
  */
-class InMemoryEventSource implements EventSource {
+public class InMemoryEventSource implements EventSource {
     /***/
     private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
 
