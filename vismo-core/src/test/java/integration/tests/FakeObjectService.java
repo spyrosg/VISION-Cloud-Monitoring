@@ -128,13 +128,14 @@ public class FakeObjectService {
     private EventBuilder randomEvent(final Operation op, final String tenant, final String user, final String container,
             final String object, final Status st) {
         final int contentSize = rand(MAX_SIZE);
-        final int duration = rand(MAX_DURATION);
-        final int latency = rand(duration);
+        final double duration = rand(MAX_DURATION);
+        final double latency = rand((int)duration);
         final double throughput = contentSize * 1.0 / duration;
 
         return dispatcher.newEvent().field("operation", op.toString()).field("tenant", tenant).field("user", user)
                 .field("container", container).field("object", object).field("status", st.toString())
                 .field("content-size", contentSize).field("transaction-latency", latency).field("transaction-duration", duration)
-                .field("transaction-throughput", throughput).field("type", op.type);
+                .field("transaction-throughput", throughput).field("type", op.type)
+                .field("timestamp", System.currentTimeMillis());
     }
 }
