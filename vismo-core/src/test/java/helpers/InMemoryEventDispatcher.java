@@ -25,7 +25,7 @@ public class InMemoryEventDispatcher implements EventDispatcher {
          * 
          * @param dict
          */
-        protected MyEvent(@SuppressWarnings("rawtypes") final Map dict) {
+        protected MyEvent(final Map<String, Object> dict) {
             super(dict);
         }
 
@@ -38,11 +38,11 @@ public class InMemoryEventDispatcher implements EventDispatcher {
             return "#<MyEvent: " + dict() + ">";
         }
     }
+
     /***/
     private static final Logger    log = LoggerFactory.getLogger(InMemoryEventDispatcher.class);
     /***/
     private final EventBuilder     builder;
-
     /***/
     private final VismoRulesEngine engine;
 

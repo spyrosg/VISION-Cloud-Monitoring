@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,11 +78,9 @@ public class CTORule extends AggregationRule {
     /**
      * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List)
      */
-    @SuppressWarnings("unchecked")
     @Override
     protected MonitoringEvent aggregate(final List<MonitoringEvent> eventList) {
-        @SuppressWarnings("rawtypes")
-        final Map dict = getCTOEvent(eventList, topic);
+        final HashMap<String, Object> dict = getCTOEvent(eventList, topic);
 
         return new VismoAggregationResult(dict);
     }
