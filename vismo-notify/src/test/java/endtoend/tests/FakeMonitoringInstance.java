@@ -56,7 +56,7 @@ public class FakeMonitoringInstance {
         o.put("timestamp", System.currentTimeMillis());
         o.put("topic", topic);
         o.put("originating-service", "fake-monitoring-instance");
-        o.put("originating-ip", "localhost");
+        o.put("originating-machine", "localhost");
         o.put("id", UUID.randomUUID().toString());
 
         log.fine("sending " + o);
