@@ -129,7 +129,7 @@ public class FakeObjectService {
             final String object, final Status st) {
         final int contentSize = rand(MAX_SIZE);
         final double duration = rand(MAX_DURATION);
-        final double latency = rand((int)duration);
+        final double latency = rand((int) duration);
         final double throughput = contentSize * 1.0 / duration;
 
         return dispatcher.newEvent().field("operation", op.toString()).field("tenant", tenant).field("user", user)
