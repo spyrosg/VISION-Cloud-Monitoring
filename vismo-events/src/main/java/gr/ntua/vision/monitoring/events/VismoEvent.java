@@ -25,7 +25,7 @@ public class VismoEvent implements MonitoringEvent {
      *            a dictionary of key/values.
      */
     protected VismoEvent(final Map<String, Object> dict) {
-        assertHaveRequiredFields(dict);
+        assertHaveRequiredFields(dict, requiredFields);
         this.dict = new HashMap<String, Object>(dict);
     }
 
@@ -105,6 +105,19 @@ public class VismoEvent implements MonitoringEvent {
 
 
     /**
+     * Check that the map contains event required fields.
+     * 
+     * @param map
+     *            the map to check.
+     * @param requiredFields
+     */
+    protected static void assertHaveRequiredFields(final Map<String, Object> map, final List<String> requiredFields) {
+        for (final String field : requiredFields)
+            requireField(map, field);
+    }
+
+
+    /**
      * Check that given key is member of the map; if not, raise an {@link Error}.
      * 
      * @param map
@@ -117,17 +130,5 @@ public class VismoEvent implements MonitoringEvent {
     protected static void requireField(final Map<String, Object> map, final String key) {
         if (!map.containsKey(key))
             throw new Error("event missing required field: " + key);
-    }
-
-
-    /**
-     * Check that the map contains event required fields.
-     * 
-     * @param map
-     *            the map to check.
-     */
-    private static void assertHaveRequiredFields(final Map<String, Object> map) {
-        for (final String field : requiredFields)
-            requireField(map, field);
     }
 }
