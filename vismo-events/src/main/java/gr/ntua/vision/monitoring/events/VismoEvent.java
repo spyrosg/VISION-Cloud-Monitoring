@@ -2,6 +2,9 @@ package gr.ntua.vision.monitoring.events;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -9,9 +12,10 @@ import java.util.Map;
  * An implementation of vismo events based on {@link Map}s.
  */
 public class VismoEvent implements MonitoringEvent {
+    /***/
+    private static final List<String> requiredFields = Arrays.asList("timestamp", "originating-service", "originating-machine");
     /** the dictionary of key/values. */
-    @SuppressWarnings("rawtypes")
-    private final Map dict;
+    private final Map<String, Object> dict;
 
 
     /**
@@ -20,16 +24,16 @@ public class VismoEvent implements MonitoringEvent {
      * @param dict
      *            a dictionary of key/values.
      */
-    protected VismoEvent(@SuppressWarnings("rawtypes") final Map dict) {
-        this.dict = dict;
+    protected VismoEvent(final Map<String, Object> dict) {
+        assertHaveRequiredFields(dict, requiredFields);
+        this.dict = new HashMap<String, Object>(dict);
     }
 
 
     /**
      * @return the underlying dictionary.
      */
-    @SuppressWarnings("rawtypes")
-    public Map dict() {
+    public Map<String, Object> dict() {
         return dict;
     }
 
@@ -90,12 +94,41 @@ public class VismoEvent implements MonitoringEvent {
 
 
     /**
+     * Update the key with given value in the event.
+     * 
      * @param key
      * @param value
-     * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
-    @SuppressWarnings("unchecked")
-    protected void put(final Object key, final Object value) {
+    protected void put(final String key, final Object value) {
         dict.put(key, value);
+    }
+
+
+    /**
+     * Check that the map contains event required fields.
+     * 
+     * @param map
+     *            the map to check.
+     * @param requiredFields
+     */
+    protected static void assertHaveRequiredFields(final Map<String, Object> map, final List<String> requiredFields) {
+        for (final String field : requiredFields)
+            requireField(map, field);
+    }
+
+
+    /**
+     * Check that given key is member of the map; if not, raise an {@link Error}.
+     * 
+     * @param map
+     *            the map to check.
+     * @param key
+     *            the key to check.
+     * @throws Error
+     *             when the <code>key</code> is missing.
+     */
+    protected static void requireField(final Map<String, Object> map, final String key) {
+        if (!map.containsKey(key))
+            throw new Error("event missing required field: " + key);
     }
 }

@@ -29,6 +29,24 @@ public class VismoAggregationResult extends VismoEvent implements AggregationRes
 
 
     /**
+     * @see gr.ntua.vision.monitoring.rules.AggregationResult#settEnd(long)
+     */
+    @Override
+    public void settEnd(final long ts) {
+        put("tEnd", ts);
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.rules.AggregationResult#settStart(long)
+     */
+    @Override
+    public void settStart(final long ts) {
+        put("tStart", ts);
+    }
+
+
+    /**
      * @see gr.ntua.vision.monitoring.rules.AggregationResult#tEnd()
      */
     @Override

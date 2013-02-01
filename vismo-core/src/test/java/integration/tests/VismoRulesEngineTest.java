@@ -8,10 +8,10 @@ import gr.ntua.vision.monitoring.rules.PeriodicRule;
 import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
-import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sinks.EventSinks;
 import gr.ntua.vision.monitoring.sources.EventSource;
 import gr.ntua.vision.monitoring.sources.EventSourceListener;
+import helpers.InMemoryEventSink;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -179,43 +179,6 @@ public class VismoRulesEngineTest {
     /**
      * 
      */
-    private static class InMemoryEventSink implements EventSink {
-        /***/
-        private final ArrayList<MonitoringEvent> eventStore;
-
-
-        /**
-         * Constructor.
-         * 
-         * @param eventStore
-         */
-        public InMemoryEventSink(final ArrayList<MonitoringEvent> eventStore) {
-            this.eventStore = eventStore;
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.sinks.EventSink#send(gr.ntua.vision.monitoring.events.MonitoringEvent)
-         */
-        @Override
-        public void send(final MonitoringEvent e) {
-            eventStore.add(e);
-        }
-
-
-        /**
-         * @see java.lang.Object#toString()
-         */
-        @Override
-        public String toString() {
-            return "#<InMemoryEventSink: " + eventStore + ">";
-        }
-    }
-
-
-    /**
-     * 
-     */
     private static class InMemoryEventSource implements EventSource {
         /***/
         private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
@@ -298,12 +261,12 @@ public class VismoRulesEngineTest {
 
 
         /**
-         * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List)
+         * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List, long, long)
          */
         @Override
-        protected MonitoringEvent aggregate(final List<MonitoringEvent> eventList) {
-            final ArrayList<Integer> intList = new ArrayList<Integer>(eventList.size());
-            extract(intList, eventList);
+        protected MonitoringEvent aggregate(final List<MonitoringEvent> eventsList, final long tStart, final long tEnd) {
+            final ArrayList<Integer> intList = new ArrayList<Integer>(eventsList.size());
+            extract(intList, eventsList);
 
             return new DummyEvent(key, sum(intList));
         }

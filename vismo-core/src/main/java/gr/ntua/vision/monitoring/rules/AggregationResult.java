@@ -8,6 +8,24 @@ import gr.ntua.vision.monitoring.events.MonitoringEvent;
  */
 public interface AggregationResult extends MonitoringEvent {
     /**
+     * This marks the end of the aggregation period.
+     * 
+     * @param ts
+     *            the timestamp.
+     */
+    void settEnd(long ts);
+
+
+    /**
+     * This marks the start of the aggregation period.
+     * 
+     * @param ts
+     *            the timestamp.
+     */
+    void settStart(long ts);
+
+
+    /**
      * @return the time end period of the aggregation.
      */
     long tEnd();

@@ -6,17 +6,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * This class provides for the low level responsibilities for a rule that runs periodically, over a list of monitoringEvents.
  */
 public abstract class PeriodicRule extends TimerTask implements RuleProc<MonitoringEvent> {
     /***/
-    private final VismoRulesEngine           engine;
+    private static final Logger                log        = LoggerFactory.getLogger(PeriodicRule.class);
     /***/
-    private final ArrayList<MonitoringEvent> eventsList = new ArrayList<MonitoringEvent>();
+    protected final ArrayList<MonitoringEvent> eventsList = new ArrayList<MonitoringEvent>();
+    /***/
+    private final VismoRulesEngine             engine;
     /** the rule's period, in milliseconds. */
-    private final long                       period;
+    private final long                         period;
 
 
     /**
@@ -33,18 +38,25 @@ public abstract class PeriodicRule extends TimerTask implements RuleProc<Monitor
 
 
     /**
-     * Run the aggregation method over all collected monitoringEvents. The result of the aggregation if not <code>null</code> will
-     * be passed back to the rules engine. Upon completion, the event list will be cleared.
+     * Run the aggregation method over all collected monitoring events. The result, if any, will be passed back to the rules
+     * engine. Upon completion, the event list will be cleared.
      * 
      * @see java.util.TimerTask#run()
      */
     @Override
     public void run() {
+        // the end of the aggregation period marks the start of the aggregation application
+        final long lastAggregationPeriodEnd = System.currentTimeMillis();
+        // the start of the aggregation period
+        final long lastAggregationPeriodStart = lastAggregationPeriodEnd - period;
+
         if (eventsList.isEmpty())
             return;
 
+        log.debug("will aggregate over {} events", eventsList.size());
+
         try {
-            send(aggregate(eventsList));
+            send(aggregate(eventsList, lastAggregationPeriodStart, lastAggregationPeriodEnd));
         } finally {
             eventsList.clear();
         }
@@ -63,11 +75,15 @@ public abstract class PeriodicRule extends TimerTask implements RuleProc<Monitor
     /**
      * This is called at the end of each period.
      * 
-     * @param eventList
+     * @param eventsList
      *            the list of monitoringEvents to aggregate over.
+     * @param tStart
+     *            the start of the aggregation period (actually the <em>collection</em> period).
+     * @param tEnd
+     *            the end of the aggregation period.
      * @return the aggregation result, if any.
      */
-    protected abstract MonitoringEvent aggregate(final List<MonitoringEvent> eventList);
+    protected abstract MonitoringEvent aggregate(final List<MonitoringEvent> eventsList, final long tStart, final long tEnd);
 
 
     /**

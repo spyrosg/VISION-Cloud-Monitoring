@@ -2,7 +2,9 @@ package gr.ntua.vision.monitoring.rules;
 
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -52,6 +54,22 @@ abstract class AggregationRule extends PeriodicRule {
     @Override
     public String toString() {
         return "#<" + getClass().getSimpleName() + ", topic=" + topic + ", period=" + (period() / 1000) + "s>";
+    }
+
+
+    /**
+     * @param dict
+     * @param e
+     */
+    protected static void addRequiredFields(final HashMap<String, Object> dict, final MonitoringEvent e) {
+        dict.put("timestamp", System.currentTimeMillis());
+        dict.put("originating-service", e.originatingService());
+
+        try {
+            dict.put("originating-machine", e.originatingIP().getHostAddress());
+        } catch (final UnknownHostException e1) {
+            log.error("cannot get originating machine ip", e);
+        }
     }
 
 

@@ -23,8 +23,7 @@ public class VismoEventFactory implements EventFactory {
      */
     @Override
     public MonitoringEvent createEvent(final String str) {
-        @SuppressWarnings("rawtypes")
-        final Map dict = parse(str);
+        final Map<String, Object> dict = parse(str);
 
         return dict != null ? new VismoEvent(dict) : null;
     }
@@ -37,10 +36,10 @@ public class VismoEventFactory implements EventFactory {
      *            the message string.
      * @return if successful, return a java {@link Map} representing the json object, <code>null</code> otherwise.
      */
-    @SuppressWarnings("rawtypes")
-    private Map parse(final String msg) {
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> parse(final String msg) {
         try {
-            return (Map) parser.parse(msg);
+            return (Map<String, Object>) parser.parse(msg);
         } catch (final ParseException e) {
             log.severe("error deserializing: " + msg);
             log.log(Level.SEVERE, "ParseException", e);
