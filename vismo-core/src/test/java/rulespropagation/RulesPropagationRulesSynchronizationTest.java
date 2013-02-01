@@ -172,7 +172,7 @@ public class RulesPropagationRulesSynchronizationTest {
         // 2.the elected node to start the synchronization process
         // 3.rules to be synchronized in all 15 nodes
 
-        threadSleep(60000);
+        threadSleep(120000);
 
         Assert.assertEquals(true, rulesManager8.getRuleStore().containsRule("AccountingRule:10000:@"));
         Assert.assertEquals(true, rulesManager9.getRuleStore().containsRule("AccountingRule:10000:@"));
