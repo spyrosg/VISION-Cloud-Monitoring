@@ -49,8 +49,9 @@ public class WebServer {
      * @throws Exception
      * @see org.eclipse.jetty.util.component.AbstractLifeCycle#stop()
      */
-    public void stop() throws Exception {
+    public void stop() throws Exception {       
         server.stop();
+        server.join();
     }
 
 

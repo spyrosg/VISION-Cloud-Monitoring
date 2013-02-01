@@ -207,6 +207,8 @@
         <version>2.8.1</version>
         <configuration>
           <parallel>classes</parallel>
+                <parallel>classes</parallel>
+                <forkMode>always</forkMode>
         </configuration>
       </plugin>
 
