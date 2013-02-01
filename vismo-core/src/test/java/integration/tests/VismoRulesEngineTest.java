@@ -261,12 +261,12 @@ public class VismoRulesEngineTest {
 
 
         /**
-         * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List)
+         * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List, long, long)
          */
         @Override
-        protected MonitoringEvent aggregate(final List<MonitoringEvent> eventList) {
-            final ArrayList<Integer> intList = new ArrayList<Integer>(eventList.size());
-            extract(intList, eventList);
+        protected MonitoringEvent aggregate(final List<MonitoringEvent> eventsList, final long tStart, final long tEnd) {
+            final ArrayList<Integer> intList = new ArrayList<Integer>(eventsList.size());
+            extract(intList, eventsList);
 
             return new DummyEvent(key, sum(intList));
         }

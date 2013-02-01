@@ -76,13 +76,20 @@ public class CTORule extends AggregationRule {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List)
+     * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List, long, long)
      */
     @Override
-    protected MonitoringEvent aggregate(final List<MonitoringEvent> eventList) {
-        final HashMap<String, Object> dict = getCTOEvent(eventList, topic);
+    protected MonitoringEvent aggregate(final List<MonitoringEvent> eventsList, final long tStart, final long tEnd) {
+        final HashMap<String, Object> dict = getCTOEvent(eventsList, topic);
 
-        return new VismoAggregationResult(dict);
+        addRequiredFields(dict, eventsList.get(0));
+
+        final VismoAggregationResult res = new VismoAggregationResult(dict);
+
+        res.settStart(tStart);
+        res.settEnd(tEnd);
+
+        return res;
     }
 
 
