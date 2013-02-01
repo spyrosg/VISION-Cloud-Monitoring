@@ -3,7 +3,9 @@ package gr.ntua.vision.monitoring.rules;
 import gr.ntua.vision.monitoring.VismoVMInfo;
 import gr.ntua.vision.monitoring.events.VismoEvent;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -13,7 +15,9 @@ import java.util.UUID;
  */
 public class VismoAggregationResult extends VismoEvent implements AggregationResult {
     /** this host's ip address. */
-    private static final String ip = new VismoVMInfo().getAddress().getHostAddress();
+    private static final String       ip             = new VismoVMInfo().getAddress().getHostAddress();
+    /***/
+    private static final List<String> requiredFields = Arrays.asList("tStart", "tEnd");
 
 
     /**
@@ -24,7 +28,26 @@ public class VismoAggregationResult extends VismoEvent implements AggregationRes
      */
     public VismoAggregationResult(final Map<String, Object> dict) {
         super(dict);
+        assertHaveRequiredFields(dict, requiredFields);
         appendDefaultFields();
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.rules.AggregationResult#settEnd(long)
+     */
+    @Override
+    public void settEnd(final long ts) {
+        put("tEnd", ts);
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.rules.AggregationResult#settStart(long)
+     */
+    @Override
+    public void settStart(final long ts) {
+        put("tStart", ts);
     }
 
 
