@@ -3,6 +3,8 @@ package integration.tests;
 import gr.ntua.vision.monitoring.dispatch.EventBuilder;
 import gr.ntua.vision.monitoring.dispatch.EventDispatcher;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Random;
 
 
@@ -41,14 +43,26 @@ public class FakeObjectService {
         SUCCESS;
     }
 
+    /***/
+    private static final String   localhost;
     /** the max request/response duration (in seconds). */
     private static final int      MAX_DURATION = 100;
     /** the max request content size (in bytes). */
     private static final int      MAX_SIZE     = 1000000;
     /***/
+    private static final String   SERVICE_NAME = "fake-obs";
+    /***/
     private final EventDispatcher dispatcher;
     /***/
     private final Random          rng;
+
+    static {
+        try {
+            localhost = InetAddress.getLocalHost().getHostAddress();
+        } catch (final UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
     /**
@@ -132,9 +146,10 @@ public class FakeObjectService {
         final double latency = rand((int) duration);
         final double throughput = contentSize * 1.0 / duration;
 
-        return dispatcher.newEvent().field("operation", op.toString()).field("tenant", tenant).field("user", user)
-                .field("container", container).field("object", object).field("status", st.toString())
-                .field("content-size", contentSize).field("transaction-latency", latency).field("transaction-duration", duration)
+        return dispatcher.newEvent().field("originating-service", SERVICE_NAME).field("originating-machine", localhost)
+                .field("operation", op.toString()).field("tenant", tenant).field("user", user).field("container", container)
+                .field("object", object).field("status", st.toString()).field("content-size", contentSize)
+                .field("transaction-latency", latency).field("transaction-duration", duration)
                 .field("transaction-throughput", throughput).field("type", op.type)
                 .field("timestamp", System.currentTimeMillis());
     }
