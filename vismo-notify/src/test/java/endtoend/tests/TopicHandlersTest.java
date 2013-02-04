@@ -7,7 +7,6 @@ import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.zeromq.ZContext;
@@ -82,8 +81,12 @@ public class TopicHandlersTest {
             registry.register(topic, handlers[i] = new TopicAssertionHandler(topic));
         }
 
+        Thread.sleep(30); // spin handlers
         inst.sendEvents();
-        waitForEventsToBeReceived();
+        Thread.sleep(100); // wait for all events to be received
+
+        for (final TopicAssertionHandler handler : handlers)
+            handler.hasReceivedEvents();
     }
 
 
@@ -94,14 +97,6 @@ public class TopicHandlersTest {
 
         setupFakeMonitoring(socketFactory);
         setupRegistry(socketFactory);
-    }
-
-
-    /***/
-    @After
-    public void tearDown() {
-        for (final TopicAssertionHandler handler : handlers)
-            handler.hasReceivedEvents();
     }
 
 
@@ -118,13 +113,5 @@ public class TopicHandlersTest {
      */
     private void setupRegistry(final ZMQFactory socketFactory) {
         registry = new VismoEventRegistry(socketFactory, CONSUMERS_PORT);
-    }
-
-
-    /**
-     * @throws InterruptedException
-     */
-    private static void waitForEventsToBeReceived() throws InterruptedException {
-        Thread.sleep(3000);
     }
 }
