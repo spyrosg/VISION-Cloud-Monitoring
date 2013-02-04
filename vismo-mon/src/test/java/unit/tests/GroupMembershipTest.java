@@ -79,7 +79,7 @@ public class GroupMembershipTest {
         Thread.sleep(EXPIRATION_PERIOD / 2); // wait just a bit before updating
         assertTrue("element should still be in group", map.containsKey(m1));
         mship.add(m2); // update group
-        Thread.sleep(EXPIRATION_PERIOD); // wait for removal of old member.
+        Thread.sleep(4 * EXPIRATION_PERIOD / 5); // wait for removal of old member.
         assertTrue("element should not have been removed yet", map.containsKey(m2));
     }
 }
