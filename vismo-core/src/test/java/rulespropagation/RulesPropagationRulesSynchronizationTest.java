@@ -1,7 +1,9 @@
 package rulespropagation;
 
+import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
+import gr.ntua.vision.monitoring.sinks.EventSinks;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -75,7 +77,7 @@ public class RulesPropagationRulesSynchronizationTest {
         // start group 2
         for (int i = RulesPropagationRulesSynchronizationTest.GROUP_SIZE1; i < RulesPropagationRulesSynchronizationTest.GROUP_SIZE1
                 + RulesPropagationRulesSynchronizationTest.GROUP_SIZE2; i++) {
-            managers.add(new RulesPropagationManager(new VismoRulesEngine(null), "gr.ntua.vision.monitoring.rules.propagation",
+            managers.add(new RulesPropagationManager(new VismoRulesEngine(new RulesStore(), new EventSinks()),
                     RulesPropagationRulesSynchronizationTest.WEBSERVER_START_PORT + i));
             managers.get(i).start();
         }
@@ -95,7 +97,7 @@ public class RulesPropagationRulesSynchronizationTest {
     @Before
     public void setUp() throws Exception {
         for (int i = 0; i < RulesPropagationRulesSynchronizationTest.GROUP_SIZE1; i++) {
-            managers.add(new RulesPropagationManager(new VismoRulesEngine(null), "gr.ntua.vision.monitoring.rules.propagation",
+            managers.add(new RulesPropagationManager(new VismoRulesEngine(new RulesStore(), new EventSinks()),
                     RulesPropagationRulesSynchronizationTest.WEBSERVER_START_PORT + i));
             managers.get(i).start();
         }

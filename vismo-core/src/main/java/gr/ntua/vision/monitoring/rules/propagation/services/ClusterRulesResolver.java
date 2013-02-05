@@ -7,7 +7,6 @@ import gr.ntua.vision.monitoring.threading.PeriodicTask;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
@@ -28,8 +27,6 @@ public class ClusterRulesResolver extends PeriodicTask {
     /***/
     private final MessageFactory                        messageFactory;
     /***/
-    private final long                                  period;
-    /***/
     private volatile ConcurrentHashMap<Integer, String> previousValidClusterRuleSet = null;
     /***/
     private volatile boolean                            sendUpdate                  = false;
@@ -46,7 +43,7 @@ public class ClusterRulesResolver extends PeriodicTask {
      * @param manager
      */
     public ClusterRulesResolver(final long period, final RulesPropagationManager manager) {
-        this.period = period;
+        super(period);
         this.manager = manager;
         messageFactory = new MessageFactory(manager);
     }
@@ -68,15 +65,12 @@ public class ClusterRulesResolver extends PeriodicTask {
     }
 
 
+    /**
+     * @see java.util.TimerTask#run()
+     */
     @Override
     public void run() {
         rulesSynchronization();
-    }
-
-
-    @Override
-    public void scheduleWith(final Timer timer) {
-        timer.schedule(this, 0, period);
     }
 
 

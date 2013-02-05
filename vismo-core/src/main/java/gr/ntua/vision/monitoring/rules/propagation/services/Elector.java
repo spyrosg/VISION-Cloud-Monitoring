@@ -3,8 +3,6 @@ package gr.ntua.vision.monitoring.rules.propagation.services;
 import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
 import gr.ntua.vision.monitoring.threading.PeriodicTask;
 
-import java.util.Timer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,15 +14,14 @@ import org.slf4j.LoggerFactory;
  * @author tmessini
  */
 public class Elector extends PeriodicTask {
-
     /***/
-    final Logger                          log                        = LoggerFactory.getLogger(Elector.class);
+    private static final Logger           log                        = LoggerFactory.getLogger(Elector.class);
     /***/
     private volatile boolean              isElected                  = false;
     /***/
     private final RulesPropagationManager manager;
     /***/
-    private final long                    period                     = 5000;
+    private static final long             period                     = 5000;
     /***/
     private volatile Integer              previousElectedPid         = 0;
     /***/
@@ -37,6 +34,7 @@ public class Elector extends PeriodicTask {
      * @param manager
      */
     public Elector(final RulesPropagationManager manager) {
+        super(period);
         this.manager = manager;
     }
 
@@ -49,17 +47,13 @@ public class Elector extends PeriodicTask {
     }
 
 
+    /**
+     * @see java.util.TimerTask#run()
+     */
     @Override
     public void run() {
         checkNodeRole();
     }
-
-
-    @Override
-    public void scheduleWith(final Timer timer) {
-        timer.schedule(this, 0, period);
-    }
-
 
     /**
      * 

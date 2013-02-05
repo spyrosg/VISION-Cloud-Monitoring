@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.sources;
 
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 import java.util.ArrayList;
 
@@ -42,7 +42,7 @@ public class InMemoryEventSource implements EventSource {
     /**
      * @param e
      */
-    public void triggerRuleEvaluationWith(final Event e) {
+    public void triggerRuleEvaluationWith(final MonitoringEvent e) {
         for (final EventSourceListener listener : listeners)
             listener.receive(e);
     }

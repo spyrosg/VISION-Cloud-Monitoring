@@ -4,7 +4,6 @@ package gr.ntua.vision.monitoring.rules;
  * @author tmessini
  */
 public class NonPeriodicRuleFactory implements RuleFactory {
-
     /**
      * @see gr.ntua.vision.monitoring.rules.RuleFactory#createRule(gr.ntua.vision.monitoring.rules.VismoRulesEngine,
      *      java.lang.String, java.lang.String, java.lang.String)
@@ -15,5 +14,4 @@ public class NonPeriodicRuleFactory implements RuleFactory {
             return new TestingRule(vismoRulesEngine, name, desc);
         return null;
     }
-
 }

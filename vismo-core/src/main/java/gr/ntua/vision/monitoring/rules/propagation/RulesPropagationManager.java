@@ -261,15 +261,18 @@ public class RulesPropagationManager extends Thread {
     }
 
 
+    /**
+     * @see java.lang.Thread#run()
+     */
     @Override
     public void run() {
+        // FIXME: why does this thread don't do anything? 
         while (true)
             try {
                 Thread.sleep(100000);
             } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
-        // TODO
     }
 
 
@@ -293,9 +296,9 @@ public class RulesPropagationManager extends Thread {
             deliverer.start();
             heartbeatReceiver.init();
             heartbeatSender.init();
-            messageWatchdog.scheduleWith(new Timer());
-            elector.scheduleWith(new Timer());
-            clusterRulesResolver.scheduleWith(new Timer());
+            messageWatchdog.scheduleWith(new Timer()); // TODO: use VismoService#addTask(PeriodicTask)
+            elector.scheduleWith(new Timer()); // TODO: use VismoService#addTask(PeriodicTask)
+            clusterRulesResolver.scheduleWith(new Timer()); // TODO: use VismoService#addTask(PeriodicTask)
         } catch (final Throwable x) {
             throw new RuntimeException(x);
         }

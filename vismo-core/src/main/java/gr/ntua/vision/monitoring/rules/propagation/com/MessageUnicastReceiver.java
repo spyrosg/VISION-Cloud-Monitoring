@@ -16,10 +16,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Basic Message Unicast Receiver Thread
  * 
- * @author tmessini
+ * @author tmessini FIXME: maybe delete?
  */
 public class MessageUnicastReceiver extends Thread {
-
     /***/
     private final static Logger     log        = LoggerFactory.getLogger(MessageUnicastReceiver.class);
     /***/
@@ -55,9 +54,11 @@ public class MessageUnicastReceiver extends Thread {
     }
 
 
+    /**
+     * @see java.lang.Thread#run()
+     */
     @Override
     public final void run() {
-
         while (!stopped)
             try {
                 clientSocket = serverSocket.accept();
@@ -82,5 +83,4 @@ public class MessageUnicastReceiver extends Thread {
     public void setManager(final RulesPropagationManager manager) {
         this.manager = manager;
     }
-
 }

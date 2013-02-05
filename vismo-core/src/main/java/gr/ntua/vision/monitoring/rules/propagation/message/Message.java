@@ -28,6 +28,9 @@ public class Message implements Serializable {
     private MessageType                        type;
 
 
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(final Object obj) {
         if (this == obj)
@@ -121,6 +124,9 @@ public class Message implements Serializable {
     }
 
 
+    /**
+     * @see java.lang.Object#hashCode()
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -195,6 +201,9 @@ public class Message implements Serializable {
     }
 
 
+    /**
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         String str = "fromId=" + fromId + "command=" + command + "type=" + type + "commandId=" + commandId + "groupSize="
@@ -203,5 +212,4 @@ public class Message implements Serializable {
             str = str + "nodeRuleSet:" + nodeRuleSet.toString();
         return str;
     }
-
 }

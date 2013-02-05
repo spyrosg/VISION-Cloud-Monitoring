@@ -5,7 +5,6 @@ import gr.ntua.vision.monitoring.rules.propagation.message.Message;
 import gr.ntua.vision.monitoring.threading.PeriodicTask;
 
 import java.util.Iterator;
-import java.util.Timer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,15 +14,12 @@ import org.slf4j.LoggerFactory;
  * @author tmessini
  */
 public class WatchDog extends PeriodicTask {
-
     /***/
-    final Logger                    log     = LoggerFactory.getLogger(WatchDog.class);
+    private static final Logger     log     = LoggerFactory.getLogger(WatchDog.class);
     /***/
     private RulesPropagationManager manager;
     /***/
     private final long              maxtime = 10000;
-    /***/
-    private final long              period;
 
 
     /**
@@ -32,19 +28,16 @@ public class WatchDog extends PeriodicTask {
      * @param period
      */
     public WatchDog(final long period) {
-        this.period = period;
+        super(period);
     }
 
 
+    /**
+     * @see java.util.TimerTask#run()
+     */
     @Override
     public void run() {
         discardMessages(maxtime);
-    }
-
-
-    @Override
-    public void scheduleWith(final Timer timer) {
-        timer.schedule(this, 0, period);
     }
 
 

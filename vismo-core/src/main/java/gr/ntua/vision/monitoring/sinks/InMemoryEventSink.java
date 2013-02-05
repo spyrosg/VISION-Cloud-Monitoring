@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.sinks;
 
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 import java.util.ArrayList;
 
@@ -10,7 +10,7 @@ import java.util.ArrayList;
  */
 public class InMemoryEventSink implements EventSink {
     /***/
-    private final ArrayList<Event> eventStore;
+    private final ArrayList<MonitoringEvent> eventStore;
 
 
     /**
@@ -18,16 +18,16 @@ public class InMemoryEventSink implements EventSink {
      * 
      * @param eventStore
      */
-    public InMemoryEventSink(final ArrayList<Event> eventStore) {
+    public InMemoryEventSink(final ArrayList<MonitoringEvent> eventStore) {
         this.eventStore = eventStore;
     }
 
 
     /**
-     * @see gr.ntua.vision.monitoring.sinks.EventSink#send(gr.ntua.vision.monitoring.events.Event)
+     * @see gr.ntua.vision.monitoring.sinks.EventSink#send(gr.ntua.vision.monitoring.events.MonitoringEvent)
      */
     @Override
-    public void send(final Event e) {
+    public void send(final MonitoringEvent e) {
         eventStore.add(e);
     }
 

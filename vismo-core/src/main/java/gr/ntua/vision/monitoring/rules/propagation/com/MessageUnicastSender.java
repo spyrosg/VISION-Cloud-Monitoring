@@ -3,7 +3,6 @@ package gr.ntua.vision.monitoring.rules.propagation.com;
 import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
 import gr.ntua.vision.monitoring.rules.propagation.message.Message;
 
-import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -16,9 +15,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author tmessini
+ * FIXME: maybe delete?
  */
 public class MessageUnicastSender extends Thread implements Observer {
-
     /***/
     @SuppressWarnings("unused")
     private final static Logger     log     = LoggerFactory.getLogger(MessageUnicastSender.class);
@@ -37,13 +36,15 @@ public class MessageUnicastSender extends Thread implements Observer {
 
 
     /**
-     * @throws IOException
      */
-    public final void init() throws IOException {
+    public final void init() {
         this.start();
     }
 
 
+    /**
+     * @see java.lang.Thread#run()
+     */
     @Override
     public void run() {
         while (!stopped)
@@ -68,6 +69,9 @@ public class MessageUnicastSender extends Thread implements Observer {
     }
 
 
+    /**
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
     @Override
     public void update(final Observable o, final Object s) {
         synchronized (this) {
@@ -95,7 +99,5 @@ public class MessageUnicastSender extends Thread implements Observer {
         } catch (final Exception e) {
             e.printStackTrace();
         }
-
     }
-
 }

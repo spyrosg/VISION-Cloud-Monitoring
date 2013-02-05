@@ -53,6 +53,9 @@ public class MessageMulticastReceiver extends Thread {
     }
 
 
+    /**
+     * @see java.lang.Thread#run()
+     */
     @Override
     public final void run() {
         try {

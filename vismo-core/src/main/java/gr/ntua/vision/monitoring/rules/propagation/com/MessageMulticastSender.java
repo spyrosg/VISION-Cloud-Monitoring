@@ -60,7 +60,7 @@ public class MessageMulticastSender extends Thread implements Observer {
     /**
      * Shutdown the message receiver.
      */
-    public final void halt() {
+    public void halt() {
         stopped = true;
         socket.close();
     }
@@ -69,13 +69,16 @@ public class MessageMulticastSender extends Thread implements Observer {
     /**
      * @throws IOException
      */
-    public final void init() throws IOException {
+    public void init() throws IOException {
         socket = new MulticastSocket(groupMulticastPort.intValue());
         socket.joinGroup(InetAddress.getByName(groupMulticastAddress));
         this.start();
     }
 
 
+    /**
+     * @see java.lang.Thread#run()
+     */
     @Override
     public void run() {
         while (!stopped)
@@ -101,6 +104,9 @@ public class MessageMulticastSender extends Thread implements Observer {
     }
 
 
+    /**
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
     @Override
     public void update(final Observable o, final Object s) {
         synchronized (this) {
@@ -144,5 +150,4 @@ public class MessageMulticastSender extends Thread implements Observer {
             }
         return false;
     }
-
 }
