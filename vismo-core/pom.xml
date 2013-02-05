@@ -7,7 +7,7 @@
   <parent>
     <artifactId>vismo</artifactId>
     <groupId>gr.ntua.vision</groupId>
-    <version>1.0.8-SNAPSHOT</version>
+    <version>1.0.9-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
@@ -198,6 +198,26 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <version>2.1.4</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>revision</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <prefix>git</prefix>
+          <dateFormat>yyyy-MM-dd HH:mm:ss z</dateFormat>
+          <dotGitDirectory>${project.basedir}/../.git</dotGitDirectory>
+          <generateGitPropertiesFile>true</generateGitPropertiesFile>
+          <generateGitPropertiesFilename>src/main/resources/git.properties</generateGitPropertiesFilename>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 
@@ -228,6 +248,12 @@
 
     <dependency>
       <artifactId>vismo-web</artifactId>
+      <groupId>gr.ntua.vision</groupId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <artifactId>vismo-mon</artifactId>
       <groupId>gr.ntua.vision</groupId>
       <version>${project.version}</version>
     </dependency>

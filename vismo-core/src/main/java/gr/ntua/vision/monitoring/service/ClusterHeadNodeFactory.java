@@ -14,25 +14,18 @@ import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 /**
  *
  */
-public class ClusterHeadNodeFactory extends CommonServiceFactory {
-    /***/
-    private final VismoConfiguration conf;
-    /***/
-    private final ZMQFactory         socketFactory;
-
-
+public class ClusterHeadNodeFactory extends AbstractVismoServiceFactory {
     /**
      * @param conf
      * @param socketFactory
      */
     public ClusterHeadNodeFactory(final VismoConfiguration conf, final ZMQFactory socketFactory) {
-        this.conf = conf;
-        this.socketFactory = socketFactory;
+        super(conf, socketFactory);
     }
 
 
     /**
-     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#boostrap(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
+     * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#boostrap(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
      */
     @Override
     protected void boostrap(final VismoRulesEngine engine) {
@@ -42,7 +35,7 @@ public class ClusterHeadNodeFactory extends CommonServiceFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#getEventSinks()
+     * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#getEventSinks()
      */
     @Override
     protected EventSinks getEventSinks() {
@@ -51,7 +44,7 @@ public class ClusterHeadNodeFactory extends CommonServiceFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#getEventSources()
+     * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#getEventSources()
      */
     @Override
     protected EventSources getEventSources() {
@@ -62,7 +55,8 @@ public class ClusterHeadNodeFactory extends CommonServiceFactory {
     /**
      * @param engine
      */
-    private static void registerRules(final VismoRulesEngine engine) {
+    @SuppressWarnings("static-method")
+    private void registerRules(final VismoRulesEngine engine) {
         // TODO: rename method
 
         final long ONE_MINUTE = 60 * 1000;

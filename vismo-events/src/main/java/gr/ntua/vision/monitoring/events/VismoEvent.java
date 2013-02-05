@@ -2,18 +2,20 @@ package gr.ntua.vision.monitoring.events;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
 /**
- * An implementation of vismo events.
+ * An implementation of vismo events based on {@link Map}s.
  */
-class VismoEvent implements Event {
-    /** this is used to get a hold of the whole dict, for serialization reasons. */
-    private static final String DICT_KEY = "!dict";
+public class VismoEvent implements MonitoringEvent {
+    /***/
+    private static final List<String> requiredFields = Arrays.asList("timestamp", "originating-service", "originating-machine");
     /** the dictionary of key/values. */
-    @SuppressWarnings("rawtypes")
-    private final Map           dict;
+    private final Map<String, Object> dict;
 
 
     /**
@@ -22,26 +24,32 @@ class VismoEvent implements Event {
      * @param dict
      *            a dictionary of key/values.
      */
-    VismoEvent(@SuppressWarnings("rawtypes") final Map dict) {
-        this.dict = dict;
+    protected VismoEvent(final Map<String, Object> dict) {
+        assertHaveRequiredFields(dict, requiredFields);
+        this.dict = new HashMap<String, Object>(dict);
     }
 
 
     /**
-     * @see gr.ntua.vision.monitoring.events.Event#get(java.lang.String)
+     * @return the underlying dictionary.
+     */
+    public Map<String, Object> dict() {
+        return dict;
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#get(java.lang.String)
      */
     @Override
     public Object get(final String key) {
-        if (key.equals(DICT_KEY))
-            return dict;
-
         return dict.get(key);
     }
 
 
     /**
      * @throws UnknownHostException
-     * @see gr.ntua.vision.monitoring.events.Event#originatingIP()
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#originatingIP()
      */
     @Override
     public InetAddress originatingIP() throws UnknownHostException {
@@ -50,7 +58,7 @@ class VismoEvent implements Event {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.events.Event#originatingService()
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#originatingService()
      */
     @Override
     public String originatingService() {
@@ -59,7 +67,7 @@ class VismoEvent implements Event {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.events.Event#timestamp()
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#timestamp()
      */
     @Override
     public long timestamp() {
@@ -68,7 +76,7 @@ class VismoEvent implements Event {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.events.Event#topic()
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#topic()
      */
     @Override
     public String topic() {
@@ -82,5 +90,45 @@ class VismoEvent implements Event {
     @Override
     public String toString() {
         return "vismo-event";
+    }
+
+
+    /**
+     * Update the key with given value in the event.
+     * 
+     * @param key
+     * @param value
+     */
+    protected void put(final String key, final Object value) {
+        dict.put(key, value);
+    }
+
+
+    /**
+     * Check that the map contains event required fields.
+     * 
+     * @param map
+     *            the map to check.
+     * @param requiredFields
+     */
+    protected static void assertHaveRequiredFields(final Map<String, Object> map, final List<String> requiredFields) {
+        for (final String field : requiredFields)
+            requireField(map, field);
+    }
+
+
+    /**
+     * Check that given key is member of the map; if not, raise an {@link Error}.
+     * 
+     * @param map
+     *            the map to check.
+     * @param key
+     *            the key to check.
+     * @throws Error
+     *             when the <code>key</code> is missing.
+     */
+    protected static void requireField(final Map<String, Object> map, final String key) {
+        if (!map.containsKey(key))
+            throw new Error("event missing required field: " + key);
     }
 }

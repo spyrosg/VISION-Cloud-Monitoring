@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.sinks;
 
 import gr.ntua.monitoring.sockets.Socket;
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 import java.util.HashSet;
 
@@ -31,10 +31,10 @@ public class UniqueEventSink extends AbstractSink {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.sinks.EventSink#send(gr.ntua.vision.monitoring.events.Event)
+     * @see gr.ntua.vision.monitoring.sinks.EventSink#send(gr.ntua.vision.monitoring.events.MonitoringEvent)
      */
     @Override
-    public void send(final Event e) {
+    public void send(final MonitoringEvent e) {
         sendOrDrop(e);
     }
 
@@ -57,7 +57,7 @@ public class UniqueEventSink extends AbstractSink {
      * @param e
      *            the event to send.
      */
-    private void sendOrDrop(final Event e) {
+    private void sendOrDrop(final MonitoringEvent e) {
         final String id = (String) e.get("id");
 
         if (haveSeenEvent(id)) {

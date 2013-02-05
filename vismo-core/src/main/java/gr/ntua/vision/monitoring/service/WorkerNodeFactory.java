@@ -7,34 +7,22 @@ import gr.ntua.vision.monitoring.sources.EventSources;
 import gr.ntua.vision.monitoring.sources.EventSourcesFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 /**
  * This is used to build the vismo worker instance.
  */
-public class WorkerNodeFactory extends CommonServiceFactory {
-    /** the log target. */
-    private static final Logger      log = LoggerFactory.getLogger(WorkerNodeFactory.class);
-    /** the configuration object. */
-    private final VismoConfiguration conf;
-    /***/
-    private final ZMQFactory         socketFactory;
-
-
+public class WorkerNodeFactory extends AbstractVismoServiceFactory {
     /**
      * @param conf
      * @param socketFactory
      */
     public WorkerNodeFactory(final VismoConfiguration conf, final ZMQFactory socketFactory) {
-        this.conf = conf;
-        this.socketFactory = socketFactory;
+        super(conf, socketFactory);
     }
 
 
     /**
-     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#getEventSinks()
+     * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#getEventSinks()
      */
     @Override
     protected EventSinks getEventSinks() {
@@ -43,7 +31,7 @@ public class WorkerNodeFactory extends CommonServiceFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.service.VismoServiceAbstractFactory#getEventSources()
+     * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#getEventSources()
      */
     @Override
     protected EventSources getEventSources() {

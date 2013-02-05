@@ -5,6 +5,7 @@ import gr.ntua.vision.monitoring.web.WebServer;
 
 import javax.ws.rs.core.MediaType;
 
+import org.eclipse.jetty.util.resource.Resource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,12 +49,25 @@ public class WebServerTest {
     }
 
 
+    /***/
+    @Test
+    public void getStaticResource() {
+        final ClientResponse res = root().path("/static-foo").path("index.html").accept(MediaType.TEXT_PLAIN)
+                .get(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
+        assertEquals("foo\n", res.getEntity(String.class));
+    }
+
+
     /**
      * @throws Exception
      */
     @Before
     public void setUp() throws Exception {
-        server.withResource(new FooResource("foo")).withResource(new BarResource("bar"));
+        server.withResource(new FooResource("foo")).withResource(new BarResource("bar"))
+                .withStaticResourceTo(Resource.newClassPathResource("/static"), "/static-foo");
+
         server.start();
     }
 

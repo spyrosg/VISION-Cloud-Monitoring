@@ -1,21 +1,19 @@
 package gr.ntua.vision.monitoring.rules;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import gr.ntua.vision.monitoring.VismoVMInfo;
+import gr.ntua.vision.monitoring.events.VismoEvent;
+
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 
 /**
- * TODO: somehow link with {@link VismoEvent}.
+ * 
  */
-public class VismoAggregationResult implements AggregationResult {
-    /** this is used to get a hold of the whole dict, for serialization reasons. */
-    private static final String       DICT_KEY = "!dict";
-    /** the dictionary of key/values. */
-    private final Map<String, Object> dict;
+public class VismoAggregationResult extends VismoEvent implements AggregationResult {
+    /** this host's ip address. */
+    private static final String ip = new VismoVMInfo().getAddress().getHostAddress();
 
 
     /**
@@ -25,58 +23,26 @@ public class VismoAggregationResult implements AggregationResult {
      *            a dictionary of key/values.
      */
     public VismoAggregationResult(final Map<String, Object> dict) {
-        this.dict = new HashMap<String, Object>(dict);
-        removeUnessecaryFields(this.dict);
-        addBasicFields(this.dict);
+        super(dict);
+        appendDefaultFields();
     }
 
 
     /**
-     * @see gr.ntua.vision.monitoring.events.Event#get(java.lang.String)
+     * @see gr.ntua.vision.monitoring.rules.AggregationResult#settEnd(long)
      */
     @Override
-    public Object get(final String key) {
-        if (key.equals(DICT_KEY))
-            return dict;
-
-        return dict.get(key);
+    public void settEnd(final long ts) {
+        put("tEnd", ts);
     }
 
 
     /**
-     * @throws UnknownHostException
-     * @see gr.ntua.vision.monitoring.events.Event#originatingIP()
+     * @see gr.ntua.vision.monitoring.rules.AggregationResult#settStart(long)
      */
     @Override
-    public InetAddress originatingIP() throws UnknownHostException {
-        return InetAddress.getLocalHost();
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.events.Event#originatingService()
-     */
-    @Override
-    public String originatingService() {
-        return (String) get1("originating-service");
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.rules.AggregationResult#puttEnd(long)
-     */
-    @Override
-    public void puttEnd(final long t) {
-        dict.put("tEnd", t);
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.rules.AggregationResult#puttStart(long)
-     */
-    @Override
-    public void puttStart(final long t) {
-        dict.put("tStart", t);
+    public void settStart(final long ts) {
+        put("tStart", ts);
     }
 
 
@@ -85,25 +51,7 @@ public class VismoAggregationResult implements AggregationResult {
      */
     @Override
     public long tEnd() {
-        return (Long) get1("tEnd");
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.events.Event#timestamp()
-     */
-    @Override
-    public long timestamp() {
-        return (Long) get1("timestamp");
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.events.Event#topic()
-     */
-    @Override
-    public String topic() {
-        return (String) get1("topic");
+        return (Long) get("tEnd");
     }
 
 
@@ -121,49 +69,17 @@ public class VismoAggregationResult implements AggregationResult {
      */
     @Override
     public long tStart() {
-        return (Long) get1("tStart");
+        return (Long) get("tStart");
     }
 
 
     /**
-     * @param dict
+     * Add required fields to the event.
      */
-    private void addBasicFields(final Map<String, Object> dict) {
-        dict.put("timestamp", System.currentTimeMillis());
-        dict.put("id", UUID.randomUUID().toString());
-
-        try {
-            // FIXME: this should be taken off {@link VMInfo}
-            dict.put("originating-machine", originatingIP().getHostAddress());
-        } catch (final UnknownHostException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    /**
-     * Retrieve the value of given key.
-     * 
-     * @param key
-     * @return the value.
-     */
-    private Object get1(final String key) {
-        return dict.get(key);
-    }
-
-
-    /**
-     * @param dict
-     */
-    private static void removeUnessecaryFields(@SuppressWarnings("rawtypes") final Map dict) {
-        dict.remove("transaction-throughput");
-        dict.remove("content-size");
-        dict.remove("object");
-        dict.remove("operation");
-        dict.remove("tenant");
-        dict.remove("container");
-        dict.remove("transaction-latency");
-        dict.remove("transaction-duration");
+    private void appendDefaultFields() {
+        put("timestamp", System.currentTimeMillis());
+        put("id", UUID.randomUUID().toString());
+        put("originating-machine", ip);
     }
 
 

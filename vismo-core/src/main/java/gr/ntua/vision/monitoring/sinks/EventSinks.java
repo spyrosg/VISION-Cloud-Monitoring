@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.sinks;
 
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,7 +40,7 @@ public class EventSinks {
      * @param e
      *            the event.
      */
-    public void push(final Event e) {
+    public void push(final MonitoringEvent e) {
         for (final EventSink sink : sinks)
             sink.send(e);
     }

@@ -43,9 +43,9 @@ public class StaticConfigPolicy implements NodePolicy {
      */
     @Override
     public Service build(final VMInfo vminfo) throws IOException {
-        final ZMQFactory socketFactory = new ZMQFactory(new ZContext());
-
         logConfig(vminfo);
+
+        final ZMQFactory socketFactory = new ZMQFactory(new ZContext());
 
         if (hostIsCloudHead(vminfo))
             return new CloudHeadNodeFactory(conf, socketFactory).build(vminfo);
@@ -57,10 +57,10 @@ public class StaticConfigPolicy implements NodePolicy {
 
 
     /**
-     * Check whether localhost is the cluster head (according to the configuration).
+     * Check whether local-host is the cluster head (according to the configuration).
      * 
      * @param vminfo
-     * @return <code>true</code> when localhost is a cloud head, <code>false</code> otherwise.
+     * @return <code>true</code> when local-host is a cloud head, <code>false</code> otherwise.
      */
     private boolean hostIsCloudHead(final VMInfo vminfo) {
         return conf.isIPCloudHead(vminfo.getAddress().getHostAddress());
@@ -68,10 +68,10 @@ public class StaticConfigPolicy implements NodePolicy {
 
 
     /**
-     * Check whether localhost is a cluster head (according to the configuration).
+     * Check whether local-host is a cluster head (according to the configuration).
      * 
      * @param vminfo
-     * @return <code>true</code> when localhost is a cluster head, <code>false</code> otherwise.
+     * @return <code>true</code> when local-host is a cluster head, <code>false</code> otherwise.
      */
     private boolean hostIsClusterHead(final VMInfo vminfo) {
         return conf.isIPClusterHead(vminfo.getAddress().getHostAddress());

@@ -1,12 +1,12 @@
 package gr.ntua.vision.monitoring.rules;
 
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 
 /**
  * 
  */
-public abstract class Rule implements RuleProc<Event> {
+public abstract class Rule implements RuleProc<MonitoringEvent> {
     /***/
     private final VismoRulesEngine engine;
 
@@ -26,14 +26,14 @@ public abstract class Rule implements RuleProc<Event> {
      */
     @Override
     public void submit() {
-        this.engine.submitRule(this);
+        engine.submitRule(this);
     }
 
 
     /**
      * @param e
      */
-    protected void send(final Event e) {
+    protected void send(final MonitoringEvent e) {
         engine.send(e);
     }
 }

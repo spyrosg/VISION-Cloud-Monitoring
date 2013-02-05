@@ -1,22 +1,27 @@
 package gr.ntua.vision.monitoring.rules;
 
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
- * This class provides for the low level responsibilities for a rule that runs periodically, over a list of events.
+ * This class provides for the low level responsibilities for a rule that runs periodically, over a list of monitoringEvents.
  */
-public abstract class PeriodicRule extends TimerTask implements RuleProc<Event> {
+public abstract class PeriodicRule extends TimerTask implements RuleProc<MonitoringEvent> {
     /***/
-    private final VismoRulesEngine engine;
+    private static final Logger                log        = LoggerFactory.getLogger(PeriodicRule.class);
     /***/
-    private final ArrayList<Event> events = new ArrayList<Event>();
+    protected final ArrayList<MonitoringEvent> eventsList = new ArrayList<MonitoringEvent>();
+    /***/
+    private final VismoRulesEngine             engine;
     /** the rule's period, in milliseconds. */
-    private final long             period;
+    private final long                         period;
 
 
     /**
@@ -32,66 +37,28 @@ public abstract class PeriodicRule extends TimerTask implements RuleProc<Event> 
     }
 
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        final PeriodicRule other = (PeriodicRule) obj;
-        if (engine == null) {
-            if (other.engine != null)
-                return false;
-        } else if (!engine.equals(other.engine))
-            return false;
-        if (events == null) {
-            if (other.events != null)
-                return false;
-        } else if (!events.equals(other.events))
-            return false;
-        if (period != other.period)
-            return false;
-        return true;
-    }
-
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((engine == null) ? 0 : engine.hashCode());
-        result = prime * result + ((events == null) ? 0 : events.hashCode());
-        result = prime * result + (int) (period ^ (period >>> 32));
-        return result;
-    }
-
-
     /**
-     * @return the period for <code>this</code> rule, in milliseconds.
-     */
-    public long period() {
-        return period;
-    }
-
-
-    /**
-     * Run the aggregation method over all collected events. The result of the aggregation if not <code>null</code> will be passed
-     * back to the rules engine. Upon completion, the event list will be cleared.
+     * Run the aggregation method over all collected monitoring events. The result, if any, will be passed back to the rules
+     * engine. Upon completion, the event list will be cleared.
      * 
      * @see java.util.TimerTask#run()
      */
     @Override
     public void run() {
-        try {
-            final Event result = aggregate(events);
+        // the end of the aggregation period marks the start of the aggregation application
+        final long lastAggregationPeriodEnd = System.currentTimeMillis();
+        // the start of the aggregation period
+        final long lastAggregationPeriodStart = lastAggregationPeriodEnd - period;
 
-            // TODO: move this desision (send or drop) to Event.
-            if (result != null)
-                send(result);
+        if (eventsList.isEmpty())
+            return;
+
+        log.debug("will aggregate over {} events", eventsList.size());
+
+        try {
+            send(aggregate(eventsList, lastAggregationPeriodStart, lastAggregationPeriodEnd));
         } finally {
-            events.clear();
+            eventsList.clear();
         }
     }
 
@@ -101,32 +68,44 @@ public abstract class PeriodicRule extends TimerTask implements RuleProc<Event> 
      */
     @Override
     public void submit() {
-        this.engine.submitRule(this);
+        engine.submitRule(this);
     }
 
 
     /**
      * This is called at the end of each period.
      * 
-     * @param eventList
-     *            the list of events to aggregate over.
+     * @param eventsList
+     *            the list of monitoringEvents to aggregate over.
+     * @param tStart
+     *            the start of the aggregation period (actually the <em>collection</em> period).
+     * @param tEnd
+     *            the end of the aggregation period.
      * @return the aggregation result, if any.
      */
-    protected abstract Event aggregate(final List<Event> eventList);
+    protected abstract MonitoringEvent aggregate(final List<MonitoringEvent> eventsList, final long tStart, final long tEnd);
 
 
     /**
      * @param e
      */
-    protected void collect(final Event e) {
-        events.add(e);
+    protected void collect(final MonitoringEvent e) {
+        eventsList.add(e);
+    }
+
+
+    /**
+     * @return the period for <code>this</code> rule, in milliseconds.
+     */
+    protected long period() {
+        return period;
     }
 
 
     /**
      * @param e
      */
-    protected void send(final Event e) {
+    protected void send(final MonitoringEvent e) {
         engine.send(e);
     }
 }

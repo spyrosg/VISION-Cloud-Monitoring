@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.rules;
 
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -146,25 +146,27 @@ public class AccountingRule extends AggregationRule {
      * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
      */
     @Override
-    public void performWith(final Event e) {
+    public void performWith(final MonitoringEvent e) {
         if (matches(e))
             collect(e);
     }
 
 
     /**
-     * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List)
+     * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List, long, long)
      */
-    @SuppressWarnings("unchecked")
     @Override
-    protected Event aggregate(final List<Event> eventList) {
-        if (eventList.size() == 0)
-            return null;
+    protected MonitoringEvent aggregate(final List<MonitoringEvent> eventsList, final long tStart, final long tEnd) {
+        final HashMap<String, Object> dict = getAccountingEventObject(eventsList);
 
-        @SuppressWarnings("rawtypes")
-        final HashMap dict = getAccountingEventObject(eventList);
+        addRequiredFields(dict, eventsList.get(0));
 
-        return new VismoAggregationResult(dict);
+        final VismoAggregationResult res = new VismoAggregationResult(dict);
+
+        res.settStart(tStart);
+        res.settEnd(tEnd);
+
+        return res;
     }
 
 
@@ -174,7 +176,7 @@ public class AccountingRule extends AggregationRule {
      * @param eventList
      * @return the accounting stats object.
      */
-    private static HashMap<String, Object> getAccountingEventObject(final List< ? extends Event> eventList) {
+    private static HashMap<String, Object> getAccountingEventObject(final List< ? extends MonitoringEvent> eventList) {
         final HashMap<String, Object> dict = new HashMap<String, Object>();
 
         dict.put("reads", transformReadList(selectReadEvents(eventList)));
@@ -191,7 +193,7 @@ public class AccountingRule extends AggregationRule {
      * @param e
      * @return <code>true</code> iff is an obs or storlet event.
      */
-    private static boolean matches(final Event e) {
+    private static boolean matches(final MonitoringEvent e) {
         // FIXME: add a field to events coming from vismo_dispatch
         return isCompleteObsEvent(e) || isStorletEngineEvent(e);
     }
@@ -204,10 +206,11 @@ public class AccountingRule extends AggregationRule {
      * @param operation
      * @return the transformed list.
      */
-    private static ArrayList<HashMap<String, Object>> transformByOperation(final ArrayList<Event> list, final String operation) {
+    private static ArrayList<HashMap<String, Object>> transformByOperation(final ArrayList<MonitoringEvent> list,
+            final String operation) {
         final ArrayList<HashMap<String, Object>> newList = new ArrayList<HashMap<String, Object>>(list.size());
 
-        for (final Event e : list) {
+        for (final MonitoringEvent e : list) {
             final HashMap<String, Object> o = transformEvent(e);
 
             o.put("eventType", operation);
@@ -222,7 +225,7 @@ public class AccountingRule extends AggregationRule {
      * @param eventList
      * @return the list of delete events as prescribed by accounting.
      */
-    private static ArrayList<HashMap<String, Object>> transformDeleteList(final ArrayList<Event> eventList) {
+    private static ArrayList<HashMap<String, Object>> transformDeleteList(final ArrayList<MonitoringEvent> eventList) {
         return transformByOperation(eventList, "delete");
     }
 
@@ -231,7 +234,7 @@ public class AccountingRule extends AggregationRule {
      * @param e
      * @return the event object as prescribed by accounting.
      */
-    private static HashMap<String, Object> transformEvent(final Event e) {
+    private static HashMap<String, Object> transformEvent(final MonitoringEvent e) {
         final HashMap<String, Object> o = new HashMap<String, Object>();
         final long ts = e.timestamp();
         final double duration = MILLIS * (Double) e.get("transaction-duration");
@@ -260,7 +263,7 @@ public class AccountingRule extends AggregationRule {
      * @param eventList
      * @return the list of read events as prescribed by accounting.
      */
-    private static ArrayList<HashMap<String, Object>> transformReadList(final ArrayList<Event> eventList) {
+    private static ArrayList<HashMap<String, Object>> transformReadList(final ArrayList<MonitoringEvent> eventList) {
         return transformByOperation(eventList, "read");
     }
 
@@ -272,10 +275,10 @@ public class AccountingRule extends AggregationRule {
      *            the event list.
      * @return the storlet aggregated events.
      */
-    private static ArrayList<HashMap<String, Object>> transformStorletEvents(final ArrayList<Event> list) {
+    private static ArrayList<HashMap<String, Object>> transformStorletEvents(final ArrayList<MonitoringEvent> list) {
         final HashMap<String, TenantStorlets> tenants = new HashMap<String, AccountingRule.TenantStorlets>();
 
-        for (final Event e : list) {
+        for (final MonitoringEvent e : list) {
             final String tenantName = (String) e.get("tenantID");
             final TenantStorlets entry = tenants.get(tenantName);
             final Storlet s = new Storlet((String) e.get("storletCodeType"), (String) e.get("storletType"));
@@ -324,7 +327,7 @@ public class AccountingRule extends AggregationRule {
      * @param eventList
      * @return the list of write events as prescribed by accounting.
      */
-    private static ArrayList<HashMap<String, Object>> transformWriteList(final ArrayList<Event> eventList) {
+    private static ArrayList<HashMap<String, Object>> transformWriteList(final ArrayList<MonitoringEvent> eventList) {
         return transformByOperation(eventList, "write");
     }
 }

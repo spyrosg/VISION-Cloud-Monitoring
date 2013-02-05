@@ -24,8 +24,8 @@ import org.json.simple.JSONValue;
 
 
 /**
- * This is the basic implementation of an {@link EventDispatcher}. Under the hood it uses a helper object ({@link EventBuilder})
- * to provide a fluent interface to sending events.
+ * This is the basic implementation of an {@link EventDispatcher}. Under the hood it uses a helper object (
+ * {@link VismoEventBuilder}) to provide a fluent interface to sending events.
  */
 public class VismoEventDispatcher implements EventDispatcher {
     /**
@@ -72,7 +72,7 @@ public class VismoEventDispatcher implements EventDispatcher {
     /***/
     private static final Logger      log                 = Logger.getLogger(VismoEventDispatcher.class.getName());
     /** the event builder. */
-    private final EventBuilder       builder;
+    private final VismoEventBuilder  builder;
     /** the configuration object. */
     private final VismoConfiguration conf;
     /** the machine's external ip address. */
@@ -117,15 +117,14 @@ public class VismoEventDispatcher implements EventDispatcher {
         this.conf = conf;
         this.sock = socketFactory.newConnectedPushSocket(conf.getProducersPoint());
         this.ip = new VismoVMInfo().getAddress().getHostAddress();
-        this.builder = new EventBuilder(this);
+        this.builder = new VismoEventBuilder(this);
     }
 
 
     /**
-     * Prepare to send an event. The {@link EventBuilder} object is used to keep track of the event fields.
-     * 
-     * @return an {@link EventBuilder} object.
+     * @see gr.ntua.vision.monitoring.dispatch.EventDispatcher#newEvent()
      */
+    @Override
     public EventBuilder newEvent() {
         return builder;
     }
@@ -161,6 +160,7 @@ public class VismoEventDispatcher implements EventDispatcher {
      *            the event as represented with a {@link Map}.
      */
     private void addBasicFields(final Map<String, Object> map) {
+        // TODO: replace with {@link VismoEvent}
         map.put("timestamp", System.currentTimeMillis());
         map.put("originating-machine", ip);
         map.put("originating-service", originatingService);

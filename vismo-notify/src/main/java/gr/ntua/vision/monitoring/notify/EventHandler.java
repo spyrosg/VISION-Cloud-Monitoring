@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.notify;
 
-import gr.ntua.vision.monitoring.events.Event;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 
 /**
@@ -14,5 +14,5 @@ public interface EventHandler {
      * @param e
      *            the event received.
      */
-    void handle(Event e);
+    void handle(MonitoringEvent e);
 }

@@ -1,8 +1,8 @@
 package gr.ntua.vision.monitoring.notify;
 
 import gr.ntua.monitoring.sockets.Socket;
-import gr.ntua.vision.monitoring.events.Event;
 import gr.ntua.vision.monitoring.events.EventFactory;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
@@ -76,7 +76,7 @@ class EventRegistry {
 
                 // bypass topic
                 final int topicIndex = msg.indexOf(" ");
-                final Event e = factory.createEvent(msg.substring(topicIndex + 1));
+                final MonitoringEvent e = factory.createEvent(msg.substring(topicIndex + 1));
 
                 if (e != null)
                     try {
