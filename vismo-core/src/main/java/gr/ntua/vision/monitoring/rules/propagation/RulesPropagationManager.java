@@ -34,11 +34,17 @@ public class RulesPropagationManager extends Thread {
     @SuppressWarnings("unused")
     private final static Logger            log                      = LoggerFactory.getLogger(RulesPropagationManager.class);
     /***/
+    private final ClusterRulesResolver     clusterRulesResolver     = new ClusterRulesResolver(20000, this);
+    /***/
+    private final ClusterRuleStore         clusterRuleStore;
+    /***/
     private final MessageDeliverer         deliverer                = new MessageDeliverer();
     /***/
     private final MessageQueue             delQueue;
     /***/
     private final MessageDispatcher        dispatcher               = new MessageDispatcher();
+    /***/
+    private final Elector                  elector;
     /***/
     private final String                   HEARTBEAT_MULTICAST_IP   = "224.0.0.1";
     /***/
@@ -52,13 +58,13 @@ public class RulesPropagationManager extends Thread {
     /***/
     private final MessageMap               messageCounter           = new MessageMap();
     /***/
-    private final MessageMulticastReceiver          messageReceiver          = new MessageMulticastReceiver();
+    private final MessageMulticastReceiver messageReceiver          = new MessageMulticastReceiver();
     /***/
-    private final MessageMulticastSender            messageSender            = new MessageMulticastSender();
+    private final MessageMulticastSender   messageSender            = new MessageMulticastSender();
     /***/
     private final MessageMap               messageTimestamp         = new MessageMap();
     /***/
-    private final WatchDog messageWatchdog;
+    private final WatchDog                 messageWatchdog;
     /***/
     private final MessageQueue             outQueue;
     /***/
@@ -66,19 +72,14 @@ public class RulesPropagationManager extends Thread {
     /***/
     private Integer                        pid;
     /***/
-    private final NodeRuleStore                ruleStore;
-    /***/
-    private final ClusterRuleStore              clusterRuleStore;
+    private final NodeRuleStore            ruleStore;
     /***/
     private int                            size;
     /***/
     private final VismoRulesEngine         vismoRulesEngine;
     /***/
-    private final WebServer           webServer;
-    /***/
-    private final Elector elector;
-    /***/
-    private final ClusterRulesResolver clusterRulesResolver = new ClusterRulesResolver(20000, this);
+    private final WebServer                webServer;
+
 
     /**
      * @param engine
@@ -102,8 +103,6 @@ public class RulesPropagationManager extends Thread {
         deliverer.setManager(this);
         messageWatchdog.setManager(this);
 
-
-
         inputQueue = new MessageQueue();
         outQueue = new MessageQueue();
         delQueue = new MessageQueue();
@@ -112,8 +111,26 @@ public class RulesPropagationManager extends Thread {
         inputQueue.addObserver(dispatcher);
         outQueue.addObserver(messageSender);
         delQueue.addObserver(deliverer);
-        
-        elector = new  Elector(this);
+
+        elector = new Elector(this);
+    }
+
+
+    /**
+     * @return resolver
+     */
+    public ClusterRulesResolver getClusterRulesResolver() {
+        return clusterRulesResolver;
+    }
+
+
+    /**
+     * common place to store cluster rules
+     * 
+     * @return ruleStore
+     */
+    public ClusterRuleStore getClusterRuleStore() {
+        return clusterRuleStore;
     }
 
 
@@ -141,12 +158,6 @@ public class RulesPropagationManager extends Thread {
         return heartbeatReceiver;
     }
 
-    /**
-     * @return resolver
-     */
-    public ClusterRulesResolver getClusterRulesResolver(){
-        return clusterRulesResolver;
-    }
 
     /**
      * @return the input queue.
@@ -154,9 +165,6 @@ public class RulesPropagationManager extends Thread {
     public MessageQueue getInQueue() {
         return inputQueue;
     }
-
-
-
 
 
     /**
@@ -184,6 +192,14 @@ public class RulesPropagationManager extends Thread {
 
 
     /**
+     * @return messageQueue
+     */
+    public MessageQueue getOutUnicastQueue() {
+        return outUnicastQueue;
+    }
+
+
+    /**
      * returns the unique id of the node
      * 
      * @return id
@@ -202,14 +218,6 @@ public class RulesPropagationManager extends Thread {
         return Integer.valueOf(randomGenerator.nextInt(100000) + 100000);
     }
 
-    /**
-     * returns whether pid is elected
-     * @return whether the node is elected
-     */
-    public boolean isElected()
-    {
-        return elector.isElected();
-    }
 
     /**
      * common place to store rules
@@ -218,15 +226,6 @@ public class RulesPropagationManager extends Thread {
      */
     public NodeRuleStore getRuleStore() {
         return ruleStore;
-    }
-
-    /**
-     * common place to store cluster rules
-     * 
-     * @return ruleStore
-     */
-    public ClusterRuleStore getClusterRuleStore() {
-        return clusterRuleStore;
     }
 
 
@@ -262,11 +261,21 @@ public class RulesPropagationManager extends Thread {
 
 
     /**
+     * returns whether pid is elected
+     * 
+     * @return whether the node is elected
+     */
+    public boolean isElected() {
+        return elector.isElected();
+    }
+
+
+    /**
      * @see java.lang.Thread#run()
      */
     @Override
     public void run() {
-        // FIXME: why does this thread don't do anything? 
+        // FIXME: why does this thread don't do anything?
         while (true)
             try {
                 Thread.sleep(100000);
@@ -304,13 +313,5 @@ public class RulesPropagationManager extends Thread {
         }
 
         super.start();
-    }
-
-
-    /**
-     * @return messageQueue
-     */
-    public MessageQueue getOutUnicastQueue() {
-        return outUnicastQueue;
     }
 }

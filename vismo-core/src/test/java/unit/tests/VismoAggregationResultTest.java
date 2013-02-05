@@ -9,8 +9,8 @@ import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoAggregationResult;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSinks;
+import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
 import helpers.InMemoryEventDispatcher;
-import helpers.InMemoryEventSink;
 import integration.tests.FakeObjectService;
 
 import java.util.ArrayList;

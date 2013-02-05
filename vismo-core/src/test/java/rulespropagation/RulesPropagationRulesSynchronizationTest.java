@@ -44,18 +44,6 @@ public class RulesPropagationRulesSynchronizationTest {
 
 
     /**
-     * returns the port we gonna use as probe
-     * 
-     * @return a random valid port
-     */
-    private static int getProbePort() {
-        final Random rand = new Random();
-        return rand.nextInt(RulesPropagationRulesSynchronizationTest.GROUP_SIZE1)
-                + RulesPropagationRulesSynchronizationTest.WEBSERVER_START_PORT;
-    }
-
-
-    /**
      * we check if the addition of a rule in a cluster through the instance that we use as a probe is propagated in a second group
      * that enters the cluster later. In order the rule to be propagated to the new group of cluster: 1.a node to be elected 2.the
      * elected node should start the synchronization process 3.valid rule set should be elected and propagated 4.all instances
@@ -139,5 +127,17 @@ public class RulesPropagationRulesSynchronizationTest {
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+
+    /**
+     * returns the port we gonna use as probe
+     * 
+     * @return a random valid port
+     */
+    private static int getProbePort() {
+        final Random rand = new Random();
+        return rand.nextInt(RulesPropagationRulesSynchronizationTest.GROUP_SIZE1)
+                + RulesPropagationRulesSynchronizationTest.WEBSERVER_START_PORT;
     }
 }

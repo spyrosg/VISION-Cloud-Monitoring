@@ -77,7 +77,6 @@ public class HeartbeatTest {
         receiver.clearMembership();
         final HeartbeatSender sender1 = new HeartbeatSender(InetAddress.getByName(MULTICAST_IP), MULTICAST_PORT, TTL);
         sender1.setHeartBeatInterval(100000);
-        
 
         receiver.init();
         sender1.init();
@@ -115,6 +114,5 @@ public class HeartbeatTest {
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 }

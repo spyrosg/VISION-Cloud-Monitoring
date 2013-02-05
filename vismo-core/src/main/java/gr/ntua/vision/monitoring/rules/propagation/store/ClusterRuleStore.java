@@ -1,6 +1,5 @@
 package gr.ntua.vision.monitoring.rules.propagation.store;
 
-
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
@@ -16,10 +15,9 @@ public class ClusterRuleStore {
     /***/
     @SuppressWarnings("unused")
     private final static Logger                                               log = LoggerFactory
-                                                                                         .getLogger(ClusterRuleStore.class);
+                                                                                          .getLogger(ClusterRuleStore.class);
     /***/
     private final ConcurrentHashMap<ConcurrentHashMap<Integer, String>, Long> clusterRulesSetTimestamped;
-
 
 
     /**
@@ -35,13 +33,12 @@ public class ClusterRuleStore {
      * @param updateDiff
      */
     public void addNodeRuleSet(final ConcurrentHashMap<Integer, String> nodeRuleSet, final long updateDiff) {
-        if (clusterRulesSetTimestamped.get(nodeRuleSet) == null) {
+        if (clusterRulesSetTimestamped.get(nodeRuleSet) == null)
             clusterRulesSetTimestamped.put(nodeRuleSet, updateDiff);
-        } else {
+        else {
             final long diff = clusterRulesSetTimestamped.get(nodeRuleSet);
-            if (updateDiff < diff) {
+            if (updateDiff < diff)
                 clusterRulesSetTimestamped.put(nodeRuleSet, updateDiff);
-            }
         }
     }
 
@@ -52,15 +49,13 @@ public class ClusterRuleStore {
     public void clearClusterRuleStore() {
         clusterRulesSetTimestamped.clear();
     }
-    
+
 
     /**
      * @return clusterRulesSetTimestamped
      */
-    public ConcurrentHashMap<ConcurrentHashMap<Integer, String>, Long> getClusterRuleStore(){
+    public ConcurrentHashMap<ConcurrentHashMap<Integer, String>, Long> getClusterRuleStore() {
         return clusterRulesSetTimestamped;
     }
-
-
 
 }

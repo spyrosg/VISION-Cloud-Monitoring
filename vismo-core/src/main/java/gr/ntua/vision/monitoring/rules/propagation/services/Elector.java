@@ -17,11 +17,11 @@ public class Elector extends PeriodicTask {
     /***/
     private static final Logger           log                        = LoggerFactory.getLogger(Elector.class);
     /***/
+    private static final long             period                     = 5000;
+    /***/
     private volatile boolean              isElected                  = false;
     /***/
     private final RulesPropagationManager manager;
-    /***/
-    private static final long             period                     = 5000;
     /***/
     private volatile Integer              previousElectedPid         = 0;
     /***/
@@ -54,6 +54,7 @@ public class Elector extends PeriodicTask {
     public void run() {
         checkNodeRole();
     }
+
 
     /**
      * 

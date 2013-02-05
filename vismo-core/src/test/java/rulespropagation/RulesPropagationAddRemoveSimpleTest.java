@@ -41,18 +41,6 @@ public class RulesPropagationAddRemoveSimpleTest {
 
 
     /**
-     * returns the port we are going to use as probe
-     * 
-     * @return a random valid port
-     */
-    private static int getProbePort() {
-        final Random rand = new Random();
-        return rand.nextInt(RulesPropagationAddRemoveSimpleTest.GROUP_SIZE)
-                + RulesPropagationAddRemoveSimpleTest.WEBSERVER_START_PORT;
-    }
-
-
-    /**
      * we check if the addition and removal of a rule in a cluster through the instance that we use as a probe is done in a
      * uniform way in all instances of group
      **/
@@ -142,5 +130,17 @@ public class RulesPropagationAddRemoveSimpleTest {
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+
+    /**
+     * returns the port we are going to use as probe
+     * 
+     * @return a random valid port
+     */
+    private static int getProbePort() {
+        final Random rand = new Random();
+        return rand.nextInt(RulesPropagationAddRemoveSimpleTest.GROUP_SIZE)
+                + RulesPropagationAddRemoveSimpleTest.WEBSERVER_START_PORT;
     }
 }

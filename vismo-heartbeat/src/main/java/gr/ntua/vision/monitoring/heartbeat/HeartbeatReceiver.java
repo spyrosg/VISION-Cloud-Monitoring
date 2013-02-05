@@ -284,7 +284,7 @@ public class HeartbeatReceiver {
      * @param clusterElectedHost
      */
     public void setClusterElectedHost(final String clusterElectedHost) {
-        this.clusterElectedHost = clusterElectedHost;        
+        this.clusterElectedHost = clusterElectedHost;
     }
 
 }

@@ -14,8 +14,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * @author tmessini
- * FIXME: maybe delete?
+ * @author tmessini FIXME: maybe delete?
  */
 public class MessageUnicastSender extends Thread implements Observer {
     /***/

@@ -82,8 +82,7 @@ public class NodeRuleStore {
      * removes the rule.
      * 
      * @param ruleId
-     *           
-     * @param updateTimestamp 
+     * @param updateTimestamp
      */
     public void deleteRule(final Integer ruleId, final boolean updateTimestamp) {
         rulesNum.remove(ruleId);
