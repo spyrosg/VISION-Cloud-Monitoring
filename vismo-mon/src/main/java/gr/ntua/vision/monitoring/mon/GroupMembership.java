@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * A {@link GroupMembership} is just a collection of {@link GroupElement}s, where there are maintained for a predefined period,
@@ -12,6 +15,8 @@ import java.util.TimerTask;
  * place taken by the new arrival.
  */
 public class GroupMembership {
+    /** the log target. */
+    static final Logger                        log   = LoggerFactory.getLogger(GroupMembership.class);
     /** the expiration period for group membership, specified in millies. */
     private final long                         expirationPeriod;
     /** the actual group. */
@@ -53,6 +58,8 @@ public class GroupMembership {
      *            the element.
      */
     public void add(final GroupElement elem) {
+        log.trace("adding member: {}", elem);
+
         if (members.containsKey(elem)) { // an identical element already exists
             removeById(elem);
             addById(elem);
@@ -81,9 +88,12 @@ public class GroupMembership {
      *            the member.
      */
     void removeById(final GroupElement member) {
+        log.trace("removing member: {}", member);
+
         final TimerTask task = members.remove(member);
 
-        task.cancel();
+        if (task != null)
+            task.cancel();
     }
 
 
@@ -114,6 +124,7 @@ public class GroupMembership {
         return new TimerTask() {
             @Override
             public void run() {
+                log.trace("removing member: {}", elem);
                 map.remove(elem);
             }
         };

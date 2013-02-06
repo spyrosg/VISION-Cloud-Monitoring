@@ -1,9 +1,7 @@
 package gr.ntua.vision.monitoring.mon;
 
-import gr.ntua.vision.monitoring.VismoConfiguration;
-
-import java.net.UnknownHostException;
 import java.util.Timer;
+import java.util.TimerTask;
 
 
 /**
@@ -11,35 +9,44 @@ import java.util.Timer;
  */
 public class VismoGroupMonitoring {
     /***/
-    private static final long        TWO_SECONDS = 2 * 1000;
+    private static final long      TWO_SECONDS = 2 * 1000;
     /***/
-    private final VismoConfiguration conf;
+    private final VismoGroupServer server;
     /***/
-    private final Timer              timer       = new Timer(true);
+    private final Timer            timer       = new Timer(true);
 
 
     /**
-     * @param conf
+     * Constructor.
+     * 
+     * @param server
      */
-    public VismoGroupMonitoring(final VismoConfiguration conf) {
-        this.conf = conf;
+    public VismoGroupMonitoring(final VismoGroupServer server) {
+        this.server = server;
     }
 
 
     /**
-     * Start monitoring.
-     * 
-     * @param printPeriod
-     *            the print period, in millies.
-     * @throws UnknownHostException
+     * @param period
+     * @param task
      */
-    public void start(final long printPeriod) throws UnknownHostException {
-        final VismoGroupServer server = new VismoGroupServer(conf);
-        final Thread t = new Thread(server, "group-server");
-        final GroupMembership mship = new GroupMembership(2 * conf.getMonPingPeriod() + 1);
+    public void addTask(final long period, final TimerTask task) {
+        timer.schedule(task, TWO_SECONDS, period);
+    }
 
-        server.register(new AddGroupMember(mship));
-        timer.schedule(new PrintGroupTask(mship), TWO_SECONDS, printPeriod);
-        t.start();
+
+    /**
+     * @param listener
+     */
+    public void register(final GroupNotification listener) {
+        server.register(listener);
+    }
+
+
+    /**
+     * Start the service.
+     */
+    public void start() {
+        new Thread(server, "vismo-group-server-monitoring").start();
     }
 }
