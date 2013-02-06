@@ -43,46 +43,18 @@ public class HeartbeatTest {
         // initiate the second sender
         final HeartbeatSender sender2 = new HeartbeatSender(InetAddress.getByName(MULTICAST_IP), MULTICAST_PORT, TTL);
         sender2.setHeartBeatInterval(1000);
-
         // initiate the second sender
         final HeartbeatSender sender3 = new HeartbeatSender(InetAddress.getByName(MULTICAST_IP), MULTICAST_PORT, TTL);
         sender3.setHeartBeatInterval(1000);
-
         receiver.init();
         sender1.init();
         sender2.init();
         sender3.init();
-
         sleep(2000);
-
         Assert.assertEquals("We expect membership to be valid", true, checkMembership(receiver.getMembers()));
-
         sender1.halt();
         sender2.halt();
         sender3.halt();
-        receiver.halt();
-    }
-
-
-    /**
-     * test a successfull registration scenario.
-     * 
-     * @throws IOException
-     */
-    @Test
-    public void testHeartbeatServiceUnSuccessfull() throws IOException {
-        HeartbeatTest.log.info("starting HeartbeatServiceUnSuccessfull test...");
-
-        final HeartbeatReceiver receiver = new HeartbeatReceiver(InetAddress.getByName(MULTICAST_IP), MULTICAST_PORT);
-        receiver.clearMembership();
-        final HeartbeatSender sender1 = new HeartbeatSender(InetAddress.getByName(MULTICAST_IP), MULTICAST_PORT, TTL);
-        sender1.setHeartBeatInterval(100000);
-
-        receiver.init();
-        sender1.init();
-        sleep(8000);
-        Assert.assertEquals("We expect membership to be invalid", false, checkMembership(receiver.getMembers()));
-        sender1.halt();
         receiver.halt();
     }
 

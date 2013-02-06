@@ -123,7 +123,7 @@ public class MessageDeliverer extends Thread implements Observer {
     private void processDeliveredMessage(final Message deliveredMessage) {
         final MessageType type = deliveredMessage.getType();
         final String rule = deliveredMessage.getCommand();
-        final Integer ruleId = new Integer(deliveredMessage.getCommandId());
+        final Integer ruleId = Integer.valueOf(deliveredMessage.getCommandId());
 
         if (type.equals(MessageType.ADD_RULE)) {
             final RuleProc<MonitoringEvent> ruleObject = getRule(rule);

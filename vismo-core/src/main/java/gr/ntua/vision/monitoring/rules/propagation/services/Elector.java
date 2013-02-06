@@ -34,7 +34,7 @@ public class Elector extends PeriodicTask {
      * @param manager
      */
     public Elector(final RulesPropagationManager manager) {
-        super(period);
+        super(Elector.period);
         this.manager = manager;
     }
 
@@ -62,23 +62,20 @@ public class Elector extends PeriodicTask {
     private void checkNodeRole() {
         if (manager.getHeartbeatReceiver().getClusterElectedHost() != null) {
             final String elected = manager.getHeartbeatReceiver().getClusterElectedHost();
+            final String[] ipPid = elected.split(":");
 
-            if (!elected.equals(null)) {
-                final String[] ipPid = elected.split(":");
+            if (ipPid.length == 2) {
+                final Integer electedPid = Integer.parseInt(ipPid[1]);
 
-                if (ipPid.length == 2) {
-                    final Integer electedPid = Integer.parseInt(ipPid[1]);
+                final int currentMulticastGroupSize = manager.getHeartbeatReceiver().getMembers().size();
 
-                    final int currentMulticastGroupSize = manager.getHeartbeatReceiver().getMembers().size();
-
-                    if (electedPid.equals(manager.getPid()) && getPreviousElectedPid().equals(electedPid)
-                            && currentMulticastGroupSize == getPreviousMulticastGroupSize())
-                        setElected(true);
-                    else {
-                        setElected(false);
-                        setPreviousElectedPid(electedPid);
-                        setPreviousMulticastGroupSize(currentMulticastGroupSize);
-                    }
+                if (electedPid.equals(manager.getPid()) && getPreviousElectedPid().equals(electedPid)
+                        && currentMulticastGroupSize == getPreviousMulticastGroupSize())
+                    setElected(true);
+                else {
+                    setElected(false);
+                    setPreviousElectedPid(electedPid);
+                    setPreviousMulticastGroupSize(currentMulticastGroupSize);
                 }
             }
         }
