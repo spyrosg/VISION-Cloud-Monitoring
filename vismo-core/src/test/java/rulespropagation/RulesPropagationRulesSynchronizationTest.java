@@ -26,9 +26,9 @@ import com.sun.jersey.api.client.WebResource;
  */
 public class RulesPropagationRulesSynchronizationTest {
     /***/
-    private static final int                         GROUP_SIZE1          = 10;
+    private static final int                         GROUP1_SIZE          = 10;
     /***/
-    private static final int                         GROUP_SIZE2          = 10;
+    private static final int                         GROUP2_SIZE          = 10;
     /***/
     private final static int                         PROBE_PORT           = RulesPropagationRulesSynchronizationTest
                                                                                   .getProbePort();
@@ -59,20 +59,20 @@ public class RulesPropagationRulesSynchronizationTest {
         // wait in order the message to be propagated and executed
         threadSleep(2000);
         // check if all rule managers have the rule in group1
-        for (int i = 0; i < RulesPropagationRulesSynchronizationTest.GROUP_SIZE1; i++)
+        for (int i = 0; i < RulesPropagationRulesSynchronizationTest.GROUP1_SIZE; i++)
             Assert.assertEquals(true, managers.get(i).getRuleStore().containsRule("AccountingRule:10000:@"));
 
         // start group 2
-        for (int i = RulesPropagationRulesSynchronizationTest.GROUP_SIZE1; i < RulesPropagationRulesSynchronizationTest.GROUP_SIZE1
-                + RulesPropagationRulesSynchronizationTest.GROUP_SIZE2; i++) {
+        for (int i = RulesPropagationRulesSynchronizationTest.GROUP1_SIZE; i < RulesPropagationRulesSynchronizationTest.GROUP1_SIZE
+                + RulesPropagationRulesSynchronizationTest.GROUP2_SIZE; i++) {
             managers.add(new RulesPropagationManager(new VismoRulesEngine(new RulesStore(), new EventSinks()),
                     RulesPropagationRulesSynchronizationTest.WEBSERVER_START_PORT + i));
             managers.get(i).start();
         }
 
         threadSleep(120000);
-        for (int i = 0; i < RulesPropagationRulesSynchronizationTest.GROUP_SIZE1
-                + RulesPropagationRulesSynchronizationTest.GROUP_SIZE2; i++)
+        for (int i = 0; i < RulesPropagationRulesSynchronizationTest.GROUP1_SIZE
+                + RulesPropagationRulesSynchronizationTest.GROUP2_SIZE; i++)
             Assert.assertEquals(true, managers.get(i).getRuleStore().containsRule("AccountingRule:10000:@"));
     }
 
@@ -84,7 +84,7 @@ public class RulesPropagationRulesSynchronizationTest {
      */
     @Before
     public void setUp() throws Exception {
-        for (int i = 0; i < RulesPropagationRulesSynchronizationTest.GROUP_SIZE1; i++) {
+        for (int i = 0; i < RulesPropagationRulesSynchronizationTest.GROUP1_SIZE; i++) {
             managers.add(new RulesPropagationManager(new VismoRulesEngine(new RulesStore(), new EventSinks()),
                     RulesPropagationRulesSynchronizationTest.WEBSERVER_START_PORT + i));
             managers.get(i).start();
@@ -100,8 +100,8 @@ public class RulesPropagationRulesSynchronizationTest {
      */
     @After
     public void tearDown() throws Exception {
-        for (int i = 0; i < RulesPropagationRulesSynchronizationTest.GROUP_SIZE1
-                + RulesPropagationRulesSynchronizationTest.GROUP_SIZE2; i++)
+        for (int i = 0; i < RulesPropagationRulesSynchronizationTest.GROUP1_SIZE
+                + RulesPropagationRulesSynchronizationTest.GROUP2_SIZE; i++)
             managers.get(i).halt();
     }
 
@@ -131,13 +131,13 @@ public class RulesPropagationRulesSynchronizationTest {
 
 
     /**
-     * returns the port we gonna use as probe
+     * returns the port we going to use as probe
      * 
      * @return a random valid port
      */
     private static int getProbePort() {
         final Random rand = new Random();
-        return rand.nextInt(RulesPropagationRulesSynchronizationTest.GROUP_SIZE1)
+        return rand.nextInt(RulesPropagationRulesSynchronizationTest.GROUP1_SIZE)
                 + RulesPropagationRulesSynchronizationTest.WEBSERVER_START_PORT;
     }
 }

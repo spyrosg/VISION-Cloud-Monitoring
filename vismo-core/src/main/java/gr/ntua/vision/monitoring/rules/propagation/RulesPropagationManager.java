@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author tmessini
  */
-public class RulesPropagationManager extends Thread {
+public class RulesPropagationManager {
     /***/
     @SuppressWarnings("unused")
     private final static Logger            log                      = LoggerFactory.getLogger(RulesPropagationManager.class);
@@ -68,8 +68,6 @@ public class RulesPropagationManager extends Thread {
     /***/
     private final MessageQueue             outQueue;
     /***/
-    private final MessageQueue             outUnicastQueue;
-    /***/
     private Integer                        pid;
     /***/
     private final NodeRuleStore            ruleStore;
@@ -79,6 +77,8 @@ public class RulesPropagationManager extends Thread {
     private final VismoRulesEngine         vismoRulesEngine;
     /***/
     private final WebServer                webServer;
+    /** the timer object. */
+    private final Timer                   timer = new Timer(true);
 
 
     /**
@@ -106,7 +106,6 @@ public class RulesPropagationManager extends Thread {
         inputQueue = new MessageQueue();
         outQueue = new MessageQueue();
         delQueue = new MessageQueue();
-        outUnicastQueue = new MessageQueue();
 
         inputQueue.addObserver(dispatcher);
         outQueue.addObserver(messageSender);
@@ -192,14 +191,6 @@ public class RulesPropagationManager extends Thread {
 
 
     /**
-     * @return messageQueue
-     */
-    public MessageQueue getOutUnicastQueue() {
-        return outUnicastQueue;
-    }
-
-
-    /**
      * returns the unique id of the node
      * 
      * @return id
@@ -252,6 +243,7 @@ public class RulesPropagationManager extends Thread {
             messageWatchdog.cancel();
             elector.cancel();
             clusterRulesResolver.cancel();
+            timer.cancel();
         } catch (final IllegalArgumentException e) {
             e.printStackTrace();
         } catch (final Exception e) {
@@ -270,21 +262,6 @@ public class RulesPropagationManager extends Thread {
     }
 
 
-    /**
-     * @see java.lang.Thread#run()
-     */
-    @Override
-    public void run() {
-        // FIXME: why does this thread don't do anything?
-        while (true)
-            try {
-                Thread.sleep(100000);
-            } catch (final InterruptedException e) {
-                e.printStackTrace();
-            }
-    }
-
-
     /***/
     public void setPid() {
         pid = getRandomID();
@@ -292,10 +269,9 @@ public class RulesPropagationManager extends Thread {
 
 
     /**
-     * @see java.lang.Thread#start()
+     * starting all threads needed for the manager
      */
-    @Override
-    public synchronized void start() {
+    public void start() {
         try {
             webServer.withResource(new RulesManagementResource(this));
             webServer.start();
@@ -305,13 +281,12 @@ public class RulesPropagationManager extends Thread {
             deliverer.start();
             heartbeatReceiver.init();
             heartbeatSender.init();
-            messageWatchdog.scheduleWith(new Timer()); // TODO: use VismoService#addTask(PeriodicTask)
-            elector.scheduleWith(new Timer()); // TODO: use VismoService#addTask(PeriodicTask)
-            clusterRulesResolver.scheduleWith(new Timer()); // TODO: use VismoService#addTask(PeriodicTask)
+            messageWatchdog.scheduleWith(timer); 
+            elector.scheduleWith(timer); 
+            clusterRulesResolver.scheduleWith(timer); 
         } catch (final Throwable x) {
             throw new RuntimeException(x);
         }
 
-        super.start();
     }
 }
