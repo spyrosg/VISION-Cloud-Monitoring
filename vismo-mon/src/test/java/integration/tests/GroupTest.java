@@ -5,6 +5,7 @@ import gr.ntua.vision.monitoring.mon.GroupClient;
 import gr.ntua.vision.monitoring.mon.GroupServer;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.LinkedHashSet;
 
@@ -57,7 +58,7 @@ public class GroupTest {
 
         server = new GroupServer(GROUP_ADDRESS, GROUP_PORT) {
             @Override
-            protected void notify(final String notification) {
+            protected void notify(@SuppressWarnings("unused") final InetAddress addr, final String notification) {
                 notifications.add(notification);
             }
         };

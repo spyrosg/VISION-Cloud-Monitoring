@@ -64,8 +64,8 @@ public abstract class GroupServer implements Runnable {
 
             final String message = new String(pack.getData(), 0, pack.getLength());
 
-            log.trace("<< '{}'", message);
-            notify(message);
+            log.trace("notifying listeners of '{}'", message);
+            notify(pack.getAddress(), message);
         }
 
         log.debug("leaving group {}", groupAddress.getHostAddress());
@@ -77,10 +77,12 @@ public abstract class GroupServer implements Runnable {
     /**
      * Pass the notification up the chain.
      * 
+     * @param addr
+     *            the address of the machine in the group this notification has been received from.
      * @param notification
-     *            the notification received.
+     *            the actual notification.
      */
-    protected abstract void notify(final String notification);
+    protected abstract void notify(InetAddress addr, final String notification);
 
 
     /**

@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring.mon;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
 
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
@@ -38,19 +39,21 @@ public class VismoGroupServer extends GroupServer {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.mon.GroupServer#notify(java.lang.String)
+     * @see gr.ntua.vision.monitoring.mon.GroupServer#notify(java.net.InetAddress, java.lang.String)
      */
     @Override
-    protected void notify(final String notification) {
-        notifyListeners(notification);
+    protected void notify(final InetAddress addr, final String notification) {
+        notifyListeners(addr, notification);
+
     }
 
 
     /**
+     * @param addr
      * @param notification
      */
-    private void notifyListeners(final String notification) {
+    private void notifyListeners(final InetAddress addr, final String notification) {
         for (final GroupNotification listener : listeners)
-            listener.pass(notification);
+            listener.pass(addr, notification);
     }
 }

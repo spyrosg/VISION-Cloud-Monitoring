@@ -32,7 +32,7 @@ public class GroupMembershipTest {
      */
     @Test
     public void afterExpirationMemberShouldBeenRemoved() throws UnknownHostException {
-        final GroupElement m = new GroupElement(InetAddress.getLocalHost());
+        final GroupElement m = new GroupElement(InetAddress.getLocalHost(), "m");
 
         mship.add(m);
         assertEquals(1, map.size());
@@ -45,7 +45,7 @@ public class GroupMembershipTest {
      */
     @Test
     public void membershipShouldSupportUniqueMembers() throws UnknownHostException, InterruptedException {
-        final GroupElement m = new GroupElement(InetAddress.getLocalHost());
+        final GroupElement m = new GroupElement(InetAddress.getLocalHost(), "m");
 
         mship.add(m);
         mship.add(m);
@@ -70,8 +70,9 @@ public class GroupMembershipTest {
     @Test
     public void shouldNotRemoveUpdatedMember() throws UnknownHostException, InterruptedException {
         final long ts = System.currentTimeMillis();
-        final GroupElement m1 = new GroupElement(InetAddress.getLocalHost(), ts);
-        final GroupElement m2 = new GroupElement(InetAddress.getLocalHost(), ts + 10);
+        final String id = "id";
+        final GroupElement m1 = new GroupElement(InetAddress.getLocalHost(), id, ts);
+        final GroupElement m2 = new GroupElement(InetAddress.getLocalHost(), id, ts + 10);
 
         assertEquals("elements should be identical", m1, m2);
 
