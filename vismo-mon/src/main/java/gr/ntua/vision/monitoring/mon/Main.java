@@ -21,8 +21,12 @@ public class Main {
         }
 
         final VismoConfiguration conf = new VismoConfiguration(args[0]);
-        final VismoGroupMonitoring mon = new VismoGroupMonitoring(conf);
+        final GroupMembership mship = new GroupMembership(2 * conf.getMonPingPeriod() + 1);
+        final VismoGroupServer server = new VismoGroupServer(conf);
+        final VismoGroupMonitoring mon = new VismoGroupMonitoring(server);
 
-        mon.start(1000 * Long.parseLong(args[1]));
+        mon.register(new AddGroupMember(mship));
+        mon.addTask(1000 * Long.parseLong(args[1]), new PrintGroupTask(mship));
+        mon.start();
     }
 }
