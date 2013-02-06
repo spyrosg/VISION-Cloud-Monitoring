@@ -264,7 +264,8 @@ public class VismoRulesEngineTest {
          * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List, long, long)
          */
         @Override
-        protected MonitoringEvent aggregate(final List<MonitoringEvent> eventsList, final long tStart, final long tEnd) {
+        protected MonitoringEvent aggregate(final List<MonitoringEvent> eventsList,
+                @SuppressWarnings("unused") final long tStart, @SuppressWarnings("unused") final long tEnd) {
             final ArrayList<Integer> intList = new ArrayList<Integer>(eventsList.size());
             extract(intList, eventsList);
 

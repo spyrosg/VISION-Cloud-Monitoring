@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * A {@link GroupMembership} is just a collection of {@link GroupElement}s, where there are maintained for a predefined period,
@@ -12,6 +15,8 @@ import java.util.TimerTask;
  * place taken by the new arrival.
  */
 public class GroupMembership {
+    /** the log target. */
+    static final Logger                        log   = LoggerFactory.getLogger(GroupMembership.class);
     /** the expiration period for group membership, specified in millies. */
     private final long                         expirationPeriod;
     /** the actual group. */
@@ -54,10 +59,13 @@ public class GroupMembership {
      */
     public void add(final GroupElement elem) {
         if (members.containsKey(elem)) { // an identical element already exists
+            log.trace("updating member: {}", elem);
             removeById(elem);
             addById(elem);
-        } else
+        } else {
+            log.trace("adding member: {}", elem);
             addById(elem);
+        }
     }
 
 
@@ -71,19 +79,6 @@ public class GroupMembership {
     public void forEach(final GroupProc proc) {
         for (final GroupElement member : members.keySet())
             proc.applyTo(member);
-    }
-
-
-    /**
-     * Remove the member from the group. Cancel its timer.
-     * 
-     * @param member
-     *            the member.
-     */
-    void removeById(final GroupElement member) {
-        final TimerTask task = members.remove(member);
-
-        task.cancel();
     }
 
 
@@ -102,6 +97,20 @@ public class GroupMembership {
 
 
     /**
+     * Remove the member from the group. Cancel its timer.
+     * 
+     * @param member
+     *            the member.
+     */
+    private void removeById(final GroupElement member) {
+        final TimerTask task = members.remove(member);
+
+        if (task != null)
+            task.cancel();
+    }
+
+
+    /**
      * Get a timer task for removing an element from a map.
      * 
      * @param map
@@ -114,6 +123,7 @@ public class GroupMembership {
         return new TimerTask() {
             @Override
             public void run() {
+                log.trace("removing member: {}", elem);
                 map.remove(elem);
             }
         };
