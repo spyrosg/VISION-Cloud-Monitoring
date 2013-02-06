@@ -49,7 +49,7 @@ public class GroupClient {
         final byte[] buf = note.getBytes();
         final DatagramPacket p = new DatagramPacket(buf, buf.length, groupAddress, port);
 
-        log.trace(">> '{}' to {}:{}", new Object[] { note, groupAddress.getHostAddress(), port });
+        log.trace(">> '{}' group {}:{}", new Object[] { note, groupAddress.getHostAddress(), port });
 
         try {
             sock.send(p);
