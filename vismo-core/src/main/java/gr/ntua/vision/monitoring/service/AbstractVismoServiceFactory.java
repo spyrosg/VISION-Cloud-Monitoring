@@ -70,7 +70,7 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
         final RulesPropagationManager rulesManager = new RulesPropagationManager(engine, 9996);
         final VismoService service = new VismoService(vminfo, sources, engine, rulesManager);
 
-        addDefaultServiceTasks(service, vminfo);
+        addDefaultServiceTasks(service);
         log.info("take it from here");
 
         return service;
@@ -79,13 +79,12 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
 
     /**
      * @param service
-     * @param vminfo
      * @throws UnknownHostException
      */
-    protected void addDefaultServiceTasks(final VismoService service, final VMInfo vminfo) throws UnknownHostException {
+    protected void addDefaultServiceTasks(final VismoService service) throws UnknownHostException {
         log.debug("adding default tasks");
         service.addTask(new JVMStatusReportTask(ONE_MINUTE));
-        service.addTask(new PingGroupTask(conf, vminfo));
+        service.addTask(new PingGroupTask(conf, "ping?"));
     }
 
 

@@ -1,6 +1,5 @@
 package gr.ntua.vision.monitoring.threading;
 
-import gr.ntua.vision.monitoring.VMInfo;
 import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.mon.VismoGroupClient;
 
@@ -20,7 +19,7 @@ public class PingGroupTask extends PeriodicTask {
     /** the vismo group client. */
     private final VismoGroupClient client;
     /***/
-    private final VMInfo           vminfo;
+    private final String           note;
 
 
     /**
@@ -28,13 +27,13 @@ public class PingGroupTask extends PeriodicTask {
      * 
      * @param conf
      *            the configuration object.
-     * @param vminfo
+     * @param note
      * @throws UnknownHostException
      */
-    public PingGroupTask(final VismoConfiguration conf, final VMInfo vminfo) throws UnknownHostException {
+    public PingGroupTask(final VismoConfiguration conf, final String note) throws UnknownHostException {
         super(conf.getMonPingPeriod());
         this.client = new VismoGroupClient(conf);
-        this.vminfo = vminfo;
+        this.note = note;
     }
 
 
@@ -44,7 +43,7 @@ public class PingGroupTask extends PeriodicTask {
     @Override
     public void run() {
         try {
-            client.notifyGroup(vminfo.getAddress().getHostAddress());
+            client.notifyGroup(note);
         } catch (final IOException e) {
             log.error("unable to contact group", e);
             // move on
