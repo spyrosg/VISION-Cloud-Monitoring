@@ -28,7 +28,7 @@ public class RulesPropagationRulesSynchronizationTest {
     /***/
     private static final int                         GROUP1_SIZE          = 10;
     /***/
-    private static final int                         GROUP2_SIZE          = 10;
+    private static final int                         GROUP2_SIZE          = 5;
     /***/
     private final static int                         PROBE_PORT           = RulesPropagationRulesSynchronizationTest
                                                                                   .getProbePort();
@@ -70,7 +70,14 @@ public class RulesPropagationRulesSynchronizationTest {
             managers.get(i).start();
         }
 
-        threadSleep(120000);
+        int countsecs = 0;
+        //wait till the second group get the rule but not more than 120 secs
+        while(managers.get(GROUP1_SIZE).getRuleStore().getRulesCatalogSize()==0 && countsecs < 120)
+        {
+            countsecs++;
+            threadSleep(1000);            
+        }
+
         for (int i = 0; i < RulesPropagationRulesSynchronizationTest.GROUP1_SIZE
                 + RulesPropagationRulesSynchronizationTest.GROUP2_SIZE; i++)
             Assert.assertEquals(true, managers.get(i).getRuleStore().containsRule("AccountingRule:10000:@"));
