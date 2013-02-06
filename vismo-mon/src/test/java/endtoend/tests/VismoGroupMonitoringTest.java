@@ -98,35 +98,43 @@ public class VismoGroupMonitoringTest {
         mon.start();
         Thread.sleep(100); // spin thread
 
-        clientsSendPings();
-
+        clientsSendPings(3);
         Thread.sleep(7 * conf.getMonPingPeriod() / 8); // make sure we don't expire
-        assertLiveMembers();
+        assertLiveMembers(3);
+
+        clientsSendPings(2); // we just lost one
+        Thread.sleep(7 * conf.getMonPingPeriod() / 8); // make sure we don't expire
+        assertLiveMembers(2);
+
+        clientsSendPings(3);
+        Thread.sleep(7 * conf.getMonPingPeriod() / 8); // make sure we don't expire
+        assertLiveMembers(3);
     }
 
 
     /**
-     * 
+     * @param expectedLiveClients
      */
-    private void assertLiveMembers() {
+    private void assertLiveMembers(final int expectedLiveClients) {
         collectMembers();
-        System.err.println(members);
-        assertEquals(3, members.size());
+        assertEquals(expectedLiveClients, members.size());
+
+        for (int i = 0; i < expectedLiveClients; ++i)
+            assertEquals(members.get(i).s, group[i].id);
     }
 
 
     /**
+     * @param length
      * @throws IOException
      */
-    private void clientsSendPings() throws IOException {
-        for (int i = 0; i < group.length; ++i)
+    private void clientsSendPings(final int length) throws IOException {
+        for (int i = 0; i < length; ++i)
             group[i].sendPing();
     }
 
 
-    /**
-     * 
-     */
+    /***/
     private void collectMembers() {
         members.clear();
         mship.forEach(new GroupProc() {

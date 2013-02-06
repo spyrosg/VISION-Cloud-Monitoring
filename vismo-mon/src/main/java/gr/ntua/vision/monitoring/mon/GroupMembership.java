@@ -58,13 +58,14 @@ public class GroupMembership {
      *            the element.
      */
     public void add(final GroupElement elem) {
-        log.trace("adding member: {}", elem);
-
         if (members.containsKey(elem)) { // an identical element already exists
+            log.trace("updating member: {}", elem);
             removeById(elem);
             addById(elem);
-        } else
+        } else {
+            log.trace("adding member: {}", elem);
             addById(elem);
+        }
     }
 
 
@@ -82,22 +83,6 @@ public class GroupMembership {
 
 
     /**
-     * Remove the member from the group. Cancel its timer.
-     * 
-     * @param member
-     *            the member.
-     */
-    void removeById(final GroupElement member) {
-        log.trace("removing member: {}", member);
-
-        final TimerTask task = members.remove(member);
-
-        if (task != null)
-            task.cancel();
-    }
-
-
-    /**
      * Add a new member to the group. Schedule its removal.
      * 
      * @param elem
@@ -108,6 +93,20 @@ public class GroupMembership {
 
         members.put(elem, task);
         timer.schedule(task, expirationPeriod);
+    }
+
+
+    /**
+     * Remove the member from the group. Cancel its timer.
+     * 
+     * @param member
+     *            the member.
+     */
+    private void removeById(final GroupElement member) {
+        final TimerTask task = members.remove(member);
+
+        if (task != null)
+            task.cancel();
     }
 
 
