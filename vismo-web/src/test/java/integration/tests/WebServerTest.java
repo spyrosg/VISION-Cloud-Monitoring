@@ -7,7 +7,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.jetty.util.resource.Resource;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.sun.jersey.api.client.Client;
@@ -29,46 +28,36 @@ public class WebServerTest {
     private final WebServer     server   = new WebServer(PORT);
 
 
-    /***/
+    /**
+     * @throws Exception
+     */
     @Test
-    public void getBarResource() {
-        final ClientResponse res = root().path("bar").accept(MediaType.TEXT_PLAIN).get(ClientResponse.class);
+    public void shouldAccessJerseyResources() throws Exception {
+        server.withResource(new FooResource("foo-value")).withResource(new BarResource("bar-value"));
+        server.start();
 
-        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
-        assertEquals("bar", res.getEntity(String.class));
-    }
+        shouldRetrieveResourceWithValue("foo/0", "foo-value");
+        shouldRetrieveResourceWithValue("bar", "bar-value");
 
+        assertEquals(ClientResponse.Status.NO_CONTENT,
+                     root().path("foo/other-foo").accept(MediaType.TEXT_PLAIN).put(ClientResponse.class)
+                             .getClientResponseStatus());
 
-    /***/
-    @Test
-    public void getFooResource() {
-        final ClientResponse res = root().path("foo").accept(MediaType.TEXT_PLAIN).get(ClientResponse.class);
-
-        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
-        assertEquals("foo", res.getEntity(String.class));
-    }
-
-
-    /***/
-    @Test
-    public void getStaticResource() {
-        final ClientResponse res = root().path("/static-foo").path("index.html").accept(MediaType.TEXT_PLAIN)
-                .get(ClientResponse.class);
-
-        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
-        assertEquals("foo\n", res.getEntity(String.class));
+        shouldRetrieveResourceWithValue("foo/1", "other-foo");
     }
 
 
     /**
      * @throws Exception
      */
-    @Before
-    public void setUp() throws Exception {
-        server.withResource(new FooResource("foo")).withResource(new BarResource("bar"))
-                .withStaticResourceTo(Resource.newClassPathResource("/static"), "/static-foo");
-
+    @Test
+    public void shouldAccessStaticResource() throws Exception {
+        server.withResource(new BarResource("bar-value"));
+        server.withStaticResourceTo(Resource.newClassPathResource("/static"), "/static-foo");
         server.start();
+
+        shouldRetrieveResourceWithValue("bar", "bar-value");
+        shouldRetrieveResourceWithValue("static-foo/index.html", "<html>\nfoo\n</html>");
     }
 
 
@@ -87,5 +76,17 @@ public class WebServerTest {
      */
     private WebResource root() {
         return client.resource(ROOT_URL);
+    }
+
+
+    /**
+     * @param path
+     * @param expectedValue
+     */
+    private void shouldRetrieveResourceWithValue(final String path, final String expectedValue) {
+        final ClientResponse res = root().path(path).accept(MediaType.TEXT_PLAIN).get(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
+        assertEquals(expectedValue, res.getEntity(String.class));
     }
 }
