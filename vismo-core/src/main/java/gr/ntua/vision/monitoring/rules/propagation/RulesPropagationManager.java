@@ -273,7 +273,7 @@ public class RulesPropagationManager {
      */
     public void start() {
         try {
-            webServer.withResource(new RulesManagementResource(this));
+            webServer.withResource(new RulesManagementResource(this)).build("/*");
             webServer.start();
             messageSender.init();
             messageReceiver.init();

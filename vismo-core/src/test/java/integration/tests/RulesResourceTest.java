@@ -71,7 +71,7 @@ public class RulesResourceTest {
     @Before
     public void setUp() throws Exception {
         server = new WebServer(PORT);
-        server.withResource(new RulesResource(catalog));
+        server.withResource(new RulesResource(catalog)).build("/*");
         server.start();
     }
 
