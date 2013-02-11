@@ -28,12 +28,15 @@ public class MessageDeliverer extends Thread implements Observer {
     private RulesPropagationManager   manager;
     /***/
     private MessageFactory            messageFactory;
+    /***/
+    volatile boolean                stopped               = false;
 
 
     /**
      * stopping the thread
      */
     public void halt() {
+        stopped = true;               
         interrupt();
     }
 
@@ -44,7 +47,7 @@ public class MessageDeliverer extends Thread implements Observer {
     @Override
     public void run() {
         Message deliveredMessage;
-        while (!isInterrupted())
+        while (!stopped)
             if (!manager.getDelQueue().isQEmpty()) {
                 deliveredMessage = manager.getDelQueue().getMessage();
                 processDeliveredMessage(deliveredMessage);

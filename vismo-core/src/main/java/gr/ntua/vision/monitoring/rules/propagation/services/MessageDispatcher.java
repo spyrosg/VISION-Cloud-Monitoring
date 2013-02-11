@@ -20,12 +20,15 @@ public class MessageDispatcher extends Thread implements Observer {
     private final static Logger     log = LoggerFactory.getLogger(MessageDispatcher.class);
     /***/
     private RulesPropagationManager manager;
+    /***/
+    volatile boolean                stopped               = false;
 
 
     /**
      * 
      */
     public void halt() {
+        stopped = true;
         interrupt();
     }
 
@@ -36,7 +39,7 @@ public class MessageDispatcher extends Thread implements Observer {
     @Override
     public void run() {
         Message incomingMessage;
-        while (!Thread.interrupted())
+        while (!stopped)
             if (!manager.getInQueue().isQEmpty()) {
                 incomingMessage = manager.getInQueue().getMessage();
                 manager.getMessageTimestamp().updateMessageTimestamp(incomingMessage);
