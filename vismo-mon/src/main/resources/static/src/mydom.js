@@ -13,8 +13,13 @@ function main(fn) {
     document.addEventListener('DOMContentLoaded', fn, false);
 }
 
-function new_elem(tag) {
-    return document.createElement(tag);
+function new_elem(tag, text) {
+    var e = document.createElement(tag);
+
+    if (text)
+        e.innerText = text;
+
+    return e;
 }
 
 function ajax(method, url, type, body) {
