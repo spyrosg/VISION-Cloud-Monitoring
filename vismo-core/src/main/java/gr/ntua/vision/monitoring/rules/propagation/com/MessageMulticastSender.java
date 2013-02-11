@@ -63,6 +63,7 @@ public class MessageMulticastSender extends Thread implements Observer {
     public void halt() {
         stopped = true;
         socket.close();
+        interrupt();
     }
 
 
