@@ -21,4 +21,10 @@ public interface VMInfo {
      *             when the pid is not available for this jvm.
      */
     int getPID();
+
+
+    /**
+     * @return a version string for the program.
+     */
+    String getVersion();
 }

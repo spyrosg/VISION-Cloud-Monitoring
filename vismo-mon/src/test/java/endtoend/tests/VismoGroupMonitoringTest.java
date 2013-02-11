@@ -120,7 +120,7 @@ public class VismoGroupMonitoringTest {
         assertEquals(expectedLiveClients, members.size());
 
         for (int i = 0; i < expectedLiveClients; ++i)
-            assertEquals(members.get(i).s, group[i].id);
+            assertEquals(members.get(i).id, group[i].id);
     }
 
 

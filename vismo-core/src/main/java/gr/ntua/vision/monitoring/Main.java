@@ -8,7 +8,6 @@ import gr.ntua.vision.monitoring.udp.UDPServer;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +39,11 @@ public class Main {
      * @throws IOException
      */
     public void start() throws IOException {
-        logVersion();
+        final VMInfo info = new VismoVMInfo();
 
-        final VismoService service = (VismoService) new StaticConfigPolicy(conf).build(new VismoVMInfo());
+        log.info("this is {}, running off commit-id {}", PROG, info.getVersion());
+
+        final VismoService service = (VismoService) new StaticConfigPolicy(conf).build(info);
         final UDPServer udpServer = new UDPFactory(conf.getUDPPort()).buildServer();
 
         udpServer.add(service);
@@ -110,20 +111,6 @@ public class Main {
             main.stop();
         else
             showHelp();
-    }
-
-
-    /**
-     * Log version, commit id and build date.
-     * 
-     * @throws IOException
-     */
-    private static void logVersion() throws IOException {
-        final Properties p = new Properties();
-
-        p.load(Main.class.getResourceAsStream("/git.properties"));
-        log.info("this is {}, running off commit-id {}, built on {}", new String[] { PROG, p.getProperty("git.commit.id.abbrev"),
-                p.getProperty("git.build.time") });
     }
 
 

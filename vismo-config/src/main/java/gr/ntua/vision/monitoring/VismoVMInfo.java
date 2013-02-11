@@ -1,11 +1,13 @@
 package gr.ntua.vision.monitoring;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.Properties;
 
 
 /**
@@ -52,6 +54,23 @@ public class VismoVMInfo implements VMInfo {
             throw new Error("Cannot get the pid of this jvm");
 
         return Integer.parseInt(jvmName.substring(0, index));
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.VMInfo#getVersion()
+     */
+    @Override
+    public String getVersion() {
+        final Properties p = new Properties();
+
+        try {
+            p.load(VismoVMInfo.class.getResourceAsStream("/git.properties"));
+        } catch (final IOException e) {
+            throw new Error("cannot get system version");
+        }
+
+        return p.getProperty("git.commit.id.abbrev") + " built on " + p.getProperty("git.build.time");
     }
 
 

@@ -11,21 +11,22 @@ import java.util.Date;
 public class GroupElement {
     /** the element's address. */
     public final InetAddress addr;
+    /** an identification string for the element. */
+    public final String      id;
     /** when was this element last updated (in milliseconds since the epoch)? */
     public final long        lastUpdated;
-    /***/
-    public final String      s;
 
 
     /**
-     * Constructor.
+     * Constructor with default time-stamp from {@link System#currentTimeMillis()}.
      * 
      * @param addr
      *            the element's address.
-     * @param s
+     * @param id
+     *            an identification string for the element.
      */
-    public GroupElement(final InetAddress addr, final String s) {
-        this(addr, s, System.currentTimeMillis());
+    public GroupElement(final InetAddress addr, final String id) {
+        this(addr, id, System.currentTimeMillis());
     }
 
 
@@ -34,13 +35,14 @@ public class GroupElement {
      * 
      * @param addr
      *            the address.
-     * @param s
+     * @param id
+     *            an identification string for the element.
      * @param lastUpdated
      *            when was this element last updated? (in milliseconds since the epoch)
      */
-    public GroupElement(final InetAddress addr, final String s, final long lastUpdated) {
+    public GroupElement(final InetAddress addr, final String id, final long lastUpdated) {
         this.addr = addr;
-        this.s = s;
+        this.id = id;
         this.lastUpdated = lastUpdated;
     }
 
@@ -62,10 +64,10 @@ public class GroupElement {
                 return false;
         } else if (!addr.equals(other.addr))
             return false;
-        if (s == null) {
-            if (other.s != null)
+        if (id == null) {
+            if (other.id != null)
                 return false;
-        } else if (!s.equals(other.s))
+        } else if (!id.equals(other.id))
             return false;
         return true;
     }
@@ -79,7 +81,7 @@ public class GroupElement {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((addr == null) ? 0 : addr.hashCode());
-        result = prime * result + ((s == null) ? 0 : s.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
         return result;
     }
 
@@ -89,7 +91,7 @@ public class GroupElement {
      */
     @Override
     public String toString() {
-        return "#<GroupElement(" + s + ") @ " + addr.getHostAddress() + " (updated " + toDate(lastUpdated) + ")>";
+        return "#<GroupElement(" + id + ") @ " + addr.getHostAddress() + " (updated " + toDate(lastUpdated) + ")>";
     }
 
 
