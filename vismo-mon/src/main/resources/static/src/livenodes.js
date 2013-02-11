@@ -38,7 +38,7 @@ function display_member_list(members) {
         var row = new_elem('tr');
         var ip = new_elem('td', member.addr);
         var last_updated = new_elem('td', date_to_human(member.lastUpdated));
-        var version = new_elem('td', '#TODO');
+        var version = new_elem('td', member.id);
 
         row.appendChild(ip);
         row.appendChild(last_updated);
