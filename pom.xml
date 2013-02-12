@@ -7,7 +7,7 @@
 
   <groupId>gr.ntua.vision</groupId>
   <artifactId>vismo</artifactId>
-  <version>1.0.9-SNAPSHOT</version>
+  <version>1.0.9</version>
   <packaging>pom</packaging>
   <name>Vismo Project</name>
   <url>http://147.102.19.118:8080/git/vismo.git</url>
