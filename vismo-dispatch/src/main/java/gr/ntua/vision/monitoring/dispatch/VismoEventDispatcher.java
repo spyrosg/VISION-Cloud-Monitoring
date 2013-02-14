@@ -21,6 +21,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.json.simple.JSONValue;
+import org.zeromq.ZContext;
 
 
 /**
@@ -88,31 +89,44 @@ public class VismoEventDispatcher implements EventDispatcher {
 
 
     /**
-     * Constructor.
+     * Constructor. In most cases, this is the constructor to use.
      * 
-     * @param serviceName
-     *            the name of the service generating the events.
      * @param configFile
      *            the vismo configuration file.
-     * @param socketFactory
-     *            the socket factory.
+     * @param serviceName
+     *            the name of the service generating the events.
      */
-    public VismoEventDispatcher(final String serviceName, final String configFile, final ZMQFactory socketFactory) {
-        this(serviceName, loadConfiguration(configFile), socketFactory);
+    public VismoEventDispatcher(final String configFile, final String serviceName) {
+        this(new ZMQFactory(new ZContext()), configFile, serviceName);
     }
 
 
     /**
      * Constructor.
      * 
-     * @param serviceName
-     *            the name of the service generating the events.
-     * @param conf
-     *            the configuration object.
      * @param socketFactory
      *            the socket factory.
+     * @param configFile
+     *            the vismo configuration file.
+     * @param serviceName
+     *            the name of the service generating the events.
      */
-    public VismoEventDispatcher(final String serviceName, final VismoConfiguration conf, final ZMQFactory socketFactory) {
+    public VismoEventDispatcher(final ZMQFactory socketFactory, final String configFile, final String serviceName) {
+        this(socketFactory, loadConfiguration(configFile), serviceName);
+    }
+
+
+    /**
+     * Constructor.
+     * 
+     * @param socketFactory
+     *            the socket factory.
+     * @param conf
+     *            the configuration object.
+     * @param serviceName
+     *            the name of the service generating the events.
+     */
+    public VismoEventDispatcher(final ZMQFactory socketFactory, final VismoConfiguration conf, final String serviceName) {
         this.originatingService = serviceName;
         this.conf = conf;
         this.sock = socketFactory.newConnectedPushSocket(conf.getProducersPoint());

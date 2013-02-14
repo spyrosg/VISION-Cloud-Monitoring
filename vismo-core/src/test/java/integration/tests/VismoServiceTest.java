@@ -159,7 +159,7 @@ public class VismoServiceTest {
      */
     @Before
     public void setUp() throws IOException {
-        obs = new FakeObjectService(new VismoEventDispatcher("fake-obs", conf, socketFactory));
+        obs = new FakeObjectService(new VismoEventDispatcher(socketFactory, conf, "fake-obs"));
 
         final ClusterHeadNodeFactory serviceFactory = new ClusterHeadNodeFactory(conf, socketFactory) {
             @Override

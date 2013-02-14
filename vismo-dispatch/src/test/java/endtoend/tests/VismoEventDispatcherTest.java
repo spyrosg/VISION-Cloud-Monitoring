@@ -44,7 +44,7 @@ public class VismoEventDispatcherTest {
         vismo = new FakeVismoInstance(socketFactory.newBoundPullSocket(conf.getProducersPoint()), NO_EXPECTED_EVENTS);
         vismo.start();
 
-        final VismoEventDispatcher d = new VismoEventDispatcher(VismoEventDispatcherTest.class.getName(), conf, socketFactory);
+        final VismoEventDispatcher d = new VismoEventDispatcher(socketFactory, conf, VismoEventDispatcherTest.class.getName());
         producer = new FakeEventProducer(d, NO_EXPECTED_EVENTS);
     }
 
