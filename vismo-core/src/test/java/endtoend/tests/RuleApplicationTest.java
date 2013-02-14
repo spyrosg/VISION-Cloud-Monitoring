@@ -1,6 +1,5 @@
 package endtoend.tests;
 
-import static org.junit.Assert.assertEquals;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.events.VismoEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
@@ -15,38 +14,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeromq.ZContext;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.WebResource.Builder;
-import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import com.sun.jersey.api.client.filter.LoggingFilter;
-
 
 /**
  * This is used to test the infrastructure
  */
-public class RuleApplicationTest {
+public class RuleApplicationTest extends HTTPClientTest {
+    /** the machine's ip */
+    static final String                          HOST_URL           = "10.0.1.101";
+    /***/
+    static final Logger                          log                = LoggerFactory.getLogger(RuleApplicationTest.class);
+    /***/
+    static final String                          TENANT             = "ntua";
     /***/
     private static final int                     CONSUMERS_PORT     = 56430;
     /***/
     private static final NoEventsCheckingHandler FOO_RULE_HANDLER   = null;
-    /** the machine's ip */
-    private static final String                  HOST_URL           = "10.0.1.101";
-    /***/
-    private static final Logger                  log                = LoggerFactory.getLogger(RuleApplicationTest.class);
     /***/
     private static final String                  OBJ_NAME           = "my-vismo-test-object-1";
     /***/
     private static final String                  PASS               = "123";
     /***/
-    private static final String                  TENANT             = "ntua";
-    /***/
     private static final String                  TEST_CONTAINER     = "vismo-test-end-to-end";
     /***/
     private static final String                  USER               = "bill";
-    /***/
-    private final Client                         client             = new Client();
     /***/
     private final PerOperationHandler            GET_OBJECT_HANDLER = new PerOperationHandler("GET");
     /***/
@@ -54,6 +44,14 @@ public class RuleApplicationTest {
     /***/
     private final VismoEventRegistry             registry           = new VismoEventRegistry(new ZMQFactory(new ZContext()),
                                                                             "tcp://" + HOST_URL + ":" + CONSUMERS_PORT);
+
+
+    /**
+     * Constructor.
+     */
+    public RuleApplicationTest() {
+        super(HOST_URL, TENANT, USER, PASS);
+    }
 
 
     /**
@@ -85,7 +83,7 @@ public class RuleApplicationTest {
         waitForEventsToBeReceived();
         shouldHaveReceivedEvent(PUT_OBJECT_HANDLER, 1);
 
-        readObject(TEST_CONTAINER, OBJ_NAME);
+        getObject(TEST_CONTAINER, OBJ_NAME);
         waitForEventsToBeReceived();
         shouldHaveReceivedEvent(GET_OBJECT_HANDLER, 1);
     }
@@ -94,7 +92,6 @@ public class RuleApplicationTest {
     /***/
     @Before
     public void setUp() {
-        setupHTTPClient();
         setupConsumers();
         createContainer(TEST_CONTAINER);
     }
@@ -108,103 +105,6 @@ public class RuleApplicationTest {
     }
 
 
-    /**
-     * @return a resource pointing to the entry point of <code>Containers</code>.
-     */
-    WebResource containers() {
-        return client.resource("http://" + HOST_URL + ":8080").path("containers");
-    }
-
-
-    /**
-     * @param cont
-     */
-    private void createContainer(final String cont) {
-        final long dur = new TimedCodeBlock() {
-            @Override
-            public void withBlock() {
-                final ClientResponse res = containers().path(TENANT).path(cont).put(ClientResponse.class);
-
-                assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
-            }
-        }.run().getDuration();
-
-        log.debug("creating container {} in {} ms", cont, dur);
-    }
-
-
-    /**
-     * @param cont
-     */
-    private void deleteContainer(final String cont) {
-        log.debug("deleting container {}", cont);
-
-        final ClientResponse res = containers().path(TENANT).path(cont).delete(ClientResponse.class);
-
-        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
-    }
-
-
-    /**
-     * @param container
-     * @param object
-     */
-    private void deleteObject(final String container, final String object) {
-        log.debug("deleting object {} under {}", object, container);
-
-        final ClientResponse res = forObject(container, object).delete(ClientResponse.class);
-
-        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
-    }
-
-
-    /**
-     * @param container
-     * @param object
-     * @return a {@link Builder}.
-     */
-    private Builder forObject(final String container, final String object) {
-        return obs().path(TENANT).path(container).path(object).type("application/cdmi-object").accept("application/cdmi-object")
-                .header("X-CDMI-Specification-Version", "1.0");
-
-    }
-
-
-    /**
-     * @return a resource pointing to the entry point of <code>Object Service</code>.
-     */
-    private WebResource obs() {
-        return client.resource("http://" + HOST_URL).path("vision-cloud").path("object-service");
-    }
-
-
-    /**
-     * @param container
-     * @param object
-     * @param payload
-     */
-    private void putObject(final String container, final String object, final String payload) {
-        log.debug("creating object {} under {}", object, container);
-
-        final ClientResponse res = forObject(container, object).entity(payload).put(ClientResponse.class);
-
-        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
-    }
-
-
-    /**
-     * @param container
-     * @param object
-     */
-    private void readObject(final String container, final String object) {
-        log.debug("reading back object {} under {}", object, container);
-
-        final ClientResponse res = forObject(container, object).get(ClientResponse.class);
-
-        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
-    }
-
-
     /***/
     private void setupConsumers() {
         registry.registerToAll(new EventHandler() {
@@ -215,13 +115,6 @@ public class RuleApplicationTest {
                 System.err.println("receiving: " + e.dict());
             }
         });
-    }
-
-
-    /***/
-    private void setupHTTPClient() {
-        client.addFilter(new HTTPBasicAuthFilter(USER + "@" + TENANT, PASS));
-        client.addFilter(new LoggingFilter(System.err));
     }
 
 
