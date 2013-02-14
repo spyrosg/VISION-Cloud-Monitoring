@@ -7,14 +7,11 @@
     </encoder>
   </appender>
 
+  <!-- make jetty less talkative -->
+  <logger name="org.eclipse.jetty" level="INFO" />
+
   <root level="TRACE">
     <appender-ref ref="STDOUT" />
   </root>
-
-  <!-- make jetty less talkative -->
-  <logger name="org.eclipse.jetty.util" level="INFO" />
-  <logger name="org.eclipse.jetty.servlet" level="INFO" />
-  <logger name="org.eclipse.jetty.server.handler" level="INFO" />
-
 
 </configuration>
