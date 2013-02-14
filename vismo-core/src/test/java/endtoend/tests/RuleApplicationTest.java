@@ -9,6 +9,7 @@ import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,111 +27,48 @@ import com.sun.jersey.api.client.filter.LoggingFilter;
  * This is used to test the infrastructure
  */
 public class RuleApplicationTest {
-    /**
-     * This is used to verify that the expected number of events for given operation were received. We only care about operations
-     * on objects, not containers.
-     */
-    private static class NoEventsPerOperationHandler implements EventHandler {
-        /***/
-        private static final String ORIGINATING_SERVICE = "object_service";
-        /** this is used to drop intermediate (vismo-dispatch) events. */
-        private static final String SPECIAL_FIELD       = "transaction-throughput";
-        /***/
-        private int                 noReceivedEvents    = 0;
-        /***/
-        private final String        operation;
-
-
-        /**
-         * Constructor.
-         * 
-         * @param operation
-         */
-        public NoEventsPerOperationHandler(final String operation) {
-            this.operation = operation;
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.notify.EventHandler#handle(gr.ntua.vision.monitoring.events.MonitoringEvent)
-         */
-        @Override
-        public void handle(final MonitoringEvent e) {
-            if (!isObsEvent(e))
-                return;
-            if (!isfullObsEvent(e))
-                return;
-            if (isContainerOperationEvent(e))
-                return;
-
-            if (operation.equals(e.get("operation")))
-                ++noReceivedEvents;
-        }
-
-
-        /**
-         * @param noExpectedEvents
-         */
-        public void haveReceivedExpectedNoEvents(final int noExpectedEvents) {
-            assertEquals(noExpectedEvents, noReceivedEvents);
-        }
-
-
-        /**
-         * @param e
-         * @return <code>true</code> iff the event represents an operation on a container, <code>false</code> otherwise.
-         */
-        private static boolean isContainerOperationEvent(final MonitoringEvent e) {
-            final String objectName = (String) e.get("object");
-
-            return objectName == null || objectName.isEmpty();
-        }
-
-
-        /**
-         * @param e
-         * @return <code>true</code> iff the events is an obs event with calculated fields (throughput, latency, etc),
-         *         <code>false</code> otherwise.
-         */
-        private static boolean isfullObsEvent(final MonitoringEvent e) {
-            return e.get(SPECIAL_FIELD) != null;
-        }
-
-
-        /**
-         * @param e
-         * @return <code>true</code> iff this is an event that comes from the obs, <code>false</code> otherwise.
-         */
-        private static boolean isObsEvent(final MonitoringEvent e) {
-            return ORIGINATING_SERVICE.equals(e.originatingService());
-        }
-    }
-
     /***/
-    private static final int                  CONSUMERS_PORT     = 56430;
+    private static final int                     CONSUMERS_PORT     = 56430;
+    /***/
+    private static final NoEventsCheckingHandler FOO_RULE_HANDLER   = null;
     /** the machine's ip */
-    private static final String               HOST_URL           = "10.0.1.101";
+    private static final String                  HOST_URL           = "10.0.1.101";
     /***/
-    private static final Logger               log                = LoggerFactory.getLogger(RuleApplicationTest.class);
+    private static final Logger                  log                = LoggerFactory.getLogger(RuleApplicationTest.class);
     /***/
-    private static final String               OBJ_NAME           = "my-vismo-test-object-1";
+    private static final String                  OBJ_NAME           = "my-vismo-test-object-1";
     /***/
-    private static final String               PASS               = "123";
+    private static final String                  PASS               = "123";
     /***/
-    private static final String               TENANT             = "ntua";
+    private static final String                  TENANT             = "ntua";
     /***/
-    private static final String               TEST_CONTAINER     = "vismo-test-end-to-end";
+    private static final String                  TEST_CONTAINER     = "vismo-test-end-to-end";
     /***/
-    private static final String               USER               = "bill";
+    private static final String                  USER               = "bill";
     /***/
-    private final Client                      client             = new Client();
+    private final Client                         client             = new Client();
     /***/
-    private final NoEventsPerOperationHandler GET_OBJECT_HANDLER = new NoEventsPerOperationHandler("GET");
+    private final PerOperationHandler            GET_OBJECT_HANDLER = new PerOperationHandler("GET");
     /***/
-    private final NoEventsPerOperationHandler PUT_OBJECT_HANDLER = new NoEventsPerOperationHandler("PUT");
+    private final PerOperationHandler            PUT_OBJECT_HANDLER = new PerOperationHandler("PUT");
     /***/
-    private final VismoEventRegistry          registry           = new VismoEventRegistry(new ZMQFactory(new ZContext()),
-                                                                         "tcp://" + HOST_URL + ":" + CONSUMERS_PORT);
+    private final VismoEventRegistry             registry           = new VismoEventRegistry(new ZMQFactory(new ZContext()),
+                                                                            "tcp://" + HOST_URL + ":" + CONSUMERS_PORT);
+
+
+    /**
+     * @throws InterruptedException
+     */
+    @Ignore
+    @Test
+    public void foo() throws InterruptedException {
+        registry.registerToAll(FOO_RULE_HANDLER);
+        submitRule("FooRule");
+
+        putObject(TEST_CONTAINER, OBJ_NAME, "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
+        Thread.sleep(2000);
+        shouldHaveReceivedEvent(FOO_RULE_HANDLER, 1);
+    }
 
 
     /**
@@ -140,11 +78,15 @@ public class RuleApplicationTest {
      */
     @Test
     public void producersShouldReceiveDefaultObsEvents() throws InterruptedException {
+        registry.registerToAll(PUT_OBJECT_HANDLER);
+        registry.registerToAll(GET_OBJECT_HANDLER);
+
         putObject(TEST_CONTAINER, OBJ_NAME, "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
-        Thread.sleep(2000);
+        waitForEventsToBeReceived();
         shouldHaveReceivedEvent(PUT_OBJECT_HANDLER, 1);
+
         readObject(TEST_CONTAINER, OBJ_NAME);
-        Thread.sleep(2000);
+        waitForEventsToBeReceived();
         shouldHaveReceivedEvent(GET_OBJECT_HANDLER, 1);
     }
 
@@ -169,7 +111,7 @@ public class RuleApplicationTest {
     /**
      * @return a resource pointing to the entry point of <code>Containers</code>.
      */
-    private WebResource containers() {
+    WebResource containers() {
         return client.resource("http://" + HOST_URL + ":8080").path("containers");
     }
 
@@ -178,11 +120,16 @@ public class RuleApplicationTest {
      * @param cont
      */
     private void createContainer(final String cont) {
-        log.debug("creating container {}", cont);
+        final long dur = new TimedCodeBlock() {
+            @Override
+            public void withBlock() {
+                final ClientResponse res = containers().path(TENANT).path(cont).put(ClientResponse.class);
 
-        final ClientResponse res = containers().path(TENANT).path(cont).put(ClientResponse.class);
+                assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+            }
+        }.run().getDuration();
 
-        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+        log.debug("creating container {} in {} ms", cont, dur);
     }
 
 
@@ -260,8 +207,6 @@ public class RuleApplicationTest {
 
     /***/
     private void setupConsumers() {
-        registry.registerToAll(PUT_OBJECT_HANDLER);
-        registry.registerToAll(GET_OBJECT_HANDLER);
         registry.registerToAll(new EventHandler() {
             @Override
             public void handle(final MonitoringEvent me) {
@@ -281,12 +226,29 @@ public class RuleApplicationTest {
 
 
     /**
+     * @param string
+     */
+    private void submitRule(final String string) {
+        // TODO Auto-generated method stub
+
+    }
+
+
+    /**
      * Check that the handler has received the given number of events.
      * 
      * @param handler
      * @param noExpectedEvents
      */
-    private static void shouldHaveReceivedEvent(final NoEventsPerOperationHandler handler, final int noExpectedEvents) {
+    private static void shouldHaveReceivedEvent(final NoEventsCheckingHandler handler, final int noExpectedEvents) {
         handler.haveReceivedExpectedNoEvents(noExpectedEvents);
+    }
+
+
+    /**
+     * @throws InterruptedException
+     */
+    private static void waitForEventsToBeReceived() throws InterruptedException {
+        Thread.sleep(1000);
     }
 }
