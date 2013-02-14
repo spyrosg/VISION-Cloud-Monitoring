@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 
 import org.slf4j.Logger;
@@ -50,8 +49,7 @@ public class GroupClient {
         final byte[] buf = note.getBytes();
         final DatagramPacket p = new DatagramPacket(buf, buf.length, groupAddress, port);
 
-        sock.setNetworkInterface(NetworkInterface.getByName("eth0"));
-        sock.setTimeToLive(5); // be somewhat liberal on the socket
+        sock.setTimeToLive(10); // be somewhat liberal on the socket
         log.trace(">> '{}' group {}:{}", new Object[] { note, groupAddress.getHostAddress(), port });
 
         try {
