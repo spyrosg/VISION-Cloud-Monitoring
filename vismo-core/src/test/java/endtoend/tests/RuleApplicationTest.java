@@ -10,33 +10,31 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.zeromq.ZContext;
 
 
 /**
- * This is used to test the infrastructure
+ * This is used to test the main rule update functionality. See {@link #verifyRuleApplicationWithEventsConsumption()}.
  */
-public class RuleApplicationTest extends HTTPClientTest {
-    /** the machine's ip */
-    static final String                          HOST_URL           = "10.0.1.101";
-    /***/
-    static final Logger                          log                = LoggerFactory.getLogger(RuleApplicationTest.class);
-    /***/
-    static final String                          TENANT             = "ntua";
+public class RuleApplicationTest {
     /***/
     private static final int                     CONSUMERS_PORT     = 56430;
     /***/
     private static final NoEventsCheckingHandler FOO_RULE_HANDLER   = null;
+    /** the machine's ip */
+    private static final String                  HOST_URL           = "10.0.1.101";
     /***/
     private static final String                  OBJ_NAME           = "my-vismo-test-object-1";
     /***/
     private static final String                  PASS               = "123";
     /***/
+    private static final String                  TENANT             = "ntua";
+    /***/
     private static final String                  TEST_CONTAINER     = "vismo-test-end-to-end";
     /***/
     private static final String                  USER               = "bill";
+    /***/
+    private final VisionHTTPClient               client             = new VisionHTTPClient(HOST_URL, TENANT, USER, PASS);
     /***/
     private final PerOperationHandler            GET_OBJECT_HANDLER = new PerOperationHandler("GET");
     /***/
@@ -44,29 +42,6 @@ public class RuleApplicationTest extends HTTPClientTest {
     /***/
     private final VismoEventRegistry             registry           = new VismoEventRegistry(new ZMQFactory(new ZContext()),
                                                                             "tcp://" + HOST_URL + ":" + CONSUMERS_PORT);
-
-
-    /**
-     * Constructor.
-     */
-    public RuleApplicationTest() {
-        super(HOST_URL, TENANT, USER, PASS);
-    }
-
-
-    /**
-     * @throws InterruptedException
-     */
-    @Ignore
-    @Test
-    public void foo() throws InterruptedException {
-        registry.registerToAll(FOO_RULE_HANDLER);
-        submitRule("FooRule");
-
-        putObject(TEST_CONTAINER, OBJ_NAME, "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
-        Thread.sleep(2000);
-        shouldHaveReceivedEvent(FOO_RULE_HANDLER, 1);
-    }
 
 
     /**
@@ -79,11 +54,11 @@ public class RuleApplicationTest extends HTTPClientTest {
         registry.registerToAll(PUT_OBJECT_HANDLER);
         registry.registerToAll(GET_OBJECT_HANDLER);
 
-        putObject(TEST_CONTAINER, OBJ_NAME, "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
+        client.putObject(TEST_CONTAINER, OBJ_NAME, "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
         waitForEventsToBeReceived();
         shouldHaveReceivedEvent(PUT_OBJECT_HANDLER, 1);
 
-        getObject(TEST_CONTAINER, OBJ_NAME);
+        client.getObject(TEST_CONTAINER, OBJ_NAME);
         waitForEventsToBeReceived();
         shouldHaveReceivedEvent(GET_OBJECT_HANDLER, 1);
     }
@@ -93,15 +68,38 @@ public class RuleApplicationTest extends HTTPClientTest {
     @Before
     public void setUp() {
         setupConsumers();
-        createContainer(TEST_CONTAINER);
+        client.createContainer(TEST_CONTAINER);
     }
 
 
     /***/
     @After
     public void tearDown() {
-        // deleteObject(TEST_CONTAINER, OBJ_NAME);
-        deleteContainer(TEST_CONTAINER);
+        client.deleteContainer(TEST_CONTAINER);
+    }
+
+
+    /**
+     * Submit and apply a rule, collect the events from given rule. The plan for the test:
+     * <ol>
+     * <li>Register a new handler that corresponds to events from a rule.
+     * <li>
+     * <li>Submit a rule to a running vismo instance.</li>
+     * <li>Perform some operations on the OBS.</li>
+     * <li>Collect and verify the events triggered by the rule added.</li>.
+     * </ol>
+     * 
+     * @throws InterruptedException
+     */
+    @Ignore("WIP")
+    @Test
+    public void verifyRuleApplicationWithEventsConsumption() throws InterruptedException {
+        registry.registerToAll(FOO_RULE_HANDLER);
+        submitRule("FooRule");
+
+        client.putObject(TEST_CONTAINER, OBJ_NAME, "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
+        Thread.sleep(2000);
+        shouldHaveReceivedEvent(FOO_RULE_HANDLER, 1);
     }
 
 
@@ -119,11 +117,10 @@ public class RuleApplicationTest extends HTTPClientTest {
 
 
     /**
-     * @param string
+     * @param rule
      */
-    private void submitRule(final String string) {
+    private void submitRule(final String rule) {
         // TODO Auto-generated method stub
-
     }
 
 
