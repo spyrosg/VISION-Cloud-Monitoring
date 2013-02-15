@@ -147,8 +147,7 @@
               <parallel>classes</parallel>
               <forkMode>always</forkMode>
               <excludes>
-                <exclude>endtoend/ContainerPutRemoveTest.java</exclude>
-                <exclude>endtoend/ObjectPutGetRemoveTest.java</exclude>
+                <exclude>endtoend/tests/RuleApplicationTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
