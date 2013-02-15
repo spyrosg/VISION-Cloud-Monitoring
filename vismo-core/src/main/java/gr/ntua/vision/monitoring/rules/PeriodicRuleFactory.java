@@ -3,9 +3,9 @@ package gr.ntua.vision.monitoring.rules;
 /***
  * @author tmessini
  */
-public class PeriodicRuleFactory implements RuleFactory {
+public class PeriodicRuleFactory implements RulesFactory {
     /**
-     * @see gr.ntua.vision.monitoring.rules.RuleFactory#createRule(gr.ntua.vision.monitoring.rules.VismoRulesEngine,
+     * @see gr.ntua.vision.monitoring.rules.RulesFactory#createRule(gr.ntua.vision.monitoring.rules.VismoRulesEngine,
      *      java.lang.String, java.lang.String, java.lang.String)
      */
     @Override

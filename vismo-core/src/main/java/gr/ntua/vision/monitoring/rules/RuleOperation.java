@@ -1,7 +1,5 @@
 package gr.ntua.vision.monitoring.rules;
 
-
-
 /**
  * This is used to perform an operation over a rule.
  */

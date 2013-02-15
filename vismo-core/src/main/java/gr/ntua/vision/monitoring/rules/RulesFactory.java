@@ -1,11 +1,9 @@
 package gr.ntua.vision.monitoring.rules;
 
-
-
 /**
  * @author tmessini
  */
-public interface RuleFactory {
+public interface RulesFactory {
     /**
      * @param vismoRulesEngine
      * @param period

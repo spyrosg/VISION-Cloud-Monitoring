@@ -11,9 +11,9 @@ public class AbstractRuleFactory {
      * @return appropriate factory.
      */
     @SuppressWarnings("static-method")
-    public RuleFactory createRuleFactory(final String type) {
-        if (type.equals("TestingRule"))
-            return new NonPeriodicRuleFactory();
+    public RulesFactory createRuleFactory(final String type) {
+        // if (type.equals("TestingRule"))
+        // return new NonPeriodicRuleFactory();
         if (type.equals("AccountingRule") || type.equals("CTORule"))
             return new PeriodicRuleFactory();
         return null;
