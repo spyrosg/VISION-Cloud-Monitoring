@@ -1,6 +1,5 @@
 package gr.ntua.vision.monitoring.rules;
 
-import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 
 /**
@@ -13,5 +12,5 @@ public interface RuleOperation {
      * @param rule
      *            the rule.
      */
-    void run(RuleProc<MonitoringEvent> rule);
+    void run(VismoRule rule);
 }

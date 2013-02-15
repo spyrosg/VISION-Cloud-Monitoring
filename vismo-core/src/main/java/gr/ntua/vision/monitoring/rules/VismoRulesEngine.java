@@ -86,7 +86,7 @@ public class VismoRulesEngine implements EventSourceListener {
      * @param rule
      *            the rule.
      */
-    public void removeRule(final RuleProc<MonitoringEvent> rule) {
+    public void removeRule(final VismoRule rule) {
         // FIXME: periodic rules aren't removed from the timer
         log.debug("removing {}", rule);
         store.remove(rule);
@@ -134,7 +134,7 @@ public class VismoRulesEngine implements EventSourceListener {
     /**
      * @param r
      */
-    private void add(final RuleProc<MonitoringEvent> r) {
+    private void add(final VismoRule r) {
         log.debug("submitting {}", r);
         store.add(r);
     }
@@ -149,7 +149,7 @@ public class VismoRulesEngine implements EventSourceListener {
     private void evaluateRulesAgainst(final MonitoringEvent e) {
         store.forEach(new RuleOperation() {
             @Override
-            public void run(final RuleProc<MonitoringEvent> r) {
+            public void run(final VismoRule r) {
                 r.performWith(e);
             }
         });

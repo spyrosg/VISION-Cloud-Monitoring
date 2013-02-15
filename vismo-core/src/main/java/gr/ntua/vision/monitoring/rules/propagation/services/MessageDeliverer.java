@@ -1,8 +1,7 @@
 package gr.ntua.vision.monitoring.rules.propagation.services;
 
-import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.rules.AbstractRuleFactory;
-import gr.ntua.vision.monitoring.rules.RuleProc;
+import gr.ntua.vision.monitoring.rules.VismoRule;
 import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
 import gr.ntua.vision.monitoring.rules.propagation.message.Message;
 import gr.ntua.vision.monitoring.rules.propagation.message.MessageFactory;
@@ -23,20 +22,20 @@ public class MessageDeliverer extends Thread implements Observer {
     /***/
     private final static Logger       log     = LoggerFactory.getLogger(MessageDeliverer.class);
     /***/
+    volatile boolean                  stopped = false;
+    /***/
     private final AbstractRuleFactory factory = new AbstractRuleFactory();
     /***/
     private RulesPropagationManager   manager;
     /***/
     private MessageFactory            messageFactory;
-    /***/
-    volatile boolean                stopped               = false;
 
 
     /**
      * stopping the thread
      */
     public void halt() {
-        stopped = true;               
+        stopped = true;
         interrupt();
     }
 
@@ -98,7 +97,7 @@ public class MessageDeliverer extends Thread implements Observer {
      * @param rule
      * @return rule object
      */
-    private RuleProc<MonitoringEvent> getRule(final String rule) {
+    private VismoRule getRule(final String rule) {
         String ruleName = "";
         String rulePeriod = "";
         String ruleDesc = "";
@@ -111,7 +110,7 @@ public class MessageDeliverer extends Thread implements Observer {
                 ruleDesc = ruleParts[2];
             }
         }
-        RuleProc<MonitoringEvent> ruleObject = null;
+        VismoRule ruleObject = null;
         if (factory.createRuleFactory(ruleName) != null)
             ruleObject = factory.createRuleFactory(ruleName).createRule(manager.getEngine(), rulePeriod, ruleName, ruleDesc);
         return ruleObject;
@@ -129,7 +128,7 @@ public class MessageDeliverer extends Thread implements Observer {
         final Integer ruleId = Integer.valueOf(deliveredMessage.getCommandId());
 
         if (type.equals(MessageType.ADD_RULE)) {
-            final RuleProc<MonitoringEvent> ruleObject = getRule(rule);
+            final VismoRule ruleObject = getRule(rule);
             if (ruleObject != null) {
                 ruleObject.submit();
                 manager.getRuleStore().addRule(rule, ruleId);
@@ -137,7 +136,7 @@ public class MessageDeliverer extends Thread implements Observer {
             }
         }
         if (type.equals(MessageType.DELETE_RULE)) {
-            final RuleProc<MonitoringEvent> ruleObject = getRule(rule);
+            final VismoRule ruleObject = getRule(rule);
             if (ruleObject != null) {
                 manager.getEngine().removeRule(ruleObject);
                 manager.getRuleStore().deleteRule(ruleId);
@@ -157,7 +156,7 @@ public class MessageDeliverer extends Thread implements Observer {
                     final Iterator<Integer> iterDel = manager.getRuleStore().getRulesMap().keySet().iterator();
                     while (iterDel.hasNext()) {
                         final Integer key = iterDel.next();
-                        final RuleProc<MonitoringEvent> ruleObject = getRule(manager.getRuleStore().getRule(key));
+                        final VismoRule ruleObject = getRule(manager.getRuleStore().getRule(key));
                         if (ruleObject != null) {
                             manager.getEngine().removeRule(ruleObject);
                             manager.getRuleStore().deleteRule(key, false);
@@ -168,7 +167,7 @@ public class MessageDeliverer extends Thread implements Observer {
                     final Iterator<Integer> iterPut = deliveredMessage.getRuleSet().keySet().iterator();
                     while (iterPut.hasNext()) {
                         final Integer key = iterPut.next();
-                        final RuleProc<MonitoringEvent> ruleObject = getRule(manager.getRuleStore().getRule(key));
+                        final VismoRule ruleObject = getRule(manager.getRuleStore().getRule(key));
                         if (ruleObject != null) {
                             ruleObject.submit();
                             checkEngineHealth();
