@@ -1,15 +1,17 @@
 package gr.ntua.vision.monitoring.rules;
 
 /**
- * @author tmessini
+ * This is used to abstract away the details of loading rules into the system.
  */
 public interface RulesFactory {
     /**
-     * @param vismoRulesEngine
-     * @param period
-     * @param name
-     * @param desc
-     * @return rule
+     * Attempts to build a rule by name.
+     * 
+     * @param ruleName
+     *            the name of the rule to load.
+     * @return on success, an instance of {@link VismoRule}.
+     * @throws RuntimeException
+     *             on some error
      */
-    public VismoRule createRule(VismoRulesEngine vismoRulesEngine, String period, String name, String desc);
+    VismoRule buildByName(String ruleName);
 }

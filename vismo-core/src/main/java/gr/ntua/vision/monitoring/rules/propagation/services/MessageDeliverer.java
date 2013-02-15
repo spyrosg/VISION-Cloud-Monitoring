@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.rules.propagation.services;
 
-import gr.ntua.vision.monitoring.rules.AbstractRuleFactory;
+import gr.ntua.vision.monitoring.rules.RulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRule;
 import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
 import gr.ntua.vision.monitoring.rules.propagation.message.Message;
@@ -20,15 +20,28 @@ import org.slf4j.LoggerFactory;
  */
 public class MessageDeliverer extends Thread implements Observer {
     /***/
-    private final static Logger       log     = LoggerFactory.getLogger(MessageDeliverer.class);
+    private final static Logger           log     = LoggerFactory.getLogger(MessageDeliverer.class);
     /***/
-    volatile boolean                  stopped = false;
+    private final RulesPropagationManager manager;
     /***/
-    private final AbstractRuleFactory factory = new AbstractRuleFactory();
+    private final MessageFactory          messageFactory;
     /***/
-    private RulesPropagationManager   manager;
+    private final RulesFactory            rulesFactory;
     /***/
-    private MessageFactory            messageFactory;
+    private volatile boolean              stopped = false;
+
+
+    /**
+     * Constructor.
+     * 
+     * @param manager
+     * @param factory
+     */
+    public MessageDeliverer(final RulesPropagationManager manager, final RulesFactory factory) {
+        this.manager = manager;
+        this.rulesFactory = factory;
+        this.messageFactory = new MessageFactory(manager);
+    }
 
 
     /**
@@ -58,15 +71,6 @@ public class MessageDeliverer extends Thread implements Observer {
                         // TODO
                     }
                 }
-    }
-
-
-    /**
-     * @param manager
-     */
-    public void setManager(final RulesPropagationManager manager) {
-        this.manager = manager;
-        messageFactory = new MessageFactory(manager);
     }
 
 
@@ -110,10 +114,8 @@ public class MessageDeliverer extends Thread implements Observer {
                 ruleDesc = ruleParts[2];
             }
         }
-        VismoRule ruleObject = null;
-        if (factory.createRuleFactory(ruleName) != null)
-            ruleObject = factory.createRuleFactory(ruleName).createRule(manager.getEngine(), rulePeriod, ruleName, ruleDesc);
-        return ruleObject;
+
+        return null; // FIXME
     }
 
 
