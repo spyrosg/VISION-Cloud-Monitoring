@@ -58,7 +58,9 @@ public abstract class PeriodicRule extends TimerTask implements RuleProc<Monitor
         final long start = System.currentTimeMillis();
 
         try {
-            send(aggregate(eventsList, lastAggregationPeriodStart, lastAggregationPeriodEnd));
+            final ArrayList<MonitoringEvent> copy = new ArrayList<MonitoringEvent>(eventsList);
+
+            send(aggregate(copy, lastAggregationPeriodStart, lastAggregationPeriodEnd));
         } finally {
             final long dur = System.currentTimeMillis() - start;
 
