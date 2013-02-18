@@ -53,11 +53,16 @@ public abstract class PeriodicRule extends TimerTask implements RuleProc<Monitor
         if (eventsList.isEmpty())
             return;
 
-        log.debug("will aggregate over {} events", eventsList.size());
+        log.debug("{} will aggregate over {} events", getClass().getSimpleName(), eventsList.size());
+
+        final long start = System.currentTimeMillis();
 
         try {
             send(aggregate(eventsList, lastAggregationPeriodStart, lastAggregationPeriodEnd));
         } finally {
+            final long dur = System.currentTimeMillis() - start;
+
+            log.debug("{} aggregating took {} ms", getClass().getSimpleName(), dur);
             eventsList.clear();
         }
     }
