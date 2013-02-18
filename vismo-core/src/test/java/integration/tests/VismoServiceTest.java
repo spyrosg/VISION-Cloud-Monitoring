@@ -15,10 +15,14 @@ import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeromq.ZContext;
 
 
@@ -27,17 +31,34 @@ import org.zeromq.ZContext;
  */
 public class VismoServiceTest {
     /**
-     * 
+     * This handler is used to release the latch when the expected number of events is received.
      */
-    private static class EventCountHandler implements EventHandler {
+    private static class ConsumerHandler implements EventHandler {
         /***/
-        private int counter = 0;
+        private final CountDownLatch latch;
+        /***/
+        private final int            noExpectedEvents;
+        /***/
+        private int                  noReceivedEvents = 0;
 
 
         /**
          * Constructor.
+         * 
+         * @param latch
+         * @param noExpectedEvents
          */
-        public EventCountHandler() {
+        public ConsumerHandler(final CountDownLatch latch, final int noExpectedEvents) {
+            this.latch = latch;
+            this.noExpectedEvents = noExpectedEvents;
+        }
+
+
+        /**
+         * @return the number of received events.
+         */
+        public int getNoReceivedEvents() {
+            return noReceivedEvents;
         }
 
 
@@ -47,15 +68,9 @@ public class VismoServiceTest {
         @Override
         public void handle(final MonitoringEvent e) {
             if (e != null)
-                ++counter;
-        }
-
-
-        /**
-         * @param noExpectedEvents
-         */
-        public void hasSeenExpectedNoEvents(final int noExpectedEvents) {
-            assertEquals(noExpectedEvents, counter);
+                ++noReceivedEvents;
+            if (noExpectedEvents == noReceivedEvents)
+                latch.countDown();
         }
     }
 
@@ -82,6 +97,7 @@ public class VismoServiceTest {
          * @param expectedNoEvents
          */
         public void hasSeenExpectedNoEvents(final int expectedNoEvents) {
+            System.err.println("rule got in total: " + counter + " events");
             assertEquals(expectedNoEvents, counter);
         }
 
@@ -95,10 +111,12 @@ public class VismoServiceTest {
                 ++counter;
         }
     }
+    /** the log target. */
+    private static final Logger      log           = LoggerFactory.getLogger(VismoServiceTest.class);
     /***/
-    private static final int         NO_GET_OPS    = 10;
+    private static final int         NO_GET_OPS    = 5000;
     /***/
-    private static final int         NO_PUT_OPS    = 10;
+    private static final int         NO_PUT_OPS    = 5000;
     /***/
     @SuppressWarnings("serial")
     private static final Properties  p             = new Properties() {
@@ -127,31 +145,11 @@ public class VismoServiceTest {
     /***/
     private final VismoConfiguration conf          = new VismoConfiguration(p);
     /***/
-    private final EventCountHandler  countHandler  = new EventCountHandler();
-    /***/
     private FakeObjectService        obs;
-    /***/
+    /** the object under test. */
     private Service                  service;
     /** the socket factory. */
     private final ZMQFactory         socketFactory = new ZMQFactory(new ZContext());
-
-
-    /**
-     * @param noOps
-     */
-    public void doGETs(final int noOps) {
-        for (int i = 0; i < noOps; ++i)
-            obs.getEvent("ntua", "bill", "foo-container", "bar-object").send();
-    }
-
-
-    /**
-     * @param noOps
-     */
-    public void doPUTs(final int noOps) {
-        for (int i = 0; i < noOps; ++i)
-            obs.putEvent("ntua", "bill", "foo-container", "bar-object").send();
-    }
 
 
     /**
@@ -185,8 +183,6 @@ public class VismoServiceTest {
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-
-        socketFactory.destroy();
     }
 
 
@@ -196,15 +192,25 @@ public class VismoServiceTest {
     @Test
     public void vismoDeliversEventsToClient() throws InterruptedException {
         final VismoEventRegistry reg = new VismoEventRegistry(socketFactory, "tcp://127.0.0.1:" + conf.getConsumersPort());
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ConsumerHandler consumer = new ConsumerHandler(latch, NO_GET_OPS + NO_PUT_OPS);
 
         service.start();
-        reg.registerToAll(countHandler);
+        reg.registerToAll(consumer);
+
+        final long start = System.currentTimeMillis();
 
         doGETs(NO_GET_OPS);
         doPUTs(NO_PUT_OPS);
+        log.debug("waiting event delivery...");
+        latch.await(5, TimeUnit.SECONDS);
 
-        waitForEventsDelivery(1000);
-        assertThatClientReceivedEvents();
+        final double dur = (System.currentTimeMillis() - start) / 1000.0;
+
+        log.debug("{} events delivered to client in {} sec ({} events/sec)", new Object[] { consumer.getNoReceivedEvents(), dur,
+                consumer.getNoReceivedEvents() / dur });
+
+        consumerHasReceivedExpectedNoEvents(consumer, NO_GET_OPS + NO_PUT_OPS);
     }
 
 
@@ -218,22 +224,41 @@ public class VismoServiceTest {
         doGETs(NO_GET_OPS);
         doPUTs(NO_PUT_OPS);
 
-        waitForEventsDelivery(1000);
+        waitForEventsDelivery(30 * 1000);
         assertThatVismoReceivedEvents();
-    }
-
-
-    /**
-     * 
-     */
-    private void assertThatClientReceivedEvents() {
-        countHandler.hasSeenExpectedNoEvents(NO_GET_OPS + NO_PUT_OPS);
     }
 
 
     /***/
     private void assertThatVismoReceivedEvents() {
         countRule.hasSeenExpectedNoEvents(NO_GET_OPS + NO_PUT_OPS);
+    }
+
+
+    /**
+     * @param noOps
+     */
+    private void doGETs(final int noOps) {
+        for (int i = 0; i < noOps; ++i)
+            obs.getEvent("ntua", "bill", "foo-container", "bar-object").send();
+    }
+
+
+    /**
+     * @param noOps
+     */
+    private void doPUTs(final int noOps) {
+        for (int i = 0; i < noOps; ++i)
+            obs.putEvent("ntua", "bill", "foo-container", "bar-object").send();
+    }
+
+
+    /**
+     * @param consumerHandler
+     * @param expectedNoEvents
+     */
+    private static void consumerHasReceivedExpectedNoEvents(final ConsumerHandler consumerHandler, final int expectedNoEvents) {
+        assertEquals(expectedNoEvents, consumerHandler.getNoReceivedEvents());
     }
 
 
