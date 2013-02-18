@@ -1,6 +1,11 @@
 package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.policy.StaticConfigPolicy;
+import gr.ntua.vision.monitoring.rules.AccountingRule;
+import gr.ntua.vision.monitoring.rules.CTORule;
+import gr.ntua.vision.monitoring.rules.PassThroughRule;
+import gr.ntua.vision.monitoring.rules.RulesStore;
+import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.service.VismoService;
 import gr.ntua.vision.monitoring.udp.UDPClient;
 import gr.ntua.vision.monitoring.udp.UDPFactory;
@@ -43,8 +48,12 @@ public class Main {
 
         log.info("this is {}, running off commit-id {}", PROG, info.getVersion());
 
-        final VismoService service = (VismoService) new StaticConfigPolicy(conf).build(info);
+        final VismoRulesEngine engine = new VismoRulesEngine(new RulesStore());
+        final VismoService service = (VismoService) new StaticConfigPolicy(conf, engine).build(info);
         final UDPServer udpServer = new UDPFactory(conf.getUDPPort()).buildServer();
+
+        submitDefaultRulesTo(engine);
+        submitRulesTo(engine);
 
         udpServer.add(service);
         udpServer.start();
@@ -124,5 +133,26 @@ public class Main {
         System.err.println("  status  report the status of vismo.");
         System.err.println("  stop    stop any running vismo instance.");
         System.err.println("  help    show this help message and exit.");
+    }
+
+
+    /**
+     * @param engine
+     */
+    private static void submitDefaultRulesTo(final VismoRulesEngine engine) {
+        new PassThroughRule(engine).submit();
+    }
+
+
+    /**
+     * @param engine
+     */
+    private static void submitRulesTo(final VismoRulesEngine engine) {
+        final long ONE_MINUTE = 60 * 1000;
+        final long THREE_SECONDS = 3 * 1000;
+
+        new CTORule(engine, "cto-3-sec", THREE_SECONDS).submit();
+        new CTORule(engine, "cto-1-min", ONE_MINUTE).submit();
+        new AccountingRule(engine, ONE_MINUTE).submit();
     }
 }
