@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring.rules;
 
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -71,7 +72,7 @@ public class RulesStore {
      *            the operation.
      */
     public void forEach(final RuleOperation op) {
-        for (final RuleProc<MonitoringEvent> rule : set)
+        for (final RuleProc<MonitoringEvent> rule : new ArrayList<RuleProc<MonitoringEvent>>(set))
             op.run(rule);
     }
 
