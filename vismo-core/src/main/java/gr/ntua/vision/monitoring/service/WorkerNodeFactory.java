@@ -1,11 +1,14 @@
 package gr.ntua.vision.monitoring.service;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
-import gr.ntua.vision.monitoring.sinks.EventSinks;
+import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
+import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sinks.EventSinksFactory;
 import gr.ntua.vision.monitoring.sources.EventSources;
 import gr.ntua.vision.monitoring.sources.EventSourcesFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
+
+import java.util.List;
 
 
 /**
@@ -15,9 +18,10 @@ public class WorkerNodeFactory extends AbstractVismoServiceFactory {
     /**
      * @param conf
      * @param socketFactory
+     * @param engine
      */
-    public WorkerNodeFactory(final VismoConfiguration conf, final ZMQFactory socketFactory) {
-        super(conf, socketFactory);
+    public WorkerNodeFactory(final VismoConfiguration conf, final ZMQFactory socketFactory, final VismoRulesEngine engine) {
+        super(conf, socketFactory, engine);
     }
 
 
@@ -25,7 +29,7 @@ public class WorkerNodeFactory extends AbstractVismoServiceFactory {
      * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#getEventSinks()
      */
     @Override
-    protected EventSinks getEventSinks() {
+    protected List< ? extends EventSink> getEventSinks() {
         return new EventSinksFactory(conf, socketFactory).buildForWorker();
     }
 

@@ -3,7 +3,6 @@ package rulespropagation;
 import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
-import gr.ntua.vision.monitoring.sinks.EventSinks;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -73,7 +72,7 @@ public class RulesPropagationAddRemoveSimpleTest {
     @Before
     public void setUp() throws Exception {
         for (int i = 0; i < RulesPropagationAddRemoveSimpleTest.GROUP_SIZE; i++) {
-            managers.add(new RulesPropagationManager(new VismoRulesEngine(new RulesStore(), new EventSinks()),
+            managers.add(new RulesPropagationManager(new VismoRulesEngine(new RulesStore()),
                     RulesPropagationAddRemoveSimpleTest.WEBSERVER_START_PORT + i));
             managers.get(i).start();
         }
