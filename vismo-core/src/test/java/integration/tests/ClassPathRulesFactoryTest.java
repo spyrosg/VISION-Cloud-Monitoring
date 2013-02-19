@@ -7,7 +7,6 @@ import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -16,16 +15,15 @@ import org.junit.Test;
  */
 public class ClassPathRulesFactoryTest {
     /***/
-    private final VismoRulesEngine      engine  = new VismoRulesEngine(new RulesStore());
-    /***/
-    private final ClassPathRulesFactory factory = new ClassPathRulesFactory(engine);
+    private final VismoRulesEngine engine = new VismoRulesEngine(new RulesStore());
 
 
     /***/
     @Test
-    public void shouldLoadRulesByFullyQualifiedName() {
-        final String FULL_RULE_NAME = PassThroughRule.class.getCanonicalName();
-        final VismoRule rule = factory.buildByName(FULL_RULE_NAME);
+    public void shouldLoadRulesByClassName() {
+        final ClassPathRulesFactory factory = new ClassPathRulesFactory(PassThroughRule.class.getPackage(), engine);
+        final String RULE_NAME = "PassThroughRule";
+        final VismoRule rule = factory.constructByName(RULE_NAME);
 
         assertTrue(rule != null);
         assertTrue(rule instanceof PassThroughRule);
@@ -33,9 +31,13 @@ public class ClassPathRulesFactoryTest {
 
 
     /***/
-    @Ignore("wip")
     @Test
-    public void shouldLoadRulesByName() {
-        // TODO
+    public void shouldLoadRulesByFullyQualifiedName() {
+        final ClassPathRulesFactory factory = new ClassPathRulesFactory(PassThroughRule.class.getPackage(), engine);
+        final String FULL_RULE_NAME = PassThroughRule.class.getCanonicalName();
+        final VismoRule rule = factory.constructByName(FULL_RULE_NAME);
+
+        assertTrue(rule != null);
+        assertTrue(rule instanceof PassThroughRule);
     }
 }

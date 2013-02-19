@@ -5,7 +5,7 @@ package gr.ntua.vision.monitoring.rules;
  */
 public interface RulesFactory {
     /**
-     * Attempts to build a rule by name.
+     * Attempts to construct a rule by name.
      * 
      * @param ruleName
      *            the name of the rule to load.
@@ -13,5 +13,19 @@ public interface RulesFactory {
      * @throws RuntimeException
      *             on some error
      */
-    VismoRule buildByName(String ruleName);
+    VismoRule constructByName(String ruleName);
+
+
+    /**
+     * Attempts to construct a rule by name and given arguments.
+     * 
+     * @param ruleName
+     *            the name of the rule to load.
+     * @param args
+     *            the list of arguments for the rule.
+     * @return on success, an instance of {@link VismoRule}.
+     * @throws RuntimeException
+     *             on some error
+     */
+    VismoRule constructByNameWithArguments(String ruleName, Object... args);
 }

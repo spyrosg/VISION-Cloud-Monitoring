@@ -3,6 +3,7 @@ package gr.ntua.vision.monitoring.rules.propagation;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatReceiver;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatSender;
 import gr.ntua.vision.monitoring.rules.ClassPathRulesFactory;
+import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.RulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.rules.propagation.com.MessageMulticastReceiver;
@@ -94,7 +95,7 @@ public class RulesPropagationManager {
      * @throws IOException
      */
     public RulesPropagationManager(final VismoRulesEngine engine, final int serverPort) throws IOException {
-        this.factory = new ClassPathRulesFactory(engine);
+        this.factory = new ClassPathRulesFactory(PassThroughRule.class.getPackage(), engine);
         this.deliverer = new MessageDeliverer(this, factory);
         this.pid = getRandomID();
 
