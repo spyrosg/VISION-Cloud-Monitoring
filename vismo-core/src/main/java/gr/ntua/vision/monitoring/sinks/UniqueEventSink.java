@@ -68,7 +68,7 @@ public class UniqueEventSink extends AbstractSink {
         eventIds.add(id);
         final String s = serialize(e);
 
-        //log.trace("sending event: {}", s);
+        log.trace("sending event: {}", s);
         send(s);
     }
 }
