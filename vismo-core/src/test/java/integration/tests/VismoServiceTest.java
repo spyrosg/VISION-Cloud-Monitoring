@@ -170,17 +170,16 @@ public class VismoServiceTest {
     }
 
 
-    /***/
+    /**
+     * @throws InterruptedException
+     */
     @After
-    public void tearDown() {
+    public void tearDown() throws InterruptedException {
         if (service != null)
             service.halt();
 
-        try {
-            Thread.sleep(1000);
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(1000);
+        socketFactory.destroy();
     }
 
 
@@ -222,7 +221,7 @@ public class VismoServiceTest {
         doGETs(NO_GET_OPS);
         doPUTs(NO_PUT_OPS);
 
-        waitForEventsDelivery(30 * 1000);
+        waitForEventsDelivery(1000);
         assertThatVismoReceivedEvents();
     }
 
