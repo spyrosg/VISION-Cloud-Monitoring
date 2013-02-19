@@ -83,7 +83,7 @@ public class VismoEventSource extends StoppableTask implements EventSource {
         while (!isInterrupted()) {
             final String message = eventSock.receive();
 
-            log.trace("from {}, received {}", getEventSource(message), message);
+            //log.trace("from {}, received {}", getEventSource(message), message);
 
             if (message == null)
                 continue;
