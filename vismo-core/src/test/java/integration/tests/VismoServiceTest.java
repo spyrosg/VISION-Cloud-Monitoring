@@ -7,6 +7,7 @@ import gr.ntua.vision.monitoring.dispatch.VismoEventDispatcher;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
+import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
@@ -162,6 +163,7 @@ public class VismoServiceTest {
 
         final VismoRulesEngine engine = new VismoRulesEngine(new RulesStore());
 
+        new PassThroughRule(engine).submit();
         countRule = new EventCountRule(engine);
         countRule.submit();
         service = new ClusterHeadNodeFactory(conf, socketFactory, engine).build(new VismoVMInfo());
@@ -199,7 +201,7 @@ public class VismoServiceTest {
         doGETs(NO_GET_OPS);
         doPUTs(NO_PUT_OPS);
         log.debug("waiting event delivery...");
-        latch.await(5, TimeUnit.SECONDS);
+        latch.await(30, TimeUnit.SECONDS);
 
         final double dur = (System.currentTimeMillis() - start) / 1000.0;
 
