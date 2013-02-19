@@ -53,11 +53,18 @@ public abstract class PeriodicRule extends TimerTask implements VismoRule {
         if (eventsList.isEmpty())
             return;
 
-        log.debug("will aggregate over {} events", eventsList.size());
+        log.debug("{} will aggregate over {} events", getClass().getSimpleName(), eventsList.size());
+
+        final long start = System.currentTimeMillis();
 
         try {
-            send(aggregate(eventsList, lastAggregationPeriodStart, lastAggregationPeriodEnd));
+            final ArrayList<MonitoringEvent> copy = new ArrayList<MonitoringEvent>(eventsList);
+
+            send(aggregate(copy, lastAggregationPeriodStart, lastAggregationPeriodEnd));
         } finally {
+            final long dur = System.currentTimeMillis() - start;
+
+            log.debug("{} aggregating took {} ms", getClass().getSimpleName(), dur);
             eventsList.clear();
         }
     }

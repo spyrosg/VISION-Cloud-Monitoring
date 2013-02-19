@@ -91,7 +91,7 @@ public class MessageMulticastSender extends Thread implements Observer {
                     try {
                         wait();
                     } catch (final InterruptedException e) {
-                        e.printStackTrace();
+                        //TODO
                     }
                 }
     }

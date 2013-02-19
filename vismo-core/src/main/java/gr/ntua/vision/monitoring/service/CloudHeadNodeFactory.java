@@ -1,14 +1,14 @@
 package gr.ntua.vision.monitoring.service;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
-import gr.ntua.vision.monitoring.rules.AccountingRule;
-import gr.ntua.vision.monitoring.rules.CTORule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
-import gr.ntua.vision.monitoring.sinks.EventSinks;
+import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sinks.EventSinksFactory;
 import gr.ntua.vision.monitoring.sources.EventSources;
 import gr.ntua.vision.monitoring.sources.EventSourcesFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
+
+import java.util.List;
 
 
 /**
@@ -18,19 +18,10 @@ public class CloudHeadNodeFactory extends AbstractVismoServiceFactory {
     /**
      * @param conf
      * @param socketFactory
+     * @param engine
      */
-    public CloudHeadNodeFactory(final VismoConfiguration conf, final ZMQFactory socketFactory) {
-        super(conf, socketFactory);
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#boostrap(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
-     */
-    @Override
-    protected void boostrap(final VismoRulesEngine engine) {
-        super.boostrap(engine);
-        registerRules(engine);
+    public CloudHeadNodeFactory(final VismoConfiguration conf, final ZMQFactory socketFactory, final VismoRulesEngine engine) {
+        super(conf, socketFactory, engine);
     }
 
 
@@ -38,7 +29,7 @@ public class CloudHeadNodeFactory extends AbstractVismoServiceFactory {
      * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#getEventSinks()
      */
     @Override
-    protected EventSinks getEventSinks() {
+    protected List< ? extends EventSink> getEventSinks() {
         return new EventSinksFactory(conf, socketFactory).buildForCloudHead();
     }
 
@@ -49,20 +40,5 @@ public class CloudHeadNodeFactory extends AbstractVismoServiceFactory {
     @Override
     protected EventSources getEventSources() {
         return new EventSourcesFactory(conf, socketFactory).buildForCloudHead();
-    }
-
-
-    /**
-     * @param engine
-     */
-    private static void registerRules(final VismoRulesEngine engine) {
-        // TODO: rename method
-
-        final long ONE_MINUTE = 60 * 1000;
-        final long THREE_SECONDS = 3 * 1000;
-
-        new CTORule(engine, "cto-3-sec", THREE_SECONDS).submit();
-        new CTORule(engine, "cto-1-min", ONE_MINUTE).submit();
-        new AccountingRule(engine, ONE_MINUTE).submit();
     }
 }

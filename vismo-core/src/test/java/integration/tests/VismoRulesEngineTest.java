@@ -8,7 +8,6 @@ import gr.ntua.vision.monitoring.rules.PeriodicRule;
 import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
-import gr.ntua.vision.monitoring.sinks.EventSinks;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
 import gr.ntua.vision.monitoring.sources.EventSource;
 import gr.ntua.vision.monitoring.sources.EventSourceListener;
@@ -391,8 +390,9 @@ public class VismoRulesEngineTest {
      */
     @Before
     public void setUp() {
-        engine = new VismoRulesEngine(rulesStore, new EventSinks(new InMemoryEventSink(eventsStore)));
+        engine = new VismoRulesEngine(rulesStore);
         engine.registerToSource(source);
+        engine.appendSink(new InMemoryEventSink(eventsStore));
     }
 
 

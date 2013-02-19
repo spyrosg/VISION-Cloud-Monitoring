@@ -3,6 +3,9 @@ package gr.ntua.vision.monitoring.sinks;
 import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.zeromq.ZContext;
 
 
@@ -41,34 +44,30 @@ public class EventSinksFactory {
 
 
     /**
-     * @return an {@link EventSinks} object.
+     * @return
      */
-    public EventSinks buildForCloudHead() {
-        return new EventSinks(new UniqueEventSink(socketFactory.newPubSocket("tcp://*:" + conf.getConsumersPort())));
+    public List< ? extends EventSink> buildForCloudHead() {
+        return Arrays.asList(new UniqueEventSink(socketFactory.newPubSocket("tcp://*:" + conf.getConsumersPort())));
     }
 
 
     /**
-     * Setup the sinks for a cluster head node.
-     * 
-     * @return an {@link EventSinks} object.
+     * @return
      */
-    public EventSinks buildForClusterHead() {
+    public List< ? extends EventSink> buildForClusterHead() {
         final EventSink sink = new UniqueEventSink(socketFactory.newPubSocket("tcp://*:" + conf.getConsumersPort()));
         final EventSink cloudSink = new UniqueEventSink(socketFactory.newConnectedPushSocket("tcp://"
                 + conf.getCloudHeads().get(0) + ":" + conf.getCloudHeadPort()));
 
-        return new EventSinks(sink, cloudSink);
+        return Arrays.asList(sink, cloudSink);
     }
 
 
     /**
-     * Setup the sinks for a worker node.
-     * 
-     * @return an {@link EventSinks} object.
+     * @return
      */
-    public EventSinks buildForWorker() {
-        return new EventSinks(new UniqueEventSink(socketFactory.newConnectedPushSocket("tcp://" + conf.getClusterHead() + ":"
+    public List< ? extends EventSink> buildForWorker() {
+        return Arrays.asList(new UniqueEventSink(socketFactory.newConnectedPushSocket("tcp://" + conf.getClusterHead() + ":"
                 + conf.getClusterHeadPort())));
     }
 }

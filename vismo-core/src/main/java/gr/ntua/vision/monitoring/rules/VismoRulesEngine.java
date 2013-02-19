@@ -1,10 +1,12 @@
 package gr.ntua.vision.monitoring.rules;
 
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
-import gr.ntua.vision.monitoring.sinks.EventSinks;
+import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sources.EventSource;
 import gr.ntua.vision.monitoring.sources.EventSourceListener;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 
 import org.slf4j.Logger;
@@ -13,31 +15,52 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This is used to evaluate the rules. Rules are triggered from events, which are received from one or more {@link EventSource}s
- * and the evaluation result (if any) is passed to one or more {@link EventSinks}. Rules are triggered in the order they were
+ * and the evaluation result (if any) is passed to one or more {@link EventSink}s. Rules are triggered in the order they were
  * added in the engine, but might produce results in an unspecified order (which basically boils down to that some rules will be
  * triggered by a timer thread).
  */
 public class VismoRulesEngine implements EventSourceListener {
     /***/
-    private static final Logger log   = LoggerFactory.getLogger(VismoRulesEngine.class);
+    private static final Logger        log   = LoggerFactory.getLogger(VismoRulesEngine.class);
     /***/
-    private final EventSinks    sinks;
+    private final ArrayList<EventSink> sinks = new ArrayList<EventSink>();
     /***/
-    private final RulesStore    store;
+    private final RulesStore           store;
     /***/
-    private final Timer         timer = new Timer(true);
+    private final Timer                timer = new Timer(true);
 
 
     /**
      * Constructor.
      * 
      * @param store
-     * @param sinks
      */
-    public VismoRulesEngine(final RulesStore store, final EventSinks sinks) {
-        log.debug("using {}", sinks);
+    public VismoRulesEngine(final RulesStore store) {
         this.store = store;
-        this.sinks = sinks;
+    }
+
+
+    /**
+     * Append given sink to the engine.
+     * 
+     * @param sink
+     *            the sink to add.
+     */
+    public void appendSink(final EventSink sink) {
+        log.debug("adding sink: {}", sink);
+        sinks.add(sink);
+    }
+
+
+    /**
+     * Append the collection of lists to the engine.
+     * 
+     * @param coll
+     *            a collection of sinks.
+     */
+    public void appendSinks(final List< ? extends EventSink> coll) {
+        log.debug("adding sinks: {}", coll);
+        sinks.addAll(coll);
     }
 
 
@@ -94,19 +117,20 @@ public class VismoRulesEngine implements EventSourceListener {
 
 
     /**
-     * @param e
-     */
-    public void send(final MonitoringEvent e) {
-        sinks.push(e);
-    }
-
-
-    /**
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
         return "#<VismoRulesEngine>";
+    }
+
+
+    /**
+     * @param e
+     */
+    void send(final MonitoringEvent e) {
+        for (final EventSink sink : sinks)
+            sink.send(e);
     }
 
 

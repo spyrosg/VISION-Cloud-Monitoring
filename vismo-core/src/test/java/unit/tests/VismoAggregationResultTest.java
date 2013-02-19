@@ -8,7 +8,6 @@ import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoAggregationResult;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
-import gr.ntua.vision.monitoring.sinks.EventSinks;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
 import helpers.InMemoryEventDispatcher;
 import integration.tests.FakeObjectService;
@@ -59,7 +58,8 @@ public class VismoAggregationResultTest {
     /***/
     @Before
     public void setUp() {
-        engine = new VismoRulesEngine(new RulesStore(), new EventSinks(sink));
+        engine = new VismoRulesEngine(new RulesStore());
+        engine.appendSink(sink);
         service = new FakeObjectService(new InMemoryEventDispatcher(engine));
     }
 

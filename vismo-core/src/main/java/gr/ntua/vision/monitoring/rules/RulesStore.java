@@ -1,5 +1,6 @@
 package gr.ntua.vision.monitoring.rules;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -69,7 +70,7 @@ public class RulesStore {
      *            the operation.
      */
     public void forEach(final RuleOperation op) {
-        for (final VismoRule rule : set)
+        for (final VismoRule rule : new ArrayList<VismoRule>(set))
             op.run(rule);
     }
 
