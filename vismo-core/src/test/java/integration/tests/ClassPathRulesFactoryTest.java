@@ -6,7 +6,6 @@ import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
-import gr.ntua.vision.monitoring.sinks.EventSinks;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,7 +16,7 @@ import org.junit.Test;
  */
 public class ClassPathRulesFactoryTest {
     /***/
-    private final VismoRulesEngine      engine  = new VismoRulesEngine(new RulesStore(), new EventSinks());
+    private final VismoRulesEngine      engine  = new VismoRulesEngine(new RulesStore());
     /***/
     private final ClassPathRulesFactory factory = new ClassPathRulesFactory(engine);
 
