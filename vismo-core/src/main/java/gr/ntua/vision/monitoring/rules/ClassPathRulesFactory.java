@@ -5,6 +5,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import org.slf4j.Logger;
@@ -49,6 +50,8 @@ public class ClassPathRulesFactory implements RulesFactory {
 
         final Constructor< ? > constructor = tryGetConstructor(cls, engine.getClass());
 
+        log.debug("matching constructor: {}", constructor);
+
         return (VismoRule) invokeWithArguments(constructor, engine);
     }
 
@@ -65,11 +68,11 @@ public class ClassPathRulesFactory implements RulesFactory {
         final Object[] newArgs = new Object[args.length + 1];
 
         newArgs[0] = engine;
-
-        for (int i = 1; i < newArgs.length; ++i)
-            newArgs[i] = args[i - 1];
+        System.arraycopy(args, 0, newArgs, 1, args.length);
 
         final Constructor< ? > constructor = tryGetConstructor(cls, toClasses(newArgs));
+
+        log.debug("matching constructor: {}", constructor);
 
         return (VismoRule) invokeWithArguments(constructor, newArgs);
     }
@@ -100,9 +103,12 @@ public class ClassPathRulesFactory implements RulesFactory {
 
 
     /**
+     * Try to find the given class by name in the specified package.
+     * 
      * @param pkg
      * @param className
-     * @return
+     * @return the fully qualified java name the corresponds to the given <code>className</code>, <code>null</code> if there's no
+     *         match.
      */
     private String tryLoadFromPackage(final Package pkg, final String className) {
         if (classesUnderPackage.isEmpty())
@@ -118,7 +124,7 @@ public class ClassPathRulesFactory implements RulesFactory {
 
     /**
      * @param pkg
-     * @return
+     * @return the list of class names found in the package.
      */
     private static ArrayList<String> getClassesForPackage(final Package pkg) {
         final ArrayList<String> classes = new ArrayList<String>();
@@ -130,7 +136,7 @@ public class ClassPathRulesFactory implements RulesFactory {
         if (resource == null)
             throw new RuntimeException("Unexpected problem: No resource for " + relPath);
 
-        log.debug("Package: '" + pkgname + "' becomes Resource: '" + resource + "'");
+        log.trace("package '{}' => {}", pkgname, resource);
         processDirectory(new File(resource.getPath()), pkgname, classes);
 
         return classes;
@@ -177,7 +183,7 @@ public class ClassPathRulesFactory implements RulesFactory {
      * @param classes
      */
     private static void processDirectory(final File directory, final String pkgname, final ArrayList<String> classes) {
-        log.debug("Reading Directory '" + directory + "'");
+        log.trace("for directory ' {}'");
 
         final String[] files = directory.list();
 
@@ -192,20 +198,22 @@ public class ClassPathRulesFactory implements RulesFactory {
             final File subdir = new File(directory, fileName);
 
             if (subdir.isDirectory())
-                processDirectory(subdir, pkgname + '.' + fileName, classes);
+                processDirectory(subdir, pkgname + "." + fileName, classes);
         }
     }
 
 
     /**
+     * Get the classes of given array of objects.
+     * 
      * @param args
-     * @return
+     * @return the array of classes corresponding to the arguments.
      */
     private static Class< ? >[] toClasses(final Object... args) {
         final Class< ? >[] arr = new Class< ? >[args.length];
 
         for (int i = 0; i < args.length; ++i)
-            arr[i] = args[i].getClass();
+            arr[i] = args[i] != null ? args[i].getClass() : null;
 
         return arr;
     }
@@ -214,13 +222,12 @@ public class ClassPathRulesFactory implements RulesFactory {
     /**
      * @param cls
      * @param classArgs
-     * @return
+     * @return the appropriate constructor for given argument of classes.
      * @throws RuntimeException
      *             on some error.
      */
     private static Constructor< ? > tryGetConstructor(final Class< ? > cls, final Class< ? >... classArgs) {
-        for (int i = 0; i < classArgs.length; ++i)
-            log.debug("classArgs[{}].class = {}", i, classArgs[i]);
+        log.trace("constructor for arguments: {}", Arrays.toString(classArgs));
 
         try {
             return cls.getConstructor(classArgs);

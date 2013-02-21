@@ -20,18 +20,14 @@ public class ClassPathRulesFactoryTest {
      * 
      */
     public static class FooRule extends Rule {
-        /***/
-        private final String id;
-
-
         /**
          * Constructor.
          * 
          * @param engine
+         * @param id
          */
         public FooRule(final VismoRulesEngine engine, final String id) {
             super(engine);
-            this.id = id;
         }
 
 
