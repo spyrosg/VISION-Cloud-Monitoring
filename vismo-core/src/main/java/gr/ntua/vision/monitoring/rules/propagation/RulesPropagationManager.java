@@ -2,6 +2,9 @@ package gr.ntua.vision.monitoring.rules.propagation;
 
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatReceiver;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatSender;
+import gr.ntua.vision.monitoring.rules.ClassPathRulesFactory;
+import gr.ntua.vision.monitoring.rules.PassThroughRule;
+import gr.ntua.vision.monitoring.rules.RulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.rules.propagation.com.MessageMulticastReceiver;
 import gr.ntua.vision.monitoring.rules.propagation.com.MessageMulticastSender;
@@ -34,17 +37,21 @@ public class RulesPropagationManager {
     @SuppressWarnings("unused")
     private final static Logger            log                      = LoggerFactory.getLogger(RulesPropagationManager.class);
     /***/
+    private static final Random            randomGenerator          = new Random();
+    /***/
     private final ClusterRulesResolver     clusterRulesResolver     = new ClusterRulesResolver(20000, this);
     /***/
     private final ClusterRuleStore         clusterRuleStore;
     /***/
-    private final MessageDeliverer         deliverer                = new MessageDeliverer();
+    private final MessageDeliverer         deliverer;
     /***/
     private final MessageQueue             delQueue;
     /***/
     private final MessageDispatcher        dispatcher               = new MessageDispatcher();
     /***/
     private final Elector                  elector;
+    /***/
+    private final RulesFactory             factory;
     /***/
     private final String                   HEARTBEAT_MULTICAST_IP   = "224.0.0.1";
     /***/
@@ -68,17 +75,18 @@ public class RulesPropagationManager {
     /***/
     private final MessageQueue             outQueue;
     /***/
-    private Integer                        pid;
+    private final int                      pid;
     /***/
     private final NodeRuleStore            ruleStore;
     /***/
     private int                            size;
+    /** the timer object. */
+    private final Timer                    timer                    = new Timer(true);
     /***/
     private final VismoRulesEngine         vismoRulesEngine;
+
     /***/
     private final WebServer                webServer;
-    /** the timer object. */
-    private final Timer                   timer = new Timer(true);
 
 
     /**
@@ -87,7 +95,10 @@ public class RulesPropagationManager {
      * @throws IOException
      */
     public RulesPropagationManager(final VismoRulesEngine engine, final int serverPort) throws IOException {
-        setPid();
+        this.factory = new ClassPathRulesFactory(PassThroughRule.class.getPackage(), engine);
+        this.deliverer = new MessageDeliverer(this, factory);
+        this.pid = getRandomID();
+
         vismoRulesEngine = engine;
         ruleStore = new NodeRuleStore();
         clusterRuleStore = new ClusterRuleStore();
@@ -100,7 +111,6 @@ public class RulesPropagationManager {
         messageReceiver.setManager(this);
         messageSender.setManager(this);
         dispatcher.setManager(this);
-        deliverer.setManager(this);
         messageWatchdog.setManager(this);
 
         inputQueue = new MessageQueue();
@@ -204,9 +214,8 @@ public class RulesPropagationManager {
      * @return integer
      */
     @SuppressWarnings("static-method")
-    public Integer getRandomID() {
-        final Random randomGenerator = new Random();
-        return Integer.valueOf(randomGenerator.nextInt(100000) + 100000);
+    public int getRandomID() {
+        return randomGenerator.nextInt(100000) + 100000;
     }
 
 
@@ -262,12 +271,6 @@ public class RulesPropagationManager {
     }
 
 
-    /***/
-    public void setPid() {
-        pid = getRandomID();
-    }
-
-
     /**
      * starting all threads needed for the manager
      */
@@ -281,12 +284,11 @@ public class RulesPropagationManager {
             deliverer.start();
             heartbeatReceiver.init();
             heartbeatSender.init();
-            messageWatchdog.scheduleWith(timer); 
-            elector.scheduleWith(timer); 
-            clusterRulesResolver.scheduleWith(timer); 
+            messageWatchdog.scheduleWith(timer);
+            elector.scheduleWith(timer);
+            clusterRulesResolver.scheduleWith(timer);
         } catch (final Throwable x) {
             throw new RuntimeException(x);
         }
-
     }
 }

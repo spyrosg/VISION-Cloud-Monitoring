@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class provides for the low level responsibilities for a rule that runs periodically, over a list of monitoringEvents.
  */
-public abstract class PeriodicRule extends TimerTask implements RuleProc<MonitoringEvent> {
+public abstract class PeriodicRule extends TimerTask implements VismoRule {
     /***/
     private static final Logger                log        = LoggerFactory.getLogger(PeriodicRule.class);
     /***/

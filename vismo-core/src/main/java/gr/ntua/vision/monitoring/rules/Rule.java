@@ -4,9 +4,10 @@ import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 
 /**
- * 
+ * This is the base class for all rules that operate on an event basis (in contrast to {@link PeriodicRule}s that work on a set of
+ * events).
  */
-public abstract class Rule implements RuleProc<MonitoringEvent> {
+public abstract class Rule implements VismoRule {
     /***/
     private final VismoRulesEngine engine;
 

@@ -1,7 +1,5 @@
 package gr.ntua.vision.monitoring.rules;
 
-import gr.ntua.vision.monitoring.events.MonitoringEvent;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,14 +10,14 @@ import java.util.Set;
  */
 public class RulesStore {
     /** the rule-set. */
-    private final Set<RuleProc<MonitoringEvent>> set;
+    private final Set<VismoRule> set;
 
 
     /**
      * Constructor.
      */
     public RulesStore() {
-        this(new HashSet<RuleProc<MonitoringEvent>>());
+        this(new HashSet<VismoRule>());
     }
 
 
@@ -29,7 +27,7 @@ public class RulesStore {
      * @param set
      *            the rule set.
      */
-    public RulesStore(final Set<RuleProc<MonitoringEvent>> set) {
+    public RulesStore(final Set<VismoRule> set) {
         this.set = set;
     }
 
@@ -40,7 +38,7 @@ public class RulesStore {
      * @param rule
      *            the rule.
      */
-    public void add(final RuleProc<MonitoringEvent> rule) {
+    public void add(final VismoRule rule) {
         set.add(rule);
     }
 
@@ -60,7 +58,7 @@ public class RulesStore {
      *            the rule.
      * @return <code>true</code> iff the rule is in the store, <code>false</code> otherwise.
      */
-    public boolean contains(final RuleProc<MonitoringEvent> rule) {
+    public boolean contains(final VismoRule rule) {
         return set.contains(rule);
     }
 
@@ -72,7 +70,7 @@ public class RulesStore {
      *            the operation.
      */
     public void forEach(final RuleOperation op) {
-        for (final RuleProc<MonitoringEvent> rule : new ArrayList<RuleProc<MonitoringEvent>>(set))
+        for (final VismoRule rule : new ArrayList<VismoRule>(set))
             op.run(rule);
     }
 
@@ -83,7 +81,7 @@ public class RulesStore {
      * @param rule
      *            the rule.
      */
-    public void remove(final RuleProc<MonitoringEvent> rule) {
+    public void remove(final VismoRule rule) {
         set.remove(rule);
     }
 
