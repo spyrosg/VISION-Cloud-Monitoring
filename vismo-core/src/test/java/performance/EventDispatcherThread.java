@@ -40,17 +40,15 @@ public class EventDispatcherThread implements Runnable {
     }
 
 
-    @Override
-    public void run() {
-        while (latch.getCount() > 0) {
-            final int randomNum = rand(EventDispatcherThread.MAX_DURATION);
-            final EventBuilder builder = randomEvent(getWeightedRandomOp(randomNum), getWeightedRandomTenant(),
-                                                     getWeightedRandomUser(randomNum), getWeightedRandomContainer(randomNum),
-                                                     getWeightedRandomObject(), getWeightedRandomSt(randomNum));
-            builder.send();
-            latch.countDown();
-        }
-
+    /**
+     * returns the name of the thread.
+     * 
+     * @return the name of the thread
+     */
+    public static String getThreadName() {
+        final Thread t = Thread.currentThread();
+        final String name = t.getName();
+        return name;
     }
 
 
@@ -152,6 +150,23 @@ public class EventDispatcherThread implements Runnable {
     }
 
 
+    @Override
+    public void run() {
+        while (latch.getCount() > 0) {
+            final int randomNum = rand(EventDispatcherThread.MAX_DURATION);
+            final EventBuilder builder = randomEvent(EventDispatcherThread.getWeightedRandomOp(randomNum),
+                                                     EventDispatcherThread.getWeightedRandomTenant(),
+                                                     EventDispatcherThread.getWeightedRandomUser(randomNum),
+                                                     EventDispatcherThread.getWeightedRandomContainer(randomNum),
+                                                     EventDispatcherThread.getWeightedRandomObject(),
+                                                     EventDispatcherThread.getWeightedRandomSt(randomNum));
+            builder.send();
+            latch.countDown();
+        }
+
+    }
+
+
     /**
      * @param maxSize
      * @return int
@@ -174,21 +189,10 @@ public class EventDispatcherThread implements Runnable {
             final String object, final Status st) {
         final int contentSize = rand(EventDispatcherThread.MAX_SIZE);
 
-        return dispatcher.newEvent().field("latch-id", latch.getCount()).field("originating-service", EventDispatcherThread.SERVICE_NAME)
-                .field("originating-machine", "localhost").field("operation", op.toString()).field("tenant", tenant)
-                .field("user", user).field("container", container).field("object", object).field("status", st.toString())
-                .field("content-size", contentSize).field("timestamp", System.currentTimeMillis());
-    }
-
-
-    /**
-     * returns the name of the thread.
-     * 
-     * @return the name of the thread
-     */
-    public static String getThreadName() {
-        Thread t = Thread.currentThread();
-        String name = t.getName();
-        return name;
+        return dispatcher.newEvent().field("latch-id", latch.getCount())
+                .field("originating-service", EventDispatcherThread.SERVICE_NAME).field("originating-machine", "localhost")
+                .field("operation", op.toString()).field("tenant", tenant).field("user", user).field("container", container)
+                .field("object", object).field("status", st.toString()).field("content-size", contentSize)
+                .field("timestamp", System.currentTimeMillis());
     }
 }

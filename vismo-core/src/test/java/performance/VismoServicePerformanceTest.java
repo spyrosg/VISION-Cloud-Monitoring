@@ -29,7 +29,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeromq.ZContext;
@@ -37,7 +36,6 @@ import org.zeromq.ZContext;
 import com.carrotsearch.junitbenchmarks.AbstractBenchmark;
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
-
 
 
 /**
@@ -67,7 +65,7 @@ public class VismoServicePerformanceTest extends AbstractBenchmark {
                                                                      }
                                                                  };
     /***/
-    private final static int                 TOTAL_NUM_OF_EVENTS = 200;
+    private final static int                 TOTAL_NUM_OF_EVENTS = 200000;
     /***/
     private final static int                 TOTAL_THREAD_NUM    = 10;
     /***/
@@ -77,12 +75,11 @@ public class VismoServicePerformanceTest extends AbstractBenchmark {
     /***/
     private Service                          service;
     /***/
-    private ZMQFactory                 socketFactory;       
+    private ZMQFactory                       socketFactory;
     /***/
     private ArrayList<SimpleConsumerHandler> consumers           = new ArrayList<SimpleConsumerHandler>();
     /***/
     private final static int                 NUM_OF_CONSUMERS    = 1;
-
 
 
     /***/
@@ -96,10 +93,6 @@ public class VismoServicePerformanceTest extends AbstractBenchmark {
         /***/
         INTENSIVE_SET
     }
-    
-
-
-
 
 
     /**
@@ -109,25 +102,24 @@ public class VismoServicePerformanceTest extends AbstractBenchmark {
      */
     @Test
     public void enginePerformanceFewEventsTest() throws InterruptedException {
-        
+
         createEventConsumers(NUM_OF_CONSUMERS);
-        
+
         final CountDownLatch eventCountDownLatch = new CountDownLatch(TOTAL_NUM_OF_EVENTS);
         final ExecutorService threadExecutor = Executors.newFixedThreadPool(VismoServicePerformanceTest.TOTAL_THREAD_NUM);
-        
+
         final long start = System.currentTimeMillis();
 
         startDispatcherThreads(threadExecutor, eventCountDownLatch);
-        waitForEventsToBeSent(eventCountDownLatch);        
+        waitForEventsToBeSent(eventCountDownLatch);
         SimpleConsumerHandler probingConsumer = consumers.get(getRandomConsumerNum(consumers));
-        waitForEventsToReachConsumer(probingConsumer);        
+        waitForEventsToReachConsumer(probingConsumer);
         threadExecutor.shutdown();
-        
+
         final double dur = (System.currentTimeMillis() - start) / 1000.0;
-        
+
         printPerformanceMessage(probingConsumer, dur);
     }
-    
 
     /**
      * 
@@ -135,13 +127,12 @@ public class VismoServicePerformanceTest extends AbstractBenchmark {
     @Rule
     public BenchmarkRule benchmarkRun1 = new BenchmarkRule();
 
+
     /**
      * @param threadExecutor
      * @param eventCountDownLatch
      */
-    @BenchmarkOptions(callgc = false, benchmarkRounds = 20, warmupRounds = 3)
-
-
+    @BenchmarkOptions(callgc = false, benchmarkRounds = 2, warmupRounds = 0)
     /**
      * the method that starts the dispatcher threads
      * @param threadExecutor
@@ -149,9 +140,9 @@ public class VismoServicePerformanceTest extends AbstractBenchmark {
      */
     private void startDispatcherThreads(ExecutorService threadExecutor, CountDownLatch eventCountDownLatch) {
         for (int i = 0; i < VismoServicePerformanceTest.TOTAL_THREAD_NUM; i++)
-            threadExecutor.execute(new EventDispatcherThread(new VismoEventDispatcher(socketFactory, conf, "performance-test"), rng,
-                    eventCountDownLatch));
-        
+            threadExecutor.execute(new EventDispatcherThread(new VismoEventDispatcher(socketFactory, conf, "performance-test"),
+                    rng, eventCountDownLatch));
+
     }
 
 
@@ -190,7 +181,7 @@ public class VismoServicePerformanceTest extends AbstractBenchmark {
      * @throws InterruptedException
      */
     private static void waitForEventsToReachConsumer(SimpleConsumerHandler probingConsumer) throws InterruptedException {
-        while (probingConsumer.getNoReceivedEvents() < TOTAL_NUM_OF_EVENTS) {            
+        while (probingConsumer.getNoReceivedEvents() < TOTAL_NUM_OF_EVENTS) {
             waitTime(1000);
         }
 
@@ -232,7 +223,8 @@ public class VismoServicePerformanceTest extends AbstractBenchmark {
 
     /**
      * tear down the infrastructure.
-     * @throws InterruptedException 
+     * 
+     * @throws InterruptedException
      */
     @After
     public void tearDown() throws InterruptedException {
@@ -249,16 +241,16 @@ public class VismoServicePerformanceTest extends AbstractBenchmark {
 
     /**
      * process the events latency
+     * 
      * @param eventsStore
      */
     @SuppressWarnings("unused")
     private static void statisticallyProcessEvents(ConcurrentHashMap<Long, Long> eventsStore) {
         SortedSet<Long> keys = new TreeSet<Long>(eventsStore.keySet());
-        for (Long key : keys) { 
-           Long value = eventsStore.get(key);
+        for (Long key : keys) {
+            Long value = eventsStore.get(key);
         }
     }
-
 
 
     /**
@@ -272,15 +264,13 @@ public class VismoServicePerformanceTest extends AbstractBenchmark {
     }
 
 
-
-    
     /**
      * loads the rules engine with different load in terms of rules.
      * 
      * @param engine
      * @param type
      */
-    private static void submitRulesToEngine(VismoRulesEngine engine,LoadedRulesSet type ) {
+    private static void submitRulesToEngine(VismoRulesEngine engine, LoadedRulesSet type) {
         switch(type){
             case PASSTHROUGH:
                 new PassThroughRule(engine).submit();
@@ -302,7 +292,7 @@ public class VismoServicePerformanceTest extends AbstractBenchmark {
                     new AccountingRule(engine, j + 3).submit();
                     new CTORule(engine, "cto*" + j, 1).submit();
                 }
-                break; 
+                break;
             case INTENSIVE_SET:
                 for (int j = 1; j < 1000; j++) {
                     new CTORule(engine, "cto" + j, 10).submit();
