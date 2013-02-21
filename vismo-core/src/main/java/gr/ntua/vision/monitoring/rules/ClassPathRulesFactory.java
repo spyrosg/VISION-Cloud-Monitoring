@@ -47,7 +47,7 @@ public class ClassPathRulesFactory implements RulesFactory {
 
         log.debug("matching class for {} => {}", ruleName, cls);
 
-        final Constructor< ? > constructor = tryGetConstructor(cls);
+        final Constructor< ? > constructor = tryGetConstructor(cls, engine.getClass());
 
         return (VismoRule) invokeWithArguments(constructor, engine);
     }
@@ -62,30 +62,16 @@ public class ClassPathRulesFactory implements RulesFactory {
 
         log.debug("matching class for {} => {}", ruleName, cls);
 
-        final Constructor< ? > constructor = tryGetConstructor(cls);
+        final Object[] newArgs = new Object[args.length + 1];
 
-        return (VismoRule) invokeWithArguments(constructor, engine, args);
-    }
+        newArgs[0] = engine;
 
+        for (int i = 1; i < newArgs.length; ++i)
+            newArgs[i] = args[i - 1];
 
-    /**
-     * @param cls
-     * @return
-     * @throws RuntimeException
-     *             on some error.
-     */
-    private Constructor< ? > tryGetConstructor(final Class< ? > cls) {
-        try {
-            return cls.getConstructor(engine.getClass());
-        } catch (final NoSuchMethodException e) {
-            log.error(cls.getCanonicalName(), e);
+        final Constructor< ? > constructor = tryGetConstructor(cls, toClasses(newArgs));
 
-            throw new RuntimeException(e);
-        } catch (final SecurityException e) {
-            log.error(cls.getCanonicalName(), e);
-
-            throw new RuntimeException(e);
-        }
+        return (VismoRule) invokeWithArguments(constructor, newArgs);
     }
 
 
@@ -207,6 +193,45 @@ public class ClassPathRulesFactory implements RulesFactory {
 
             if (subdir.isDirectory())
                 processDirectory(subdir, pkgname + '.' + fileName, classes);
+        }
+    }
+
+
+    /**
+     * @param args
+     * @return
+     */
+    private static Class< ? >[] toClasses(final Object... args) {
+        final Class< ? >[] arr = new Class< ? >[args.length];
+
+        for (int i = 0; i < args.length; ++i)
+            arr[i] = args[i].getClass();
+
+        return arr;
+    }
+
+
+    /**
+     * @param cls
+     * @param classArgs
+     * @return
+     * @throws RuntimeException
+     *             on some error.
+     */
+    private static Constructor< ? > tryGetConstructor(final Class< ? > cls, final Class< ? >... classArgs) {
+        for (int i = 0; i < classArgs.length; ++i)
+            log.debug("classArgs[{}].class = {}", i, classArgs[i]);
+
+        try {
+            return cls.getConstructor(classArgs);
+        } catch (final NoSuchMethodException e) {
+            log.error(cls.getCanonicalName(), e);
+
+            throw new RuntimeException(e);
+        } catch (final SecurityException e) {
+            log.error(cls.getCanonicalName(), e);
+
+            throw new RuntimeException(e);
         }
     }
 }
