@@ -47,7 +47,7 @@ public class HeartbeatReceiver {
                 try {
                     Thread.sleep(MEMBERSHIP_UPDATE_INTERVAL);
                 } catch (final InterruptedException e) {
-                    HeartbeatReceiver.log.debug("Multicast Processor Thread sleep interrupted");
+                    //TODO removing messages
                 }
                 updateHostsMembership(MEMBERSHIP_TIMEOUT);
                 updateClusterElectedHost();

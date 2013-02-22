@@ -77,7 +77,7 @@ public final class HeartbeatSender {
                     try {
                         Thread.sleep(getSendInterval());
                     } catch (final InterruptedException e) {
-                        HeartbeatSender.log.debug("Sleep after error interrupted. Initial cause was " + e.getMessage());
+                        //TODO removing messages
                     }
             }
         }
