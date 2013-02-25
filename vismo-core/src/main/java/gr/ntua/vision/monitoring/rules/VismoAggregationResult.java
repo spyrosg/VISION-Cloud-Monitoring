@@ -23,8 +23,7 @@ public class VismoAggregationResult extends VismoEvent implements AggregationRes
      *            a dictionary of key/values.
      */
     public VismoAggregationResult(final Map<String, Object> dict) {
-        super(dict);
-        appendDefaultFields();
+        super(appendDefaultFields(dict));
     }
 
 
@@ -75,11 +74,16 @@ public class VismoAggregationResult extends VismoEvent implements AggregationRes
 
     /**
      * Add required fields to the event.
+     * 
+     * @param dict
+     * @return
      */
-    private void appendDefaultFields() {
-        put("timestamp", System.currentTimeMillis());
-        put("id", UUID.randomUUID().toString());
-        put("originating-machine", ip);
+    private static Map<String, Object> appendDefaultFields(final Map<String, Object> dict) {
+        dict.put("timestamp", System.currentTimeMillis());
+        dict.put("id", UUID.randomUUID().toString());
+        dict.put("originating-machine", ip);
+
+        return dict;
     }
 
 

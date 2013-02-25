@@ -20,13 +20,17 @@ public class InMemoryEventDispatcher implements EventDispatcher {
      * 
      */
     private static class MyEvent extends VismoEvent {
+        /***/
+        private static final String localhost = "127.0.0.1";
+
+
         /**
          * Constructor.
          * 
          * @param dict
          */
         protected MyEvent(final Map<String, Object> dict) {
-            super(dict);
+            super(appendDefaultFields(dict));
         }
 
 
@@ -36,6 +40,18 @@ public class InMemoryEventDispatcher implements EventDispatcher {
         @Override
         public String toString() {
             return "#<MyEvent: " + dict() + ">";
+        }
+
+
+        /**
+         * @param dict
+         * @return
+         */
+        private static Map<String, Object> appendDefaultFields(final Map<String, Object> dict) {
+            dict.put("timestamp", System.currentTimeMillis());
+            dict.put("originating-machine", localhost);
+
+            return dict;
         }
     }
 
