@@ -14,28 +14,24 @@ import com.sun.management.OperatingSystemMXBean;
  */
 @SuppressWarnings("restriction")
 public class JVMStatusReportTask extends PeriodicTask {
-    /***/
-    private static final Logger                log         = LoggerFactory.getLogger(JVMStatusReportTask.class);
-    /** the number of bytes in a megabyte. */
-    private static final int                   MB          = 1024 * 1024;
-    /** a millisecond in nanoseconds. */
-    private static final int                   MILLI       = 1000000;
+    /** the log target. */
+    private static final Logger                log      = LoggerFactory.getLogger(JVMStatusReportTask.class);
     /** the system's number of cpus. */
     private static final int                   nCPUs;
     /***/
-    private static final OperatingSystemMXBean osBean      = (com.sun.management.OperatingSystemMXBean) ManagementFactory
-                                                                   .getOperatingSystemMXBean();
+    private static final OperatingSystemMXBean osBean   = (com.sun.management.OperatingSystemMXBean) ManagementFactory
+                                                                .getOperatingSystemMXBean();
+    /** the process' time in the cpu(s), in milliseconds. */
+    private static double                      procTime = getProcCPUTime();
     /***/
-    private static final RuntimeMXBean         runbean     = ManagementFactory.getRuntimeMXBean();
-    /***/
-    private static final Runtime               runtime     = Runtime.getRuntime();
-    /** the vm's process time in milliseconds on latest access. */
-    private long                               processTime = 0;
-    /** the vm's uptime in milliseconds on latest access. */
-    private long                               upTime      = 0;
+    private static final RuntimeMXBean         runbean  = ManagementFactory.getRuntimeMXBean();
+    /** the runtime object. */
+    private static final Runtime               runtime  = Runtime.getRuntime();
+    /** the process' uptime, in milliseconds. */
+    private static double                      upTime   = getProcUpTime();
 
     static {
-        nCPUs = osBean.getAvailableProcessors();
+        nCPUs = runtime.availableProcessors();
     }
 
 
@@ -55,59 +51,51 @@ public class JVMStatusReportTask extends PeriodicTask {
      */
     @Override
     public void run() {
-        reportFreeMemoryPercent();
-        reportCPUUsage();
+        log.debug("cpu load {}%", String.format("%.2f", getCPULoad()));
+        log.debug("total memory {} Mbytes, used {}%", runtime.totalMemory() / (1024 * 1024),
+                  String.format("%.2f", getUsedMemory()));
     }
 
 
     /**
-     * Calculate something like the vm's load on the cpu. This is the amount time spent using the cpu over the time difference of
-     * two consecutive calls to this method. <br />
+     * Calculate something like the vm's process load on the cpu. This is the ratio of elapsed cpu time spent by the process to
+     * the elapsed uptime of the process.
      * 
-     * @See {@linkplain "http://knight76.blogspot.gr/2009/05/how-to-get-java-cpu-usage-jvm-instance.html"}
      * @return the vm's cpu load as a double in the range [0, 1).
      */
-    private double getVMCPULoad() {
-        final long currUpTime = runbean.getUptime();
-        final long currProcessTime = osBean.getProcessCpuTime() / MILLI;
-
-        if (upTime <= 0 || processTime <= 0) {
-            // swap out the old values
-            upTime = currUpTime;
-            processTime = currProcessTime;
-
-            return 0.0;
-        }
+    public static double getCPULoad() {
+        final double elapsedUpTime = getProcUpTime() - upTime;
+        final double elapsedProcTime = getProcCPUTime() - procTime;
 
         // cpu load could go higher than 100% because currUpTime
-        // and currProcessTime are not fetched simultaneously. Limit to 99%
-        final double load = Math.min(99.0, 1.0 * (currProcessTime - processTime) / (nCPUs * (currUpTime - upTime)));
-
-        // swap out the old values
-        upTime = currUpTime;
-        processTime = currProcessTime;
-
-        return load;
+        // and currProcTime are not fetched simultaneously. Limit it to 99%.
+        return Math.min(99.9, 100 * elapsedProcTime / (nCPUs * elapsedUpTime));
     }
 
 
     /**
-     * 
+     * @return the percent of used memory in the jvm.
      */
-    private void reportCPUUsage() {
-        log.debug("cpu load {}%", String.format("%.2f", getVMCPULoad()));
+    public static double getUsedMemory() {
+        final long freeBytes = runtime.freeMemory();
+        final double totalBytes = runtime.totalMemory();
+
+        return 100 * (totalBytes - freeBytes) / totalBytes;
     }
 
 
     /**
-     * 
+     * @return the time this process has spent in the cpu(s) in milliseconds.
      */
-    private static void reportFreeMemoryPercent() {
-        final long freeMemBytes = runtime.freeMemory();
-        final long totalMemBytes = runtime.totalMemory();
-        final double used = 100.0 * (totalMemBytes - freeMemBytes) / totalMemBytes;
-        final long totalMemMBytes = totalMemBytes / MB;
+    private static double getProcCPUTime() {
+        return osBean.getProcessCpuTime() / 1000000.0;
+    }
 
-        log.debug("using {}% of {} MBytes", String.format("%.2f", used), totalMemMBytes);
+
+    /**
+     * @return the time this process has been running in milliseconds.
+     */
+    private static double getProcUpTime() {
+        return runbean.getUptime();
     }
 }
