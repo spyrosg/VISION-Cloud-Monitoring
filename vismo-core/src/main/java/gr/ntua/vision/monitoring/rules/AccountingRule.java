@@ -174,7 +174,7 @@ public class AccountingRule extends AbstractAggregationRule {
 
     /**
      * @param eventList
-     * @return
+     * @return a map.
      */
     private static HashMap<String, Object> getAccountingEventObject(final List< ? extends Event> eventList) {
         final HashMap<String, Object> dict = new HashMap<String, Object>();
@@ -192,7 +192,7 @@ public class AccountingRule extends AbstractAggregationRule {
     /**
      * @param list
      * @param operation
-     * @return
+     * @return a list.
      */
     private static ArrayList<HashMap<String, Object>> transformByOperation(final ArrayList<Event> list, final String operation) {
         final ArrayList<HashMap<String, Object>> newList = new ArrayList<HashMap<String, Object>>(list.size());
@@ -257,7 +257,7 @@ public class AccountingRule extends AbstractAggregationRule {
 
     /**
      * @param list
-     * @return
+     * @return a list.
      */
     private static ArrayList<HashMap<String, Object>> transformStorletEvents(final ArrayList<Event> list) {
         final HashMap<String, TenantStorlets> tenants = new HashMap<String, AccountingRule.TenantStorlets>();

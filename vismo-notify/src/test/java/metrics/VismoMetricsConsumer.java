@@ -53,7 +53,7 @@ public class VismoMetricsConsumer {
 
 
         /**
-         * @return
+         * @return the duration.
          */
         private double getDuration() {
             return ((endTime - startTime) / 1000.0);

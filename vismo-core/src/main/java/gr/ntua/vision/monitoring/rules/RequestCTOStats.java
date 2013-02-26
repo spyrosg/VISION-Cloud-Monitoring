@@ -120,7 +120,7 @@ class RequestCTOStats {
 
 
     /**
-     * @return
+     * @return a number.
      */
     public double sumTransactionTimes() {
         return sumList(transactionTimes);

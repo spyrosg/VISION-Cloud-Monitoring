@@ -25,7 +25,7 @@ public interface AggregationRule {
 
     /**
      * @param e
-     * @return
+     * @return <code>true</code> iff the event matches the rule, <code>false</code> otherwise.
      */
     boolean matches(Event e);
 }

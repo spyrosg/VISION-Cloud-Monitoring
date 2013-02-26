@@ -127,7 +127,7 @@ public class VismoAggregationResult implements AggregationResult {
 
     /**
      * @param key
-     * @return
+     * @return a value under given key.
      */
     private Object get1(final String key) {
         return dict.get(key);

@@ -18,7 +18,7 @@ public interface MonitoringSocket {
 
     /**
      * @param message
-     * @return
+     * @return nada
      */
     boolean send(String message);
 }
