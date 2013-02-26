@@ -88,7 +88,6 @@
           </defineStatements>
 
           <mappings>
-
             <mapping>
               <directory>/srv/vismo</directory>
               <username>root</username>
@@ -100,9 +99,19 @@
                   <location>target/vismo-core-${project.version}.jar</location>
                   <destination>vismo.jar</destination>
                 </source>
+              </sources>
+            </mapping>
+
+            <mapping>
+              <directory>/etc</directory>
+              <username>root</username>
+              <groupname>root</groupname>
+              <filemode>0644</filemode>
+              <directoryIncluded>false</directoryIncluded>
+              <sources>
                 <source>
                   <location>../vismo-config/src/main/resources/config.properties</location>
-                  <destination>config.properties</destination>
+                  <destination>visioncloud_vismo.conf</destination>
                 </source>
               </sources>
             </mapping>
@@ -120,7 +129,6 @@
                 </source>
               </sources>
             </mapping>
-
           </mappings>
         </configuration>
 
