@@ -7,7 +7,7 @@
 . /etc/rc.d/init.d/functions
 
 VISMO_JAR=/srv/vismo/vismo.jar
-VISMO_CONFIG=/srv/vismo/config.properties
+VISMO_CONFIG=/etc/visioncloud_vismo.conf
 
 
 is_vismo_running() {
