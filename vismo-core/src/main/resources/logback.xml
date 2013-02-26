@@ -1,37 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-  <!-- logger name="com.sun.jersey.api.container.filter" level="trace" / -->
-
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+  <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>%-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m\n%ex</pattern>
     </encoder>
+    <target>System.err</target>
   </appender>
 
-  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>/var/log/vismo.log</file>
-    <layout class="ch.qos.logback.classic.PatternLayout">
+  <appender name="SYSLOG" class="ch.qos.logback.classic.net.SyslogAppender">
+    <syslogHost>10.0.0.1</syslogHost>
+    <facility>USER</facility>
+    <suffixPattern>{}vismo %-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m\n%ex</suffixPattern>
+  </appender>
+
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>/var/log/vision-log/visioncloud_vismo.log</file>
+    <encoder>
       <pattern>%-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m\n%ex</pattern>
-    </layout>
+    </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>/var/log/vismo-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-      <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-        <maxFileSize>100MB</maxFileSize>
-      </timeBasedFileNamingAndTriggeringPolicy>
+      <fileNamePattern>/var/log/vision-log/visioncloud_vismo-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+      <maxHistory>7</maxHistory>
     </rollingPolicy>
   </appender>
 
-  <appender name="SYSLOG" level="INFO" class="ch.qos.logback.classic.net.SyslogAppender">
-    <syslogHost>127.0.0.1</syslogHost>
-    <facility>AUTH</facility>
-    <suffixPattern>%-5p %C: %M %d [%t] %c -%m%n</suffixPattern>
-  </appender>
+  <!-- make jetty less talkative -->
+  <logger name="org.eclipse.jetty.util" level="INFO" />
+  <logger name="org.eclipse.jetty.servlet" level="INFO" />
+  <logger name="org.eclipse.jetty.server.handler" level="INFO" />
+
+  <root level="DEBUG">
+    <appender-ref ref="SYSLOG" />
+  </root>
 
   <root level="TRACE">
-    <appender-ref ref="STDOUT" />
+    <appender-ref ref="STDERR" />
     <appender-ref ref="FILE" />
-    <appender-ref ref="SYSLOG" />
   </root>
 
 </configuration>
