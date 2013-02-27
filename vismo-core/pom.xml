@@ -7,7 +7,7 @@
   <parent>
     <artifactId>vismo</artifactId>
     <groupId>gr.ntua.vision</groupId>
-    <version>1.0.6</version>
+    <version>1.0.6-ibc-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
@@ -137,23 +137,22 @@
   </build>
 
   <dependencies>
-
     <dependency>
       <artifactId>vismo-config</artifactId>
       <groupId>gr.ntua.vision</groupId>
-      <version>1.0.6</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <artifactId>vismo-notify</artifactId>
       <groupId>gr.ntua.vision</groupId>
-      <version>1.0.6</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <artifactId>vismo-zmq</artifactId>
       <groupId>gr.ntua.vision</groupId>
-      <version>1.0.6</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -212,7 +211,6 @@
       <version>1.1</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
 </project>
