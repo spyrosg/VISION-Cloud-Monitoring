@@ -75,7 +75,6 @@
           <summary>The monitoring infrastructure of the VISION Cloud.</summary>
           <description>The monitoring infrastructure of the VISION Cloud.</description>
           <packager>vassilis</packager>
-          <release>1.0</release>
 
           <requires>
             <require>java &gt;= 1.6</require>
