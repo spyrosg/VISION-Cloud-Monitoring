@@ -3,6 +3,7 @@ package gr.ntua.vision.monitoring.notify;
 import gr.ntua.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
+import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import java.util.logging.Logger;
 
@@ -12,9 +13,7 @@ import java.util.logging.Logger;
  */
 public class EventHandlerTask implements Runnable {
     /** the log target. */
-    private static final Logger ilog   = Logger.getLogger(EventHandlerTask.class.getName());
-    /***/
-    private volatile boolean    closed = false;
+    private static final Logger ilog = Logger.getLogger(EventHandlerTask.class.getName());
     /** the event factory. */
     private final EventFactory  factory;
     /** the actual handler. */
@@ -28,25 +27,26 @@ public class EventHandlerTask implements Runnable {
      * 
      * @param factory
      *            the event factory.
-     * @param sock
-     *            the socket.
+     * @param socketFactory
+     * @param addr
+     * @param topic
      * @param handler
      *            the actual handler.
      */
-    public EventHandlerTask(final EventFactory factory, final Socket sock, final EventHandler handler) {
+    EventHandlerTask(final EventFactory factory, final ZMQFactory socketFactory, final String addr, final String topic,
+            final EventHandler handler) {
         this.factory = factory;
-        this.sock = sock;
+        this.sock = socketFactory.newSubSocket(addr, topic);
         this.handler = handler;
     }
 
 
     /**
-     * Halt the handler's execution; dispose the thread's resources.
+     * Halt the task's execution.
      */
+    @SuppressWarnings("static-method")
     public void halt() {
         Thread.currentThread().interrupt();
-        sock.close();
-        closed = true;
     }
 
 
@@ -58,9 +58,6 @@ public class EventHandlerTask implements Runnable {
         ilog.config("entering receive/handle loop");
 
         while (!Thread.currentThread().isInterrupted()) {
-            if (closed)
-                break;
-
             final String msg = sock.receive();
 
             ilog.fine("received: " + msg);
@@ -79,5 +76,16 @@ public class EventHandlerTask implements Runnable {
                     x.printStackTrace();
                 }
         }
+
+        sock.close();
+    }
+
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "#<EventHandlerTask: " + sock + ">";
     }
 }

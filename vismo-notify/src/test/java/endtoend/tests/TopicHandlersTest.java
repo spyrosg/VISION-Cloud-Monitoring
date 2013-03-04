@@ -72,7 +72,6 @@ public class TopicHandlersTest {
     private VismoEventRegistry            registry;
     /***/
     private final ZMQFactory              socketFactory  = new ZMQFactory(new ZContext());
-
     /***/
     private final EventHandlerTask[]      tasks          = new EventHandlerTask[topics.length];
 
