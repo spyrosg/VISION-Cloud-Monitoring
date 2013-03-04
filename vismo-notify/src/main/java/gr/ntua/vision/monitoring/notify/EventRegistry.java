@@ -1,8 +1,6 @@
 package gr.ntua.vision.monitoring.notify;
 
 import gr.ntua.monitoring.sockets.Socket;
-import gr.ntua.vision.monitoring.events.EventFactory;
-import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
@@ -28,67 +26,6 @@ import java.util.logging.Logger;
  * notified asynchronously to the main client program loop.
  */
 class EventRegistry {
-    /**
-     * The event handler task is responsible for listening for incoming events and pass those events to the handler.
-     */
-    private static class EventHandlerTask implements Runnable {
-        /** the log target. */
-        private static final Logger ilog = Logger.getLogger(EventHandlerTask.class.getName());
-        /** the event factory. */
-        private final EventFactory  factory;
-        /** the actual handler. */
-        private final EventHandler  handler;
-        /** the socket. */
-        private final Socket        sock;
-
-
-        /**
-         * Constructor.
-         * 
-         * @param factory
-         *            the event factory.
-         * @param sock
-         *            the socket.
-         * @param handler
-         *            the actual handler.
-         */
-        public EventHandlerTask(final EventFactory factory, final Socket sock, final EventHandler handler) {
-            this.factory = factory;
-            this.sock = sock;
-            this.handler = handler;
-        }
-
-
-        /**
-         * @see java.lang.Thread#run()
-         */
-        @Override
-        public void run() {
-            ilog.config("entering receive/handle loop");
-
-            while (true) {
-                final String msg = sock.receive();
-
-                ilog.fine("received: " + msg);
-
-                if (msg == null)
-                    continue;
-
-                // bypass topic
-                final int topicIndex = msg.indexOf(" ");
-                final MonitoringEvent e = factory.createEvent(msg.substring(topicIndex + 1));
-
-                if (e != null)
-                    try {
-                        handler.handle(e);
-                    } catch (final Throwable x) {
-                        x.printStackTrace();
-                    }
-            }
-        }
-    }
-
-
     /**
      * A custom log formatter. The format should match the following logback notation:
      * <code>%-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m\n%ex</code>.
@@ -166,12 +103,16 @@ class EventRegistry {
      *            the event topic.
      * @param handler
      *            the handler.
+     * @return
      */
-    public void register(final String topic, final EventHandler handler) {
+    public EventHandlerTask register(final String topic, final EventHandler handler) {
         final Socket sock = socketFactory.newSubSocket(addr, topic);
+        final EventHandlerTask task = new EventHandlerTask(new VismoEventFactory(), sock, handler);
 
         log.config("registering handler for topic '" + topic + "', using " + sock);
-        pool.submit(new EventHandlerTask(new VismoEventFactory(), sock, handler));
+        pool.submit(task);
+
+        return task;
     }
 
 
@@ -180,9 +121,10 @@ class EventRegistry {
      * 
      * @param handler
      *            the handler.
+     * @return
      */
-    public void registerToAll(final EventHandler handler) {
-        register("", handler);
+    public EventHandlerTask registerToAll(final EventHandler handler) {
+        return register("", handler);
     }
 
 

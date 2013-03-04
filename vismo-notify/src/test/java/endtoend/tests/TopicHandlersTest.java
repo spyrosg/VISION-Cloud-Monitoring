@@ -4,9 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
+import gr.ntua.vision.monitoring.notify.EventHandlerTask;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.zeromq.ZContext;
@@ -68,6 +70,11 @@ public class TopicHandlersTest {
     private FakeMonitoringInstance        inst;
     /***/
     private VismoEventRegistry            registry;
+    /***/
+    private final ZMQFactory              socketFactory  = new ZMQFactory(new ZContext());
+
+    /***/
+    private final EventHandlerTask[]      tasks          = new EventHandlerTask[topics.length];
 
 
     /**
@@ -78,7 +85,7 @@ public class TopicHandlersTest {
         for (int i = 0; i < topics.length; ++i) {
             final String topic = topics[i];
 
-            registry.register(topic, handlers[i] = new TopicAssertionHandler(topic));
+            tasks[i] = registry.register(topic, handlers[i] = new TopicAssertionHandler(topic));
         }
 
         Thread.sleep(30); // spin handlers
@@ -93,10 +100,18 @@ public class TopicHandlersTest {
     /***/
     @Before
     public void setUp() {
-        final ZMQFactory socketFactory = new ZMQFactory(new ZContext());
-
         setupFakeMonitoring(socketFactory);
         setupRegistry(socketFactory);
+    }
+
+
+    /**
+     * 
+     */
+    @After
+    public void tearDown() {
+        for (final EventHandlerTask task : tasks)
+            task.halt();
     }
 
 
@@ -104,7 +119,7 @@ public class TopicHandlersTest {
      * @param socketFactory
      */
     private void setupFakeMonitoring(final ZMQFactory socketFactory) {
-        inst = new FakeMonitoringInstance(socketFactory.newPubSocket(CONSUMERS_PORT), 10, topics);
+        inst = new FakeMonitoringInstance(socketFactory.newPubSocket(CONSUMERS_PORT), 1000, topics);
     }
 
 
