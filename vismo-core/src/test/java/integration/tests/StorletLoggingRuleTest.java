@@ -55,7 +55,7 @@ public class StorletLoggingRuleTest {
         new StorletLoggingRule(engine, PERIOD).submit();
 
         sendEvents(NO_EVENTS_TO_SEND);
-        waitForAggregation(PERIOD);
+        waitForAggregation();
         assertProperAggregationResult();
         assertLastEventIsFromStorletEngineRule();
 
@@ -64,6 +64,7 @@ public class StorletLoggingRuleTest {
         final List<HashMap<String, Object>> groups = (List<HashMap<String, Object>>) e.get("groups");
 
         assertEquals(GROUPS_OF_EVENTS, groups.size());
+        assertProperOrderOfGroupMessages(groups);
     }
 
 
@@ -90,10 +91,29 @@ public class StorletLoggingRuleTest {
 
 
     /**
-     * @param n
+     * @param groups
+     */
+    private static void assertProperOrderOfGroupMessages(final List<HashMap<String, Object>> groups) {
+        for (final HashMap<String, Object> group : groups) {
+            @SuppressWarnings("unchecked")
+            final ArrayList<HashMap<String, Object>> messages = (ArrayList<HashMap<String, Object>>) group.get("messages");
+
+            System.err.println("messages: " + messages);
+            for (int i = 0; i < messages.size() - 1; ++i) {
+                final long currTs = (Long) messages.get(i).get("timestamp");
+                final long nextTs = (Long) messages.get(i + 1).get("timestamp");
+
+                if (currTs > nextTs)
+                    throw new AssertionError("storlet group messages should be sorted by time");
+            }
+        }
+    }
+
+
+    /**
      * @throws InterruptedException
      */
-    private static void waitForAggregation(final long n) throws InterruptedException {
-        Thread.sleep(n);
+    private static void waitForAggregation() throws InterruptedException {
+        Thread.sleep((long) (PERIOD * 1.1));
     }
 }

@@ -3,6 +3,8 @@ package gr.ntua.vision.monitoring.rules;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -161,7 +163,7 @@ public class StorletLoggingRule extends PeriodicRule {
         dict.put("originating-service", eventsList.get(0).originatingService());
         dict.put("tStart", tStart);
         dict.put("tEnd", tEnd);
-        dict.put("groups", toJSONLike(aggregateOverMessages(eventsList)));
+        dict.put("groups", toMap(aggregateOverMessages(eventsList)));
 
         return new VismoAggregationResult(dict);
     }
@@ -188,6 +190,14 @@ public class StorletLoggingRule extends PeriodicRule {
             }
         }
 
+        for (final StorletLog log : logs)
+            Collections.sort(log.messages, new Comparator<StorletMessage>() {
+                @Override
+                public int compare(final StorletMessage o1, final StorletMessage o2) {
+                    return o1.timeStamp > o2.timeStamp ? 1 : o1.timeStamp < o2.timeStamp ? -1 : 0;
+                }
+            });
+
         return logs;
     }
 
@@ -205,7 +215,7 @@ public class StorletLoggingRule extends PeriodicRule {
      * @param logs
      * @return grouped storlet logging events.
      */
-    private static ArrayList<HashMap<String, Object>> toJSONLike(final ArrayList<StorletLog> logs) {
+    private static ArrayList<HashMap<String, Object>> toMap(final ArrayList<StorletLog> logs) {
         final ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
 
         for (final StorletLog log : logs) {
@@ -214,7 +224,19 @@ public class StorletLoggingRule extends PeriodicRule {
             o.put("storlet-id", log.storletId);
             o.put("activation-id", log.activationId);
             o.put("sre-id", log.sreId);
-            o.put("messages", log.messages);
+
+            final ArrayList<HashMap<String, Object>> messageList = new ArrayList<HashMap<String, Object>>();
+
+            for (final StorletMessage m : log.messages) {
+                final HashMap<String, Object> mm = new HashMap<String, Object>();
+
+                mm.put("timestamp", m.timeStamp);
+                mm.put("message", m.m);
+
+                messageList.add(mm);
+            }
+
+            o.put("messages", messageList);
 
             list.add(o);
         }
