@@ -14,7 +14,8 @@ import com.sun.jersey.api.client.filter.LoggingFilter;
 
 
 /**
- * 
+ * This is used to perform operation on the VISION Cloud. Mainly, it can create containers and objects. Basic authentication is
+ * required.
  */
 public class VisionHTTPClient {
     /***/
@@ -129,6 +130,9 @@ public class VisionHTTPClient {
 
     /***/
     private void setupClient() {
+        client.setConnectTimeout(3);
+        client.setReadTimeout(3);
+
         client.addFilter(new HTTPBasicAuthFilter(user + "@" + tenant, pass));
         client.addFilter(new LoggingFilter(System.err));
         client.addFilter(new ClientFilter() {
