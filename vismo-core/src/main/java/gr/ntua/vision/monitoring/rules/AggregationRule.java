@@ -49,6 +49,15 @@ abstract class AggregationRule extends PeriodicRule {
 
 
     /**
+     * @see gr.ntua.vision.monitoring.rules.RuleProc#id()
+     */
+    @Override
+    public String id() {
+        return toString();
+    }
+
+
+    /**
      * @see java.lang.Object#toString()
      */
     @Override
