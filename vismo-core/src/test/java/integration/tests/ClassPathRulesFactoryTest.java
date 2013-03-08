@@ -26,7 +26,7 @@ public class ClassPathRulesFactoryTest {
          * @param engine
          * @param id
          */
-        public FooRule(final VismoRulesEngine engine, final String id) {
+        public FooRule(final VismoRulesEngine engine, @SuppressWarnings("unused") final String id) {
             super(engine);
         }
 
@@ -35,7 +35,7 @@ public class ClassPathRulesFactoryTest {
          * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
          */
         @Override
-        public void performWith(final MonitoringEvent c) {
+        public void performWith(@SuppressWarnings("unused") final MonitoringEvent c) {
             // ignored
         }
     }
