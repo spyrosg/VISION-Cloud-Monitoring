@@ -9,7 +9,6 @@ import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.Rule;
-import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.service.ClusterHeadNodeFactory;
 import gr.ntua.vision.monitoring.service.Service;
@@ -161,7 +160,7 @@ public class VismoServiceTest {
     public void setUp() throws IOException {
         obs = new FakeObjectService(new VismoEventDispatcher(socketFactory, conf, "fake-obs"));
 
-        final VismoRulesEngine engine = new VismoRulesEngine(new RulesStore());
+        final VismoRulesEngine engine = new VismoRulesEngine();
 
         new PassThroughRule(engine).submit();
         countRule = new EventCountRule(engine);

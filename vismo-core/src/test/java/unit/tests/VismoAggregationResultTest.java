@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.rules.AccountingRule;
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
-import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoAggregationResult;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
@@ -58,7 +57,7 @@ public class VismoAggregationResultTest {
     /***/
     @Before
     public void setUp() {
-        engine = new VismoRulesEngine(new RulesStore());
+        engine = new VismoRulesEngine();
         engine.appendSink(sink);
         service = new FakeObjectService(new InMemoryEventDispatcher(engine));
     }

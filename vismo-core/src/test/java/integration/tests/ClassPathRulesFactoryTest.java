@@ -5,7 +5,6 @@ import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.rules.ClassPathRulesFactory;
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.Rule;
-import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 
@@ -41,7 +40,7 @@ public class ClassPathRulesFactoryTest {
     }
 
     /***/
-    private final VismoRulesEngine engine = new VismoRulesEngine(new RulesStore());
+    private final VismoRulesEngine engine = new VismoRulesEngine();
 
 
     /***/

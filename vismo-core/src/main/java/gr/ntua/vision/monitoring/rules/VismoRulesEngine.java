@@ -32,6 +32,14 @@ public class VismoRulesEngine implements EventSourceListener {
 
     /**
      * Constructor.
+     */
+    public VismoRulesEngine() {
+        this(new RulesStore());
+    }
+
+
+    /**
+     * Constructor.
      * 
      * @param store
      */

@@ -1,6 +1,5 @@
 package rulespropagation;
 
-import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
 
@@ -72,7 +71,7 @@ public class RulesPropagationAddRemoveSimpleTest {
     @Before
     public void setUp() throws Exception {
         for (int i = 0; i < RulesPropagationAddRemoveSimpleTest.GROUP_SIZE; i++) {
-            managers.add(new RulesPropagationManager(new VismoRulesEngine(new RulesStore()),
+            managers.add(new RulesPropagationManager(new VismoRulesEngine(),
                     RulesPropagationAddRemoveSimpleTest.WEBSERVER_START_PORT + i));
             managers.get(i).start();
         }
@@ -82,11 +81,9 @@ public class RulesPropagationAddRemoveSimpleTest {
 
     /**
      * shutdowns the managers
-     * 
-     * @throws Exception
      */
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         for (int i = 0; i < RulesPropagationAddRemoveSimpleTest.GROUP_SIZE; i++)
             managers.get(i).halt();
     }
