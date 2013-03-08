@@ -2,9 +2,14 @@ package integration.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import gr.ntua.vision.monitoring.resources.RulesResource;
+import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
+import gr.ntua.vision.monitoring.rules.RulesStore;
+import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
+import gr.ntua.vision.monitoring.rules.VismoRulesFactory;
 import gr.ntua.vision.monitoring.web.WebServer;
 
-import java.util.HashMap;
+import javax.ws.rs.core.MediaType;
 
 import org.junit.After;
 import org.junit.Before;
@@ -13,55 +18,55 @@ import org.junit.Test;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
 
 
 /**
- * 
+ * This is used to test the addition/deletion of rules through the HTTP interface.
  */
 public class RulesResourceTest {
     /***/
-    private static final int               PORT     = 9998;
+    private static final int    PORT       = 9998;
     /***/
-    private static final String            ROOT_URL = "http://localhost:" + PORT;
+    private static final String ROOT_URL   = "http://localhost:" + PORT;
     /***/
-    private final HashMap<Integer, String> catalog  = new HashMap<Integer, String>();
+    private final Client        client;
     /***/
-    private final Client                   client   = new Client();
+    private VismoRulesEngine    engine;
     /***/
-    private WebServer                      server;
-
-
+    private VismoRulesFactory   factory;
     /***/
-    @Test
-    public void deleteRule() {
-        final String RULE_ID = "10";
-
-        root().path("rules").path("foo-rule").path(RULE_ID).path("foo description").put();
-
-        final ClientResponse res = root().path("rules").path(RULE_ID).delete(ClientResponse.class);
-        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
-    }
-
-
+    private final RulesStore    rulesStore = new RulesStore();
     /***/
-    @Test
-    public void getRule() {
-        final String RULE_ID = "10";
+    private WebServer           server;
 
-        root().path("rules").path("foo-rule").path(RULE_ID).path("foo description").put();
+    {
+        final ClientConfig cc = new DefaultClientConfig();
 
-        final ClientResponse res = root().path("rules").path(RULE_ID).get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
+        cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
+        client = Client.create(cc);
     }
 
 
     /***/
     @Test
     public void putRule() {
-        final ClientResponse res = root().path("rules").path("foo-rule").path("10").path("foo-desc").put(ClientResponse.class);
+        final ThresholdRuleBean bean = new ThresholdRuleBean();
 
-        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
-        assertTrue(catalog.containsKey(1));
+        bean.setTopic("my-topic");
+        bean.setMetric("latency");
+        bean.setPredicate(">");
+        bean.setThreshold(1.3);
+
+        final ClientResponse res = root().path("rules").type(MediaType.APPLICATION_JSON).entity(bean).post(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+
+        final String id = res.getEntity(String.class);
+
+        assertTrue("rules factory should insert rule in the store", rulesStore.containsById(id));
     }
 
 
@@ -70,8 +75,11 @@ public class RulesResourceTest {
      */
     @Before
     public void setUp() throws Exception {
+        engine = new VismoRulesEngine(rulesStore);
+        factory = new VismoRulesFactory(engine);
+
         server = new WebServer(PORT);
-        server.withResource(new RulesResource(catalog)).build("/*");
+        server.withResource(new RulesResource(factory)).build("/*");
         server.start();
     }
 
