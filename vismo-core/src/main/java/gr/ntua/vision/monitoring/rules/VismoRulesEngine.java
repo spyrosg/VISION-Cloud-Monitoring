@@ -73,20 +73,20 @@ public class VismoRulesEngine implements EventSourceListener {
 
 
     /**
-     * @return number of rules
-     */
-    public int getRulesTotalNumber() {
-        return store.size();
-
-    }
-
-
-    /**
      * Turn off the engine. No more rules will be run.
      */
     public void halt() {
         timer.cancel();
         store.clear();
+    }
+
+
+    /**
+     * @return the number of rules active in the engine.
+     */
+    public int noRules() {
+        return store.size();
+
     }
 
 

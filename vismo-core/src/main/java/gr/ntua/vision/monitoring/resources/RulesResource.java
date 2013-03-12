@@ -35,7 +35,7 @@ public class RulesResource {
 
 
     /**
-     * Submit a new rule to the engine.
+     * Construct and submit a new rule to the engine.
      * 
      * @param bean
      * @return on success, return the id of the newly added rule

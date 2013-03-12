@@ -12,6 +12,7 @@ import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.service.ClusterHeadNodeFactory;
 import gr.ntua.vision.monitoring.service.Service;
+import gr.ntua.vision.monitoring.service.VismoService;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import java.io.IOException;
@@ -28,7 +29,8 @@ import org.zeromq.ZContext;
 
 
 /**
- * 
+ * This is used to test the general facilities of the {@link VismoService}; thus is should receive events from producers, process
+ * them in a rules engine and dispatch them to consumers.
  */
 public class VismoServiceTest {
     /**

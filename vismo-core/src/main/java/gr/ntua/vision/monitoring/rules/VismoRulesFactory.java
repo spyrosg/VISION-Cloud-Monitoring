@@ -6,6 +6,8 @@ import gr.ntua.vision.monitoring.resources.ThresholdRuleValidationError;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -56,9 +58,13 @@ public class VismoRulesFactory {
      * @return a {@link VismoRule} object.
      */
     private VismoRule buildFrom(final ThresholdRuleBean bean) {
-        // TODO: implement
         return new Rule(engine) {
-            private final String uuid = UUID.randomUUID().toString();
+            /***/
+            private static final String OBS  = "fake-obs";
+            /** the log target. */
+            private final Logger        log1 = LoggerFactory.getLogger(Rule.class);
+            /***/
+            private final String        uuid = UUID.randomUUID().toString();
 
 
             @Override
@@ -68,8 +74,42 @@ public class VismoRulesFactory {
 
 
             @Override
-            public void performWith(final MonitoringEvent c) {
-                // TODO Auto-generated method stub
+            public void performWith(final MonitoringEvent e) {
+                if (!OBS.equals(e.originatingService()))
+                    return;
+
+                log1.debug("have event: {}", e);
+
+                send(new MonitoringEvent() {
+                    @Override
+                    public Object get(final String key) {
+                        return null;
+                    }
+
+
+                    @Override
+                    public InetAddress originatingIP() throws UnknownHostException {
+                        return e.originatingIP();
+                    }
+
+
+                    @Override
+                    public String originatingService() {
+                        return e.originatingService();
+                    }
+
+
+                    @Override
+                    public long timestamp() {
+                        return System.currentTimeMillis();
+                    }
+
+
+                    @Override
+                    public String topic() {
+                        return bean.getTopic();
+                    }
+                });
             }
         };
     }
