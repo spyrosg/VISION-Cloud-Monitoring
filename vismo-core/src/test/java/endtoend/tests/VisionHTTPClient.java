@@ -130,8 +130,8 @@ public class VisionHTTPClient {
 
     /***/
     private void setupClient() {
-        client.setConnectTimeout(3);
-        client.setReadTimeout(3);
+        client.setConnectTimeout(3000);
+        client.setReadTimeout(3000);
 
         client.addFilter(new HTTPBasicAuthFilter(user + "@" + tenant, pass));
         client.addFilter(new LoggingFilter(System.err));
