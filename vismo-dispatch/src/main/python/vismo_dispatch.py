@@ -4,7 +4,7 @@
 from __future__ import print_function
 
 import socket, struct, fcntl, sys
-from os import getpid
+from os import getpid, getenv
 from time import time
 from pyjavaproperties import Properties
 from uuid import uuid4
@@ -13,9 +13,7 @@ import json
 
 
 # this is the file that holds the lib's configuration
-CONFIGURATION_PROPERTIES = '/etc/visioncloud_vismo.conf'
-#CONFIGURATION_PROPERTIES = 'config.properties'
-
+CONFIGURATION_PROPERTIES = getenv('VISMO_CONFIG', '/etc/visioncloud_vismo.conf')
 
 ###
 ##
