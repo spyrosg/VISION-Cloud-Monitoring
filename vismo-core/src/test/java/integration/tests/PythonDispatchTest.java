@@ -15,6 +15,8 @@ import java.io.OutputStreamWriter;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeromq.ZContext;
 
 
@@ -31,6 +33,8 @@ public class PythonDispatchTest {
 
 
         /**
+         * Constructor.
+         * 
          * @param noExpectedEvents
          */
         public NoEventsSourceListener(final int noExpectedEvents) {
@@ -38,9 +42,7 @@ public class PythonDispatchTest {
         }
 
 
-        /**
-         * 
-         */
+        /***/
         public void haveExpectedNoEvents() {
             assertEquals(noExpectedEvents, noReceivedEvents);
         }
@@ -51,12 +53,27 @@ public class PythonDispatchTest {
          */
         @Override
         public void receive(final MonitoringEvent e) {
-            if (e != null)
-                ++noReceivedEvents;
+            if (e == null)
+                return;
+            if (e.get("tag") != null) {
+                log.error("received unexpected event: {} with field 'tag'", e);
+
+                throw new AssertionError("received unexpected event: " + e + " with field 'tag'");
+            }
+            if (e.get("transaction-throughput") == null) {
+                log.error("received unexpected event: {} without field 'transaction-throughput'", e);
+
+                throw new AssertionError("received unexpected event: " + e + " without field 'transaction-throughput'");
+            }
+
+            ++noReceivedEvents;
         }
     }
+
     /***/
-    private static final int       NO_EVENTS_TO_SEND = 10;
+    static final Logger            log               = LoggerFactory.getLogger(PythonDispatchTest.class);
+    /***/
+    private static final int       NO_EVENTS_TO_SEND = 2;
     /***/
     private static final String    PY_DISPATCH       = "../vismo-dispatch/src/main/python/vismo_dispatch.py";
     /***/
@@ -69,7 +86,6 @@ public class PythonDispatchTest {
     private final ZMQFactory       factory           = new ZMQFactory(new ZContext());
     /***/
     private NoEventsSourceListener listener;
-
     /***/
     private VismoEventSource       source;
 
@@ -97,7 +113,7 @@ public class PythonDispatchTest {
     public void sourceReceivesEventsFromPyDispatch() throws IOException, InterruptedException {
         source.start();
         runPythonVismoDispatch();
-        Thread.sleep(300);
+        Thread.sleep(1000);
         listener.haveExpectedNoEvents();
     }
 
