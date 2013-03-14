@@ -65,10 +65,11 @@ class EventDispatcher(object):
         self.service_name = service_name
         self.sock = sock
 
-    def send(self, **event):
-        """Dispatch the event."""
+    def _send(self, event):
+        """Actually dispatch the event."""
 
-        self.sock.send(event)
+        log('sending: {0}'.format(event))
+        self.sock.send(json.dumps(event))
 
 
 class VismoEventDispatcher(EventDispatcher):
@@ -178,10 +179,6 @@ class VismoEventDispatcher(EventDispatcher):
         event['originating-cluster'] = self.cluster_name
         event['id'] = str(uuid4())
 
-    def _sock_send(self, event):
-        log('sending: {0}'.format(event))
-        self.sock.send(json.dumps(event))
-
     def handle_event(self, event):
         """
             This does most of the work. It accumulates the interesting events,
@@ -191,7 +188,7 @@ class VismoEventDispatcher(EventDispatcher):
 
         # has the event anything to do with request/response?
         if 'tag' not in event:
-            self._sock_send(event)
+            self._send(event)
             return
 
         tag = event['tag']
@@ -223,11 +220,11 @@ class VismoEventDispatcher(EventDispatcher):
             # not needed
             del main_event['tag']
 
-            self._sock_send(event)
-            self._sock_send(main_event)
+            self._send(event)
+            self._send(main_event)
         else:
             # send anyway
-            self._sock_send(event)
+            self._send(event)
 
     def calculate_latency(self):
         """
