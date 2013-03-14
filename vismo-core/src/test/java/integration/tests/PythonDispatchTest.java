@@ -73,7 +73,7 @@ public class PythonDispatchTest {
     /***/
     static final Logger            log               = LoggerFactory.getLogger(PythonDispatchTest.class);
     /***/
-    private static final int       NO_EVENTS_TO_SEND = 2;
+    private static final int       NO_EVENTS_TO_SEND = 1;
     /***/
     private static final String    PY_DISPATCH       = "../vismo-dispatch/src/main/python/vismo_dispatch.py";
     /***/
@@ -113,7 +113,7 @@ public class PythonDispatchTest {
     public void sourceReceivesEventsFromPyDispatch() throws IOException, InterruptedException {
         source.start();
         runPythonVismoDispatch();
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         listener.haveExpectedNoEvents();
     }
 

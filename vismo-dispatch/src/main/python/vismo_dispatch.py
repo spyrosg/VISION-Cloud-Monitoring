@@ -208,13 +208,13 @@ class VismoEventDispatcher(EventDispatcher):
             main_event = dict(self.end_response_event)
             main_event['id'] = str(uuid4())
 
-            main_event['transaction-latency'] = self.calculate_latency()
-            main_event['transaction-duration'] = self.calculate_transaction_duration()
+            main_event['transaction-latency'] = self.get_latency()
+            main_event['transaction-duration'] = self.get_transaction_duration()
 
             if 'content-size' not in main_event or main_event['content-size'] is None:
                 main_event['transaction-throughput'] = 0
             else:
-                main_event['transaction-throughput'] = self.calculate_throughput(main_event['content-size'], main_event['transaction-duration'])
+                main_event['transaction-throughput'] = self.get_throughput(main_event['content-size'], main_event['transaction-duration'])
             # TODO: Calculate availability and other Niki's required stuff
 
             # not needed
@@ -226,7 +226,7 @@ class VismoEventDispatcher(EventDispatcher):
             # send anyway
             self._send(event)
 
-    def calculate_latency(self):
+    def get_latency(self):
         """
             Latency here is defined as the time duration from the time the system received
             the start request event till the time the system is ready to start serving the
@@ -235,7 +235,7 @@ class VismoEventDispatcher(EventDispatcher):
 
         return self.calculate_event_time_difference(self.start_request_event, self.start_response_event)
 
-    def calculate_transaction_duration(self):
+    def get_transaction_duration(self):
         """
             Transaction duration is the time spent serving the request. More accurately, is the
             duration from the time the system received the start request event till the time the
@@ -244,7 +244,7 @@ class VismoEventDispatcher(EventDispatcher):
 
         return self.calculate_event_time_difference(self.start_request_event, self.end_response_event)
 
-    def calculate_throughput(self, content_size, transaction_time):
+    def get_throughput(self, content_size, transaction_time):
         """
             Throughput is defined as the the number of bytes served in the unit of time.
             Transaction size is measured in bytes, transaction_time in seconds.
@@ -259,18 +259,21 @@ if __name__ == '__main__':
 
     mon = VismoEventDispatcher('foo')
 
-    def mon_send(operation, tag, tenant, user, container, obj):
-        mon.send(status='SUCCESS', tag=tag, operation=operation, tenant=tenant, user=user, container=container, obj=obj)
+    def mon_send(operation, tag, tenant, user, container, obj, timestamp, content_size=0):
+        mon.send(status='SUCCESS', tag=tag, operation=operation, tenant=tenant, user=user,
+                container=container, obj=obj, timestamp=timestamp, content_size=content_size)
 
     def send_put(tenant, user, container, obj):
-        mon_send('PUT', 'start-request', tenant, user, container, obj)
-        mon_send('PUT', 'start-response', tenant, user, container, obj)
-        mon_send('PUT', 'end-response', tenant, user, container, obj)
+        t = int(1000 * time())
+        mon_send('PUT', 'start-request', tenant, user, container, obj, t)
+        mon_send('PUT', 'start-response', tenant, user, container, obj, int(t + 1000))
+        mon_send('PUT', 'end-response', tenant, user, container, obj, int(t + 2000), 100)
 
     def send_get():
-        mon_send('GET', 'start-request', tenant, user, container, obj)
-        mon_send('GET', 'start-response', tenant, user, container, obj)
-        mon_send('GET', 'end-response', tenant, user, container, obj)
+        t = int(1000 * time())
+        mon_send('GET', 'start-request', tenant, user, container, obj, t)
+        mon_send('GET', 'start-response', tenant, user, container, obj, int(t + 1000))
+        mon_send('GET', 'end-response', tenant, user, container, obj, int(t + 2000), 100)
 
     ctr = 0
 
