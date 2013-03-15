@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,9 +28,11 @@ public class PythonDispatchTest {
     /***/
     private static class NoEventsSourceListener implements EventSourceListener {
         /***/
-        private final int noExpectedEvents;
+        private final ArrayList<MonitoringEvent> events           = new ArrayList<MonitoringEvent>();
         /***/
-        private int       noReceivedEvents = 0;
+        private final int                        noExpectedEvents;
+        /***/
+        private int                              noReceivedEvents = 0;
 
 
         /**
@@ -48,25 +51,33 @@ public class PythonDispatchTest {
         }
 
 
+        /***/
+        public void haveExpectedTypeEvents() {
+            for (final MonitoringEvent e : events) {
+                if (e.get("tag") != null)
+                    throw new AssertionError("received unexpected event: " + e + " with field 'tag'");
+
+                if (e.get("transaction-throughput") == null)
+                    throw new AssertionError("received unexpected event: " + e + " with no field 'transaction-throughput'");
+            }
+        }
+
+
         /**
          * @see gr.ntua.vision.monitoring.sources.EventSourceListener#receive(gr.ntua.vision.monitoring.events.MonitoringEvent)
          */
         @Override
         public void receive(final MonitoringEvent e) {
-            if (e == null)
-                return;
-            if (e.get("tag") != null) {
-                log.error("received unexpected event: {} with field 'tag'", e);
-
-                throw new AssertionError("received unexpected event: " + e + " with field 'tag'");
-            }
-            if (e.get("transaction-throughput") == null) {
-                log.error("received unexpected event: {} without field 'transaction-throughput'", e);
-
-                throw new AssertionError("received unexpected event: " + e + " without field 'transaction-throughput'");
-            }
-
+            collect(e);
             ++noReceivedEvents;
+        }
+
+
+        /**
+         * @param e
+         */
+        private void collect(final MonitoringEvent e) {
+            events.add(e);
         }
     }
 
@@ -115,6 +126,7 @@ public class PythonDispatchTest {
         runPythonVismoDispatch();
         Thread.sleep(2000);
         listener.haveExpectedNoEvents();
+        listener.haveExpectedTypeEvents();
     }
 
 
