@@ -111,8 +111,7 @@ public class PythonDispatchTest {
         conf = new VismoConfiguration(VISMO_CONFIG_FILE);
         source = new VismoEventSource(factory.newBoundPullSocket(conf.getProducersPoint()), factory.newConnectedPushSocket(conf
                 .getProducersPoint()));
-        listener = new NoEventsSourceListener(NO_EVENTS_TO_SEND);
-        source.add(listener);
+        source.start();
     }
 
 
@@ -122,9 +121,11 @@ public class PythonDispatchTest {
      */
     @Test
     public void sourceReceivesEventsFromPyDispatch() throws IOException, InterruptedException {
-        source.start();
+        listener = new NoEventsSourceListener(NO_EVENTS_TO_SEND);
+        source.add(listener);
+
         runPythonVismoDispatch();
-        Thread.sleep(2000);
+        Thread.sleep(500);
         listener.haveExpectedNoEvents();
         listener.haveExpectedTypeEvents();
     }

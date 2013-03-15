@@ -41,9 +41,6 @@ def get_public_ip(iface='eth0'):
 
     return socket.inet_ntoa(ip)
 
-def is_effectively_zero(n):
-    return abs(n) <= 5e-9
-
 def log(msg):
     print('vismo-local-event-dispatcher: {0}'.format(msg), file=sys.stderr)
 
@@ -89,19 +86,17 @@ class VismoEventDispatcher(EventDispatcher):
         self.load_configuration()
         sock = self.create_push_socket(self.producers_point)
         super(VismoEventDispatcher, self).__init__(service_name, sock)
-        self.start_request_event = None
-        self.start_response_event = None
-        self.end_response_event = None
-        self.events_received = []
+        self.start_request = None
+        self.start_response = None
+        self.end_response = None
 
     def load_configuration(self):
         p = Properties()
         p.load(open(CONFIGURATION_PROPERTIES))
         self.producers_point = p['producers.point']
         # FIXME: auto acquire the name according to the machine's ip
-        self.cluster_name = 'test'
-        self.iface = 'eth0'
-        self.ip = get_public_ip(self.iface)
+        self.cluster_name = socket.gethostname().split('-')[0]
+        self.ip = get_public_ip()
 
     def create_push_socket(self, end_point):
         ctx = zmq.Context()
@@ -112,72 +107,16 @@ class VismoEventDispatcher(EventDispatcher):
 
         return sock
 
-    def calculate_event_time_difference(self, e1, e2):
-        """
-            Calculates the time difference of the two events. It is assumed
-            that e1 ``happens before'' e2, so that a positive difference is
-            returned.
-
-            It is also assumed that the event timestamps are in millis and
-            the returned value is in seconds.
-        """
-
-        return (float(e2['timestamp']) - float(e1['timestamp'])) / 1000.0
-
-    def calculate_mean_value_per_time_unit(self, val, time_diff):
-        if is_effectively_zero(time_diff):
-            return 0.0
-
-        return float(val) / float(time_diff)
-
     def send(self, **event):
         """
             This is the single public entry point to the object.
         """
 
-        self.cleanup_event(event)
-        self.add_basic_fields(event)
+        self.add_timestamp(event)
         self.handle_event(event)
 
-    def cleanup_event(self, event):
-        """
-            For consistency reasons, use dashes and full nouns.
-        """
-
-        def object_service_topic_to_http_op(topic):
-            if topic == 'reads':
-                return 'GET'
-            elif topic == 'writes':
-                return 'PUT'
-            elif topic == 'deletes':
-                return 'DELETE'
-            else:
-                log('got unknown topic: {0}'.format(topic))
-                return topic
-
-        if 'content_size' in event:
-            content_size = event['content_size']
-            del event['content_size']
-
-            if content_size is None:
-                content_size = 0
-            if isinstance(content_size, basestring):
-                content_size = long(content_size)
-
-            event['content-size'] = content_size
-        if 'obj' in event:
-            event['object'] = event['obj']
-            del event['obj']
-        if 'topic' in event:
-            event['operation'] = object_service_topic_to_http_op(event['topic'])
-            del event['topic']
-
-    def add_basic_fields(self, event):
+    def add_timestamp(self, event):
         event['timestamp'] = int(1000 * time())
-        event['originating-machine'] = self.ip
-        event['originating-service'] = self.service_name
-        event['originating-cluster'] = self.cluster_name
-        event['id'] = str(uuid4())
 
     def handle_event(self, event):
         """
@@ -191,40 +130,35 @@ class VismoEventDispatcher(EventDispatcher):
             self._send(event)
             return
 
+        log('received: {0}'.format(event))
         tag = event['tag']
 
         if tag == 'start-request':
-            self.start_request_event = event
+            self.start_request = event
         elif tag == 'start-response':
-            self.start_response_event = event
+            self.start_response = event
         elif tag == 'end-response':
-            self.end_response_event = event
-        else:
-            log_and_raise('handed event with incomprehensible tag: {0}, event: {1}'.format(tag, event), ValueError)
+            self.end_response = event
 
-        ## TODO: handle object services failures => availability
-        # if we have all the events
-        if self.start_request_event and self.start_response_event and self.end_response_event:
-            main_event = dict(self.end_response_event)
-            main_event['id'] = str(uuid4())
-
-            main_event['transaction-latency'] = self.get_latency()
-            main_event['transaction-duration'] = self.get_transaction_duration()
-
-            if 'content-size' not in main_event or main_event['content-size'] is None:
-                main_event['transaction-throughput'] = 0
-            else:
-                main_event['transaction-throughput'] = self.get_throughput(main_event['content-size'], main_event['transaction-duration'])
-            # TODO: Calculate availability and other Niki's required stuff
-
-            # not needed
-            del main_event['tag']
-
-            self._send(event)
-            self._send(main_event)
-        else:
-            # send anyway
-            self._send(event)
+        if self.start_request and self.start_response and self.end_response:
+            try:
+                event = dict(self.end_response)
+                event['id'] = str(uuid4())
+                event['timestamp'] = int(1000 * time())
+                event['originating-machine'] = self.ip
+                event['originating-service'] = self.service_name
+                event['originating-cluster'] = self.cluster_name
+                event['transaction-latency'] = self.get_latency()
+                event['transaction-duration'] = self.get_transaction_duration()
+                event['content-size'] = long(self.end_response['content_size'])
+                event['object'] = self.end_response['obj']
+                event['transaction-throughput'] = self.get_throughput()
+                del event['content_size']
+                del event['obj']
+                del event['tag']
+                self._send(event)
+            finally:
+                self.start_request, self.start_response, self.end_response = None, None, None
 
     def get_latency(self):
         """
@@ -233,7 +167,10 @@ class VismoEventDispatcher(EventDispatcher):
             response, as seen by the start response event.
         """
 
-        return self.calculate_event_time_difference(self.start_request_event, self.start_response_event)
+        t1 = float(self.start_request['timestamp'])
+        t2 = float(self.start_response['timestamp'])
+
+        return (t2 - t1) / 1000
 
     def get_transaction_duration(self):
         """
@@ -242,16 +179,25 @@ class VismoEventDispatcher(EventDispatcher):
             system received the end response event.
         """
 
-        return self.calculate_event_time_difference(self.start_request_event, self.end_response_event)
+        t1 = float(self.start_request['timestamp'])
+        t2 = float(self.end_response['timestamp'])
 
-    def get_throughput(self, content_size, transaction_time):
+        return (t2 - t1) / 1000
+
+    def get_throughput(self):
         """
             Throughput is defined as the the number of bytes served in the unit of time.
             Transaction size is measured in bytes, transaction_time in seconds.
             Output value is in bytes per second.
         """
 
-        return self.calculate_mean_value_per_time_unit(content_size, transaction_time)
+        size = float(self.end_response['content_size'])
+        duration = self.get_transaction_duration()
+
+        if abs(duration) <= 5e-9:
+            return 0
+
+        return size / duration
 
 
 if __name__ == '__main__':
