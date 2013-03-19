@@ -205,25 +205,45 @@ if __name__ == '__main__':
 
     mon = VismoEventDispatcher('foo')
 
-    def mon_send(operation, tag, tenant, user, container, obj, timestamp, content_size=0):
+    def mon_send_data(operation, tag, tenant, user, container, obj, timestamp, content_size=0):
         mon.send(status='SUCCESS', tag=tag, operation=operation, tenant=tenant, user=user,
                 container=container, obj=obj, timestamp=timestamp, content_size=content_size)
 
     def send_put(tenant, user, container, obj):
         t = int(1000 * time())
-        mon_send('PUT', 'start-request', tenant, user, container, obj, t)
-        mon_send('PUT', 'start-response', tenant, user, container, obj, int(t + 1000))
-        mon_send('PUT', 'end-response', tenant, user, container, obj, int(t + 2000), 100)
+        mon_send_data('PUT', 'start-request', tenant, user, container, obj, t)
+        mon_send_data('PUT', 'start-response', tenant, user, container, obj, int(t + 1000))
+        mon_send_data('PUT', 'end-response', tenant, user, container, obj, int(t + 2000), 100)
 
     def send_get():
         t = int(1000 * time())
-        mon_send('GET', 'start-request', tenant, user, container, obj, t)
-        mon_send('GET', 'start-response', tenant, user, container, obj, int(t + 1000))
-        mon_send('GET', 'end-response', tenant, user, container, obj, int(t + 2000), 100)
+        mon_send_data('GET', 'start-request', tenant, user, container, obj, t)
+        mon_send_data('GET', 'start-response', tenant, user, container, obj, int(t + 1000))
+        mon_send_data('GET', 'end-response', tenant, user, container, obj, int(t + 2000), 100)
 
-    ctr = 0
+    def send_put_multi(tenant, user, container, obj):
+        t = int(1000 * time())
+        mon_send_data('PUT_MULTI', 'start-request', tenant, user, container, obj, t)
+        mon_send_data('PUT_MULTI', 'start-response', tenant, user, container, obj, int(t + 1000))
+        mon_send_data('PUT_MULTI', 'end-response', tenant, user, container, obj, int(t + 2000), 100)
 
-    for i in range(int(sys.argv[1])):
-        send_put('ntua', 'vassilis', 'test-container', 'foo')
+    def send_put_metadata():
+        pass
+
+    def send_get_metadata():
+        pass
+
+    if sys.argv[1] == 'multi':
+        ctr = 0
+
+        for i in range(int(sys.argv[2])):
+            send_put_multi('ntua', 'vassilis', 'test-container', 'foo')
+    elif sys.argv[1] == 'meta':
+        sys.exit(1)
+    else:
+        ctr = 0
+
+        for i in range(int(sys.argv[2])):
+            send_put('ntua', 'vassilis', 'test-container', 'foo')
 
 #{"status": "SUCCESS", "container": "events", "timestamp": 1361897370880, "object": "event-1361897364933", "transaction-duration": 5.4139999999999997, "content-size": 733, "originating-machine": "10.0.1.101", "user": "admin", "transaction-latency": 5.399, "transaction-throughput": 135.38973032877726, "originating-cluster": "test", "operation": "PUT", "type": "write", "id": "53638f2f-3c0a-4711-8ab1-01b836337f2c", "originating-service": "object_service", "tenant": "analytics"}

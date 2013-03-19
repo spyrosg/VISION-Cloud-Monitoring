@@ -100,6 +100,8 @@ public class VismoEventSource extends StoppableTask implements EventSource {
             }
         }
 
+        shutdownSocket.close();
+        eventSock.close();
         log.debug("shutting down");
     }
 

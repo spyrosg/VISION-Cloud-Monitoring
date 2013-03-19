@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -26,13 +27,13 @@ import org.zeromq.ZContext;
  */
 public class PythonDispatchTest {
     /***/
-    private static class NoEventsSourceListener implements EventSourceListener {
+    public static abstract class VerifyingEventsListener implements EventSourceListener {
         /***/
-        private final ArrayList<MonitoringEvent> events           = new ArrayList<MonitoringEvent>();
+        protected final ArrayList<MonitoringEvent> events           = new ArrayList<MonitoringEvent>();
         /***/
-        private final int                        noExpectedEvents;
+        private final int                          noExpectedEvents;
         /***/
-        private int                              noReceivedEvents = 0;
+        private int                                noReceivedEvents = 0;
 
 
         /**
@@ -40,14 +41,88 @@ public class PythonDispatchTest {
          * 
          * @param noExpectedEvents
          */
-        public NoEventsSourceListener(final int noExpectedEvents) {
+        public VerifyingEventsListener(final int noExpectedEvents) {
             this.noExpectedEvents = noExpectedEvents;
         }
 
 
+        /**
+         * @see gr.ntua.vision.monitoring.sources.EventSourceListener#receive(gr.ntua.vision.monitoring.events.MonitoringEvent)
+         */
+        @Override
+        public void receive(final MonitoringEvent e) {
+            collect(e);
+            ++noReceivedEvents;
+        }
+
+
         /***/
-        public void haveExpectedNoEvents() {
+        public void verifyEvents() {
+            haveExpectedNoEvents();
+            verifyEventsHelper();
+        }
+
+
+        /***/
+        public abstract void verifyEventsHelper();
+
+
+        /**
+         * @param e
+         */
+        private void collect(final MonitoringEvent e) {
+            events.add(e);
+        }
+
+
+        /***/
+        private void haveExpectedNoEvents() {
             assertEquals(noExpectedEvents, noReceivedEvents);
+        }
+    }
+
+
+    /***/
+    private static class MultiUploadEvents extends VerifyingEventsListener {
+        /***/
+        private static final String MULTI_PUT_OPERATION = "PUT_MULTI";
+
+
+        /**
+         * Constructor.
+         * 
+         * @param noExpectedEvents
+         */
+        public MultiUploadEvents(final int noExpectedEvents) {
+            super(noExpectedEvents);
+        }
+
+
+        /**
+         * @see integration.tests.PythonDispatchTest.VerifyingEventsListener#verifyEventsHelper()
+         */
+        @Override
+        public void verifyEventsHelper() {
+            for (final MonitoringEvent e : events) {
+                if (!MULTI_PUT_OPERATION.equals(e.get("operation")))
+                    throw new AssertionError("received unexpected event: " + e + " which is not multi upload");
+
+                if (e.get("transaction-throughput") == null)
+                    throw new AssertionError("received unexpected event: " + e + " with no field 'transaction-throughput'");
+            }
+        }
+    }
+
+
+    /***/
+    private static class PlainEventsListener extends VerifyingEventsListener {
+        /**
+         * Constructor.
+         * 
+         * @param noExpectedEvents
+         */
+        public PlainEventsListener(final int noExpectedEvents) {
+            super(noExpectedEvents);
         }
 
 
@@ -64,41 +139,40 @@ public class PythonDispatchTest {
 
 
         /**
-         * @see gr.ntua.vision.monitoring.sources.EventSourceListener#receive(gr.ntua.vision.monitoring.events.MonitoringEvent)
+         * @see integration.tests.PythonDispatchTest.VerifyingEventsListener#verifyEventsHelper()
          */
         @Override
-        public void receive(final MonitoringEvent e) {
-            collect(e);
-            ++noReceivedEvents;
-        }
-
-
-        /**
-         * @param e
-         */
-        private void collect(final MonitoringEvent e) {
-            events.add(e);
+        public void verifyEventsHelper() {
+            haveExpectedTypeEvents();
         }
     }
 
     /***/
-    static final Logger            log               = LoggerFactory.getLogger(PythonDispatchTest.class);
+    private static final Logger     log                    = LoggerFactory.getLogger(PythonDispatchTest.class);
+    /** this is the flag for updating/getting metadata events. */
+    private static final String     META                   = "meta";
     /***/
-    private static final int       NO_EVENTS_TO_SEND = 1;
+    private static final String     MINIMUM_PYTHON_VERSION = "2.6";
+    /** this is the flag used to push multi upload events. */
+    private static final String     MULTI                  = "multi";
     /***/
-    private static final String    PY_DISPATCH       = "../vismo-dispatch/src/main/python/vismo_dispatch.py";
+    private static final int        NO_EVENTS_TO_SEND      = 100;
+    /** this is the flag for plain put/get events. */
+    private static final String     PLAIN                  = "plain";
     /***/
-    private static final String    PYTHON            = "/usr/local/bin/python";
+    private static final String     PY_DISPATCH            = "../vismo-dispatch/src/main/python/vismo_dispatch.py";
     /***/
-    private static final String    VISMO_CONFIG_FILE = "src/test/resources/vismo-config.properties";
+    private static final String     PYTHON                 = "/usr/bin/python2";
     /***/
-    private VismoConfiguration     conf;
+    private static final String     VISMO_CONFIG_FILE      = "src/test/resources/vismo-config.properties";
     /***/
-    private final ZMQFactory       factory           = new ZMQFactory(new ZContext());
+    private VismoConfiguration      conf;
     /***/
-    private NoEventsSourceListener listener;
+    private final ZMQFactory        factory                = new ZMQFactory(new ZContext());
     /***/
-    private VismoEventSource       source;
+    private VerifyingEventsListener listener;
+    /***/
+    private VismoEventSource        source;
 
 
     /**
@@ -107,7 +181,8 @@ public class PythonDispatchTest {
      */
     @Before
     public void setUp() throws IOException, InterruptedException {
-        requirePythonVersion("2.6");
+        log.debug("checking minimum python version");
+        requirePython(MINIMUM_PYTHON_VERSION);
         conf = new VismoConfiguration(VISMO_CONFIG_FILE);
         source = new VismoEventSource(factory.newBoundPullSocket(conf.getProducersPoint()), factory.newConnectedPushSocket(conf
                 .getProducersPoint()));
@@ -120,14 +195,37 @@ public class PythonDispatchTest {
      * @throws IOException
      */
     @Test
-    public void sourceReceivesEventsFromPyDispatch() throws IOException, InterruptedException {
-        listener = new NoEventsSourceListener(NO_EVENTS_TO_SEND);
+    public void shouldReceiveMultiUploadEvents() throws IOException, InterruptedException {
+        listener = new MultiUploadEvents(NO_EVENTS_TO_SEND);
         source.add(listener);
 
-        runPythonVismoDispatch();
-        Thread.sleep(500);
-        listener.haveExpectedNoEvents();
-        listener.haveExpectedTypeEvents();
+        runPythonVismoDispatch(MULTI);
+        Thread.sleep(1000);
+        listener.verifyEventsHelper();
+    }
+
+
+    /**
+     * This is the base case feature.
+     * 
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    @Test
+    public void sourceReceivesEventsFromPyDispatch() throws IOException, InterruptedException {
+        listener = new PlainEventsListener(NO_EVENTS_TO_SEND);
+        source.add(listener);
+
+        runPythonVismoDispatch(PLAIN);
+        Thread.sleep(1000);
+        listener.verifyEventsHelper();
+    }
+
+
+    /***/
+    @After
+    public void tearDown() {
+        source.halt();
     }
 
 
@@ -136,7 +234,7 @@ public class PythonDispatchTest {
      * @throws IOException
      * @throws InterruptedException
      */
-    private static void requirePythonVersion(final String version) throws IOException, InterruptedException {
+    private static void requirePython(final String version) throws IOException, InterruptedException {
         final double requiredVersion = Double.valueOf(version.substring(0, 3));
         final ProcessBuilder builder = new ProcessBuilder(PYTHON, "--version");
 
@@ -151,7 +249,7 @@ public class PythonDispatchTest {
         final String[] fs = reader.readLine().split(" ");
         final double actualVersion = Double.valueOf(fs[1].substring(0, 3));
 
-        System.err.println("python version: " + fs[1]);
+        log.debug("found python version: " + fs[1]);
         assertTrue("this test should be run against at least python version " + version, actualVersion >= requiredVersion);
 
         try {
@@ -166,11 +264,13 @@ public class PythonDispatchTest {
 
 
     /**
+     * @param flag
+     *            the command line flag that controls which events will be sent.
      * @throws IOException
      * @throws InterruptedException
      */
-    private static void runPythonVismoDispatch() throws IOException, InterruptedException {
-        final ProcessBuilder builder = new ProcessBuilder(PYTHON, PY_DISPATCH, String.valueOf(NO_EVENTS_TO_SEND));
+    private static void runPythonVismoDispatch(final String flag) throws IOException, InterruptedException {
+        final ProcessBuilder builder = new ProcessBuilder(PYTHON, PY_DISPATCH, flag, String.valueOf(NO_EVENTS_TO_SEND));
 
         builder.environment().put("VISMO_CONFIG", VISMO_CONFIG_FILE);
         builder.redirectErrorStream(true);
@@ -182,7 +282,7 @@ public class PythonDispatchTest {
         writer.flush();
 
         for (String s = reader.readLine(); s != null; s = reader.readLine())
-            System.err.println(proc + " >> " + s);
+            log.debug("{} >> {}", proc, s);
 
         try {
             final int ret = proc.waitFor();
