@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +79,41 @@ public class PythonDispatchTest {
         /***/
         private void haveExpectedNoEvents() {
             assertEquals(noExpectedEvents, noReceivedEvents);
+        }
+    }
+
+
+    /***/
+    private static class MetadataEventsListener extends VerifyingEventsListener {
+        /***/
+        private static final String GET            = "GET_METADATA";
+        /***/
+        private static final String PUT            = "PUT_METADATA";
+        /***/
+        private static final String REQUIRED_FIELD = "metadata-size";
+
+
+        /**
+         * Constructor.
+         * 
+         * @param noExpectedEvents
+         */
+        public MetadataEventsListener(final int noExpectedEvents) {
+            super(noExpectedEvents);
+        }
+
+
+        /**
+         * @see integration.tests.PythonDispatchTest.VerifyingEventsListener#verifyEventsHelper()
+         */
+        @Override
+        public void verifyEventsHelper() {
+            for (final MonitoringEvent e : events) {
+                if (!(PUT.equals(e.get("operation")) || GET.equals(e.get("operation"))))
+                    throw new AssertionError("received unexpected event: " + e + " which is not about metadata");
+                if (e.get(REQUIRED_FIELD) == null)
+                    throw new AssertionError("received unexpected event: " + e + " with no field '" + REQUIRED_FIELD + "'");
+            }
         }
     }
 
@@ -177,16 +213,28 @@ public class PythonDispatchTest {
 
     /**
      * @throws IOException
-     * @throws InterruptedException
      */
     @Before
-    public void setUp() throws IOException, InterruptedException {
-        log.debug("checking minimum python version");
-        requirePython(MINIMUM_PYTHON_VERSION);
+    public void setUp() throws IOException {
         conf = new VismoConfiguration(VISMO_CONFIG_FILE);
         source = new VismoEventSource(factory.newBoundPullSocket(conf.getProducersPoint()), factory.newConnectedPushSocket(conf
                 .getProducersPoint()));
         source.start();
+    }
+
+
+    /**
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    @Test
+    public void shouldReceivedMetadataEvents() throws IOException, InterruptedException {
+        listener = new MetadataEventsListener(NO_EVENTS_TO_SEND);
+        source.add(listener);
+
+        runPythonVismoDispatch(META);
+        Thread.sleep(1000);
+        listener.verifyEvents();
     }
 
 
@@ -201,7 +249,7 @@ public class PythonDispatchTest {
 
         runPythonVismoDispatch(MULTI);
         Thread.sleep(1000);
-        listener.verifyEventsHelper();
+        listener.verifyEvents();
     }
 
 
@@ -218,14 +266,28 @@ public class PythonDispatchTest {
 
         runPythonVismoDispatch(PLAIN);
         Thread.sleep(1000);
-        listener.verifyEventsHelper();
+        listener.verifyEvents();
     }
 
 
-    /***/
+    /**
+     * @throws InterruptedException
+     */
     @After
-    public void tearDown() {
+    public void tearDown() throws InterruptedException {
         source.halt();
+        Thread.sleep(50); // wait for source sockets to die off.
+    }
+
+
+    /**
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    @BeforeClass
+    public static void assertEnvironmentHasUsablePython() throws IOException, InterruptedException {
+        log.debug("checking minimum python version");
+        requirePython(MINIMUM_PYTHON_VERSION);
     }
 
 

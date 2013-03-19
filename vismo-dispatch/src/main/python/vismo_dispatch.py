@@ -142,21 +142,35 @@ class VismoEventDispatcher(EventDispatcher):
 
         if self.start_request and self.start_response and self.end_response:
             try:
-                event = dict(self.end_response)
-                event['id'] = str(uuid4())
-                event['timestamp'] = int(1000 * time())
-                event['originating-machine'] = self.ip
-                event['originating-service'] = self.service_name
-                event['originating-cluster'] = self.cluster_name
-                event['transaction-latency'] = self.get_latency()
-                event['transaction-duration'] = self.get_transaction_duration()
-                event['content-size'] = long(self.end_response['content_size'])
-                event['object'] = self.end_response['obj']
-                event['transaction-throughput'] = self.get_throughput()
-                del event['content_size']
-                del event['obj']
-                del event['tag']
-                self._send(event)
+                if 'content_size' in self.end_response:
+                    event = dict(self.end_response)
+                    event['id'] = str(uuid4())
+                    event['timestamp'] = int(1000 * time())
+                    event['originating-machine'] = self.ip
+                    event['originating-service'] = self.service_name
+                    event['originating-cluster'] = self.cluster_name
+                    event['transaction-latency'] = self.get_latency()
+                    event['transaction-duration'] = self.get_transaction_duration()
+                    event['content-size'] = long(self.end_response['content_size'])
+                    event['object'] = self.end_response['obj']
+                    event['transaction-throughput'] = self.get_throughput()
+                    del event['content_size']
+                    del event['obj']
+                    del event['tag']
+                    self._send(event)
+                elif 'metadata_size' in self.end_response:
+                    event = dict(self.end_response)
+                    event['id'] = str(uuid4())
+                    event['timestamp'] = int(1000 * time())
+                    event['originating-machine'] = self.ip
+                    event['originating-service'] = self.service_name
+                    event['originating-cluster'] = self.cluster_name
+                    event['metadata-size'] = long(self.end_response['metadata_size'])
+                    event['object'] = self.end_response['obj']
+                    del event['metadata_size']
+                    del event['obj']
+                    del event['tag']
+                    self._send(event)
             finally:
                 self.start_request, self.start_response, self.end_response = None, None, None
 
@@ -205,45 +219,52 @@ if __name__ == '__main__':
 
     mon = VismoEventDispatcher('foo')
 
-    def mon_send_data(operation, tag, tenant, user, container, obj, timestamp, content_size=0):
+    def mon_send_data(operation, tag, tenant, user, container, obj, content_size=0):
         mon.send(status='SUCCESS', tag=tag, operation=operation, tenant=tenant, user=user,
-                container=container, obj=obj, timestamp=timestamp, content_size=content_size)
+                container=container, obj=obj, content_size=content_size)
+
+    def mon_send_metadata(operation, tag, tenant, user, container, obj, key=None, val=None):
+        mon.send(status='SUCCESS', tag=tag, operation=operation, tenant=tenant, user=user,
+                container=container, obj=obj, metadata_size=val)
 
     def send_put(tenant, user, container, obj):
         t = int(1000 * time())
-        mon_send_data('PUT', 'start-request', tenant, user, container, obj, t)
-        mon_send_data('PUT', 'start-response', tenant, user, container, obj, int(t + 1000))
-        mon_send_data('PUT', 'end-response', tenant, user, container, obj, int(t + 2000), 100)
+        mon_send_data('PUT', 'start-request', tenant, user, container, obj)
+        mon_send_data('PUT', 'start-response', tenant, user, container, obj)
+        mon_send_data('PUT', 'end-response', tenant, user, container, obj, 100)
 
-    def send_get():
+    def send_get(tenant, user, container, obj):
         t = int(1000 * time())
-        mon_send_data('GET', 'start-request', tenant, user, container, obj, t)
-        mon_send_data('GET', 'start-response', tenant, user, container, obj, int(t + 1000))
-        mon_send_data('GET', 'end-response', tenant, user, container, obj, int(t + 2000), 100)
+        mon_send_data('GET', 'start-request', tenant, user, container, obj)
+        mon_send_data('GET', 'start-response', tenant, user, container, obj)
+        mon_send_data('GET', 'end-response', tenant, user, container, obj, 200)
 
     def send_put_multi(tenant, user, container, obj):
         t = int(1000 * time())
-        mon_send_data('PUT_MULTI', 'start-request', tenant, user, container, obj, t)
-        mon_send_data('PUT_MULTI', 'start-response', tenant, user, container, obj, int(t + 1000))
-        mon_send_data('PUT_MULTI', 'end-response', tenant, user, container, obj, int(t + 2000), 100)
+        mon_send_data('PUT_MULTI', 'start-request', tenant, user, container, obj)
+        mon_send_data('PUT_MULTI', 'start-response', tenant, user, container, obj)
+        mon_send_data('PUT_MULTI', 'end-response', tenant, user, container, obj, 500)
 
-    def send_put_metadata():
-        pass
+    def send_put_metadata(tenant, user, container, obj):
+        t = int(1000 * time())
+        mon_send_metadata('PUT_METADATA', 'start-request', tenant, user, container, obj)
+        mon_send_metadata('PUT_METADATA', 'start-response', tenant, user, container, obj)
+        mon_send_metadata('PUT_METADATA', 'end-response', tenant, user, container, obj, 'foo', 500)
 
-    def send_get_metadata():
-        pass
+    def send_get_metadata(tenant, user, container, obj):
+        t = int(1000 * time())
+        mon_send_metadata('GET_METADATA', 'start-request', tenant, user, container, obj)
+        mon_send_metadata('GET_METADATA', 'start-response', tenant, user, container, obj)
+        mon_send_metadata('GET_METADATA', 'end-response', tenant, user, container, obj, 'bar', 567)
 
     if sys.argv[1] == 'multi':
-        ctr = 0
-
         for i in range(int(sys.argv[2])):
             send_put_multi('ntua', 'vassilis', 'test-container', 'foo')
     elif sys.argv[1] == 'meta':
-        sys.exit(1)
+        for i in range(int(sys.argv[2]) / 2):
+            send_put_metadata('ntua', 'vassilis', 'test-container-meta', 'foo')
+            send_get_metadata('ntua', 'vassilis', 'test-container-meta', 'foo')
     else:
-        ctr = 0
-
-        for i in range(int(sys.argv[2])):
+        for i in range(int(sys.argv[2]) / 2):
             send_put('ntua', 'vassilis', 'test-container', 'foo')
-
-#{"status": "SUCCESS", "container": "events", "timestamp": 1361897370880, "object": "event-1361897364933", "transaction-duration": 5.4139999999999997, "content-size": 733, "originating-machine": "10.0.1.101", "user": "admin", "transaction-latency": 5.399, "transaction-throughput": 135.38973032877726, "originating-cluster": "test", "operation": "PUT", "type": "write", "id": "53638f2f-3c0a-4711-8ab1-01b836337f2c", "originating-service": "object_service", "tenant": "analytics"}
+            send_get('ntua', 'vassilis', 'test-container', 'foo')
