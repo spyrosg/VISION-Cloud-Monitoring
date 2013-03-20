@@ -170,16 +170,11 @@ public class VismoServiceTest {
     }
 
 
-    /**
-     * @throws InterruptedException
-     */
+    /***/
     @After
-    public void tearDown() throws InterruptedException {
+    public void tearDown() {
         if (service != null)
             service.halt();
-
-        Thread.sleep(1000);
-        //socketFactory.destroy();
     }
 
 
