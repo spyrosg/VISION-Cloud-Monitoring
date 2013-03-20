@@ -179,7 +179,7 @@ public class VismoServiceTest {
             service.halt();
 
         Thread.sleep(1000);
-        socketFactory.destroy();
+        //socketFactory.destroy();
     }
 
 
