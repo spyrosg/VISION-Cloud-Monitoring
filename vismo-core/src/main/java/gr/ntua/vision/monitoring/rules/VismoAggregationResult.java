@@ -1,8 +1,9 @@
 package gr.ntua.vision.monitoring.rules;
 
 import gr.ntua.vision.monitoring.VismoVMInfo;
-import gr.ntua.vision.monitoring.events.MapBasedEvent;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
@@ -11,9 +12,11 @@ import java.util.UUID;
 /**
  * 
  */
-public class VismoAggregationResult extends MapBasedEvent implements AggregationResult {
+public class VismoAggregationResult implements AggregationResult {
     /** this host's ip address. */
-    private static final String ip = new VismoVMInfo().getAddress().getHostAddress();
+    private static final String       ip = new VismoVMInfo().getAddress().getHostAddress();
+    /***/
+    private final Map<String, Object> dict;
 
 
     /**
@@ -23,8 +26,35 @@ public class VismoAggregationResult extends MapBasedEvent implements Aggregation
      *            a dictionary of key/values.
      */
     public VismoAggregationResult(final Map<String, Object> dict) {
-        super(dict);
+        this.dict = dict;
         appendDefaultFields();
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#get(java.lang.String)
+     */
+    @Override
+    public Object get(final String key) {
+        return dict.get(key);
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#originatingIP()
+     */
+    @Override
+    public InetAddress originatingIP() throws UnknownHostException {
+        return InetAddress.getByName((String) dict.get("originating-machine"));
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#originatingService()
+     */
+    @Override
+    public String originatingService() {
+        return (String) dict.get("originating-service");
     }
 
 
@@ -56,6 +86,24 @@ public class VismoAggregationResult extends MapBasedEvent implements Aggregation
 
 
     /**
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#timestamp()
+     */
+    @Override
+    public long timestamp() {
+        return (Long) dict.get("timestamp");
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#topic()
+     */
+    @Override
+    public String topic() {
+        return (String) dict.get("topic");
+    }
+
+
+    /**
      * @see java.lang.Object#toString()
      */
     @Override
@@ -80,6 +128,15 @@ public class VismoAggregationResult extends MapBasedEvent implements Aggregation
         put("timestamp", System.currentTimeMillis());
         put("id", UUID.randomUUID().toString());
         put("originating-machine", ip);
+    }
+
+
+    /**
+     * @param key
+     * @param val
+     */
+    private void put(final String key, final Object val) {
+        dict.put(key, val);
     }
 
 

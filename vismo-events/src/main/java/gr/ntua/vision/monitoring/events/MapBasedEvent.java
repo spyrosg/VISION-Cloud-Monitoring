@@ -24,7 +24,7 @@ public class MapBasedEvent implements MonitoringEvent {
      * @param dict
      *            a dictionary of key/values.
      */
-    protected MapBasedEvent(final Map<String, Object> dict) {
+    MapBasedEvent(final Map<String, Object> dict) {
         assertHaveRequiredFields(dict, requiredFields);
         this.dict = new HashMap<String, Object>(dict);
     }
