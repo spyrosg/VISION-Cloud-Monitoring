@@ -2,7 +2,7 @@ package helpers;
 
 import gr.ntua.vision.monitoring.dispatch.EventBuilder;
 import gr.ntua.vision.monitoring.dispatch.EventDispatcher;
-import gr.ntua.vision.monitoring.events.VismoEvent;
+import gr.ntua.vision.monitoring.events.MapBasedEvent;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 
 import java.util.HashMap;
@@ -19,7 +19,7 @@ public class InMemoryEventDispatcher implements EventDispatcher {
     /**
      * 
      */
-    private static class MyEvent extends VismoEvent {
+    private static class MyEvent extends MapBasedEvent {
         /**
          * Constructor.
          * 

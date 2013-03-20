@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.rules;
 
 import gr.ntua.vision.monitoring.VismoVMInfo;
-import gr.ntua.vision.monitoring.events.VismoEvent;
+import gr.ntua.vision.monitoring.events.MapBasedEvent;
 
 import java.util.Date;
 import java.util.Map;
@@ -11,7 +11,7 @@ import java.util.UUID;
 /**
  * 
  */
-public class VismoAggregationResult extends VismoEvent implements AggregationResult {
+public class VismoAggregationResult extends MapBasedEvent implements AggregationResult {
     /** this host's ip address. */
     private static final String ip = new VismoVMInfo().getAddress().getHostAddress();
 
