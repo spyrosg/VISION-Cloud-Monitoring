@@ -105,4 +105,13 @@ class ThresholdEvent implements MonitoringEvent {
     public String topic() {
         return topic;
     }
+
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "#<ThresholdEvent: " + ruleId + " of topic: " + topic + " at timestamp: " + ts + ", value: " + valueExceeded + ">";
+    }
 }

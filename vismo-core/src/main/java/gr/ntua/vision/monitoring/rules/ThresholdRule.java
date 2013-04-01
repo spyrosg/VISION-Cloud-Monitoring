@@ -165,6 +165,6 @@ public class ThresholdRule extends Rule {
             if (p.op.equals(op))
                 return p;
 
-        throw new ThresholdRuleValidationError("unsupported operator: " + op);
+        throw new ThresholdRuleValidationError("unsupported predicate: " + op);
     }
 }

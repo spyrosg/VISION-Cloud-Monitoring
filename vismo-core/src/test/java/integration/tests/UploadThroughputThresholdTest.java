@@ -18,6 +18,8 @@ import javax.ws.rs.core.MediaType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -34,6 +36,8 @@ import com.sun.jersey.api.json.JSONConfiguration;
 public class UploadThroughputThresholdTest {
     /***/
     private static final String              CONTAINER = "test-container";
+    /***/
+    private static final Logger              log       = LoggerFactory.getLogger(UploadThroughputThresholdTest.class);
     /***/
     private static final int                 PORT      = 9998;
     /***/
@@ -147,6 +151,7 @@ public class UploadThroughputThresholdTest {
      * @param e
      */
     private static void assertIsExpectedEvent(final MonitoringEvent e) {
+        log.debug("asserting event: {}", e);
         assertEquals("throughput-topic", e.topic());
         assertTrue((Double) e.get("value") >= THRESHOLD);
     }
