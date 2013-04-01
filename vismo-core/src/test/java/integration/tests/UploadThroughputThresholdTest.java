@@ -1,6 +1,7 @@
 package integration.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.RulesResource;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
@@ -39,6 +40,8 @@ public class UploadThroughputThresholdTest {
     private static final String              ROOT_URL  = "http://localhost:" + PORT;
     /***/
     private static final String              TENANT    = "ntua";
+    /***/
+    private static final double              THRESHOLD = 5;
     /***/
     private static final String              USER      = "vassilis";
     /***/
@@ -81,13 +84,27 @@ public class UploadThroughputThresholdTest {
 
     /***/
     @Test
+    public void shouldRejectInvalidSpecRules() {
+        assertEquals(0, engine.noRules());
+
+        final ClientResponse res = submitRule(invalidSpecificationRule());
+
+        assertEquals(ClientResponse.Status.BAD_REQUEST, res.getClientResponseStatus());
+        assertEquals(0, engine.noRules());
+    }
+
+
+    /***/
+    @Test
     public void submitRuleShouldProduceEvent() {
         assertEquals(0, engine.noRules());
-        submitThroughputThresholdRule();
+
+        final ClientResponse res = submitRule(throughputThresholdRule());
+
+        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
         assertEquals(1, engine.noRules());
 
-        obs.putEvent(TENANT, USER, CONTAINER, "ignored-object-name").send();
-
+        triggerRule();
         assertEquals(1, eventSink.size());
         assertIsExpectedEvent(eventSink.get(0));
     }
@@ -111,25 +128,18 @@ public class UploadThroughputThresholdTest {
     }
 
 
+    /**
+     * @param bean
+     * @return the {@link ClientResponse}.
+     */
+    private ClientResponse submitRule(final ThresholdRuleBean bean) {
+        return root().path("rules").type(MediaType.APPLICATION_JSON).entity(bean).post(ClientResponse.class);
+    }
+
+
     /***/
-    private void submitThroughputThresholdRule() {
-        final ThresholdRuleBean bean = new ThresholdRuleBean();
-
-        // we're concerned about the upload throughout
-        bean.setMetric("transaction-throughput");
-        bean.setOperation("PUT");
-        // under given container
-        bean.setAggregationUnit(TENANT + "," + USER + "," + CONTAINER);
-        // if it's lower
-        bean.setPredicate("<=");
-        // than 5 bytes / second
-        bean.setThreshold(5);
-        // generate event with given topic.
-        bean.setTopic("throughput-topic");
-
-        final ClientResponse res = root().path("rules").type(MediaType.APPLICATION_JSON).entity(bean).post(ClientResponse.class);
-
-        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+    private void triggerRule() {
+        obs.putEvent(TENANT, USER, CONTAINER, "ignored-object-name").send();
     }
 
 
@@ -138,5 +148,50 @@ public class UploadThroughputThresholdTest {
      */
     private static void assertIsExpectedEvent(final MonitoringEvent e) {
         assertEquals("throughput-topic", e.topic());
+        assertTrue((Double) e.get("value") >= THRESHOLD);
+    }
+
+
+    /**
+     * @return a {@link ThresholdRuleBean}.
+     */
+    private static ThresholdRuleBean invalidSpecificationRule() {
+        final ThresholdRuleBean bean = new ThresholdRuleBean();
+
+        // we're concerned about the upload throughout
+        bean.setMetric("transaction-throughput");
+        bean.setOperation("PUT");
+        // under given container
+        bean.setAggregationUnit(TENANT + "," + USER + "," + CONTAINER);
+        // if it's lower
+        bean.setPredicate("-my-predicate-");
+        // than 5 bytes / second
+        bean.setThreshold(THRESHOLD);
+        // generate event with given topic.
+        bean.setTopic("throughput-topic");
+
+        return bean;
+    }
+
+
+    /**
+     * @return a {@link ThresholdRuleBean}.
+     */
+    private static ThresholdRuleBean throughputThresholdRule() {
+        final ThresholdRuleBean bean = new ThresholdRuleBean();
+
+        // we're concerned about the upload throughout
+        bean.setMetric("transaction-throughput");
+        bean.setOperation("PUT");
+        // under given container
+        bean.setAggregationUnit(TENANT + "," + USER + "," + CONTAINER);
+        // if it's lower
+        bean.setPredicate(">=");
+        // than 5 bytes / second
+        bean.setThreshold(THRESHOLD);
+        // generate event with given topic.
+        bean.setTopic("throughput-topic");
+
+        return bean;
     }
 }

@@ -174,7 +174,6 @@ public class VismoEventDispatcher implements EventDispatcher {
      *            the event as represented with a {@link Map}.
      */
     private void addBasicFields(final Map<String, Object> map) {
-        // TODO: replace with {@link VismoEvent}
         map.put("timestamp", System.currentTimeMillis());
         map.put("originating-machine", ip);
         map.put("originating-service", originatingService);

@@ -1,14 +1,10 @@
 package gr.ntua.vision.monitoring.rules;
 
-import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleValidationError;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,60 +54,30 @@ public class VismoRulesFactory {
      * @return a {@link VismoRule} object.
      */
     private VismoRule buildFrom(final ThresholdRuleBean bean) {
-        return new Rule(engine) {
-            /***/
-            private static final String OBS  = "fake-obs";
-            /** the log target. */
-            private final Logger        log1 = LoggerFactory.getLogger(Rule.class);
-            /***/
-            private final String        uuid = UUID.randomUUID().toString();
+        if (bean.getPeriod() > 0)
+            return buildThresholdPeriodicRule(bean);
+
+        return buildThresholdRule(bean);
+    }
 
 
-            @Override
-            public String id() {
-                return uuid;
-            }
+    /**
+     * @param bean
+     * @return
+     */
+    private ThresholdPeriodicRule buildThresholdPeriodicRule(final ThresholdRuleBean bean) {
+        // TODO
+        return null;
+    }
 
 
-            @Override
-            public void performWith(final MonitoringEvent e) {
-                if (!OBS.equals(e.originatingService()))
-                    return;
-
-                log1.debug("have event: {}", e);
-
-                send(new MonitoringEvent() {
-                    @Override
-                    public Object get(final String key) {
-                        return null;
-                    }
-
-
-                    @Override
-                    public InetAddress originatingIP() throws UnknownHostException {
-                        return e.originatingIP();
-                    }
-
-
-                    @Override
-                    public String originatingService() {
-                        return e.originatingService();
-                    }
-
-
-                    @Override
-                    public long timestamp() {
-                        return System.currentTimeMillis();
-                    }
-
-
-                    @Override
-                    public String topic() {
-                        return bean.getTopic();
-                    }
-                });
-            }
-        };
+    /**
+     * @param bean
+     * @return
+     */
+    private ThresholdRule buildThresholdRule(final ThresholdRuleBean bean) {
+        return new ThresholdRule(engine, bean.getTopic(), ThresholdRule.predicateFromString(bean.getPredicate()),
+                bean.getOperation(), bean.getMetric(), bean.getThreshold());
     }
 
 

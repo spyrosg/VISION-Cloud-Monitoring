@@ -75,7 +75,6 @@ public class InMemoryEventDispatcher implements EventDispatcher {
          */
         @Override
         public String topic() {
-            // TODO Auto-generated method stub
             return null;
         }
 
