@@ -100,10 +100,41 @@ public class UploadThroughputThresholdTest {
 
     /***/
     @Test
-    public void submitRuleShouldProduceEvent() {
+    public void submitRuleShouldNotProduceEventWhenNotMatching() {
         assertEquals(0, engine.noRules());
 
-        final ClientResponse res = submitRule(throughputThresholdRule());
+        final ClientResponse res = submitRule(throughputThresholdRule(TENANT, USER, "-dummy-"));
+
+        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+        assertEquals(1, engine.noRules());
+
+        triggerRule();
+        assertEquals(0, eventSink.size());
+    }
+
+
+    /***/
+    @Test
+    public void submitRuleShouldProduceEventWithContainerAggregationUnit() {
+        assertEquals(0, engine.noRules());
+
+        final ClientResponse res = submitRule(throughputThresholdRule(TENANT, USER, CONTAINER));
+
+        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+        assertEquals(1, engine.noRules());
+
+        triggerRule();
+        assertEquals(1, eventSink.size());
+        assertIsExpectedEvent(eventSink.get(0));
+    }
+
+
+    /***/
+    @Test
+    public void submitRuleShouldProduceEventWithUserAggregationUnit() {
+        assertEquals(0, engine.noRules());
+
+        final ClientResponse res = submitRule(throughputThresholdRule(TENANT, USER));
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
         assertEquals(1, engine.noRules());
@@ -180,16 +211,43 @@ public class UploadThroughputThresholdTest {
 
 
     /**
+     * @param tenant
+     * @param user
      * @return a {@link ThresholdRuleBean}.
      */
-    private static ThresholdRuleBean throughputThresholdRule() {
+    private static ThresholdRuleBean throughputThresholdRule(final String tenant, final String user) {
         final ThresholdRuleBean bean = new ThresholdRuleBean();
 
         // we're concerned about the upload throughout
         bean.setMetric("transaction-throughput");
         bean.setOperation("PUT");
         // under given container
-        bean.setAggregationUnit(TENANT + "," + USER + "," + CONTAINER);
+        bean.setAggregationUnit(tenant + "," + user);
+        // if it's lower
+        bean.setPredicate(">=");
+        // than 5 bytes / second
+        bean.setThreshold(THRESHOLD);
+        // generate event with given topic.
+        bean.setTopic("throughput-topic");
+
+        return bean;
+    }
+
+
+    /**
+     * @param tenant
+     * @param user
+     * @param containerName
+     * @return a {@link ThresholdRuleBean}.
+     */
+    private static ThresholdRuleBean throughputThresholdRule(final String tenant, final String user, final String containerName) {
+        final ThresholdRuleBean bean = new ThresholdRuleBean();
+
+        // we're concerned about the upload throughout
+        bean.setMetric("transaction-throughput");
+        bean.setOperation("PUT");
+        // under given container
+        bean.setAggregationUnit(tenant + "," + user + "," + containerName);
         // if it's lower
         bean.setPredicate(">=");
         // than 5 bytes / second

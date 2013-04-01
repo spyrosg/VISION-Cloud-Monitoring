@@ -63,7 +63,7 @@ public class VismoRulesFactory {
 
     /**
      * @param bean
-     * @return
+     * @return a {@link ThresholdPeriodicRule}.
      */
     private ThresholdPeriodicRule buildThresholdPeriodicRule(final ThresholdRuleBean bean) {
         // TODO
@@ -73,11 +73,10 @@ public class VismoRulesFactory {
 
     /**
      * @param bean
-     * @return
+     * @return a {@link ThresholdRule}.
      */
     private ThresholdRule buildThresholdRule(final ThresholdRuleBean bean) {
-        return new ThresholdRule(engine, bean.getTopic(), ThresholdRule.predicateFromString(bean.getPredicate()),
-                bean.getOperation(), bean.getMetric(), bean.getThreshold());
+        return new ThresholdRule(engine, bean);
     }
 
 
