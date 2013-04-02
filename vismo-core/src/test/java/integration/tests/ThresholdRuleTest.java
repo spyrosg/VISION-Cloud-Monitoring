@@ -88,7 +88,7 @@ public class ThresholdRuleTest {
 
     /***/
     @Test
-    public void shouldRejectInvalidSpecRules() {
+    public void shouldRejectSubmittedRuleOfInvalidSpecification() {
         assertEquals(0, engine.noRules());
 
         final ClientResponse res = submitRule(invalidSpecificationRule());
@@ -100,7 +100,7 @@ public class ThresholdRuleTest {
 
     /***/
     @Test
-    public void submitRuleShouldNotProduceEventWhenNotMatching() {
+    public void submittedRuleShouldNotProduceEventWhenNotMatching() {
         assertEquals(0, engine.noRules());
 
         final ClientResponse res = submitRule(throughputThresholdRule(TENANT, USER, "-dummy-"));
@@ -115,7 +115,7 @@ public class ThresholdRuleTest {
 
     /***/
     @Test
-    public void submitRuleShouldProduceEventWithContainerAggregationUnit() {
+    public void submittedRuleShouldProduceEventWithContainerAggregationUnit() {
         assertEquals(0, engine.noRules());
 
         final ClientResponse res = submitRule(throughputThresholdRule(TENANT, USER, CONTAINER));
@@ -131,7 +131,7 @@ public class ThresholdRuleTest {
 
     /***/
     @Test
-    public void submitRuleShouldProduceEventWithUserAggregationUnit() {
+    public void submittedRuleShouldProduceEventWithUserAggregationUnit() {
         assertEquals(0, engine.noRules());
 
         final ClientResponse res = submitRule(throughputThresholdRule(TENANT, USER));
@@ -225,7 +225,7 @@ public class ThresholdRuleTest {
         bean.setAggregationUnit(tenant + "," + user);
         // if it's lower
         bean.setPredicate(">=");
-        // than 5 bytes / second
+        // than threshold bytes / second
         bean.setThreshold(THRESHOLD);
         // generate event with given topic.
         bean.setTopic("throughput-topic");
@@ -250,7 +250,7 @@ public class ThresholdRuleTest {
         bean.setAggregationUnit(tenant + "," + user + "," + containerName);
         // if it's lower
         bean.setPredicate(">=");
-        // than 5 bytes / second
+        // than threshold bytes / second
         bean.setThreshold(THRESHOLD);
         // generate event with given topic.
         bean.setTopic("throughput-topic");
