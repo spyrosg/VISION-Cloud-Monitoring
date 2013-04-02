@@ -5,7 +5,6 @@ import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.rules.ClassPathRulesFactory;
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.Rule;
-import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 
@@ -26,8 +25,17 @@ public class ClassPathRulesFactoryTest {
          * @param engine
          * @param id
          */
-        public FooRule(final VismoRulesEngine engine, final String id) {
+        public FooRule(final VismoRulesEngine engine, @SuppressWarnings("unused") final String id) {
             super(engine);
+        }
+
+
+        /**
+         * @see gr.ntua.vision.monitoring.rules.RuleProc#id()
+         */
+        @Override
+        public String id() {
+            return toString();
         }
 
 
@@ -35,13 +43,13 @@ public class ClassPathRulesFactoryTest {
          * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
          */
         @Override
-        public void performWith(final MonitoringEvent c) {
+        public void performWith(@SuppressWarnings("unused") final MonitoringEvent c) {
             // ignored
         }
     }
 
     /***/
-    private final VismoRulesEngine engine = new VismoRulesEngine(new RulesStore());
+    private final VismoRulesEngine engine = new VismoRulesEngine();
 
 
     /***/

@@ -9,10 +9,10 @@ import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.Rule;
-import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.service.ClusterHeadNodeFactory;
 import gr.ntua.vision.monitoring.service.Service;
+import gr.ntua.vision.monitoring.service.VismoService;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import java.io.IOException;
@@ -29,7 +29,8 @@ import org.zeromq.ZContext;
 
 
 /**
- * 
+ * This is used to test the general facilities of the {@link VismoService}; thus is should receive events from producers, process
+ * them in a rules engine and dispatch them to consumers.
  */
 public class VismoServiceTest {
     /**
@@ -105,6 +106,15 @@ public class VismoServiceTest {
 
 
         /**
+         * @see gr.ntua.vision.monitoring.rules.RuleProc#id()
+         */
+        @Override
+        public String id() {
+            return toString();
+        }
+
+
+        /**
          * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
          */
         @Override
@@ -161,7 +171,7 @@ public class VismoServiceTest {
     public void setUp() throws IOException {
         obs = new FakeObjectService(new VismoEventDispatcher(socketFactory, conf, "fake-obs"));
 
-        final VismoRulesEngine engine = new VismoRulesEngine(new RulesStore());
+        final VismoRulesEngine engine = new VismoRulesEngine();
 
         new PassThroughRule(engine).submit();
         countRule = new EventCountRule(engine);

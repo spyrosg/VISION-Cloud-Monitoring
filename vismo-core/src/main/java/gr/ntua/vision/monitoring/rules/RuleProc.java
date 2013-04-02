@@ -10,6 +10,12 @@ package gr.ntua.vision.monitoring.rules;
  */
 public interface RuleProc<C> {
     /**
+     * @return a unique string identifying the rule.
+     */
+    String id();
+
+
+    /**
      * @param c
      *            the condition.
      */

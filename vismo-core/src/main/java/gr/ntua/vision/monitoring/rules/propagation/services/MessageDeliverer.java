@@ -89,9 +89,9 @@ public class MessageDeliverer extends Thread implements Observer {
      * checks whether the engine rules number is the same as the web interface number.
      */
     private void checkEngineHealth() {
-        if (manager.getEngine().getRulesTotalNumber() != manager.getRuleStore().getRulesCatalogSize())
+        if (manager.getEngine().noRules() != manager.getRuleStore().getRulesCatalogSize())
             MessageDeliverer.log.debug("ERROR: web rule #: " + manager.getRuleStore().getRulesCatalogSize() + " engine rule#: "
-                    + manager.getEngine().getRulesTotalNumber());
+                    + manager.getEngine().noRules());
     }
 
 

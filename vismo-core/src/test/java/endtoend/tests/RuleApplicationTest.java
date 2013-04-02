@@ -1,7 +1,7 @@
 package endtoend.tests;
 
+import gr.ntua.vision.monitoring.events.MapBasedEvent;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
-import gr.ntua.vision.monitoring.events.VismoEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
@@ -108,7 +108,7 @@ public class RuleApplicationTest {
         registry.registerToAll(new EventHandler() {
             @Override
             public void handle(final MonitoringEvent me) {
-                final VismoEvent e = (VismoEvent) me;
+                final MapBasedEvent e = (MapBasedEvent) me;
 
                 System.err.println("receiving: " + e.dict());
             }

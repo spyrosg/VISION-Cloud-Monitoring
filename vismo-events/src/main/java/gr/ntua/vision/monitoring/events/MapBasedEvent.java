@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * An implementation of vismo events based on {@link Map}s.
  */
-public class VismoEvent implements MonitoringEvent {
+public class MapBasedEvent implements MonitoringEvent {
     /***/
     private static final List<String> requiredFields = Arrays.asList("timestamp", "originating-service", "originating-machine");
     /** the dictionary of key/values. */
@@ -24,7 +24,7 @@ public class VismoEvent implements MonitoringEvent {
      * @param dict
      *            a dictionary of key/values.
      */
-    protected VismoEvent(final Map<String, Object> dict) {
+    MapBasedEvent(final Map<String, Object> dict) {
         assertHaveRequiredFields(dict, requiredFields);
         this.dict = new HashMap<String, Object>(dict);
     }

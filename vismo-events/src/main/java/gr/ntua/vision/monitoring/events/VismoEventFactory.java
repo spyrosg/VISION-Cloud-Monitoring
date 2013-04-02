@@ -25,7 +25,7 @@ public class VismoEventFactory implements EventFactory {
     public MonitoringEvent createEvent(final String str) {
         final Map<String, Object> dict = parse(str);
 
-        return dict != null ? new VismoEvent(dict) : null;
+        return dict != null ? new MapBasedEvent(dict) : null;
     }
 
 

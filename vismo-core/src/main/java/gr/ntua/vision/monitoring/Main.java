@@ -4,7 +4,6 @@ import gr.ntua.vision.monitoring.policy.StaticConfigPolicy;
 import gr.ntua.vision.monitoring.rules.AccountingRule;
 import gr.ntua.vision.monitoring.rules.CTORule;
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
-import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.service.VismoService;
 import gr.ntua.vision.monitoring.udp.UDPClient;
@@ -48,7 +47,7 @@ public class Main {
 
         log.info("this is {}, running off commit-id {}", PROG, info.getVersion());
 
-        final VismoRulesEngine engine = new VismoRulesEngine(new RulesStore());
+        final VismoRulesEngine engine = new VismoRulesEngine();
         final VismoService service = (VismoService) new StaticConfigPolicy(conf, engine).build(info);
         final UDPServer udpServer = new UDPFactory(conf.getUDPPort()).buildServer();
 
