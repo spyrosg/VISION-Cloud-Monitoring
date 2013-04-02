@@ -18,15 +18,6 @@ public class PassThroughRule extends Rule {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.rules.RuleProc#id()
-     */
-    @Override
-    public String id() {
-        return toString();
-    }
-
-
-    /**
      * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
      */
     @Override

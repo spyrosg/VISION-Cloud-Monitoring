@@ -15,9 +15,7 @@ import org.junit.Test;
  * 
  */
 public class ClassPathRulesFactoryTest {
-    /**
-     * 
-     */
+    /***/
     public static class FooRule extends Rule {
         /**
          * Constructor.
@@ -27,15 +25,6 @@ public class ClassPathRulesFactoryTest {
          */
         public FooRule(final VismoRulesEngine engine, @SuppressWarnings("unused") final String id) {
             super(engine);
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.rules.RuleProc#id()
-         */
-        @Override
-        public String id() {
-            return toString();
         }
 
 

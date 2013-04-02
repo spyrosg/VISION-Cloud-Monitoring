@@ -2,6 +2,8 @@ package gr.ntua.vision.monitoring.rules;
 
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
+import java.util.UUID;
+
 
 /**
  * This is the base class for all rules that operate on an event basis (in contrast to {@link PeriodicRule}s that work on a set of
@@ -10,6 +12,8 @@ import gr.ntua.vision.monitoring.events.MonitoringEvent;
 public abstract class Rule implements VismoRule {
     /***/
     private final VismoRulesEngine engine;
+    /***/
+    private final String           id;
 
 
     /**
@@ -19,6 +23,16 @@ public abstract class Rule implements VismoRule {
      */
     public Rule(final VismoRulesEngine engine) {
         this.engine = engine;
+        this.id = UUID.randomUUID().toString();
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.rules.RuleProc#id()
+     */
+    @Override
+    public String id() {
+        return id;
     }
 
 

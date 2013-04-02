@@ -155,15 +155,6 @@ public class VismoRulesEngineTest {
 
 
         /**
-         * @see gr.ntua.vision.monitoring.rules.RuleProc#id()
-         */
-        @Override
-        public String id() {
-            return toString();
-        }
-
-
-        /**
          * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
          */
         @Override
@@ -246,15 +237,6 @@ public class VismoRulesEngineTest {
         public IntSumRule(final VismoRulesEngine engine, final long period, final String key) {
             super(engine, period);
             this.key = key;
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.rules.RuleProc#id()
-         */
-        @Override
-        public String id() {
-            return toString();
         }
 
 

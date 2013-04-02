@@ -11,7 +11,6 @@ import gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.ThresholdFold;
 import gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.ThresholdPredicate;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ThresholdPeriodicRule extends PeriodicRule {
     /***/
-    private static final Logger      log  = LoggerFactory.getLogger(ThresholdPeriodicRule.class);
+    private static final Logger      log = LoggerFactory.getLogger(ThresholdPeriodicRule.class);
     /***/
     private final String             aggregationUnit;
     /***/
@@ -37,8 +36,6 @@ public class ThresholdPeriodicRule extends PeriodicRule {
     private final double             thresholdValue;
     /***/
     private final String             topic;
-    /***/
-    private final String             uuid = UUID.randomUUID().toString();
 
 
     /**
@@ -60,15 +57,6 @@ public class ThresholdPeriodicRule extends PeriodicRule {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.rules.RuleProc#id()
-     */
-    @Override
-    public String id() {
-        return uuid;
-    }
-
-
-    /**
      * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
      */
     @Override
@@ -85,7 +73,7 @@ public class ThresholdPeriodicRule extends PeriodicRule {
      */
     @Override
     public String toString() {
-        return "#<ThresholdPeriodicRule: " + uuid + ", period: " + period() + ", topic: " + topic + ">";
+        return "#<ThresholdPeriodicRule: " + id() + ", period: " + period() + ", topic: " + topic + ">";
     }
 
 
@@ -102,7 +90,7 @@ public class ThresholdPeriodicRule extends PeriodicRule {
 
         log.debug(String.format("have violation of metric %s '%s', offending value %s", foldMethod, metric, aggregatedValue));
 
-        return new ThresholdEvent(uuid, eventsList.get(0).originatingService(), topic, aggregatedValue);
+        return new ThresholdEvent(id(), eventsList.get(0).originatingService(), topic, aggregatedValue);
     }
 
 

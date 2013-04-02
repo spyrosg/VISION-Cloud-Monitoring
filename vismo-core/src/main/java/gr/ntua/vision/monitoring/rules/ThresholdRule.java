@@ -8,8 +8,6 @@ import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
 import gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.ThresholdPredicate;
 
-import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +17,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ThresholdRule extends Rule {
     /** the log target. */
-    private static final Logger      log  = LoggerFactory.getLogger(Rule.class);
+    private static final Logger      log = LoggerFactory.getLogger(Rule.class);
     /***/
     private final String             aggregationUnit;
     /***/
@@ -32,8 +30,6 @@ public class ThresholdRule extends Rule {
     private final double             thresholdValue;
     /***/
     private final String             topic;
-    /***/
-    private final String             uuid = UUID.randomUUID().toString();
 
 
     /**
@@ -54,15 +50,6 @@ public class ThresholdRule extends Rule {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.rules.RuleProc#id()
-     */
-    @Override
-    public String id() {
-        return uuid;
-    }
-
-
-    /**
      * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
      */
     @Override
@@ -76,7 +63,7 @@ public class ThresholdRule extends Rule {
 
         if (thresholdExceededBy(pred, eventValue, thresholdValue)) {
             log.debug("have violation of metric '{}', offending value {}", metric, eventValue);
-            send(new ThresholdEvent(uuid, e.originatingService(), topic, eventValue));
+            send(new ThresholdEvent(id(), e.originatingService(), topic, eventValue));
         }
     }
 
@@ -86,6 +73,6 @@ public class ThresholdRule extends Rule {
      */
     @Override
     public String toString() {
-        return "#<ThresholdRule: " + uuid + ", topic: " + topic + ">";
+        return "#<ThresholdRule: " + id() + ", topic: " + topic + ">";
     }
 }

@@ -5,6 +5,7 @@ import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,8 @@ public abstract class PeriodicRule extends TimerTask implements VismoRule {
     protected final ArrayList<MonitoringEvent> eventsList = new ArrayList<MonitoringEvent>();
     /***/
     private final VismoRulesEngine             engine;
+    /***/
+    private final String                       id;
     /** the rule's period, in milliseconds. */
     private final long                         period;
 
@@ -34,6 +37,16 @@ public abstract class PeriodicRule extends TimerTask implements VismoRule {
     public PeriodicRule(final VismoRulesEngine engine, final long period) {
         this.engine = engine;
         this.period = period;
+        this.id = UUID.randomUUID().toString();
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.rules.RuleProc#id()
+     */
+    @Override
+    public String id() {
+        return id;
     }
 
 
