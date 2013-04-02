@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring.mon;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.mon.resources.GroupMembershipResource;
+import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import gr.ntua.vision.monitoring.web.WebServer;
 
 
@@ -37,6 +38,10 @@ public class Main {
             mon.addTask(1000 * Long.parseLong(args[1]), new PrintGroupTask(mship));
 
         mon.start();
-        server.withResource(new GroupMembershipResource(mship)).withStaticResourcesFrom("/static", "/*").build("/api/*").start();
+
+        server.withWebAppAt(WebAppBuilder.buildFrom(new GroupMembershipResource(mship)), "/api*")
+                .withStaticResourcesAt("/static", "/*");
+
+        server.start();
     }
 }

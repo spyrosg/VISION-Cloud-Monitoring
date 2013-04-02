@@ -1,6 +1,7 @@
 package integration.tests;
 
 import static org.junit.Assert.assertEquals;
+import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import gr.ntua.vision.monitoring.web.WebServer;
 
 import javax.ws.rs.core.MediaType;
@@ -32,7 +33,7 @@ public class WebServerTest {
      */
     @Test
     public void shouldAccessJerseyResources() throws Exception {
-        server.withResource(new FooResource("foo-value")).withResource(new BarResource("bar-value")).build("/*").start();
+        server.withWebAppAt(WebAppBuilder.buildFrom(new FooResource("foo-value"), new BarResource("bar-value")), "/*").start();
 
         shouldRetrieveResourceWithValue("/foo/0", "foo-value");
         shouldRetrieveResourceWithValue("/bar", "bar-value");
@@ -50,7 +51,8 @@ public class WebServerTest {
      */
     @Test
     public void shouldAccessStaticResource() throws Exception {
-        server.withStaticResourcesFrom("/static", "/*").withResource(new BarResource("bar-value")).build("/api/*").start();
+        server.withWebAppAt(WebAppBuilder.buildFrom(new BarResource("bar-value")), "/api/*")
+                .withStaticResourcesAt("/static", "/*").start();
 
         shouldRetrieveResourceWithValue("/api/bar", "bar-value");
         shouldRetrieveResourceWithValue("/index.html", "<html>\nfoo\n</html>");

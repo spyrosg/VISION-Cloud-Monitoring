@@ -18,6 +18,7 @@ import gr.ntua.vision.monitoring.rules.propagation.services.MessageDispatcher;
 import gr.ntua.vision.monitoring.rules.propagation.services.WatchDog;
 import gr.ntua.vision.monitoring.rules.propagation.store.ClusterRuleStore;
 import gr.ntua.vision.monitoring.rules.propagation.store.NodeRuleStore;
+import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import gr.ntua.vision.monitoring.web.WebServer;
 
 import java.io.IOException;
@@ -276,7 +277,7 @@ public class RulesPropagationManager {
      */
     public void start() {
         try {
-            webServer.withResource(new RulesManagementResource(this)).build("/*");
+            webServer.withWebAppAt(WebAppBuilder.buildFrom(new RulesManagementResource(this)), "/*");
             webServer.start();
             messageSender.init();
             messageReceiver.init();

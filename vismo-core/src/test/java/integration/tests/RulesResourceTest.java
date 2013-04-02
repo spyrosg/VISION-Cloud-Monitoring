@@ -2,9 +2,12 @@ package integration.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import gr.ntua.vision.monitoring.web.WebServer;
 
 import java.util.HashMap;
+
+import javax.ws.rs.core.Application;
 
 import org.junit.After;
 import org.junit.Before;
@@ -70,8 +73,11 @@ public class RulesResourceTest {
      */
     @Before
     public void setUp() throws Exception {
+        final WebAppBuilder builder = new WebAppBuilder();
+        final Application rulesApp = builder.addResource(new RulesResource(catalog)).build();
+
         server = new WebServer(PORT);
-        server.withResource(new RulesResource(catalog)).build("/*");
+        server.withWebAppAt(rulesApp, "/*");
         server.start();
     }
 
