@@ -1,8 +1,13 @@
 package gr.ntua.vision.monitoring.rules;
 
+import static gr.ntua.vision.monitoring.rules.ThresholdRulesFactoryUtils.fromString;
+import static gr.ntua.vision.monitoring.rules.ThresholdRulesFactoryUtils.requireNotNull;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
+import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
+import gr.ntua.vision.monitoring.rules.ThresholdRulesFactoryUtils.ThresholdPredicate;
 
 import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -10,19 +15,35 @@ import java.util.List;
  */
 public class ThresholdPeriodicRule extends PeriodicRule {
     /***/
-    private final String topic;
+    private final String             aggregationUnit;
+    /***/
+    private final String             metric;
+    /***/
+    private final String             operation;
+    /***/
+    private final ThresholdPredicate pred;
+    /***/
+    private final double             thresholdValue;
+    /***/
+    private final String             topic;
+    /***/
+    private final String             uuid = UUID.randomUUID().toString();
 
 
     /**
      * Constructor.
      * 
      * @param engine
-     * @param period
-     * @param topic
+     * @param bean
      */
-    public ThresholdPeriodicRule(final VismoRulesEngine engine, final long period, final String topic) {
-        super(engine, period);
-        this.topic = topic;
+    public ThresholdPeriodicRule(final VismoRulesEngine engine, final ThresholdRuleBean bean) {
+        super(engine, bean.getPeriod());
+        this.topic = requireNotNull(bean.getTopic());
+        this.pred = fromString(bean.getPredicate());
+        this.operation = bean.getOperation();
+        this.metric = requireNotNull(bean.getMetric());
+        this.aggregationUnit = bean.getAggregationUnit();
+        this.thresholdValue = bean.getThreshold();
     }
 
 
@@ -31,8 +52,7 @@ public class ThresholdPeriodicRule extends PeriodicRule {
      */
     @Override
     public String id() {
-        // TODO Auto-generated method stub
-        return null;
+        return uuid;
     }
 
 

@@ -1,8 +1,10 @@
 package gr.ntua.vision.monitoring.rules;
 
+import static gr.ntua.vision.monitoring.rules.ThresholdRulesFactoryUtils.fromString;
+import static gr.ntua.vision.monitoring.rules.ThresholdRulesFactoryUtils.requireNotNull;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
-import gr.ntua.vision.monitoring.resources.ThresholdRuleValidationError;
+import gr.ntua.vision.monitoring.rules.ThresholdRulesFactoryUtils.ThresholdPredicate;
 
 import java.util.UUID;
 
@@ -14,58 +16,6 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class ThresholdRule extends Rule {
-    /***/
-    private enum ThresholdPredicate {
-        /***/
-        GE(">=") {
-            @Override
-            public boolean perform(final double x, final double y) {
-                return x >= y;
-            }
-        },
-        /***/
-        GT(">") {
-            @Override
-            public boolean perform(final double x, final double y) {
-                return x > y;
-            }
-        },
-        /***/
-        LE("<=") {
-            @Override
-            public boolean perform(final double x, final double y) {
-                return x <= y;
-            }
-        },
-        /***/
-        LT("<") {
-            @Override
-            public boolean perform(final double x, final double y) {
-                return x < y;
-            }
-        };
-
-        /***/
-        public final String op;
-
-
-        /**
-         * Constructor.
-         * 
-         * @param op
-         */
-        private ThresholdPredicate(final String op) {
-            this.op = op;
-        }
-
-
-        /**
-         * @param x
-         * @param y
-         * @return the evaluation result of the operation.
-         */
-        public abstract boolean perform(final double x, final double y);
-    }
 
     /** the log target. */
     private static final Logger      log   = LoggerFactory.getLogger(Rule.class);
@@ -200,33 +150,5 @@ public class ThresholdRule extends Rule {
      */
     private boolean thresholdExceededBy(final double eventValue) {
         return pred.perform(eventValue, thresholdValue);
-    }
-
-
-    /**
-     * @param op
-     * @return a {@link ThresholdPredicate}.
-     * @throws ThresholdRuleValidationError
-     */
-    private static ThresholdPredicate fromString(final String op) throws ThresholdRuleValidationError {
-        for (final ThresholdPredicate p : ThresholdPredicate.values())
-            if (p.op.equals(op))
-                return p;
-
-        throw new ThresholdRuleValidationError("unsupported predicate: " + op);
-    }
-
-
-    /**
-     * @param s
-     * @return <code>s</code> if the string can be considered non empty.
-     * @throws ThresholdRuleValidationError
-     *             when the string is empty.
-     */
-    private static String requireNotNull(final String s) {
-        if (s == null || s.isEmpty())
-            throw new ThresholdRuleValidationError("empty");
-
-        return s;
     }
 }

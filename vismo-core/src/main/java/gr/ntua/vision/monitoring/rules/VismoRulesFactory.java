@@ -66,8 +66,7 @@ public class VismoRulesFactory {
      * @return a {@link ThresholdPeriodicRule}.
      */
     private ThresholdPeriodicRule buildThresholdPeriodicRule(final ThresholdRuleBean bean) {
-        // TODO
-        return null;
+        return new ThresholdPeriodicRule(engine, bean);
     }
 
 
