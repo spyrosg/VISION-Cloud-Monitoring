@@ -1,10 +1,11 @@
 package gr.ntua.vision.monitoring.rules;
 
-import static gr.ntua.vision.monitoring.rules.ThresholdRulesFactoryUtils.fromString;
-import static gr.ntua.vision.monitoring.rules.ThresholdRulesFactoryUtils.requireNotNull;
+import static gr.ntua.vision.monitoring.rules.ThresholdRulesUtils.fromString;
+import static gr.ntua.vision.monitoring.rules.ThresholdRulesUtils.isApplicable;
+import static gr.ntua.vision.monitoring.rules.ThresholdRulesUtils.requireNotNull;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
-import gr.ntua.vision.monitoring.rules.ThresholdRulesFactoryUtils.ThresholdPredicate;
+import gr.ntua.vision.monitoring.rules.ThresholdRulesUtils.ThresholdPredicate;
 
 import java.util.UUID;
 
@@ -16,11 +17,8 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class ThresholdRule extends Rule {
-
     /** the log target. */
-    private static final Logger      log   = LoggerFactory.getLogger(Rule.class);
-    /***/
-    private static final String[]    UNITS = { "tenant", "user", "container", "object" };
+    private static final Logger      log  = LoggerFactory.getLogger(Rule.class);
     /***/
     private final String             aggregationUnit;
     /***/
@@ -34,7 +32,7 @@ public class ThresholdRule extends Rule {
     /***/
     private final String             topic;
     /***/
-    private final String             uuid  = UUID.randomUUID().toString();
+    private final String             uuid = UUID.randomUUID().toString();
 
 
     /**
@@ -70,7 +68,7 @@ public class ThresholdRule extends Rule {
     public void performWith(final MonitoringEvent e) {
         log.trace("got event: {}", e);
 
-        if (!isApplicable(e))
+        if (!isApplicable(e, metric, operation, aggregationUnit))
             return;
 
         final double eventValue = (Double) e.get(metric);
@@ -79,68 +77,6 @@ public class ThresholdRule extends Rule {
             log.debug("have violation on metric '{}', offending value {}", metric, eventValue);
             send(new ThresholdEvent(uuid, e.originatingService(), topic, eventValue));
         }
-    }
-
-
-    /**
-     * When <code>aggregationUnit</code> is unspecified by the user, this method returns <code>true</code>, since it means that it
-     * applies to all units.
-     * 
-     * @param e
-     * @return <code>true</code> if the event comes from a matching unit.
-     */
-    private boolean checkAggregationUnit(final MonitoringEvent e) {
-        if (aggregationUnit == null || aggregationUnit.isEmpty())
-            return true;
-
-        final String[] fs = aggregationUnit.split(",");
-
-        for (int i = 0; i < UNITS.length; ++i) {
-            if (i >= fs.length)
-                continue;
-
-            final String val = fs[i];
-            final String unit = UNITS[i];
-            final Object o = e.get(unit);
-
-            if (o == null)
-                continue;
-
-            log.trace(String.format("unit %s => %s matching %s", unit, o, val));
-
-            if (!o.equals(val))
-                return false;
-        }
-
-        return true;
-    }
-
-
-    /**
-     * When <code>operation</code> is unspecified by the user, this method returns <code>true</code>, since it means that it
-     * applies to all operations.
-     * 
-     * @param e
-     * @return <code>true</code> if the event comes from a matching operation.
-     */
-    private boolean checkOperation(final MonitoringEvent e) {
-        if (operation == null || operation.isEmpty())
-            return true;
-
-        if (operation.equals(e.get("operation")))
-            return true;
-
-        return false;
-    }
-
-
-    /**
-     * @param e
-     * @return <code>true</code> if this is an event that matches <code>this</code> rule.
-     */
-    private boolean isApplicable(final MonitoringEvent e) {
-        return e.get(metric) != null && checkOperation(e) && checkAggregationUnit(e);
-
     }
 
 
