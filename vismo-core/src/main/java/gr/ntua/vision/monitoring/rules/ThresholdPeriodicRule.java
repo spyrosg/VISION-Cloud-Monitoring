@@ -1,10 +1,13 @@
 package gr.ntua.vision.monitoring.rules;
 
-import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.fromString;
+import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.foldFrom;
 import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.isApplicable;
+import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.predicateFrom;
 import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.requireNotNull;
+import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.thresholdExceededBy;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
+import gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.ThresholdFold;
 import gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.ThresholdPredicate;
 
 import java.util.List;
@@ -23,6 +26,8 @@ public class ThresholdPeriodicRule extends PeriodicRule {
     /***/
     private final String             aggregationUnit;
     /***/
+    private final ThresholdFold      foldMethod;
+    /***/
     private final String             metric;
     /***/
     private final String             operation;
@@ -32,7 +37,6 @@ public class ThresholdPeriodicRule extends PeriodicRule {
     private final double             thresholdValue;
     /***/
     private final String             topic;
-
     /***/
     private final String             uuid = UUID.randomUUID().toString();
 
@@ -46,11 +50,12 @@ public class ThresholdPeriodicRule extends PeriodicRule {
     public ThresholdPeriodicRule(final VismoRulesEngine engine, final ThresholdRuleBean bean) {
         super(engine, bean.getPeriod());
         this.topic = requireNotNull(bean.getTopic());
-        this.pred = fromString(bean.getPredicate());
+        this.pred = predicateFrom(bean.getPredicate());
         this.operation = bean.getOperation();
         this.metric = requireNotNull(bean.getMetric());
         this.aggregationUnit = bean.getAggregationUnit();
         this.thresholdValue = bean.getThreshold();
+        this.foldMethod = foldFrom(bean.getAggregationMethod());
     }
 
 
@@ -68,10 +73,19 @@ public class ThresholdPeriodicRule extends PeriodicRule {
      */
     @Override
     public void performWith(final MonitoringEvent e) {
-        log.trace("got event: {}", e);
-
-        if (!isApplicable(e, metric, operation, aggregationUnit))
+        if (isApplicable(e, metric, operation, aggregationUnit)) {
+            log.debug("got applicable: {}", e);
             collect(e);
+        }
+    }
+
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "#<ThresholdPeriodicRule: " + uuid + ", period: " + period() + ", topic: " + topic + ">";
     }
 
 
@@ -79,14 +93,29 @@ public class ThresholdPeriodicRule extends PeriodicRule {
      * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List, long, long)
      */
     @Override
-    protected MonitoringEvent aggregate(final List<MonitoringEvent> eventsList, final long tStart, final long tEnd) {
-        /*final double eventValue = (Double) e.get(metric);
+    protected MonitoringEvent aggregate(final List<MonitoringEvent> eventsList, @SuppressWarnings("unused") final long tStart,
+            @SuppressWarnings("unused") final long tEnd) {
+        final double aggregatedValue = performFold(eventsList);
 
-        if (thresholdExceededBy(eventValue)) {
-            log.debug("have violation on metric '{}', offending value {}", metric, eventValue);
-            send(new ThresholdEvent(uuid, e.originatingService(), topic, eventValue));
-        }*/
+        if (!thresholdExceededBy(pred, aggregatedValue, thresholdValue))
+            return null;
 
-        return null;
+        log.debug(String.format("have violation of metric %s '%s', offending value %s", foldMethod, metric, aggregatedValue));
+
+        return new ThresholdEvent(uuid, eventsList.get(0).originatingService(), topic, aggregatedValue);
+    }
+
+
+    /**
+     * @param eventsList
+     * @return the fold application value.
+     */
+    private double performFold(final List<MonitoringEvent> eventsList) {
+        final double arr[] = new double[eventsList.size()];
+
+        for (int i = 0; i < arr.length; ++i)
+            arr[i] = (Double) eventsList.get(i).get(metric);
+
+        return foldMethod.perform(arr);
     }
 }

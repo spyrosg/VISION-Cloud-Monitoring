@@ -12,6 +12,91 @@ import org.slf4j.LoggerFactory;
  */
 class ThresholdRulesTraits {
     /***/
+    public enum ThresholdFold {
+        /***/
+        AVG("avg") {
+            @Override
+            public double perform(final double[] arr) {
+                if (arr.length == 0)
+                    return 0;
+                if (arr.length == 1)
+                    return arr[0];
+
+                return ThresholdFold.SUM.perform(arr) / arr.length;
+            }
+        },
+        /***/
+        MAX("max") {
+            @Override
+            public double perform(final double[] arr) {
+                if (arr.length == 0)
+                    return Double.POSITIVE_INFINITY;
+                if (arr.length == 1)
+                    return arr[0];
+
+                double max = arr[0];
+
+                for (int i = 0; i < arr.length; ++i)
+                    if (arr[i] > max)
+                        max = arr[i];
+
+                return max;
+            }
+        },
+        /***/
+        MIN("min") {
+            @Override
+            public double perform(final double[] arr) {
+                if (arr.length == 0)
+                    return Double.NEGATIVE_INFINITY;
+                if (arr.length == 1)
+                    return arr[0];
+
+                double min = arr[0];
+
+                for (int i = 0; i < arr.length; ++i)
+                    if (arr[i] < min)
+                        min = arr[i];
+
+                return min;
+            }
+        },
+        /***/
+        SUM("sum") {
+            @Override
+            public double perform(final double[] arr) {
+                double sum = 0;
+
+                for (int i = 0; i < arr.length; ++i)
+                    sum += arr[i];
+
+                return sum;
+            }
+        };
+
+        /***/
+        public final String name;
+
+
+        /**
+         * Constructor.
+         * 
+         * @param name
+         */
+        private ThresholdFold(final String name) {
+            this.name = name;
+        }
+
+
+        /**
+         * @param arr
+         * @return the application result.
+         */
+        public abstract double perform(final double[] arr);
+    }
+
+
+    /***/
     public enum ThresholdPredicate {
         /***/
         GE(">=") {
@@ -43,16 +128,16 @@ class ThresholdRulesTraits {
         };
 
         /***/
-        public final String op;
+        public final String name;
 
 
         /**
          * Constructor.
          * 
-         * @param op
+         * @param name
          */
-        private ThresholdPredicate(final String op) {
-            this.op = op;
+        private ThresholdPredicate(final String name) {
+            this.name = name;
         }
 
 
@@ -66,7 +151,6 @@ class ThresholdRulesTraits {
 
     /***/
     private static final Logger   log   = LoggerFactory.getLogger(ThresholdRulesTraits.class);
-
     /***/
     private static final String[] UNITS = { "tenant", "user", "container", "object" };
 
@@ -125,24 +209,21 @@ class ThresholdRulesTraits {
         if (operation == null || operation.isEmpty())
             return true;
 
-        if (operation.equals(e.get("operation")))
-            return true;
-
-        return false;
+        return operation.equals(e.get("operation"));
     }
 
 
     /**
-     * @param op
-     * @return a {@link ThresholdPredicate}.
+     * @param method
+     * @return a {@link ThresholdFold}.
      * @throws ThresholdRuleValidationError
      */
-    static ThresholdPredicate fromString(final String op) throws ThresholdRuleValidationError {
-        for (final ThresholdPredicate p : ThresholdPredicate.values())
-            if (p.op.equals(op))
+    static ThresholdFold foldFrom(final String method) throws ThresholdRuleValidationError {
+        for (final ThresholdFold p : ThresholdFold.values())
+            if (p.name.equals(method))
                 return p;
 
-        throw new ThresholdRuleValidationError("unsupported predicate: " + op);
+        throw new ThresholdRuleValidationError("unsupported aggregation method: " + method);
     }
 
 
@@ -159,6 +240,20 @@ class ThresholdRulesTraits {
 
 
     /**
+     * @param predicate
+     * @return a {@link ThresholdPredicate}.
+     * @throws ThresholdRuleValidationError
+     */
+    static ThresholdPredicate predicateFrom(final String predicate) throws ThresholdRuleValidationError {
+        for (final ThresholdPredicate p : ThresholdPredicate.values())
+            if (p.name.equals(predicate))
+                return p;
+
+        throw new ThresholdRuleValidationError("unsupported predicate: " + predicate);
+    }
+
+
+    /**
      * @param s
      * @return <code>s</code> if the string can be considered non empty.
      * @throws ThresholdRuleValidationError
@@ -169,5 +264,16 @@ class ThresholdRulesTraits {
             throw new ThresholdRuleValidationError("empty");
 
         return s;
+    }
+
+
+    /**
+     * @param pred
+     * @param eventValue
+     * @param thresholdValue
+     * @return <code>true</code> when <code>eventValue</code> has exceeded <code>thresholdValue</code>.
+     */
+    static boolean thresholdExceededBy(final ThresholdPredicate pred, final double eventValue, final double thresholdValue) {
+        return pred.perform(eventValue, thresholdValue);
     }
 }

@@ -1,8 +1,9 @@
 package gr.ntua.vision.monitoring.rules;
 
-import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.fromString;
 import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.isApplicable;
+import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.predicateFrom;
 import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.requireNotNull;
+import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.thresholdExceededBy;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
 import gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.ThresholdPredicate;
@@ -44,7 +45,7 @@ public class ThresholdRule extends Rule {
     public ThresholdRule(final VismoRulesEngine engine, final ThresholdRuleBean bean) {
         super(engine);
         this.topic = requireNotNull(bean.getTopic());
-        this.pred = fromString(bean.getPredicate());
+        this.pred = predicateFrom(bean.getPredicate());
         this.operation = bean.getOperation();
         this.metric = requireNotNull(bean.getMetric());
         this.aggregationUnit = bean.getAggregationUnit();
@@ -66,25 +67,25 @@ public class ThresholdRule extends Rule {
      */
     @Override
     public void performWith(final MonitoringEvent e) {
-        log.trace("got event: {}", e);
-
         if (!isApplicable(e, metric, operation, aggregationUnit))
             return;
 
+        log.debug("got applicable: {}", e);
+
         final double eventValue = (Double) e.get(metric);
 
-        if (thresholdExceededBy(eventValue)) {
-            log.debug("have violation on metric '{}', offending value {}", metric, eventValue);
+        if (thresholdExceededBy(pred, eventValue, thresholdValue)) {
+            log.debug("have violation of metric '{}', offending value {}", metric, eventValue);
             send(new ThresholdEvent(uuid, e.originatingService(), topic, eventValue));
         }
     }
 
 
     /**
-     * @param eventValue
-     * @return <code>true</code> when <code>eventValue</code> has exceeded <code>thresholdValue</code>.
+     * @see java.lang.Object#toString()
      */
-    private boolean thresholdExceededBy(final double eventValue) {
-        return pred.perform(eventValue, thresholdValue);
+    @Override
+    public String toString() {
+        return "#<ThresholdRule: " + uuid + ", topic: " + topic + ">";
     }
 }

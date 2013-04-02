@@ -223,9 +223,9 @@ public class ThresholdRuleTest {
         bean.setOperation("PUT");
         // under given container
         bean.setAggregationUnit(tenant + "," + user);
-        // if it's lower
+        // if it's higher...
         bean.setPredicate(">=");
-        // than threshold bytes / second
+        // than THRESHOLD bytes / second
         bean.setThreshold(THRESHOLD);
         // generate event with given topic.
         bean.setTopic("throughput-topic");
