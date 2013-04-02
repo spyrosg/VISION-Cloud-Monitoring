@@ -62,7 +62,7 @@ public class ThresholdRule extends Rule {
         /**
          * @param x
          * @param y
-         * @return
+         * @return the evaluation result of the operation.
          */
         public abstract boolean perform(final double x, final double y);
     }
@@ -189,7 +189,7 @@ public class ThresholdRule extends Rule {
      * @return <code>true</code> if this is an event that matches <code>this</code> rule.
      */
     private boolean isApplicable(final MonitoringEvent e) {
-        return checkOperation(e) && checkAggregationUnit(e);
+        return e.get(metric) != null && checkOperation(e) && checkAggregationUnit(e);
 
     }
 
