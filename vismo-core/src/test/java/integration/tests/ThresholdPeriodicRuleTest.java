@@ -8,6 +8,7 @@ import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.rules.VismoRulesFactory;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
+import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import gr.ntua.vision.monitoring.web.WebServer;
 import helpers.InMemoryEventDispatcher;
 
@@ -88,7 +89,7 @@ public class ThresholdPeriodicRuleTest {
         engine.appendSink(new InMemoryEventSink(eventSink));
 
         server = new WebServer(PORT);
-        server.withResource(new RulesResource(factory)).build("/*");
+        server.withWebAppAt(WebAppBuilder.buildFrom(new RulesResource(factory)), "/*");
         server.start();
     }
 
