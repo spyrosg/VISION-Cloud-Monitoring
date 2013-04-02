@@ -23,6 +23,9 @@ public class MessageFactory implements AbstractMessageFactory {
     }
 
 
+    /**
+     * @see gr.ntua.vision.monitoring.rules.propagation.message.AbstractMessageFactory#createMessage(gr.ntua.vision.monitoring.rules.propagation.message.MessageType)
+     */
     @Override
     public Message createMessage(final MessageType type) {
         if (type.equals(MessageType.SET_RULES)) {
@@ -48,6 +51,10 @@ public class MessageFactory implements AbstractMessageFactory {
     }
 
 
+    /**
+     * @see gr.ntua.vision.monitoring.rules.propagation.message.AbstractMessageFactory#createMessage(gr.ntua.vision.monitoring.rules.propagation.message.MessageType,
+     *      java.lang.Integer)
+     */
     @Override
     public Message createMessage(final MessageType type, final Integer commandId) {
         if (type.equals(MessageType.RULES)) {
@@ -74,6 +81,10 @@ public class MessageFactory implements AbstractMessageFactory {
     }
 
 
+    /**
+     * @see gr.ntua.vision.monitoring.rules.propagation.message.AbstractMessageFactory#createMessage(gr.ntua.vision.monitoring.rules.propagation.message.MessageType,
+     *      java.lang.Integer, java.lang.String)
+     */
     @Override
     public Message createMessage(final MessageType type, final Integer commandId, final String command) {
         if (type.equals(MessageType.ADD_RULE)) {
@@ -87,5 +98,4 @@ public class MessageFactory implements AbstractMessageFactory {
         }
         return null;
     }
-
 }

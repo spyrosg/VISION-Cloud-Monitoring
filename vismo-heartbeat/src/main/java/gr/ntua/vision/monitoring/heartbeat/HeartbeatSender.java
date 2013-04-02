@@ -77,7 +77,7 @@ public final class HeartbeatSender {
                     try {
                         Thread.sleep(getSendInterval());
                     } catch (final InterruptedException e) {
-                        //TODO removing messages
+                        // TODO removing messages
                     }
             }
         }
@@ -259,5 +259,4 @@ public final class HeartbeatSender {
     public void setSendInterval(final long sendInterval) {
         this.sendInterval = sendInterval;
     }
-
 }

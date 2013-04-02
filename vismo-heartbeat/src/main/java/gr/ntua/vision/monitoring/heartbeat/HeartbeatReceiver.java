@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
  * @author tmessini
  */
 public class HeartbeatReceiver {
-
     /**
      * A multicast receiver which continuously receives heartbeats.
      */
@@ -47,7 +46,7 @@ public class HeartbeatReceiver {
                 try {
                     Thread.sleep(MEMBERSHIP_UPDATE_INTERVAL);
                 } catch (final InterruptedException e) {
-                    //TODO removing messages
+                    // TODO removing messages
                 }
                 updateHostsMembership(MEMBERSHIP_TIMEOUT);
                 updateClusterElectedHost();
@@ -286,5 +285,4 @@ public class HeartbeatReceiver {
     public void setClusterElectedHost(final String clusterElectedHost) {
         this.clusterElectedHost = clusterElectedHost;
     }
-
 }

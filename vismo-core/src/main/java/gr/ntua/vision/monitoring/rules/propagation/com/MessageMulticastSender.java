@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
  * @author tmessini
  */
 public class MessageMulticastSender extends Thread implements Observer {
-
     /***/
     private final static Logger     log                   = LoggerFactory.getLogger(MessageMulticastSender.class);
     /***/
@@ -91,7 +90,7 @@ public class MessageMulticastSender extends Thread implements Observer {
                     try {
                         wait();
                     } catch (final InterruptedException e) {
-                        //TODO
+                        // TODO
                     }
                 }
     }
@@ -109,7 +108,7 @@ public class MessageMulticastSender extends Thread implements Observer {
      * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
      */
     @Override
-    public void update(final Observable o, final Object s) {
+    public void update(@SuppressWarnings("unused") final Observable o, @SuppressWarnings("unused") final Object s) {
         synchronized (this) {
             notify();
         }

@@ -78,7 +78,7 @@ public class MessageDeliverer extends Thread implements Observer {
      * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
      */
     @Override
-    public void update(final Observable o, final Object m) {
+    public void update(@SuppressWarnings("unused") final Observable o, @SuppressWarnings("unused") final Object m) {
         synchronized (this) {
             notify();
         }

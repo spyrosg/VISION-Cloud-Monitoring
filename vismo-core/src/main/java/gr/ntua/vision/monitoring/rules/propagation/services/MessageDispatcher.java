@@ -17,11 +17,11 @@ public class MessageDispatcher extends Thread implements Observer {
 
     /***/
     @SuppressWarnings("unused")
-    private final static Logger     log = LoggerFactory.getLogger(MessageDispatcher.class);
+    private final static Logger     log     = LoggerFactory.getLogger(MessageDispatcher.class);
+    /***/
+    volatile boolean                stopped = false;
     /***/
     private RulesPropagationManager manager;
-    /***/
-    volatile boolean                stopped               = false;
 
 
     /**
@@ -75,7 +75,7 @@ public class MessageDispatcher extends Thread implements Observer {
      * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
      */
     @Override
-    public void update(final Observable o, final Object m) {
+    public void update(@SuppressWarnings("unused") final Observable o, @SuppressWarnings("unused") final Object m) {
         synchronized (this) {
             notify();
         }
