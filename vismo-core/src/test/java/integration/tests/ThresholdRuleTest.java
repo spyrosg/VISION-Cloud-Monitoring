@@ -31,13 +31,13 @@ import com.sun.jersey.api.json.JSONConfiguration;
 
 /**
  * This is used to validate that a newly added rule can run and produce events in the rules' engine. The specific rule constructed
- * and submitted, generates events when a request's throughput is too low.
+ * and submitted generates events when a request's throughput is too high.
  */
-public class UploadThroughputThresholdTest {
+public class ThresholdRuleTest {
     /***/
     private static final String              CONTAINER = "test-container";
     /***/
-    private static final Logger              log       = LoggerFactory.getLogger(UploadThroughputThresholdTest.class);
+    private static final Logger              log       = LoggerFactory.getLogger(ThresholdRuleTest.class);
     /***/
     private static final int                 PORT      = 9998;
     /***/
