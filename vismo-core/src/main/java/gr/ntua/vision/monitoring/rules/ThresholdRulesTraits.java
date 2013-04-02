@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  */
-class ThresholdRulesUtils {
+class ThresholdRulesTraits {
     /***/
     public enum ThresholdPredicate {
         /***/
@@ -65,7 +65,7 @@ class ThresholdRulesUtils {
     }
 
     /***/
-    private static final Logger   log   = LoggerFactory.getLogger(ThresholdRulesUtils.class);
+    private static final Logger   log   = LoggerFactory.getLogger(ThresholdRulesTraits.class);
 
     /***/
     private static final String[] UNITS = { "tenant", "user", "container", "object" };
@@ -74,7 +74,7 @@ class ThresholdRulesUtils {
     /**
      * Constructor.
      */
-    private ThresholdRulesUtils() {
+    private ThresholdRulesTraits() {
     }
 
 

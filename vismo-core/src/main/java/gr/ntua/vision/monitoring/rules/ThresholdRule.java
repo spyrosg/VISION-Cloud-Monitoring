@@ -1,11 +1,11 @@
 package gr.ntua.vision.monitoring.rules;
 
-import static gr.ntua.vision.monitoring.rules.ThresholdRulesUtils.fromString;
-import static gr.ntua.vision.monitoring.rules.ThresholdRulesUtils.isApplicable;
-import static gr.ntua.vision.monitoring.rules.ThresholdRulesUtils.requireNotNull;
+import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.fromString;
+import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.isApplicable;
+import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.requireNotNull;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
-import gr.ntua.vision.monitoring.rules.ThresholdRulesUtils.ThresholdPredicate;
+import gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.ThresholdPredicate;
 
 import java.util.UUID;
 
