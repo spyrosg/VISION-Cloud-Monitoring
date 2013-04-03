@@ -117,9 +117,9 @@ public class VismoServiceTest {
     /** the log target. */
     private static final Logger      log           = LoggerFactory.getLogger(VismoServiceTest.class);
     /***/
-    private static final int         NO_GET_OPS    = 5000;
+    private static final int         NO_GET_OPS    = 1000;
     /***/
-    private static final int         NO_PUT_OPS    = 5000;
+    private static final int         NO_PUT_OPS    = 1000;
     /***/
     @SuppressWarnings("serial")
     private static final Properties  p             = new Properties() {
