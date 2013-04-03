@@ -114,9 +114,17 @@ public class ClassPathRulesFactory implements RulesFactory {
         if (classesUnderPackage.isEmpty())
             classesUnderPackage.addAll(getClassesForPackage(pkg));
 
-        for (final String name : classesUnderPackage)
-            if (name.contains(className))
+        for (final String name : classesUnderPackage) {
+            final int idx = name.lastIndexOf(".");
+
+            if (idx >= 0) {
+                if (name.substring(idx + 1).equals(className))
+                    return name;
+            } else if (name.equals(className))
                 return name;
+        }
+
+        log.warn("no constructor for {}", className);
 
         return null;
     }
@@ -212,8 +220,12 @@ public class ClassPathRulesFactory implements RulesFactory {
     private static Class< ? >[] toClasses(final Object... args) {
         final Class< ? >[] arr = new Class< ? >[args.length];
 
+        // FIXME: handle primitive types; Long.class != long.class
         for (int i = 0; i < args.length; ++i)
-            arr[i] = args[i] != null ? args[i].getClass() : null;
+            if (args[i].getClass() == Long.class)
+                arr[i] = long.class;
+            else
+                arr[i] = args[i] != null ? args[i].getClass() : null;
 
         return arr;
     }

@@ -1,10 +1,9 @@
 package integration.tests;
 
 import static org.junit.Assert.assertTrue;
-import gr.ntua.vision.monitoring.events.MonitoringEvent;
+import gr.ntua.vision.monitoring.rules.AccountingRule;
 import gr.ntua.vision.monitoring.rules.ClassPathRulesFactory;
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
-import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.VismoRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 
@@ -16,29 +15,18 @@ import org.junit.Test;
  */
 public class ClassPathRulesFactoryTest {
     /***/
-    public static class FooRule extends Rule {
-        /**
-         * Constructor.
-         * 
-         * @param engine
-         * @param id
-         */
-        public FooRule(final VismoRulesEngine engine, @SuppressWarnings("unused") final String id) {
-            super(engine);
-        }
+    private final VismoRulesEngine engine = new VismoRulesEngine();
 
-
-        /**
-         * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
-         */
-        @Override
-        public void performWith(@SuppressWarnings("unused") final MonitoringEvent c) {
-            // ignored
-        }
-    }
 
     /***/
-    private final VismoRulesEngine engine = new VismoRulesEngine();
+    @Test
+    public void shouldLoadAccountingRule() {
+        final ClassPathRulesFactory factory = new ClassPathRulesFactory(PassThroughRule.class.getPackage(), engine);
+        final VismoRule rule = factory.constructByNameWithArguments("AccountingRule", 1000l);
+
+        assertTrue(rule != null);
+        assertTrue(rule instanceof AccountingRule);
+    }
 
 
     /***/
