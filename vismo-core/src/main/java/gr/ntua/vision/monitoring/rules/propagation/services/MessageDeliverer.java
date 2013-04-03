@@ -115,7 +115,7 @@ public class MessageDeliverer extends Thread implements Observer {
             }
         }
 
-        return null; // FIXME
+        return rulesFactory.constructByNameWithArguments(ruleName, Long.valueOf(rulePeriod));
     }
 
 
