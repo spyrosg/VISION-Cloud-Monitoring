@@ -30,6 +30,7 @@ public class FakeStorletEngine {
      */
     public void sendEvent(final String storletId, final String activationId, final String message) {
         dispatcher.newEvent().field("originating-service", SERVICE_NAME).field("sre-id", SRE_ID).field("storlet-id", storletId)
-                .field("activation-id", activationId).field("message", message).send();
+                .field("activation-id", activationId).field("message", message).field("timestamp", System.currentTimeMillis())
+                .send();
     }
 }
