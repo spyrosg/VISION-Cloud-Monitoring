@@ -265,6 +265,9 @@
         <configuration>
           <showSuccess>true</showSuccess>
           <outputDirectory>.</outputDirectory>
+          <disableXmlReport>false</disableXmlReport>
+          <aggregate>true</aggregate>
+          <linkXRef>true</linkXRef>
         </configuration>
       </plugin>
 
