@@ -8,6 +8,12 @@ import gr.ntua.vision.monitoring.events.MonitoringEvent;
  */
 public interface EventSink {
     /**
+     * 
+     */
+    void close();
+
+
+    /**
      * Send the event out.
      * 
      * @param e

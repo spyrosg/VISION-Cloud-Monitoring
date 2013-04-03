@@ -24,6 +24,15 @@ public class InMemoryEventSink implements EventSink {
 
 
     /**
+     * @see gr.ntua.vision.monitoring.sinks.EventSink#close()
+     */
+    @Override
+    public void close() {
+        // NOP
+    }
+
+
+    /**
      * @see gr.ntua.vision.monitoring.sinks.EventSink#send(gr.ntua.vision.monitoring.events.MonitoringEvent)
      */
     @Override

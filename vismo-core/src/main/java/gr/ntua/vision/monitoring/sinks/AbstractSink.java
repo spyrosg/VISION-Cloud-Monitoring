@@ -14,7 +14,9 @@ import org.json.simple.JSONObject;
  */
 abstract class AbstractSink implements EventSink {
     /***/
-    private final Socket sock;
+    private volatile boolean closed = false;
+    /***/
+    private final Socket     sock;
 
 
     /**
@@ -24,6 +26,16 @@ abstract class AbstractSink implements EventSink {
      */
     public AbstractSink(final Socket sock) {
         this.sock = sock;
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.sinks.EventSink#close()
+     */
+    @Override
+    public void close() {
+        sock.close();
+        closed = true;
     }
 
 
@@ -43,7 +55,8 @@ abstract class AbstractSink implements EventSink {
      *            a string.
      */
     protected void send(final String str) {
-        sock.send(str);
+        if (!closed)
+            sock.send(str);
     }
 
 

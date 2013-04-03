@@ -217,7 +217,7 @@ public class VismoServiceTest {
         doGETs(NO_GET_OPS);
         doPUTs(NO_PUT_OPS);
 
-        waitForEventsDelivery(1000);
+        waitForEventsDelivery(2000);
         assertThatVismoReceivedEvents();
     }
 

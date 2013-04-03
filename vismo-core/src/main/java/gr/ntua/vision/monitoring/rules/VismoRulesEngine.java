@@ -78,6 +78,7 @@ public class VismoRulesEngine implements EventSourceListener {
      * Turn off the engine. No more rules will be run.
      */
     public void halt() {
+        sinksClose();
         timer.cancel();
         store.clear();
     }
@@ -195,5 +196,16 @@ public class VismoRulesEngine implements EventSourceListener {
      */
     private void schedule(final PeriodicRule rule) {
         timer.schedule(rule, 0, rule.period());
+    }
+
+
+    /**
+     * 
+     */
+    private void sinksClose() {
+        for (final EventSink sink : sinks) {
+            log.debug("closing sink: {}", sink);
+            sink.close();
+        }
     }
 }
