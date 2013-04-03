@@ -16,6 +16,7 @@ import org.zeromq.ZContext;
 /**
  * This is used to test the main rule update functionality. See {@link #verifyRuleApplicationWithEventsConsumption()}.
  */
+@Ignore("requires testbed vpn connectivity")
 public class RuleApplicationTest {
     /***/
     private static final int                     CONSUMERS_PORT     = 56430;
@@ -95,7 +96,7 @@ public class RuleApplicationTest {
     @Test
     public void verifyRuleApplicationWithEventsConsumption() throws InterruptedException {
         registry.registerToAll(FOO_RULE_HANDLER);
-        submitRule("FooRule");
+        // TODO submitRule("FooRule");
 
         client.putObject(TEST_CONTAINER, OBJ_NAME, "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
         Thread.sleep(2000);
@@ -113,14 +114,6 @@ public class RuleApplicationTest {
                 System.err.println("receiving: " + e.dict());
             }
         });
-    }
-
-
-    /**
-     * @param rule
-     */
-    private void submitRule(final String rule) {
-        // TODO Auto-generated method stub
     }
 
 
