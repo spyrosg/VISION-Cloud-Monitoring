@@ -119,8 +119,14 @@ public class VismoGroupMonitoringTest {
         collectMembers();
         assertEquals(expectedLiveClients, members.size());
 
-        for (int i = 0; i < expectedLiveClients; ++i)
-            assertEquals(members.get(i).id, group[i].id);
+        int total = 0;
+
+        for (final GroupElement elem : members)
+            for (int i = 0; i < group.length; ++i)
+                if (group[i].id.equals(elem.id))
+                    ++total;
+
+        assertEquals(expectedLiveClients, total);
     }
 
 
