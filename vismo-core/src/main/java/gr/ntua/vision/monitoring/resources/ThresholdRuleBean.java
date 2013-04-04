@@ -1,9 +1,14 @@
 package gr.ntua.vision.monitoring.resources;
 
+import gr.ntua.vision.monitoring.rules.RuleBean;
+import gr.ntua.vision.monitoring.rules.ThresholdPeriodicRule;
+import gr.ntua.vision.monitoring.rules.ThresholdRule;
+
+
 /**
- * This is just a data holder, the exchange media format for TODO
+ * This is just a data holder, the exchange media format for {@link ThresholdRule}s or {@link ThresholdPeriodicRule}s.
  */
-public class ThresholdRuleBean {
+public class ThresholdRuleBean implements RuleBean {
     /***/
     private String aggregationMethod;
     /***/
