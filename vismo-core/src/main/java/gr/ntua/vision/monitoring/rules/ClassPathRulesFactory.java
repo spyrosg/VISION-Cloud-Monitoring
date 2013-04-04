@@ -16,34 +16,61 @@ import org.slf4j.LoggerFactory;
  * This is used to construct (load) rules from the class path. You can eithen specify the fully qualified java name of the class
  * of the rule to load, or just the plain name. If a class is not found, an attempt will made to load from inside a package.
  */
-public class ClassPathRulesFactory implements RulesFactory {
+public class ClassPathRulesFactory extends AbstractRulesFactory {
     /***/
-    private static final Logger    log                 = LoggerFactory.getLogger(ClassPathRulesFactory.class);
+    private static final Logger   log                 = LoggerFactory.getLogger(ClassPathRulesFactory.class);
     /***/
-    private final HashSet<String>  classesUnderPackage = new HashSet<String>();
+    private final HashSet<String> classesUnderPackage = new HashSet<String>();
     /***/
-    private final VismoRulesEngine engine;
-    /***/
-    private final Package          pkg;
+    private final Package         pkg;
 
 
     /**
      * Constructor.
      * 
-     * @param pkg
+     * @param next
      * @param engine
+     * @param pkg
      */
-    public ClassPathRulesFactory(final Package pkg, final VismoRulesEngine engine) {
+    public ClassPathRulesFactory(final RulesFactory next, final VismoRulesEngine engine, final Package pkg) {
+        super(next, engine);
         this.pkg = pkg;
-        this.engine = engine;
     }
 
 
     /**
-     * @see gr.ntua.vision.monitoring.rules.RulesFactory#constructByName(java.lang.String)
+     * Constructor.
+     * 
+     * @param engine
+     * @param pkg
+     */
+    public ClassPathRulesFactory(final VismoRulesEngine engine, final Package pkg) {
+        this(null, engine, pkg);
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.rules.RulesFactory#buildFrom(gr.ntua.vision.monitoring.rules.RuleBean)
      */
     @Override
-    public VismoRule constructByName(final String ruleName) {
+    public VismoRule buildFrom(final RuleBean bean) {
+        if (!(bean instanceof DefaultRuleBean))
+            return next().buildFrom(bean);
+
+        final DefaultRuleBean b = (DefaultRuleBean) bean;
+
+        if (b.getPeriod() == 0)
+            return constructByName(b.getName());
+
+        return constructByNameWithArguments(b.getName(), b.getPeriod());
+    }
+
+
+    /**
+     * @param ruleName
+     * @return a {@link VismoRule}, loaded by name.
+     */
+    private VismoRule constructByName(final String ruleName) {
         final Class< ? > cls = tryLoadClass(ruleName);
 
         log.debug("matching class for {} => {}", ruleName, cls);
@@ -57,10 +84,11 @@ public class ClassPathRulesFactory implements RulesFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.rules.RulesFactory#constructByNameWithArguments(java.lang.String, java.lang.Object[])
+     * @param ruleName
+     * @param args
+     * @return a {@link VismoRule} loaded by name and arguments.
      */
-    @Override
-    public VismoRule constructByNameWithArguments(final String ruleName, final Object... args) {
+    private VismoRule constructByNameWithArguments(final String ruleName, final Object... args) {
         final Class< ? > cls = tryLoadClass(ruleName);
 
         log.debug("matching class for {} => {}", ruleName, cls);

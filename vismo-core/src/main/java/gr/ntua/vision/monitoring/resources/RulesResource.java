@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.resources;
 
-import gr.ntua.vision.monitoring.rules.ThresholdRulesFactory;
+import gr.ntua.vision.monitoring.rules.RulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRule;
 
 import java.net.URI;
@@ -21,7 +21,7 @@ import javax.ws.rs.core.Response.Status;
 @Consumes(MediaType.APPLICATION_JSON)
 public class RulesResource {
     /***/
-    private final ThresholdRulesFactory factory;
+    private final RulesFactory factory;
 
 
     /**
@@ -29,7 +29,7 @@ public class RulesResource {
      * 
      * @param factory
      */
-    public RulesResource(final ThresholdRulesFactory factory) {
+    public RulesResource(final RulesFactory factory) {
         this.factory = factory;
     }
 
@@ -45,7 +45,7 @@ public class RulesResource {
     @POST
     public Response submitRule(final ThresholdRuleBean bean) {
         try {
-            final VismoRule rule = factory.buildRule(bean);
+            final VismoRule rule = factory.buildFrom(bean);
 
             rule.submit();
 

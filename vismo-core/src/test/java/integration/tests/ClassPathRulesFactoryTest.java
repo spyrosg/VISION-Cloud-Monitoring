@@ -3,6 +3,7 @@ package integration.tests;
 import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.rules.AccountingRule;
 import gr.ntua.vision.monitoring.rules.ClassPathRulesFactory;
+import gr.ntua.vision.monitoring.rules.DefaultRuleBean;
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.VismoRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
@@ -21,8 +22,10 @@ public class ClassPathRulesFactoryTest {
     /***/
     @Test
     public void shouldLoadAccountingRule() {
-        final ClassPathRulesFactory factory = new ClassPathRulesFactory(PassThroughRule.class.getPackage(), engine);
-        final VismoRule rule = factory.constructByNameWithArguments("AccountingRule", 1000l);
+        final ClassPathRulesFactory factory = new ClassPathRulesFactory(engine, PassThroughRule.class.getPackage());
+        final DefaultRuleBean bean = new DefaultRuleBean("AccountingRule", 1000l);
+
+        final VismoRule rule = factory.buildFrom(bean);
 
         assertTrue(rule != null);
         assertTrue(rule instanceof AccountingRule);
@@ -32,9 +35,12 @@ public class ClassPathRulesFactoryTest {
     /***/
     @Test
     public void shouldLoadRulesByClassName() {
-        final ClassPathRulesFactory factory = new ClassPathRulesFactory(PassThroughRule.class.getPackage(), engine);
+        final ClassPathRulesFactory factory = new ClassPathRulesFactory(engine, PassThroughRule.class.getPackage());
         final String RULE_NAME = "PassThroughRule";
-        final VismoRule rule = factory.constructByName(RULE_NAME);
+        final DefaultRuleBean bean = new DefaultRuleBean();
+
+        bean.setName(RULE_NAME);
+        final VismoRule rule = factory.buildFrom(bean);
 
         assertTrue(rule != null);
         assertTrue(rule instanceof PassThroughRule);
@@ -44,22 +50,14 @@ public class ClassPathRulesFactoryTest {
     /***/
     @Test
     public void shouldLoadRulesByFullyQualifiedName() {
-        final ClassPathRulesFactory factory = new ClassPathRulesFactory(PassThroughRule.class.getPackage(), engine);
+        final ClassPathRulesFactory factory = new ClassPathRulesFactory(engine, PassThroughRule.class.getPackage());
         final String FULL_RULE_NAME = PassThroughRule.class.getCanonicalName();
-        final VismoRule rule = factory.constructByName(FULL_RULE_NAME);
+        final DefaultRuleBean bean = new DefaultRuleBean();
+
+        bean.setName(FULL_RULE_NAME);
+        final VismoRule rule = factory.buildFrom(bean);
 
         assertTrue(rule != null);
         assertTrue(rule instanceof PassThroughRule);
-    }
-
-
-    /***/
-    @Test
-    public void shouldLoadRuleWithArguments() {
-        final ClassPathRulesFactory factory = new ClassPathRulesFactory(FooRule.class.getPackage(), engine);
-        final VismoRule rule = factory.constructByNameWithArguments("FooRule", "my-rule");
-
-        assertTrue(rule != null);
-        assertTrue(rule instanceof FooRule);
     }
 }

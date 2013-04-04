@@ -2,15 +2,14 @@ package gr.ntua.vision.monitoring.rules.propagation;
 
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatReceiver;
 import gr.ntua.vision.monitoring.heartbeat.HeartbeatSender;
+import gr.ntua.vision.monitoring.resources.RulesManagementResource;
 import gr.ntua.vision.monitoring.rules.ClassPathRulesFactory;
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
-import gr.ntua.vision.monitoring.rules.RulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.rules.propagation.com.MessageMulticastReceiver;
 import gr.ntua.vision.monitoring.rules.propagation.com.MessageMulticastSender;
 import gr.ntua.vision.monitoring.rules.propagation.message.MessageMap;
 import gr.ntua.vision.monitoring.rules.propagation.message.MessageQueue;
-import gr.ntua.vision.monitoring.rules.propagation.resource.RulesManagementResource;
 import gr.ntua.vision.monitoring.rules.propagation.services.ClusterRulesResolver;
 import gr.ntua.vision.monitoring.rules.propagation.services.Elector;
 import gr.ntua.vision.monitoring.rules.propagation.services.MessageDeliverer;
@@ -52,8 +51,6 @@ public class RulesPropagationManager {
     /***/
     private final Elector                  elector;
     /***/
-    private final RulesFactory             factory;
-    /***/
     private final String                   HEARTBEAT_MULTICAST_IP   = "224.0.0.1";
     /***/
     private final int                      HEARTBEAT_MULTICAST_PORT = 6307;
@@ -85,7 +82,6 @@ public class RulesPropagationManager {
     private final Timer                    timer                    = new Timer(true);
     /***/
     private final VismoRulesEngine         vismoRulesEngine;
-
     /***/
     private final WebServer                webServer;
 
@@ -96,8 +92,7 @@ public class RulesPropagationManager {
      * @throws IOException
      */
     public RulesPropagationManager(final VismoRulesEngine engine, final int serverPort) throws IOException {
-        this.factory = new ClassPathRulesFactory(PassThroughRule.class.getPackage(), engine);
-        this.deliverer = new MessageDeliverer(this, factory);
+        this.deliverer = new MessageDeliverer(this, new ClassPathRulesFactory(engine, PassThroughRule.class.getPackage()));
         this.pid = getRandomID();
 
         vismoRulesEngine = engine;

@@ -1,5 +1,6 @@
 package gr.ntua.vision.monitoring.rules.propagation.services;
 
+import gr.ntua.vision.monitoring.rules.DefaultRuleBean;
 import gr.ntua.vision.monitoring.rules.RulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRule;
 import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
@@ -104,18 +105,16 @@ public class MessageDeliverer extends Thread implements Observer {
     private VismoRule getRule(final String rule) {
         String ruleName = "";
         String rulePeriod = "";
-        String ruleDesc = "";
 
         if (rule != null && rule.contains(":")) {
             final String[] ruleParts = rule.split(":");
             if (ruleParts.length == 3) {
                 ruleName = ruleParts[0];
                 rulePeriod = ruleParts[1];
-                ruleDesc = ruleParts[2];
             }
         }
 
-        return rulesFactory.constructByNameWithArguments(ruleName, Long.valueOf(rulePeriod));
+        return rulesFactory.buildFrom(new DefaultRuleBean(ruleName, Long.valueOf(rulePeriod)));
     }
 
 

@@ -13,13 +13,22 @@ import org.slf4j.LoggerFactory;
 /**
  * This is used to abstract away the creation of threshold rules; rules
  */
-public class ThresholdRulesFactory {
+public class ThresholdRulesFactory extends AbstractRulesFactory {
     /** the log target. */
-    private static final Logger    log            = LoggerFactory.getLogger(ThresholdRulesFactory.class);
+    private static final Logger   log            = LoggerFactory.getLogger(ThresholdRulesFactory.class);
     /** the list of fields that should have a value in the provided beans. */
-    private static final String[]  requiredFields = { "topic", "predicate", "threshold", "metric" };
-    /** the rules engine. */
-    private final VismoRulesEngine engine;
+    private static final String[] requiredFields = { "topic", "predicate", "threshold", "metric" };
+
+
+    /**
+     * Constructor.
+     * 
+     * @param next
+     * @param engine
+     */
+    public ThresholdRulesFactory(final RulesFactory next, final VismoRulesEngine engine) {
+        super(next, engine);
+    }
 
 
     /**
@@ -28,7 +37,7 @@ public class ThresholdRulesFactory {
      * @param engine
      */
     public ThresholdRulesFactory(final VismoRulesEngine engine) {
-        this.engine = engine;
+        super(engine);
     }
 
 
@@ -40,10 +49,14 @@ public class ThresholdRulesFactory {
      * @throws ThresholdRuleValidationError
      *             when a required parameter (field) is missing or has an invalid value.
      */
-    public VismoRule buildRule(final ThresholdRuleBean bean) throws ThresholdRuleValidationError {
-        validateBean(bean);
+    @Override
+    public VismoRule buildFrom(final RuleBean bean) {
+        if (!(bean instanceof ThresholdRuleBean))
+            return this.next().buildFrom(bean);
 
-        return buildFrom(bean);
+        validateBean((ThresholdRuleBean) bean);
+
+        return build((ThresholdRuleBean) bean);
     }
 
 
@@ -53,7 +66,7 @@ public class ThresholdRulesFactory {
      * @param bean
      * @return a {@link VismoRule} object.
      */
-    private VismoRule buildFrom(final ThresholdRuleBean bean) {
+    private VismoRule build(final ThresholdRuleBean bean) {
         if (bean.getPeriod() > 0)
             return buildThresholdPeriodicRule(bean);
 
