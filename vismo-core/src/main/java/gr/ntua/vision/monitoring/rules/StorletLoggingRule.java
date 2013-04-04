@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * The storlet engine logging rule, used to aggregate logging events.
  */
-public class StorletLoggingRule extends PeriodicRule {
+public class StorletLoggingRule extends AggregationRule {
     /**
      * 
      */
@@ -138,7 +138,7 @@ public class StorletLoggingRule extends PeriodicRule {
      * @param period
      */
     public StorletLoggingRule(final VismoRulesEngine engine, final long period) {
-        super(engine, period);
+        super(engine, period, TOPIC);
     }
 
 
