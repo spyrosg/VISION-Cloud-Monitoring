@@ -5,8 +5,8 @@ import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.resources.RulesResource;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
 import gr.ntua.vision.monitoring.rules.RulesStore;
+import gr.ntua.vision.monitoring.rules.ThresholdRulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
-import gr.ntua.vision.monitoring.rules.VismoRulesFactory;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import gr.ntua.vision.monitoring.web.WebServer;
 
@@ -75,7 +75,7 @@ public class RulesResourceTest {
     public void setUp() throws Exception {
         final WebAppBuilder builder = new WebAppBuilder();
         final VismoRulesEngine engine = new VismoRulesEngine(rulesStore);
-        final Application rulesApp = builder.addResource(new RulesResource(new VismoRulesFactory(engine))).build();
+        final Application rulesApp = builder.addResource(new RulesResource(new ThresholdRulesFactory(engine))).build();
 
         server = new WebServer(PORT);
         server.withWebAppAt(rulesApp, "/*");

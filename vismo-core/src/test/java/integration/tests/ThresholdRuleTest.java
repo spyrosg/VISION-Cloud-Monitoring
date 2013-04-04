@@ -5,8 +5,8 @@ import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.RulesResource;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
+import gr.ntua.vision.monitoring.rules.ThresholdRulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
-import gr.ntua.vision.monitoring.rules.VismoRulesFactory;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import gr.ntua.vision.monitoring.web.WebServer;
@@ -56,7 +56,7 @@ public class ThresholdRuleTest {
     /***/
     private final ArrayList<MonitoringEvent> eventSink = new ArrayList<MonitoringEvent>();
     /***/
-    private VismoRulesFactory                factory;
+    private ThresholdRulesFactory            factory;
     /***/
     private FakeObjectService                obs;
     /***/
@@ -77,7 +77,7 @@ public class ThresholdRuleTest {
     public void setUp() throws Exception {
         engine = new VismoRulesEngine();
         obs = new FakeObjectService(new InMemoryEventDispatcher(engine));
-        factory = new VismoRulesFactory(engine);
+        factory = new ThresholdRulesFactory(engine);
 
         engine.appendSink(new InMemoryEventSink(eventSink));
 

@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.resources;
 
+import gr.ntua.vision.monitoring.rules.ThresholdRulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRule;
-import gr.ntua.vision.monitoring.rules.VismoRulesFactory;
 
 import java.net.URI;
 
@@ -21,7 +21,7 @@ import javax.ws.rs.core.Response.Status;
 @Consumes(MediaType.APPLICATION_JSON)
 public class RulesResource {
     /***/
-    private final VismoRulesFactory factory;
+    private final ThresholdRulesFactory factory;
 
 
     /**
@@ -29,7 +29,7 @@ public class RulesResource {
      * 
      * @param factory
      */
-    public RulesResource(final VismoRulesFactory factory) {
+    public RulesResource(final ThresholdRulesFactory factory) {
         this.factory = factory;
     }
 

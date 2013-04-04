@@ -13,9 +13,9 @@ import org.slf4j.LoggerFactory;
 /**
  * This is used to abstract away the creation of threshold rules; rules
  */
-public class VismoRulesFactory {
+public class ThresholdRulesFactory {
     /** the log target. */
-    private static final Logger    log            = LoggerFactory.getLogger(VismoRulesFactory.class);
+    private static final Logger    log            = LoggerFactory.getLogger(ThresholdRulesFactory.class);
     /** the list of fields that should have a value in the provided beans. */
     private static final String[]  requiredFields = { "topic", "predicate", "threshold", "metric" };
     /** the rules engine. */
@@ -27,7 +27,7 @@ public class VismoRulesFactory {
      * 
      * @param engine
      */
-    public VismoRulesFactory(final VismoRulesEngine engine) {
+    public ThresholdRulesFactory(final VismoRulesEngine engine) {
         this.engine = engine;
     }
 
