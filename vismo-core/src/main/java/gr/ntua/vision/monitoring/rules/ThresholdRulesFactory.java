@@ -51,8 +51,11 @@ public class ThresholdRulesFactory extends AbstractRulesFactory {
      */
     @Override
     public VismoRule buildFrom(final RuleBean bean) {
-        if (!(bean instanceof ThresholdRuleBean))
+        if (!(bean instanceof ThresholdRuleBean)) {
+            log.debug("bean {} not applicable; trying next", bean);
+
             return this.next().buildFrom(bean);
+        }
 
         validateBean((ThresholdRuleBean) bean);
 

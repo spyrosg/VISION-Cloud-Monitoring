@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.resources.RulesResource;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
+import gr.ntua.vision.monitoring.rules.ClassPathRulesFactory;
+import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.ThresholdRulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
@@ -50,7 +52,34 @@ public class RulesResourceTest {
 
     /***/
     @Test
-    public void putRule() {
+    public void httpDELETEShouldRemoveExistingRuleFromStore() {
+        throw new AssertionError("TODO");
+    }
+
+
+    /***/
+    @Test
+    public void httpGETShouldListStoredRules() {
+        throw new AssertionError("TODO");
+    }
+
+
+    /***/
+    @Test
+    public void httpPOSTSholdStoreDefaultRule() {
+        final ClientResponse res = root().path("rules").path("AccountingRule").path("10000").post(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+
+        final String id = res.getEntity(String.class);
+
+        assertTrue("rules factory should insert rule in the store", rulesStore.containsById(id));
+    }
+
+
+    /***/
+    @Test
+    public void httpPOSTShouldStoreThresholdRule() {
         final ThresholdRuleBean bean = new ThresholdRuleBean();
 
         bean.setTopic("my-topic");
@@ -68,6 +97,13 @@ public class RulesResourceTest {
     }
 
 
+    /***/
+    @Test
+    public void httpPUTShouldUpdateRule() {
+        throw new AssertionError("TODO");
+    }
+
+
     /**
      * @throws Exception
      */
@@ -75,7 +111,9 @@ public class RulesResourceTest {
     public void setUp() throws Exception {
         final WebAppBuilder builder = new WebAppBuilder();
         final VismoRulesEngine engine = new VismoRulesEngine(rulesStore);
-        final Application rulesApp = builder.addResource(new RulesResource(new ThresholdRulesFactory(engine))).build();
+        final ClassPathRulesFactory clsPathfactory = new ClassPathRulesFactory(engine, PassThroughRule.class.getPackage());
+        final ThresholdRulesFactory factory = new ThresholdRulesFactory(clsPathfactory, engine);
+        final Application rulesApp = builder.addResource(new RulesResource(factory)).build();
 
         server = new WebServer(PORT);
         server.withWebAppAt(rulesApp, "/*");

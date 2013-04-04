@@ -1,5 +1,6 @@
 package gr.ntua.vision.monitoring.resources;
 
+import gr.ntua.vision.monitoring.rules.DefaultRuleBean;
 import gr.ntua.vision.monitoring.rules.RulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRule;
 
@@ -8,6 +9,8 @@ import java.net.URI;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -18,7 +21,6 @@ import javax.ws.rs.core.Response.Status;
  * 
  */
 @Path("rules")
-@Consumes(MediaType.APPLICATION_JSON)
 public class RulesResource {
     /***/
     private final RulesFactory factory;
@@ -35,6 +37,26 @@ public class RulesResource {
 
 
     /**
+     * @param name
+     * @param period
+     * @return on success, return the id of the newly added rule
+     */
+    @Path("{name}/{period}")
+    @POST
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response submitDefaultRule(@PathParam("name") final String name, @PathParam("period") final long period) {
+        final VismoRule rule = factory.buildFrom(new DefaultRuleBean(name, period));
+
+        if (rule == null)
+            return Response.status(Status.NOT_FOUND).entity("unknown rule: " + rule).build();
+
+        rule.submit();
+
+        return Response.created(URI.create("/" + rule.id())).entity(rule.id()).build();
+    }
+
+
+    /**
      * Construct and submit a new rule to the engine.
      * 
      * @param bean
@@ -43,15 +65,17 @@ public class RulesResource {
      *             when a rule is not found or the
      */
     @POST
-    public Response submitRule(final ThresholdRuleBean bean) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response submitThresholdRule(final ThresholdRuleBean bean) {
         try {
             final VismoRule rule = factory.buildFrom(bean);
 
             rule.submit();
 
-            return Response.created(URI.create("/" + rule.id())).type(MediaType.TEXT_PLAIN).entity(rule.id()).build();
+            return Response.created(URI.create("/" + rule.id())).entity(rule.id()).build();
         } catch (final ThresholdRuleValidationError e) {
-            throw new WebApplicationException(Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN)
+            throw new WebApplicationException(Response.status(Status.BAD_REQUEST)
                     .entity("invalid rule specification: " + e.getMessage()).build());
         }
     }
