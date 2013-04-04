@@ -1,6 +1,7 @@
 package gr.ntua.vision.monitoring.resources;
 
 import gr.ntua.vision.monitoring.rules.DefaultRuleBean;
+import gr.ntua.vision.monitoring.rules.RuleOperation;
 import gr.ntua.vision.monitoring.rules.RulesFactory;
 import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRule;
@@ -56,10 +57,25 @@ public class RulesResource {
     }
 
 
+    /**
+     * @return a response of status 200.
+     */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     public Response listRules() {
-        return null;
+        final StringBuilder buf = new StringBuilder();
+
+        store.forEach(new RuleOperation() {
+            @Override
+            public void run(final VismoRule rule) {
+                buf.append(rule.toString());
+                buf.append(": ");
+                buf.append(rule.id());
+                buf.append("\n");
+            }
+        });
+
+        return Response.ok(buf.toString()).build();
     }
 
 

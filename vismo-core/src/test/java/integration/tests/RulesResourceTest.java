@@ -17,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.sun.jersey.api.client.Client;
@@ -68,9 +69,15 @@ public class RulesResourceTest {
     /***/
     @Test
     public void httpGETShouldListStoredRules() {
+        postRule(getBean());
+        postRule("AccountingRule", 30 * 1000);
+        postRule("StorletLoggingRule", 60 * 1000);
+        postRule(getBean(45 * 1000));
+
         final ClientResponse res = getRules();
 
         assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
+        assertEquals(4, rulesStore.size());
         System.out.println(res.getEntity(String.class));
     }
 
@@ -78,7 +85,7 @@ public class RulesResourceTest {
     /***/
     @Test
     public void httpPOSTSholdStoreDefaultRule() {
-        final ClientResponse res = root().path("rules").path("AccountingRule").path("10000").post(ClientResponse.class);
+        final ClientResponse res = postRule("AccountingRule", 10000);
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
 
@@ -91,13 +98,7 @@ public class RulesResourceTest {
     /***/
     @Test
     public void httpPOSTShouldStoreThresholdRule() {
-        final ThresholdRuleBean bean = new ThresholdRuleBean();
-
-        bean.setTopic("my-topic");
-        bean.setMetric("latency");
-        bean.setPredicate(">");
-        bean.setThreshold(1.3);
-
+        final ThresholdRuleBean bean = getBean();
         final ClientResponse res = postRule(bean);
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
@@ -109,6 +110,7 @@ public class RulesResourceTest {
 
 
     /***/
+    @Ignore
     @Test
     public void httpPUTShouldUpdateRule() {
         throw new AssertionError("TODO");
@@ -145,15 +147,15 @@ public class RulesResourceTest {
 
     /**
      * @param ruleId
-     * @return
+     * @return the {@link ClientResponse}.
      */
     private ClientResponse deleteRule(final String ruleId) {
-        return root().path("rules").path(ruleId).type(MediaType.TEXT_PLAIN).delete(ClientResponse.class);
+        return root().path("rules").path(ruleId).accept(MediaType.TEXT_PLAIN).delete(ClientResponse.class);
     }
 
 
     /**
-     * @return
+     * @return the {@link ClientResponse}.
      */
     private ClientResponse getRules() {
         return root().path("rules").get(ClientResponse.class);
@@ -161,8 +163,18 @@ public class RulesResourceTest {
 
 
     /**
+     * @param name
+     * @param period
+     * @return the {@link ClientResponse}.
+     */
+    private ClientResponse postRule(final String name, final long period) {
+        return root().path("rules").path(name).path(String.valueOf(period)).post(ClientResponse.class);
+    }
+
+
+    /**
      * @param bean
-     * @return
+     * @return the {@link ClientResponse}.
      */
     private ClientResponse postRule(final ThresholdRuleBean bean) {
         return root().path("rules").type(MediaType.APPLICATION_JSON).entity(bean).post(ClientResponse.class);
@@ -174,5 +186,38 @@ public class RulesResourceTest {
      */
     private WebResource root() {
         return client.resource(ROOT_URL);
+    }
+
+
+    /**
+     * @return a {@link ThresholdRuleBean}.
+     */
+    private static ThresholdRuleBean getBean() {
+        final ThresholdRuleBean bean = new ThresholdRuleBean();
+
+        bean.setTopic("my-topic");
+        bean.setMetric("latency");
+        bean.setPredicate(">");
+        bean.setThreshold(1.3);
+
+        return bean;
+    }
+
+
+    /**
+     * @param period
+     * @return a {@link ThresholdRuleBean}.
+     */
+    private static ThresholdRuleBean getBean(final long period) {
+        final ThresholdRuleBean bean = new ThresholdRuleBean();
+
+        bean.setTopic("my-topic");
+        bean.setMetric("latency");
+        bean.setPredicate(">");
+        bean.setThreshold(1.3);
+        bean.setPeriod(period);
+        bean.setAggregationMethod("sum");
+
+        return bean;
     }
 }

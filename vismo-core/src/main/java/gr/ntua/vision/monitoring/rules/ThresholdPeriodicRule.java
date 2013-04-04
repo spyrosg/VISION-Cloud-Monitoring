@@ -73,7 +73,8 @@ public class ThresholdPeriodicRule extends PeriodicRule {
      */
     @Override
     public String toString() {
-        return "#<ThresholdPeriodicRule: " + id() + ", period: " + period() + ", topic: " + topic + ">";
+        return "#<ThresholdPeriodicRule: " + topic + ", period=" + (period() / 1000) + ", " + metric + " " + pred.name + " "
+                + thresholdValue + ">";
     }
 
 

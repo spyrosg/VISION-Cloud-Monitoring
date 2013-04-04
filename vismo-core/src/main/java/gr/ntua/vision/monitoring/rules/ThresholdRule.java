@@ -73,6 +73,6 @@ public class ThresholdRule extends Rule {
      */
     @Override
     public String toString() {
-        return "#<ThresholdRule: " + id() + ", topic: " + topic + ">";
+        return "#<ThresholdRule: " + topic + ", " + metric + " " + pred.name + " " + thresholdValue + ">";
     }
 }

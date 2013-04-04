@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.rules;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -23,7 +23,7 @@ public class RulesStore {
      * Constructor.
      */
     public RulesStore() {
-        this(new HashMap<String, VismoRule>());
+        this(new LinkedHashMap<String, VismoRule>());
     }
 
 
