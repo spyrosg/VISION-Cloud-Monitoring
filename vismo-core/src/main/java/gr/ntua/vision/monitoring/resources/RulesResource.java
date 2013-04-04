@@ -2,11 +2,14 @@ package gr.ntua.vision.monitoring.resources;
 
 import gr.ntua.vision.monitoring.rules.DefaultRuleBean;
 import gr.ntua.vision.monitoring.rules.RulesFactory;
+import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRule;
 
 import java.net.URI;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -24,15 +27,39 @@ import javax.ws.rs.core.Response.Status;
 public class RulesResource {
     /***/
     private final RulesFactory factory;
+    /***/
+    private final RulesStore   store;
 
 
     /**
      * Constructor.
      * 
      * @param factory
+     * @param store
      */
-    public RulesResource(final RulesFactory factory) {
+    public RulesResource(final RulesFactory factory, final RulesStore store) {
         this.factory = factory;
+        this.store = store;
+    }
+
+
+    /**
+     * @param id
+     * @return if the rule was succesfully removed from the store, a respone of status 204, else, a response of status 404.
+     */
+    @Path("{rule-id}")
+    @DELETE
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response deleteRule(@PathParam("rule-id") final String id) {
+        return (store.remove(id) ? Response.noContent() : Response.status(Status.NOT_FOUND)).build();
+    }
+
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listRules() {
+        return null;
     }
 
 

@@ -4,11 +4,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * This is used to maintain the rules in the system.
  */
 public class RulesStore {
+    /***/
+    private static final Logger          log = LoggerFactory.getLogger(RulesStore.class);
+
     /** the rule-set (mapping rule ids to rules). */
     private final Map<String, VismoRule> map;
 
@@ -39,6 +45,7 @@ public class RulesStore {
      *            the rule.
      */
     public void add(final VismoRule rule) {
+        log.debug("adding rule: {}", rule.id());
         map.put(rule.id(), rule);
     }
 
@@ -88,13 +95,26 @@ public class RulesStore {
 
 
     /**
+     * Remove rule by its id.
+     * 
+     * @param id
+     *            the rule id.
+     * @return <code>true</code> if the rule existed in the rule and has been removed, <code>false</code> otherwise.
+     */
+    public boolean remove(final String id) {
+        log.debug("removing rule: {}", id);
+        return map.remove(id) != null;
+    }
+
+
+    /**
      * Remove the specified rule from the store.
      * 
      * @param rule
      *            the rule.
      */
     public void remove(final VismoRule rule) {
-        map.remove(rule.id());
+        remove(rule.id());
     }
 
 

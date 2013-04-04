@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.RulesResource;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
+import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.ThresholdRulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
@@ -89,7 +90,7 @@ public class ThresholdPeriodicRuleTest {
         engine.appendSink(new InMemoryEventSink(eventSink));
 
         server = new WebServer(PORT);
-        server.withWebAppAt(WebAppBuilder.buildFrom(new RulesResource(factory)), "/*");
+        server.withWebAppAt(WebAppBuilder.buildFrom(new RulesResource(factory, new RulesStore())), "/*");
         server.start();
     }
 
