@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring.rules.propagation.resource;
+package gr.ntua.vision.monitoring.resources;
 
 import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
 import gr.ntua.vision.monitoring.rules.propagation.message.MessageFactory;
