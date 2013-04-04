@@ -28,7 +28,7 @@ public class StorletLoggingRuleTest {
     /***/
     private static final int                 NO_EVENTS_TO_SEND = 100;
     /** the rule's period in seconds. */
-    private static final long                PERIOD            = 500;
+    private static final long                PERIOD            = 1000;
     /***/
     private final VismoRulesEngine           engine            = new VismoRulesEngine(new RulesStore());
     /***/
@@ -98,7 +98,6 @@ public class StorletLoggingRuleTest {
             @SuppressWarnings("unchecked")
             final ArrayList<HashMap<String, Object>> messages = (ArrayList<HashMap<String, Object>>) group.get("messages");
 
-            System.err.println("messages: " + messages);
             for (int i = 0; i < messages.size() - 1; ++i) {
                 final long currTs = (Long) messages.get(i).get("timestamp");
                 final long nextTs = (Long) messages.get(i + 1).get("timestamp");

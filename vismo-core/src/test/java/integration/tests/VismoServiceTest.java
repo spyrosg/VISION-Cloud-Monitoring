@@ -117,9 +117,9 @@ public class VismoServiceTest {
     /** the log target. */
     private static final Logger      log           = LoggerFactory.getLogger(VismoServiceTest.class);
     /***/
-    private static final int         NO_GET_OPS    = 1000;
+    private static final int         NO_GET_OPS    = 100;
     /***/
-    private static final int         NO_PUT_OPS    = 1000;
+    private static final int         NO_PUT_OPS    = 100;
     /***/
     @SuppressWarnings("serial")
     private static final Properties  p             = new Properties() {
@@ -196,7 +196,7 @@ public class VismoServiceTest {
         doGETs(NO_GET_OPS);
         doPUTs(NO_PUT_OPS);
         log.debug("waiting event delivery...");
-        latch.await(30, TimeUnit.SECONDS);
+        latch.await(10, TimeUnit.SECONDS);
 
         final double dur = (System.currentTimeMillis() - start) / 1000.0;
 
