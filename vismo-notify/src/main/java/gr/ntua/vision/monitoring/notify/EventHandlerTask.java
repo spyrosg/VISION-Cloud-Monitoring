@@ -13,11 +13,15 @@ import java.util.logging.Logger;
  */
 public class EventHandlerTask implements Runnable {
     /** the log target. */
-    private static final Logger ilog = Logger.getLogger(EventHandlerTask.class.getName());
+    private static final Logger ilog     = Logger.getLogger(EventHandlerTask.class.getName());
+    /***/
+    private static final String SHUTDOWN = "shutdown";
     /** the event factory. */
     private final EventFactory  factory;
     /** the actual handler. */
     private final EventHandler  handler;
+    /***/
+    private final Socket        shutdownSock;
     /** the socket. */
     private final Socket        sock;
 
@@ -37,6 +41,7 @@ public class EventHandlerTask implements Runnable {
             final EventHandler handler) {
         this.factory = factory;
         this.sock = socketFactory.newSubSocket(addr, topic);
+        this.shutdownSock = socketFactory.newPubSocket(addr);
         this.handler = handler;
     }
 
@@ -44,9 +49,9 @@ public class EventHandlerTask implements Runnable {
     /**
      * Halt the task's execution.
      */
-    @SuppressWarnings("static-method")
     public void halt() {
         Thread.currentThread().interrupt();
+        shutdownSock.send(SHUTDOWN);
     }
 
 
@@ -64,6 +69,8 @@ public class EventHandlerTask implements Runnable {
 
             if (msg == null)
                 continue;
+            if (SHUTDOWN.equals(msg))
+                break;
 
             // bypass topic
             final int topicIndex = msg.indexOf(" ");
