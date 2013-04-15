@@ -1,0 +1,82 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <prerequisites>
+    <maven>3.0.0</maven>
+  </prerequisites>
+
+  <parent>
+    <groupId>gr.ntua.vision</groupId>
+    <artifactId>vismo</artifactId>
+    <version>1.1.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>vismo-perf</artifactId>
+  <name>Vismo Perf</name>
+  <description>The benchmarks' infrastructure for Vismo.</description>
+
+  <dependencies>
+    <dependency>
+      <artifactId>vismo-dispatch</artifactId>
+      <groupId>gr.ntua.vision</groupId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <artifactId>vismo-notify</artifactId>
+      <groupId>gr.ntua.vision</groupId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <artifactId>vismo-web</artifactId>
+      <groupId>gr.ntua.vision</groupId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+
+      <!-- produce an a fat or uber jar, with mvn package -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.6</version>
+        <configuration>
+          <createDependencyReducedPom>true</createDependencyReducedPom>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+              </excludes>
+            </filter>
+          </filters>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+
+</project>

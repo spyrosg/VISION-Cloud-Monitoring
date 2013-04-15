@@ -24,6 +24,7 @@
     <module>vismo-heartbeat</module>
     <module>vismo-sockets</module>
     <module>vismo-mon</module>
+    <module>vismo-perf</module>
   </modules>
 
   <properties>
