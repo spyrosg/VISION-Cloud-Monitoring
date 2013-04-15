@@ -96,6 +96,15 @@ class EventRegistry {
 
 
     /**
+     * Stop the registry; no new registrations will take place.
+     */
+    public void halt() {
+        pool.shutdown();
+        pool.shutdownNow();
+    }
+
+
+    /**
      * Register the handler to receive events only of the given topic.
      * 
      * @param topic
