@@ -45,6 +45,16 @@ public interface SocketFactory {
 
 
     /**
+     * Return a connected publish socket.
+     * 
+     * @param addr
+     *            the address to bind to.
+     * @return a new connected publish socket.
+     */
+    Socket newPubConnectSocket(String addr);
+
+
+    /**
      * Return a bound publish socket.
      * 
      * @param addr

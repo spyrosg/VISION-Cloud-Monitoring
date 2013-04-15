@@ -41,7 +41,7 @@ public class EventHandlerTask implements Runnable {
             final EventHandler handler) {
         this.factory = factory;
         this.sock = socketFactory.newSubSocket(addr, topic);
-        this.shutdownSock = socketFactory.newPubSocket(addr);
+        this.shutdownSock = socketFactory.newPubConnectSocket(addr);
         this.handler = handler;
     }
 

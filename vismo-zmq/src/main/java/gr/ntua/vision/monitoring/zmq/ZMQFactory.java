@@ -76,6 +76,15 @@ public class ZMQFactory implements SocketFactory {
      * @see gr.ntua.monitoring.sockets.SocketFactory#newPubSocket(java.lang.String)
      */
     @Override
+    public Socket newPubConnectSocket(final String addr) {
+        return new ZMQSocket(createConnectedSocket(ZMQ.PUB, addr), addr);
+    }
+
+
+    /**
+     * @see gr.ntua.monitoring.sockets.SocketFactory#newPubSocket(java.lang.String)
+     */
+    @Override
     public Socket newPubSocket(final String addr) {
         return new ZMQSocket(createBoundSocket(ZMQ.PUB, addr), addr);
     }
