@@ -77,7 +77,7 @@ public class ThresholdRuleTest {
     @Before
     public void setUp() throws Exception {
         engine = new VismoRulesEngine();
-        obs = new FakeObjectService(new InMemoryEventDispatcher(engine));
+        obs = new FakeObjectService(new InMemoryEventDispatcher(engine, "fake-obs"));
         factory = new ThresholdRulesFactory(engine);
 
         engine.appendSink(new InMemoryEventSink(eventSink));

@@ -90,6 +90,16 @@ class ThresholdEvent implements MonitoringEvent {
 
 
     /**
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#serialize()
+     */
+    @Override
+    public String serialize() {
+        // FIXME
+        return null;
+    }
+
+
+    /**
      * @see gr.ntua.vision.monitoring.events.MonitoringEvent#timestamp()
      */
     @Override

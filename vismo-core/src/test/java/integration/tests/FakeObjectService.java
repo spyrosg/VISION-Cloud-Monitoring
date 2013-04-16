@@ -135,6 +135,6 @@ public class FakeObjectService {
         return dispatcher.newEvent().field("operation", op.toString()).field("tenant", tenant).field("user", user)
                 .field("container", container).field("object", object).field("status", st.toString())
                 .field("content-size", contentSize).field("transaction-latency", latency).field("transaction-duration", duration)
-                .field("transaction-throughput", throughput).field("type", op.type);
+                .field("transaction-throughput", throughput).field("topic", "obs");
     }
 }

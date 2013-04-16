@@ -59,7 +59,7 @@ public class VismoAggregationResultTest {
     public void setUp() {
         engine = new VismoRulesEngine();
         engine.appendSink(sink);
-        service = new FakeObjectService(new InMemoryEventDispatcher(engine));
+        service = new FakeObjectService(new InMemoryEventDispatcher(engine, "fake-obs"));
     }
 
 

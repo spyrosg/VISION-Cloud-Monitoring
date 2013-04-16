@@ -7,11 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.simple.JSONObject;
+
 
 /**
  * An implementation of vismo events based on {@link Map}s.
  */
-public class MapBasedEvent implements MonitoringEvent {
+class MapBasedEvent implements MonitoringEvent {
     /***/
     private static final List<String> requiredFields = Arrays.asList("timestamp", "originating-service", "originating-machine");
     /** the dictionary of key/values. */
@@ -27,14 +29,6 @@ public class MapBasedEvent implements MonitoringEvent {
     MapBasedEvent(final Map<String, Object> dict) {
         assertHaveRequiredFields(dict, requiredFields);
         this.dict = new HashMap<String, Object>(dict);
-    }
-
-
-    /**
-     * @return the underlying dictionary.
-     */
-    public Map<String, Object> dict() {
-        return dict;
     }
 
 
@@ -63,6 +57,15 @@ public class MapBasedEvent implements MonitoringEvent {
     @Override
     public String originatingService() {
         return (String) dict.get("originating-service");
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#serialize()
+     */
+    @Override
+    public String serialize() {
+        return JSONObject.toJSONString(dict);
     }
 
 

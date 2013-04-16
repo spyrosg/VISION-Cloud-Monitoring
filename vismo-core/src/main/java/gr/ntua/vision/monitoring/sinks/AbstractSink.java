@@ -1,12 +1,10 @@
 package gr.ntua.vision.monitoring.sinks;
 
-import gr.ntua.monitoring.sockets.Socket;
-import gr.ntua.vision.monitoring.events.MapBasedEvent;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
+import gr.ntua.vision.monitoring.sockets.Socket;
 
-import java.util.Map;
-
-import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -14,9 +12,11 @@ import org.json.simple.JSONObject;
  */
 abstract class AbstractSink implements EventSink {
     /***/
-    private volatile boolean closed = false;
+    private static final Logger log    = LoggerFactory.getLogger(AbstractSink.class);
     /***/
-    private final Socket     sock;
+    private volatile boolean    closed = false;
+    /***/
+    private final Socket        sock;
 
 
     /**
@@ -55,8 +55,11 @@ abstract class AbstractSink implements EventSink {
      *            a string.
      */
     protected void send(final String str) {
-        if (!closed)
-            sock.send(str);
+        if (closed)
+            return;
+
+        log.trace("sending: {}", str);
+        sock.send(str);
     }
 
 
@@ -67,10 +70,16 @@ abstract class AbstractSink implements EventSink {
      *            the event.
      * @return a string representation for the event.
      */
-    protected static String serialize(final MonitoringEvent e) {
-        @SuppressWarnings("rawtypes")
-        final Map dict = ((MapBasedEvent) e).dict();
+    protected String serialize(final MonitoringEvent e) {
+        if (sock.isZMQPUB()) {
+            final String topic = e.topic();
 
-        return JSONObject.toJSONString(dict);
+            if (topic == null)
+                throw new Error("event with null topic");
+
+            return topic + " " + e.serialize();
+        }
+
+        return e.serialize();
     }
 }

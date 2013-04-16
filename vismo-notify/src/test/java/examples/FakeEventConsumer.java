@@ -1,12 +1,9 @@
 package examples;
 
-import gr.ntua.vision.monitoring.events.MapBasedEvent;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
-
-import java.util.Map;
 
 import org.zeromq.ZContext;
 
@@ -25,12 +22,10 @@ public class FakeEventConsumer {
         @Override
         public void handle(final MonitoringEvent e) {
             try {
-                @SuppressWarnings("rawtypes")
-                final Map dict = ((MapBasedEvent) e).dict();
                 final Object special = e.get(FakeEventConsumer.SPECIAL_FIELD);
 
                 if (special != null)
-                    System.err.println(getClass().getSimpleName() + ": " + e.get("originating-machine") + " => " + dict);
+                    System.err.println(getClass().getSimpleName() + ": " + e.get("originating-machine") + " => " + e.toString());
             } catch (final Throwable x) {
                 x.printStackTrace();
             }

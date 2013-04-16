@@ -36,7 +36,8 @@ public class StorletLoggingRuleTest {
     /***/
     private final InMemoryEventSink          sink              = new InMemoryEventSink(eventsList);
     /***/
-    private final FakeStorletEngine          storletEngine     = new FakeStorletEngine(new InMemoryEventDispatcher(engine));
+    private final FakeStorletEngine          storletEngine     = new FakeStorletEngine(new InMemoryEventDispatcher(engine,
+                                                                       "fake-sre"));
 
 
     /***/
@@ -113,6 +114,6 @@ public class StorletLoggingRuleTest {
      * @throws InterruptedException
      */
     private static void waitForAggregation() throws InterruptedException {
-        Thread.sleep((long) (PERIOD * 1.1));
+        Thread.sleep((long) (PERIOD * 1.5));
     }
 }

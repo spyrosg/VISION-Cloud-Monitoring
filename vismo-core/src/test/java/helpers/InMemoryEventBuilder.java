@@ -45,7 +45,6 @@ public class InMemoryEventBuilder implements EventBuilder {
      */
     @Override
     public void send() {
-        log.trace("sending {}", map);
         dispatcher.send(new HashMap<String, Object>(map));
         map.clear();
     }

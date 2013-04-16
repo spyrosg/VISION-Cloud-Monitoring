@@ -37,6 +37,12 @@ public interface MonitoringEvent {
 
 
     /**
+     * @return a serialized form for <code>this</code> event.
+     */
+    String serialize();
+
+
+    /**
      * @return the instant of time <code>this</code> event was generated, in the <strong>originating</strong> host. The time is
      *         measured in milliseconds since the epoch.
      */

@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
+import org.json.simple.JSONObject;
+
 
 /**
  * 
@@ -55,6 +57,15 @@ public class VismoAggregationResult implements AggregationResult {
     @Override
     public String originatingService() {
         return (String) dict.get("originating-service");
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.events.MonitoringEvent#serialize()
+     */
+    @Override
+    public String serialize() {
+        return JSONObject.toJSONString(dict);
     }
 
 

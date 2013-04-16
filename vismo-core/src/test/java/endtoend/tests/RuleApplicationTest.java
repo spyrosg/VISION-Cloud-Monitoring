@@ -1,6 +1,5 @@
 package endtoend.tests;
 
-import gr.ntua.vision.monitoring.events.MapBasedEvent;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
@@ -109,9 +108,7 @@ public class RuleApplicationTest {
         registry.registerToAll(new EventHandler() {
             @Override
             public void handle(final MonitoringEvent me) {
-                final MapBasedEvent e = (MapBasedEvent) me;
-
-                System.err.println("receiving: " + e.dict());
+                System.err.println("receiving: " + me.toString());
             }
         });
     }

@@ -83,6 +83,15 @@ public class VismoRulesEngineTest {
 
 
         /**
+         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#serialize()
+         */
+        @Override
+        public String serialize() {
+            return toString();
+        }
+
+
+        /**
          * @see gr.ntua.vision.monitoring.events.MonitoringEvent#timestamp()
          */
         @Override
