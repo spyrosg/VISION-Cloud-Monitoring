@@ -7,6 +7,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.UUID;
 
+import org.json.simple.JSONObject;
+
 
 /**
  * 
@@ -92,10 +94,20 @@ class ThresholdEvent implements MonitoringEvent {
     /**
      * @see gr.ntua.vision.monitoring.events.MonitoringEvent#serialize()
      */
+    @SuppressWarnings("unchecked")
     @Override
     public String serialize() {
-        // FIXME
-        return null;
+        final JSONObject o = new JSONObject();
+
+        o.put("id", id);
+        o.put("rule-id", ruleId);
+        o.put("value", valueExceeded);
+        o.put("timestamp", ts);
+        o.put("topic", topic);
+        o.put("originating-service", originatingService);
+        o.put("originating-machine", vminfo.getAddress());
+
+        return o.toJSONString();
     }
 
 
