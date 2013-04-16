@@ -1,4 +1,4 @@
-package gr.ntua.monitoring.sockets;
+package gr.ntua.vision.monitoring.sockets;
 
 /**
  *

@@ -1,9 +1,9 @@
 package gr.ntua.vision.monitoring.sources;
 
-import gr.ntua.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
+import gr.ntua.vision.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.threading.StoppableTask;
 
 import java.util.ArrayList;

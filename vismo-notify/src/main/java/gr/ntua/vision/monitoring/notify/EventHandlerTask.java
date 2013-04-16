@@ -1,8 +1,8 @@
 package gr.ntua.vision.monitoring.notify;
 
-import gr.ntua.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
+import gr.ntua.vision.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import java.util.logging.Logger;

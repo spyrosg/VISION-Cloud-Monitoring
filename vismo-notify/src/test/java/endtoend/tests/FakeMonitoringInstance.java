@@ -1,6 +1,6 @@
 package endtoend.tests;
 
-import gr.ntua.monitoring.sockets.Socket;
+import gr.ntua.vision.monitoring.sockets.Socket;
 
 import java.util.Random;
 import java.util.UUID;

@@ -1,7 +1,7 @@
 package endtoend.tests;
 
 import static org.junit.Assert.assertEquals;
-import gr.ntua.monitoring.sockets.Socket;
+import gr.ntua.vision.monitoring.sockets.Socket;
 
 import java.util.logging.Logger;
 

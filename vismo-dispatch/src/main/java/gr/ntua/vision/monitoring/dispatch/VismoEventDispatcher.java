@@ -1,8 +1,8 @@
 package gr.ntua.vision.monitoring.dispatch;
 
-import gr.ntua.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.VismoVMInfo;
+import gr.ntua.vision.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import java.io.IOException;

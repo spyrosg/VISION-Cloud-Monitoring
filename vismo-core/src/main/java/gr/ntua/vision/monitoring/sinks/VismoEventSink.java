@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.sinks;
 
-import gr.ntua.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
+import gr.ntua.vision.monitoring.sockets.Socket;
 
 
 /**

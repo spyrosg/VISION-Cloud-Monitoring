@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.zmq;
 
-import gr.ntua.monitoring.sockets.Socket;
-import gr.ntua.monitoring.sockets.SocketFactory;
+import gr.ntua.vision.monitoring.sockets.Socket;
+import gr.ntua.vision.monitoring.sockets.SocketFactory;
 
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
@@ -37,7 +37,7 @@ public class ZMQFactory implements SocketFactory {
 
 
     /**
-     * @see gr.ntua.monitoring.sockets.SocketFactory#newBoundPullSocket(java.lang.String)
+     * @see gr.ntua.vision.monitoring.sockets.SocketFactory#newBoundPullSocket(java.lang.String)
      */
     @Override
     public Socket newBoundPullSocket(final String addr) {
@@ -46,7 +46,7 @@ public class ZMQFactory implements SocketFactory {
 
 
     /**
-     * @see gr.ntua.monitoring.sockets.SocketFactory#newBoundPushSocket(java.lang.String)
+     * @see gr.ntua.vision.monitoring.sockets.SocketFactory#newBoundPushSocket(java.lang.String)
      */
     @Override
     public Socket newBoundPushSocket(final String addr) {
@@ -55,7 +55,7 @@ public class ZMQFactory implements SocketFactory {
 
 
     /**
-     * @see gr.ntua.monitoring.sockets.SocketFactory#newConnectedPullSocket(java.lang.String)
+     * @see gr.ntua.vision.monitoring.sockets.SocketFactory#newConnectedPullSocket(java.lang.String)
      */
     @Override
     public Socket newConnectedPullSocket(final String addr) {
@@ -64,7 +64,7 @@ public class ZMQFactory implements SocketFactory {
 
 
     /**
-     * @see gr.ntua.monitoring.sockets.SocketFactory#newConnectedPushSocket(java.lang.String)
+     * @see gr.ntua.vision.monitoring.sockets.SocketFactory#newConnectedPushSocket(java.lang.String)
      */
     @Override
     public Socket newConnectedPushSocket(final String addr) {
@@ -73,7 +73,7 @@ public class ZMQFactory implements SocketFactory {
 
 
     /**
-     * @see gr.ntua.monitoring.sockets.SocketFactory#newPubSocket(java.lang.String)
+     * @see gr.ntua.vision.monitoring.sockets.SocketFactory#newPubSocket(java.lang.String)
      */
     @Override
     public Socket newPubConnectSocket(final String addr) {
@@ -82,7 +82,7 @@ public class ZMQFactory implements SocketFactory {
 
 
     /**
-     * @see gr.ntua.monitoring.sockets.SocketFactory#newPubSocket(java.lang.String)
+     * @see gr.ntua.vision.monitoring.sockets.SocketFactory#newPubSocket(java.lang.String)
      */
     @Override
     public Socket newPubSocket(final String addr) {
@@ -91,7 +91,7 @@ public class ZMQFactory implements SocketFactory {
 
 
     /**
-     * @see gr.ntua.monitoring.sockets.SocketFactory#newSubSocket(java.lang.String, java.lang.String)
+     * @see gr.ntua.vision.monitoring.sockets.SocketFactory#newSubSocket(java.lang.String, java.lang.String)
      */
     @Override
     public Socket newSubSocket(final String addr, final String topic) {
