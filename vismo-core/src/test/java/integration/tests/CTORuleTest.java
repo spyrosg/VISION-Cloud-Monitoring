@@ -19,6 +19,7 @@ import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.zeromq.ZContext;
@@ -99,6 +100,14 @@ public class CTORuleTest {
         sendEvents(10);
         latch.await(900, TimeUnit.MILLISECONDS);
         assertGotExpectedEvent(handler);
+    }
+
+
+    /***/
+    @After
+    public void tearDown() {
+        if (service != null)
+            service.halt();
     }
 
 
