@@ -43,8 +43,11 @@ class ConsumerHandler implements EventHandler {
      */
     @Override
     public void handle(final MonitoringEvent e) {
-        if (e != null)
-            ++noReceivedEvents;
+        if (e == null)
+            return;
+
+        ++noReceivedEvents;
+
         if (noExpectedEvents == noReceivedEvents)
             latch.countDown();
     }
