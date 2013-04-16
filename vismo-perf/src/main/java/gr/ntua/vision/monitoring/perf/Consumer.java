@@ -1,11 +1,11 @@
 package gr.ntua.vision.monitoring.perf;
 
+import static gr.ntua.vision.monitoring.perf.Utils.requireFile;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.EventHandlerTask;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
 
-import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -142,15 +142,5 @@ public class Consumer {
         }, timeout);
 
         cons.start();
-    }
-
-
-    /**
-     * @param path
-     * @throws Error
-     */
-    private static void requireFile(final String path) throws Error {
-        if (!new File(path).exists())
-            throw new Error("no such file or directory: " + path);
     }
 }

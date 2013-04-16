@@ -1,10 +1,9 @@
 package gr.ntua.vision.monitoring.perf;
 
+import static gr.ntua.vision.monitoring.perf.Utils.requireFile;
 import gr.ntua.vision.monitoring.dispatch.VismoEventDispatcher;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import gr.ntua.vision.monitoring.web.WebServer;
-
-import java.io.File;
 
 
 /**
@@ -78,15 +77,5 @@ public class Producer {
         requireFile(configFile);
 
         new Producer(configFile, port).start();
-    }
-
-
-    /**
-     * @param path
-     * @throws Error
-     */
-    private static void requireFile(final String path) throws Error {
-        if (!new File(path).exists())
-            throw new Error("no such file or directory: " + path);
     }
 }
