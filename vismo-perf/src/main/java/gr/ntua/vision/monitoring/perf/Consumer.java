@@ -3,11 +3,11 @@ package gr.ntua.vision.monitoring.perf;
 import static gr.ntua.vision.monitoring.perf.Utils.requireFile;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
-import gr.ntua.vision.monitoring.notify.EventHandlerTask;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
+import gr.ntua.vision.monitoring.web.WebAppBuilder;
+import gr.ntua.vision.monitoring.web.WebServer;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.ArrayList;
 
 
 /**
@@ -19,13 +19,26 @@ public class Consumer {
      */
     private static class PerfHandler implements EventHandler {
         /***/
-        private int noReceivedEvents;
+        private int          noReceivedEvents;
+        /***/
+        private final String topic;
 
 
         /**
          * Constructor.
          */
         public PerfHandler() {
+            this("*");
+        }
+
+
+        /**
+         * Constructor.
+         * 
+         * @param topic
+         */
+        public PerfHandler(final String topic) {
+            this.topic = topic;
             this.noReceivedEvents = 0;
         }
 
@@ -48,99 +61,139 @@ public class Consumer {
 
             ++noReceivedEvents;
         }
+
+
+        /**
+         * 
+         */
+        public void reset() {
+            noReceivedEvents = 0;
+        }
+
+
+        /**
+         * @see java.lang.Object#toString()
+         */
+        @Override
+        public String toString() {
+            return "#<PerfHandler: " + topic + ">";
+        }
     }
 
     /***/
-    private static final String      PROG = "Consumer";
+    private static final int             PORT     = 9992;
     /***/
-    private PerfHandler              handler;
+    private static final String          PROG     = "Consumer";
     /***/
-    private final VismoEventRegistry registry;
+    private final ArrayList<PerfHandler> handlers = new ArrayList<PerfHandler>();
     /***/
-    private EventHandlerTask         task;
+    private final VismoEventRegistry     registry;
     /***/
-    private final String             topic;
+    private final WebServer              server;
 
 
     /**
      * Constructor.
      * 
      * @param configFile
+     * @param port
      */
-    private Consumer(final String configFile) {
-        this(configFile, null);
-    }
-
-
-    /**
-     * Constructor.
-     * 
-     * @param configFile
-     * @param topic
-     */
-    private Consumer(final String configFile, final String topic) {
+    private Consumer(final String configFile, final int port) {
+        this.server = new WebServer(port);
         this.registry = new VismoEventRegistry(configFile);
-        this.topic = topic;
     }
 
 
     /**
-     * @return the number of received events.
+     * @return s
      */
-    protected int getNoReceivedEvents() {
-        return (handler != null) ? handler.getNoReceivedEvents() : 0;
+    String getHandlers() {
+        final StringBuilder buf = new StringBuilder();
+
+        for (int i = 0; i < handlers.size(); ++i)
+            buf.append(i).append(": ").append(handlers.get(i)).append("\n");
+
+        return buf.toString();
     }
 
 
     /**
-     * 
+     * @param i
+     * @return n
      */
-    protected void halt() {
-        if (task != null)
-            task.halt();
-
-        registry.halt();
+    int getNoReceivingEvents(final int i) {
+        return handlers.get(i).getNoReceivedEvents();
     }
 
 
     /**
-     * 
+     * @throws Exception
      */
-    private void start() {
-        this.handler = new PerfHandler();
-        this.task = topic != null ? registry.register(topic, handler) : registry.registerToAll(handler);
+    void halt() throws Exception {
+        server.stop();
+    }
+
+
+    /**
+     * @return n
+     */
+    int registerHandler() {
+        final PerfHandler handler = new PerfHandler();
+
+        registry.registerToAll(handler);
+        handlers.add(handler);
+
+        return handlers.size() - 1;
+    }
+
+
+    /**
+     * @param topic
+     * @return n
+     */
+    int registerHandler(final String topic) {
+        final PerfHandler handler = new PerfHandler();
+
+        registry.register(topic, handler);
+        handlers.add(handler);
+
+        return handlers.size() - 1;
+    }
+
+
+    /**
+     * @param i
+     */
+    void resetHandler(final int i) {
+        handlers.get(i).reset();
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    private void start() throws Exception {
+        server.withWebAppAt(WebAppBuilder.buildFrom(new ConsumersCommandResource(this)), "/*").start();
     }
 
 
     /**
      * @param args
+     * @throws Exception
      */
-    public static void main(final String... args) {
-        if (args.length < 3) {
+    public static void main(final String... args) throws Exception {
+        if (args.length < 1) {
             System.err.println("arg count");
-            System.err.println(PROG + " config timeout no-events [topic]");
+            System.err.println(PROG + " config [port:-9992]");
+            System.err.println(PROG + " config [port:-" + PORT + "]");
             System.exit(1);
         }
 
         final String configFile = args[0];
-        final long timeout = Long.valueOf(args[1]);
-        final int noExpectedEvents = Integer.valueOf(args[2]);
+        final int port = args.length == 2 ? Integer.valueOf(args[1]) : PORT;
 
         requireFile(configFile);
 
-        final Timer t = new Timer(true);
-        final Consumer cons = args.length == 4 ? new Consumer(configFile, args[3]) : new Consumer(configFile);
-
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                cons.halt();
-
-                if (noExpectedEvents != cons.getNoReceivedEvents())
-                    throw new Error("got " + cons.getNoReceivedEvents() + " events, expecting " + noExpectedEvents);
-            }
-        }, timeout);
-
-        cons.start();
+        new Consumer(configFile, port).start();
     }
 }
