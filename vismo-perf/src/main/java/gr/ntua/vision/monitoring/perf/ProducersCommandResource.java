@@ -14,9 +14,9 @@ import javax.ws.rs.core.Response;
 /**
  * 
  */
-@Path("command")
+@Path("/")
 @Produces(MediaType.TEXT_PLAIN)
-public class CommandResource {
+public class ProducersCommandResource {
     /***/
     final Producer      prod;
     /***/
@@ -28,7 +28,7 @@ public class CommandResource {
      * 
      * @param prod
      */
-    public CommandResource(final Producer prod) {
+    public ProducersCommandResource(final Producer prod) {
         this.t = new Timer(true);
         this.prod = prod;
     }
@@ -39,7 +39,7 @@ public class CommandResource {
      * @return a response.
      */
     @POST
-    @Path("send/{no-events}")
+    @Path("events/{no-events}")
     public Response send(@PathParam("no-events") final int noEvents) {
         t.schedule(new TimerTask() {
             @Override
@@ -56,8 +56,8 @@ public class CommandResource {
      * @return a response.
      */
     @POST
-    @Path("stop")
-    public Response stop() {
+    @Path("halt")
+    public Response shutdown() {
         t.schedule(new TimerTask() {
             @Override
             public void run() {

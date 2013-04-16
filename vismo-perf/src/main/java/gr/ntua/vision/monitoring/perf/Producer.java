@@ -57,7 +57,7 @@ public class Producer {
      * @throws Exception
      */
     void start() throws Exception {
-        server.withWebAppAt(WebAppBuilder.buildFrom(new CommandResource(this)), "/*").start();
+        server.withWebAppAt(WebAppBuilder.buildFrom(new ProducersCommandResource(this)), "/*").start();
     }
 
 
