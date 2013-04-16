@@ -11,6 +11,12 @@ public interface Socket {
 
 
     /**
+     * @return
+     */
+    boolean isZMQPUB();
+
+
+    /**
      * @return the message received, or <code>null</code> on io error.
      */
     String receive();
@@ -24,9 +30,4 @@ public interface Socket {
      * @return <code>true</code> on success, <code>false</code> otherwise.
      */
     boolean send(String message);
-
-    /**
-     * @return
-     */
-    boolean isZMQPUB();
 }

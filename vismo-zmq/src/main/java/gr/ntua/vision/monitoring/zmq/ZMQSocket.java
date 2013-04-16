@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.zmq;
 
-import gr.ntua.monitoring.sockets.Socket;
+import gr.ntua.vision.monitoring.sockets.Socket;
 
 import org.zeromq.ZMQ;
 
@@ -30,7 +30,7 @@ class ZMQSocket implements Socket {
 
 
     /**
-     * @see gr.ntua.monitoring.sockets.Socket#close()
+     * @see gr.ntua.vision.monitoring.sockets.Socket#close()
      */
     @Override
     public void close() {
@@ -39,7 +39,16 @@ class ZMQSocket implements Socket {
 
 
     /**
-     * @see gr.ntua.monitoring.sockets.Socket#receive()
+     * @see gr.ntua.vision.monitoring.sockets.Socket#isZMQPUB()
+     */
+    @Override
+    public boolean isZMQPUB() {
+        return sock.getType() == 1;
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.sockets.Socket#receive()
      */
     @Override
     public String receive() {
@@ -53,7 +62,7 @@ class ZMQSocket implements Socket {
 
 
     /**
-     * @see gr.ntua.monitoring.sockets.Socket#send(java.lang.String)
+     * @see gr.ntua.vision.monitoring.sockets.Socket#send(java.lang.String)
      */
     @Override
     public boolean send(final String message) {
@@ -76,7 +85,7 @@ class ZMQSocket implements Socket {
      * @return the socket type.
      */
     private static String getType(final ZMQ.Socket sock) {
-        switch (sock.getType()){
+        switch(sock.getType()){
             case 0:
                 return "PAIR";
             case 1:
