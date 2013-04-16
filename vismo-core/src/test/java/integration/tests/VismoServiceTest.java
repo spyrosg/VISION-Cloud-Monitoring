@@ -5,7 +5,6 @@ import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.VismoVMInfo;
 import gr.ntua.vision.monitoring.dispatch.VismoEventDispatcher;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
-import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.Rule;
@@ -33,51 +32,6 @@ import org.zeromq.ZContext;
  * them in a rules engine and dispatch them to consumers.
  */
 public class VismoServiceTest {
-    /**
-     * This handler is used to release the latch when the expected number of events is received.
-     */
-    private static class ConsumerHandler implements EventHandler {
-        /***/
-        private final CountDownLatch latch;
-        /***/
-        private final int            noExpectedEvents;
-        /***/
-        private int                  noReceivedEvents = 0;
-
-
-        /**
-         * Constructor.
-         * 
-         * @param latch
-         * @param noExpectedEvents
-         */
-        public ConsumerHandler(final CountDownLatch latch, final int noExpectedEvents) {
-            this.latch = latch;
-            this.noExpectedEvents = noExpectedEvents;
-        }
-
-
-        /**
-         * @return the number of received events.
-         */
-        public int getNoReceivedEvents() {
-            return noReceivedEvents;
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.notify.EventHandler#handle(gr.ntua.vision.monitoring.events.MonitoringEvent)
-         */
-        @Override
-        public void handle(final MonitoringEvent e) {
-            if (e != null)
-                ++noReceivedEvents;
-            if (noExpectedEvents == noReceivedEvents)
-                latch.countDown();
-        }
-    }
-
-
     /**
      * This is used to count the number of events received.
      */
