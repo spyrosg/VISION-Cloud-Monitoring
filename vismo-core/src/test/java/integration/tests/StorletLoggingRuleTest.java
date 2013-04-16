@@ -36,8 +36,7 @@ public class StorletLoggingRuleTest {
     /***/
     private final InMemoryEventSink          sink              = new InMemoryEventSink(eventsList);
     /***/
-    private final FakeStorletEngine          storletEngine     = new FakeStorletEngine(new InMemoryEventDispatcher(engine,
-                                                                       "fake-sre"));
+    private final FakeStorletEngine          storletEngine     = new FakeStorletEngine(new InMemoryEventDispatcher(engine, "SRE"));
 
 
     /***/
