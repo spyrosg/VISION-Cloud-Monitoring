@@ -60,6 +60,7 @@ public class Consumer {
                 return;
 
             ++noReceivedEvents;
+            System.out.println("latency=" + getLatency(e));
         }
 
 
@@ -77,6 +78,15 @@ public class Consumer {
         @Override
         public String toString() {
             return "#<PerfHandler: " + topic + ">";
+        }
+
+
+        /**
+         * @param e
+         * @return d
+         */
+        private static double getLatency(final MonitoringEvent e) {
+            return (System.currentTimeMillis() - e.timestamp()) / 1000.0;
         }
     }
 

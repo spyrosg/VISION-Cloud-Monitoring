@@ -11,7 +11,7 @@
   <!-- make jetty less talkative -->
   <logger name="org.eclipse.jetty" level="INFO" />
 
-  <root level="TRACE">
+  <root level="DEBUG">
     <appender-ref ref="STDERR" />
   </root>
 

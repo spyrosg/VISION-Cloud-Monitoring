@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This is providing utility methods for transmitting an event through a socket.
  */
+@SuppressWarnings("unused")
 abstract class AbstractSink implements EventSink {
     /***/
     private static final Logger log    = LoggerFactory.getLogger(AbstractSink.class);
@@ -58,7 +59,7 @@ abstract class AbstractSink implements EventSink {
         if (closed)
             return;
 
-        log.trace("sending: {}", str);
+        // log.trace("sending: {}", str);
         sock.send(str);
     }
 
