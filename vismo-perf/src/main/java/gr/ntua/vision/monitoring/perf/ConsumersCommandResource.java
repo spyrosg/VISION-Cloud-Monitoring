@@ -50,8 +50,8 @@ public class ConsumersCommandResource {
      */
     @GET
     @Path("handlers/{index}")
-    public int getNoReceivingEvents(@PathParam("index") final int i) {
-        return cons.getNoReceivingEvents(i);
+    public Response getNoReceivingEvents(@PathParam("index") final int i) {
+        return Response.ok(cons.getNoReceivingEvents(i) + "\n").build();
     }
 
 
@@ -62,7 +62,6 @@ public class ConsumersCommandResource {
     @Path("handlers")
     public Response newHandler() {
         final int n = cons.registerHandler();
-
         return Response.created(URI.create("/" + n)).build();
     }
 

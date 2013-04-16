@@ -152,7 +152,7 @@ public class Consumer {
      * @return n
      */
     int registerHandler(final String topic) {
-        final PerfHandler handler = new PerfHandler();
+        final PerfHandler handler = new PerfHandler(topic);
 
         registry.register(topic, handler);
         handlers.add(handler);
