@@ -3,6 +3,7 @@ package gr.ntua.vision.monitoring;
 import gr.ntua.vision.monitoring.policy.StaticConfigPolicy;
 import gr.ntua.vision.monitoring.rules.AccountingRule;
 import gr.ntua.vision.monitoring.rules.CTORule;
+import gr.ntua.vision.monitoring.rules.EventReceivingRule;
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.service.VismoService;
@@ -52,7 +53,7 @@ public class Main {
         final UDPServer udpServer = new UDPFactory(conf.getUDPPort()).buildServer();
 
         submitDefaultRulesTo(engine);
-        submitRulesTo(engine);
+        // submitRulesTo(engine);
 
         udpServer.add(service);
         udpServer.start();
@@ -140,6 +141,7 @@ public class Main {
      */
     private static void submitDefaultRulesTo(final VismoRulesEngine engine) {
         new PassThroughRule(engine).submit();
+        new EventReceivingRule(engine).submit();
     }
 
 

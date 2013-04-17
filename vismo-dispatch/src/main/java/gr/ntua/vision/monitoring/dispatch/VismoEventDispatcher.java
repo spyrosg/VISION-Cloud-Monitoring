@@ -166,6 +166,8 @@ public class VismoEventDispatcher implements EventDispatcher {
 
         log.config("sending event: " + s);
         sock.send(s);
+
+        System.out.println("id=" + map.get("id") + ", producer=" + System.currentTimeMillis() + ", ts=" + map.get("timestamp"));
     }
 
 
