@@ -72,15 +72,14 @@ abstract class AbstractSink implements EventSink {
      * @return a string representation for the event.
      */
     protected String serialize(final MonitoringEvent e) {
+        final String ser = e.serialize();
+
         if (sock.isZMQPUB()) {
             final String topic = e.topic();
 
-            if (topic == null)
-                throw new Error("event with null topic");
-
-            return topic + " " + e.serialize();
+            return (topic != null ? topic : "*") + " " + ser;
         }
 
-        return e.serialize();
+        return ser;
     }
 }
