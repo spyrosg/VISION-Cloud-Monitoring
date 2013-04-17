@@ -162,12 +162,14 @@ public class VismoEventDispatcher implements EventDispatcher {
     void send(final Map<String, Object> map) {
         addBasicFields(map);
 
-        final String s = JSONValue.toJSONString(map);
+        final String actual = JSONValue.toJSONString(map);
 
-        log.config("sending event: " + s);
-        sock.send(s);
+        log.config("sending event: " + actual);
 
-        System.out.println("id=" + map.get("id") + ", producer=" + System.currentTimeMillis() + ", ts=" + map.get("timestamp"));
+        final long len = actual.length();
+        map.put("bytes", len + 3);
+
+        sock.send(JSONValue.toJSONString(map));
     }
 
 
