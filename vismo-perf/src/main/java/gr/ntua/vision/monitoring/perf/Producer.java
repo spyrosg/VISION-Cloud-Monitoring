@@ -11,13 +11,13 @@ import gr.ntua.vision.monitoring.web.WebServer;
  */
 public class Producer {
     /***/
-    private static final int    PORT = 9991;
+    private static final int        PORT = 9991;
     /***/
-    private static final String PROG = "Producer";
+    private static final String     PROG = "Producer";
     /***/
-    private final String        configFile;
+    private final WebServer         server;
     /***/
-    private final WebServer     server;
+    private final FakeObjectService service;
 
 
     /**
@@ -27,7 +27,7 @@ public class Producer {
      * @param port
      */
     private Producer(final String configFile, final int port) {
-        this.configFile = configFile;
+        this.service = new FakeObjectService(new VismoEventDispatcher(configFile, "producer"));
         this.server = new WebServer(port);
     }
 
@@ -44,11 +44,18 @@ public class Producer {
      * @param noEvents
      */
     void sendEvents(final int noEvents) {
-        final VismoEventDispatcher dispatcher = new VismoEventDispatcher(configFile, "producer");
-        final FakeObjectService service = new FakeObjectService(dispatcher);
-
         for (int i = 0; i < noEvents; ++i)
             service.send();
+    }
+
+
+    /**
+     * @param topic
+     * @param noEvents
+     */
+    void sendEvents(final String topic, final int noEvents) {
+        for (int i = 0; i < noEvents; ++i)
+            service.send(topic);
     }
 
 

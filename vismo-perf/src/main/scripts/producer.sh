@@ -6,7 +6,7 @@ prog=$(basename $0)
 
 case $1 in
 	send*)
-		curl -v -X POST http://localhost:$PORT/events/$2 ;;
+		curl -v -X POST http://localhost:$PORT/events/$2/$3 ;;
 	start*)
 		exec java -cp vismo-perf-*.jar gr.ntua.vision.monitoring.perf.Producer "$CONF" $PORT & ;;
 	halt*)

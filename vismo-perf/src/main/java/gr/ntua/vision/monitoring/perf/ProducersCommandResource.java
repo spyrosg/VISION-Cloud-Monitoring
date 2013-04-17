@@ -48,7 +48,26 @@ public class ProducersCommandResource {
             }
         }, 3 * 100);
 
-        return Response.ok("sending " + noEvents + " events").build();
+        return Response.ok("sending " + noEvents + " events\n").build();
+    }
+
+
+    /**
+     * @param topic
+     * @param noEvents
+     * @return a response.
+     */
+    @POST
+    @Path("events/{topic}/{no-events}")
+    public Response send(@PathParam("topic") final String topic, @PathParam("no-events") final int noEvents) {
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                prod.sendEvents(topic, noEvents);
+            }
+        }, 3 * 100);
+
+        return Response.ok("sending " + noEvents + " events\n").build();
     }
 
 

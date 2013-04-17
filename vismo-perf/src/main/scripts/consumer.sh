@@ -10,13 +10,11 @@ case $1 in
 	no*)
 		curl -v -X GET http://localhost:$PORT/handlers/"$2" ;;
 	new*)
-		test -z "$2" && curl -v -X PUT http://localhost:$PORT/handlers/ ||
-			curl -v -X PUT http://localhost:$PORT/handlers/"$2"/
-		;;
+		curl -v -X PUT http://localhost:$PORT/handlers/"$2" ;;
 	reset*)
 		curl -v -X POST http://localhost:$PORT/handlers/"$2" ;;
 	start*)
-		exec java -cp vismo-perf-*.jar gr.ntua.vision.monitoring.perf.Consumer "$CONF" $PORT & ;;
+		exec java -cp vismo-perf-*.jar gr.ntua.vision.monitoring.perf.Consumer "$CONF" $PORT >$2 & ;;
 	halt*)
 		curl -v -X POST http://localhost:$PORT/halt ;;
 	*)

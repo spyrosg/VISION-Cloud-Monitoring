@@ -51,7 +51,7 @@ public class ConsumersCommandResource {
     @GET
     @Path("handlers/{index}")
     public Response getNoReceivingEvents(@PathParam("index") final int i) {
-        return Response.ok(cons.getNoReceivingEvents(i) + "\n").build();
+        return Response.ok("have received: " + cons.getNoReceivingEvents(i) + " events\n").build();
     }
 
 

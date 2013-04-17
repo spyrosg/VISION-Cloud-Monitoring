@@ -60,7 +60,10 @@ public class Consumer {
                 return;
 
             ++noReceivedEvents;
-            System.out.println("latency=" + getLatency(e));
+
+            final long now = System.currentTimeMillis();
+
+            System.out.println("now=" + now + ", ts=" + e.timestamp() + ", latency=" + getLatency(now, e));
         }
 
 
@@ -82,11 +85,12 @@ public class Consumer {
 
 
         /**
+         * @param now
          * @param e
          * @return d
          */
-        private static double getLatency(final MonitoringEvent e) {
-            return (System.currentTimeMillis() - e.timestamp()) / 1000.0;
+        private static double getLatency(final long now, final MonitoringEvent e) {
+            return (now - e.timestamp()) / 1000.0;
         }
     }
 
@@ -132,7 +136,11 @@ public class Consumer {
      * @return n
      */
     int getNoReceivingEvents(final int i) {
-        return handlers.get(i).getNoReceivedEvents();
+        final PerfHandler h = handlers.get(i);
+
+        System.out.println("handler " + h + " has received " + h.getNoReceivedEvents() + " events");
+
+        return h.getNoReceivedEvents();
     }
 
 
@@ -175,7 +183,11 @@ public class Consumer {
      * @param i
      */
     void resetHandler(final int i) {
-        handlers.get(i).reset();
+        final PerfHandler h = handlers.get(i);
+
+        System.out.println("handler " + h + " reset");
+
+        h.reset();
     }
 
 
@@ -194,7 +206,6 @@ public class Consumer {
     public static void main(final String... args) throws Exception {
         if (args.length < 1) {
             System.err.println("arg count");
-            System.err.println(PROG + " config [port:-9992]");
             System.err.println(PROG + " config [port:-" + PORT + "]");
             System.exit(1);
         }

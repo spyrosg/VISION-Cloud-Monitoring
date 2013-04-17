@@ -14,22 +14,11 @@ public class FakeObjectService {
     /***/
     public enum Operation {
         /***/
-        DELETE("delete"),
+        DELETE,
         /***/
-        GET("read"),
+        GET,
         /***/
-        PUT("write");
-
-        /***/
-        public final String type;
-
-
-        /**
-         * @param type
-         */
-        private Operation(final String type) {
-            this.type = type;
-        }
+        PUT
     }
 
 
@@ -84,6 +73,20 @@ public class FakeObjectService {
 
 
     /**
+     * @param topic
+     * @param tenant
+     * @param user
+     * @param container
+     * @param object
+     * @return an obs delete event.
+     */
+    public EventBuilder delEvent(final String topic, final String tenant, final String user, final String container,
+            final String object) {
+        return randomEvent(topic, Operation.DELETE, tenant, user, container, object, Status.SUCCESS);
+    }
+
+
+    /**
      * @param tenant
      * @param user
      * @param container
@@ -92,6 +95,20 @@ public class FakeObjectService {
      */
     public EventBuilder getEvent(final String tenant, final String user, final String container, final String object) {
         return randomEvent(Operation.GET, tenant, user, container, object, Status.SUCCESS);
+    }
+
+
+    /**
+     * @param topic
+     * @param tenant
+     * @param user
+     * @param container
+     * @param object
+     * @return an obs get event
+     */
+    public EventBuilder getEvent(final String topic, final String tenant, final String user, final String container,
+            final String object) {
+        return randomEvent(topic, Operation.GET, tenant, user, container, object, Status.SUCCESS);
     }
 
 
@@ -108,6 +125,20 @@ public class FakeObjectService {
 
 
     /**
+     * @param topic
+     * @param tenant
+     * @param user
+     * @param container
+     * @param object
+     * @return an obs put event
+     */
+    public EventBuilder putEvent(final String topic, final String tenant, final String user, final String container,
+            final String object) {
+        return randomEvent(topic, Operation.PUT, tenant, user, container, object, Status.SUCCESS);
+    }
+
+
+    /**
      * Send a random event.
      */
     public void send() {
@@ -119,6 +150,23 @@ public class FakeObjectService {
             getEvent("one-tenant", "other user", "de container", "da obj").send();
         else
             delEvent("one-tenant", "other user", "de container", "da obj").send();
+    }
+
+
+    /**
+     * Send a random event.
+     * 
+     * @param topic
+     */
+    public void send(final String topic) {
+        final double d = rng.nextDouble();
+
+        if (d <= 0.75)
+            putEvent(topic, "one-tenant", "other user", "de container", "da obj").send();
+        else if (d <= 0.9)
+            getEvent(topic, "one-tenant", "other user", "de container", "da obj").send();
+        else
+            delEvent(topic, "one-tenant", "other user", "de container", "da obj").send();
     }
 
 
@@ -150,6 +198,30 @@ public class FakeObjectService {
         return dispatcher.newEvent().field("operation", op.toString()).field("tenant", tenant).field("user", user)
                 .field("container", container).field("object", object).field("status", st.toString())
                 .field("content-size", contentSize).field("transaction-latency", latency).field("transaction-duration", duration)
-                .field("transaction-throughput", throughput).field("topic", "obs?");
+                .field("transaction-throughput", throughput);
+    }
+
+
+    /**
+     * @param topic
+     * @param op
+     * @param tenant
+     * @param user
+     * @param container
+     * @param object
+     * @param st
+     * @return an event
+     */
+    private EventBuilder randomEvent(final String topic, final Operation op, final String tenant, final String user,
+            final String container, final String object, final Status st) {
+        final int contentSize = rand(MAX_SIZE);
+        final double duration = rand(MAX_DURATION);
+        final double latency = rand((int) duration);
+        final double throughput = contentSize * 1.0 / duration;
+
+        return dispatcher.newEvent().field("operation", op.toString()).field("tenant", tenant).field("user", user)
+                .field("container", container).field("object", object).field("status", st.toString())
+                .field("content-size", contentSize).field("transaction-latency", latency).field("transaction-duration", duration)
+                .field("transaction-throughput", throughput).field("topic", topic);
     }
 }
