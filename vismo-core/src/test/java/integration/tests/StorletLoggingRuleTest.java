@@ -56,7 +56,7 @@ public class StorletLoggingRuleTest {
 
         sendEvents(NO_EVENTS_TO_SEND);
         waitForAggregation();
-        assertProperAggregationResult();
+        assertHaveExpectedNoEvents();
         assertLastEventIsFromStorletEngineRule();
 
         final MonitoringEvent e = eventsList.get(eventsList.size() - 1);
@@ -70,13 +70,14 @@ public class StorletLoggingRuleTest {
 
     /***/
     private void assertLastEventIsFromStorletEngineRule() {
-        assertEquals(eventsList.get(eventsList.size() - 1).topic(), EXPECTED_TOPIC);
+        assertEquals("last event should've come out of StorletLoggingRule", eventsList.get(eventsList.size() - 1).topic(),
+                     EXPECTED_TOPIC);
     }
 
 
     /***/
-    private void assertProperAggregationResult() {
-        assertEquals(NO_EVENTS_TO_SEND + 1, eventsList.size());
+    private void assertHaveExpectedNoEvents() {
+        assertEquals("did not collect expected no of events", NO_EVENTS_TO_SEND + 1, eventsList.size());
     }
 
 
