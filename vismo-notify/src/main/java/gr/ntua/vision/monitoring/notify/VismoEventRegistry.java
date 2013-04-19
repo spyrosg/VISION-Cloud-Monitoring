@@ -9,17 +9,26 @@ import org.zeromq.ZContext;
 
 
 /**
- *
+ * The default event registry.
  */
 public class VismoEventRegistry extends EventRegistry {
     /**
+     * Default constructor. This is used to register and receive events from the cluster head.
+     */
+    public VismoEventRegistry() {
+        this(getDefaultRegistryAddress(loadConfigFrom(VismoConfiguration.VISMO_CONFIG_FILE)));
+    }
+
+
+    /**
      * Constructor.
      * 
-     * @param vismoConfigFile
-     *            the vismo configuration file.
+     * @param registryAddress
+     *            The address and port of the machine to register and receive events from. The address should be of the form:
+     *            <code>"tcp://" + numeric-ip + ":" + port-no</code>.
      */
-    public VismoEventRegistry(final String vismoConfigFile) {
-        this(new ZMQFactory(new ZContext()), toAddr(configWith(vismoConfigFile)));
+    public VismoEventRegistry(final String registryAddress) {
+        this(new ZMQFactory(new ZContext()), registryAddress);
     }
 
 
@@ -37,26 +46,26 @@ public class VismoEventRegistry extends EventRegistry {
 
 
     /**
+     * @param conf
+     *            the configuration object.
+     * @return the default registry address.
+     */
+    private static String getDefaultRegistryAddress(final VismoConfiguration conf) {
+        return "tcp://" + conf.getClusterHead() + ":" + conf.getClusterHeadPort();
+    }
+
+
+    /**
      * Load the configuration.
      * 
      * @param configFile
      * @return the configuration object.
      */
-    private static VismoConfiguration configWith(final String configFile) {
+    private static VismoConfiguration loadConfigFrom(final String configFile) {
         try {
             return new VismoConfiguration(configFile);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-
-    /**
-     * @param conf
-     *            the configuration object.
-     * @return the address to connect to.
-     */
-    private static String toAddr(final VismoConfiguration conf) {
-        return "tcp://127.0.0.1:" + conf.getConsumersPort();
     }
 }
