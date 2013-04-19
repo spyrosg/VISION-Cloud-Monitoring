@@ -9,6 +9,8 @@ import java.util.Properties;
  * 
  */
 public class VismoConfiguration extends PropertiesConfiguration {
+    /** this is the default path of the configuration. */
+    public static final String  VISMO_CONFIG_FILE          = "/etc/visioncloud_vismo.conf";
     /***/
     private static final String CLOUD_HEAD_PORT_PROPERTY   = "cloud.head.port";
     /***/
