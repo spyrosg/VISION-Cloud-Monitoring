@@ -59,7 +59,6 @@
               </defineStatements>
 
               <mappings>
-
                 <mapping>
                   <directory>/srv/vismo</directory>
                   <username>root</username>
@@ -71,17 +70,6 @@
                       <location>target/vismo-core-${project.version}.jar</location>
                       <destination>vismo.jar</destination>
                     </source>
-
-                    <source>
-                      <location>../vismo-dispatch/src/main/python/vismo_dispatch.py</location>
-                      <destination>vismo_dispatch.py</destination>
-                    </source>
-
-                    <source>
-                      <location>../vismo-dispatch/src/main/python/pyjavaproperties.py</location>
-                      <destination>pyjavaproperties.py</destination>
-                    </source>
-
                   </sources>
                 </mapping>
 
@@ -98,7 +86,6 @@
                     </source>
                   </sources>
                 </mapping>
-
               </mappings>
             </configuration>
 
