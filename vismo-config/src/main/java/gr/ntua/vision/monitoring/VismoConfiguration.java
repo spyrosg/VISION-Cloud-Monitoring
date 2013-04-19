@@ -34,6 +34,8 @@ public class VismoConfiguration extends PropertiesConfiguration {
     /***/
     private static final String PRODUCERS_POINT_PROPERTY   = "producers.point";
     /***/
+    private static final String STARTUP_RULES_PROPERY      = "startup.rules";
+    /***/
     private static final String UDP_PORT_PROPERTY          = "udp.port";
 
 
@@ -145,6 +147,14 @@ public class VismoConfiguration extends PropertiesConfiguration {
      */
     public String getProducersPoint() {
         return get(PRODUCERS_POINT_PROPERTY);
+    }
+
+
+    /**
+     * @return the list of rules to load at startup.
+     */
+    public List<String> getStartupRules() {
+        return getAsList(STARTUP_RULES_PROPERY);
     }
 
 
