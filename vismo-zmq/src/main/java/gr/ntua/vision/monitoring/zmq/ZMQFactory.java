@@ -141,7 +141,9 @@ public class ZMQFactory implements SocketFactory {
         final ZMQ.Socket sock = ctx.createSocket(type);
 
         sock.setLinger(0);
-        sock.setSendTimeOut(0);
+
+        if (type != ZMQ.PUB)
+            sock.setSendTimeOut(0);
 
         try {
             sock.connect(addr);
