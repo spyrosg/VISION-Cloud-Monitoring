@@ -11,7 +11,7 @@ public interface Socket {
 
 
     /**
-     * @return
+     * @return <code>true</code> iff this is a zmq pub socket, <code>false</code> otherwise.
      */
     boolean isZMQPUB();
 

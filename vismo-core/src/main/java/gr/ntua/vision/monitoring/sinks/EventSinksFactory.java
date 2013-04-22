@@ -47,7 +47,9 @@ public class EventSinksFactory {
      * @return the list of {@link EventSink}s for the cloud head service.
      */
     public List< ? extends EventSink> buildForCloudHead() {
-        return Arrays.asList(new VismoEventSink(socketFactory.newPubSocket("tcp://*:" + conf.getConsumersPort())));
+        final String consumersAddress = "tcp://*:" + conf.getConsumersPort();
+
+        return Arrays.asList(new TopicedEventSink(socketFactory.newPubSocket(consumersAddress)));
     }
 
 
@@ -55,9 +57,11 @@ public class EventSinksFactory {
      * @return the list of {@link EventSink}s for the cluster head service.
      */
     public List< ? extends EventSink> buildForClusterHead() {
-        final EventSink sink = new VismoEventSink(socketFactory.newPubSocket("tcp://*:" + conf.getConsumersPort()));
-        final EventSink cloudSink = new VismoEventSink(socketFactory.newConnectedPushSocket("tcp://"
-                + conf.getCloudHeads().get(0) + ":" + conf.getCloudHeadPort()));
+        final String consumersAddress = "tcp://*:" + conf.getConsumersPort();
+        final EventSink sink = new TopicedEventSink(socketFactory.newPubSocket(consumersAddress));
+
+        final String cloudHeadAddress = "tcp://" + conf.getCloudHeads().get(0) + ":" + conf.getCloudHeadPort();
+        final EventSink cloudSink = new PlainEventSink(socketFactory.newConnectedPushSocket(cloudHeadAddress));
 
         return Arrays.asList(sink, cloudSink);
     }
@@ -67,7 +71,8 @@ public class EventSinksFactory {
      * @return the list of {@link EventSink}s for the worker service.
      */
     public List< ? extends EventSink> buildForWorker() {
-        return Arrays.asList(new VismoEventSink(socketFactory.newConnectedPushSocket("tcp://" + conf.getClusterHead() + ":"
-                + conf.getClusterHeadPort())));
+        final String clusterHeadAddress = "tcp://" + conf.getClusterHead() + ":" + conf.getClusterHeadPort();
+
+        return Arrays.asList(new PlainEventSink(socketFactory.newConnectedPushSocket(clusterHeadAddress)));
     }
 }

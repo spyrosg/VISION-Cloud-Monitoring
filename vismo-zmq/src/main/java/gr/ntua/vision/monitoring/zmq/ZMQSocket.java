@@ -43,7 +43,7 @@ class ZMQSocket implements Socket {
      */
     @Override
     public boolean isZMQPUB() {
-        return sock.getType() == 1;
+        return sock.getType() == ZMQ.PUB;
     }
 
 
