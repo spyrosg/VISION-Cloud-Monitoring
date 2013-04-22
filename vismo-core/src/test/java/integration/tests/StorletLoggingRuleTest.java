@@ -69,15 +69,15 @@ public class StorletLoggingRuleTest {
 
 
     /***/
-    private void assertLastEventIsFromStorletEngineRule() {
-        assertEquals("last event should've come out of StorletLoggingRule", eventsList.get(eventsList.size() - 1).topic(),
-                     EXPECTED_TOPIC);
+    private void assertHaveExpectedNoEvents() {
+        assertEquals("did not collect expected no of events", NO_EVENTS_TO_SEND + 1, eventsList.size());
     }
 
 
     /***/
-    private void assertHaveExpectedNoEvents() {
-        assertEquals("did not collect expected no of events", NO_EVENTS_TO_SEND + 1, eventsList.size());
+    private void assertLastEventIsFromStorletEngineRule() {
+        assertEquals("last event should've come out of StorletLoggingRule", eventsList.get(eventsList.size() - 1).topic(),
+                     EXPECTED_TOPIC);
     }
 
 

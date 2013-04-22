@@ -89,7 +89,7 @@ class EventRegistry {
      * @param addr
      *            the address to connect to for incoming events.
      */
-    public EventRegistry(final ZMQFactory socketFactory, final String addr) {
+    protected EventRegistry(final ZMQFactory socketFactory, final String addr) {
         this.socketFactory = socketFactory;
         this.addr = addr;
     }
