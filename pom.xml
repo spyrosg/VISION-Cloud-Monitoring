@@ -10,7 +10,7 @@
   <version>1.1.3-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Vismo Project</name>
-  <url>http://147.102.19.118:8080/git/vismo.git</url>
+  <url>http://147.102.19.238:8080/git/vismo.git</url>
   <description>The monitoring infrastructure and libraries of the VISION Cloud.</description>
 
   <modules>
@@ -58,9 +58,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:http://147.102.19.118:8080/git/vismo.git</connection>
-    <developerConnection>scm:git:git@147.102.19.118:vismo.git</developerConnection>
-    <url>http://147.102.19.118:8080/git/vismo.git</url>
+    <connection>scm:git:http://147.102.19.238:8080/git/vismo.git</connection>
+    <developerConnection>scm:git:git@147.102.19.238:vismo.git</developerConnection>
+    <url>http://147.102.19.238:8080/git/vismo.git</url>
     <tag>HEAD</tag>
   </scm>
 
@@ -91,7 +91,7 @@
         <repository>
           <id>ntua.releases</id>
           <name>ntua releases repo</name>
-          <url>http://147.102.19.118:8090/archiva/repository/internal</url>
+          <url>http://147.102.19.238:8090/archiva/repository/internal</url>
           <releases><enabled>true</enabled></releases>
           <snapshots><enabled>false</enabled></snapshots>
         </repository>
@@ -99,7 +99,7 @@
         <repository>
           <id>ntua.snapshots</id>
           <name>ntua snapshots repo</name>
-          <url>http://147.102.19.118:8090/archiva/repository/snapshots</url>
+          <url>http://147.102.19.238:8090/archiva/repository/snapshots</url>
           <releases><enabled>false</enabled></releases>
           <snapshots><enabled>true</enabled></snapshots>
         </repository>
@@ -109,7 +109,7 @@
         <pluginRepository>
           <id>ntua.releases</id>
           <name>ntua releases repo</name>
-          <url>http://147.102.19.118:8090/archiva/repository/internal</url>
+          <url>http://147.102.19.238:8090/archiva/repository/internal</url>
           <releases><enabled>true</enabled></releases>
           <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
@@ -117,7 +117,7 @@
         <pluginRepository>
           <id>ntua.snapshots</id>
           <name>ntua snapshots repo</name>
-          <url>http://147.102.19.118:8090/archiva/repository/snapshots</url>
+          <url>http://147.102.19.238:8090/archiva/repository/snapshots</url>
           <releases><enabled>false</enabled></releases>
           <snapshots><enabled>true</enabled></snapshots>
         </pluginRepository>
