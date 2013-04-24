@@ -17,6 +17,8 @@ public interface Socket {
 
 
     /**
+     * Block and wait for a message to receive.
+     * 
      * @return the message received, or <code>null</code> on io error.
      */
     String receive();
@@ -30,4 +32,12 @@ public interface Socket {
      * @return <code>true</code> on success, <code>false</code> otherwise.
      */
     boolean send(String message);
+
+
+    /**
+     * If a message is available to read off the socket, deliver it. Else, return <code>null</code> without waiting.
+     * 
+     * @return the message received, or <code>null</code> on io error.
+     */
+    String receiveNonBlocking();
 }

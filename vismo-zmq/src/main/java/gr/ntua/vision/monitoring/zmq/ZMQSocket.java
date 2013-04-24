@@ -52,12 +52,16 @@ class ZMQSocket implements Socket {
      */
     @Override
     public String receive() {
-        final byte[] message = sock.recv(0);
+        return recv(0);
+    }
 
-        if (message == null)
-            return null;
 
-        return new String(message, 0, message.length);
+    /**
+     * @see gr.ntua.vision.monitoring.sockets.Socket#receiveNonBlocking()
+     */
+    @Override
+    public String receiveNonBlocking() {
+        return recv(ZMQ.NOBLOCK);
     }
 
 
@@ -76,6 +80,20 @@ class ZMQSocket implements Socket {
     @Override
     public String toString() {
         return "#<ZSocket: " + getType(sock) + ", port=" + addr + ">";
+    }
+
+
+    /**
+     * @param flags
+     * @return the message received, as a string, or, <code>null</code> on error or the socket has no available messages.
+     */
+    private String recv(final int flags) {
+        final byte[] message = sock.recv(flags);
+
+        if (message == null)
+            return null;
+
+        return new String(message, 0, message.length);
     }
 
 
