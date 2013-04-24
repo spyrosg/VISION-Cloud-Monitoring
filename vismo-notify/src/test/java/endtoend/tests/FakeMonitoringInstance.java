@@ -40,6 +40,14 @@ public class FakeMonitoringInstance {
     }
 
 
+    /**
+     * 
+     */
+    public void halt() {
+        sock.close();
+    }
+
+
     /***/
     public void sendEvents() {
         for (int i = 0; i < noEventsToSend; ++i)

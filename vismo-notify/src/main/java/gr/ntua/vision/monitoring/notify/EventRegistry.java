@@ -1,6 +1,7 @@
 package gr.ntua.vision.monitoring.notify;
 
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
+import gr.ntua.vision.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import java.io.PrintWriter;
@@ -113,7 +114,8 @@ class EventRegistry {
      * @return the {@link EventHandlerTask} for the given handler.
      */
     public EventHandlerTask register(final String topic, final EventHandler handler) {
-        final EventHandlerTask task = new EventHandlerTask(new VismoEventFactory(), socketFactory, addr, topic, handler);
+        final Socket sock = socketFactory.newSubSocket(addr, topic);
+        final EventHandlerTask task = new EventHandlerTask(new VismoEventFactory(), sock, handler);
 
         log.config("registering handler for topic '" + topic + "' => " + task);
         pool.submit(task);

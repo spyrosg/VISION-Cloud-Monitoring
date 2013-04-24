@@ -13,6 +13,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.zeromq.ZContext;
@@ -63,7 +64,7 @@ public class EventHandlerTaskTest {
     /***/
     private static final String    CONSUMERS_PORT    = "tcp://127.0.0.1:27890";
     /***/
-    private static final int       NO_EVENTS_TO_SEND = 10;
+    private static final int       NO_EVENTS_TO_SEND = 100;
     /***/
     private static final String    TOPIC             = "foo";
     /***/
@@ -97,14 +98,30 @@ public class EventHandlerTaskTest {
      */
     @Test
     public void taskShouldHaltOnCommand() throws InterruptedException {
-        Thread.sleep(30);
-        assertTrue(task.isRunning());
+        spinThread(30);
+        assertTrue("task should've started", task.isRunning());
 
         mon.sendEvents();
         latch.await(1, TimeUnit.SECONDS);
         task.halt();
-        Thread.sleep(100);
+        spinThread(30);
 
         assertFalse("task should've halted", task.isRunning());
+    }
+
+
+    /***/
+    @After
+    public void tearDown() {
+        mon.halt();
+    }
+
+
+    /**
+     * @param n
+     * @throws InterruptedException
+     */
+    private static void spinThread(final long n) throws InterruptedException {
+        Thread.sleep(n);
     }
 }
