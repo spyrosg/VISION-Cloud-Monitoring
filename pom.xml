@@ -66,15 +66,15 @@
 
   <distributionManagement>
     <repository>
-      <id>testbed.releases</id>
-      <name>vision testbed releases</name>
-      <url>http://10.0.0.1:8000/archiva/repository/internal/</url>
+      <id>ntua.releases</id>
+      <name>ntua releases repo</name>
+      <url>http://147.102.19.238:8090/archiva/repository/internal</url>
     </repository>
 
     <snapshotRepository>
-      <id>testbed.snapshots</id>
-      <name>vision testbed snapshots</name>
-      <url>http://10.0.0.1:8000/archiva/repository/snapshots/</url>
+      <id>ntua.snapshots</id>
+      <name>ntua snapshots repo</name>
+      <url>http://147.102.19.238:8090/archiva/repository/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
 
@@ -118,47 +118,6 @@
           <id>ntua.snapshots</id>
           <name>ntua snapshots repo</name>
           <url>http://147.102.19.238:8090/archiva/repository/snapshots</url>
-          <releases><enabled>false</enabled></releases>
-          <snapshots><enabled>true</enabled></snapshots>
-        </pluginRepository>
-      </pluginRepositories>
-    </profile>
-
-    <!-- profile used in testbed -->
-    <profile>
-      <id>vision.testbed</id>
-
-      <repositories>
-        <repository>
-          <id>testbed.releases</id>
-          <name>testbed releases repo</name>
-          <url>http://10.0.0.1:8000/archiva/repository/internal</url>
-          <releases><enabled>true</enabled></releases>
-          <snapshots><enabled>false</enabled></snapshots>
-        </repository>
-
-        <repository>
-          <id>testbed.snapshots</id>
-          <name>testbed snapshots repo</name>
-          <url>http://10.0.0.1:8000/archiva/repository/snapshots</url>
-          <releases><enabled>false</enabled></releases>
-          <snapshots><enabled>true</enabled></snapshots>
-        </repository>
-      </repositories>
-
-      <pluginRepositories>
-        <pluginRepository>
-          <id>testbed.releases</id>
-          <name>testbed releases repo</name>
-          <url>http://10.0.0.1:8000/archiva/repository/internal</url>
-          <releases><enabled>true</enabled></releases>
-          <snapshots><enabled>false</enabled></snapshots>
-        </pluginRepository>
-
-        <pluginRepository>
-          <id>testbed.snapshots</id>
-          <name>testbed snapshots repo</name>
-          <url>http://10.0.0.1:8000/archiva/repository/snapshots</url>
           <releases><enabled>false</enabled></releases>
           <snapshots><enabled>true</enabled></snapshots>
         </pluginRepository>
