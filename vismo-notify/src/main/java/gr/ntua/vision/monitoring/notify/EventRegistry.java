@@ -8,10 +8,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
@@ -67,15 +66,17 @@ class EventRegistry {
     }
 
     /***/
-    private static final Logger   log               = Logger.getLogger(EventRegistry.class.getName());
+    private static final Logger               log               = Logger.getLogger(EventRegistry.class.getName());
     /** the property name to set when activating logging output. */
-    private static final String   notifyLogProperty = "notify.log";
+    private static final String               notifyLogProperty = "notify.log";
     /** the address all consumers will connect to. */
-    private final String          addr;
-    /** the pool of threads. Each thread corresponds to one event handler. */
-    private final ExecutorService pool              = Executors.newCachedThreadPool();
+    private final String                      addr;
     /** the socket factory. */
-    private final ZMQFactory      socketFactory;
+    private final ZMQFactory                  socketFactory;
+    /***/
+    private final ArrayList<EventHandlerTask> tasks             = new ArrayList<EventHandlerTask>();
+    /** the pool of threads. Each thread corresponds to one event handler. */
+    private final ArrayList<Thread>           threads           = new ArrayList<Thread>();
 
     static {
         activateLogger();
@@ -100,7 +101,21 @@ class EventRegistry {
      * Stop the registry; no new registrations will take place.
      */
     public void halt() {
-        pool.shutdown();
+        log.config("halting " + tasks.size() + " tasks");
+
+        for (final EventHandlerTask t : tasks)
+            t.halt();
+
+        log.config("joining " + threads.size() + " threads");
+
+        for (final Thread t : threads)
+            try {
+                t.join();
+            } catch (InterruptedException ignored) {
+                // NOP
+            }
+
+        log.config("joined");
     }
 
 
@@ -118,9 +133,8 @@ class EventRegistry {
         final EventHandlerTask task = new EventHandlerTask(new VismoEventFactory(), sock, handler);
 
         log.config("registering handler for topic '" + topic + "' => " + task);
-        pool.submit(task);
 
-        return task;
+        return start(task);
     }
 
 
@@ -133,6 +147,21 @@ class EventRegistry {
      */
     public EventHandlerTask registerToAll(final EventHandler handler) {
         return register("", handler);
+    }
+
+
+    /**
+     * @param task
+     * @return
+     */
+    private EventHandlerTask start(final EventHandlerTask task) {
+        final Thread t = new Thread(task, task.toString());
+
+        tasks.add(task);
+        threads.add(t);
+        t.start();
+
+        return task;
     }
 
 
