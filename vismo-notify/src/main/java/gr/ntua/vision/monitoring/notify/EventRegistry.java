@@ -100,7 +100,6 @@ class EventRegistry {
      */
     public void halt() {
         pool.shutdown();
-        pool.shutdownNow();
     }
 
 

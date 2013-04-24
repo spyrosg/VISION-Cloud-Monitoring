@@ -13,13 +13,15 @@ import java.util.logging.Logger;
  */
 public class EventHandlerTask implements Runnable {
     /** the log target. */
-    private static final Logger ilog     = Logger.getLogger(EventHandlerTask.class.getName());
-    /***/
-    private static final String SHUTDOWN = "shutdown";
+    private static final Logger ilog    = Logger.getLogger(EventHandlerTask.class.getName());
     /** the event factory. */
     private final EventFactory  factory;
     /** the actual handler. */
     private final EventHandler  handler;
+    /***/
+    private volatile boolean    running = false;
+    /***/
+    private final String        shutdownCommand;
     /***/
     private final Socket        shutdownSock;
     /** the socket. */
@@ -43,6 +45,7 @@ public class EventHandlerTask implements Runnable {
         this.sock = socketFactory.newSubSocket(addr, topic);
         this.shutdownSock = socketFactory.newPubConnectSocket(addr);
         this.handler = handler;
+        this.shutdownCommand = topic + " shutdown";
     }
 
 
@@ -50,8 +53,15 @@ public class EventHandlerTask implements Runnable {
      * Halt the task's execution.
      */
     public void halt() {
-        Thread.currentThread().interrupt();
-        shutdownSock.send(SHUTDOWN);
+        shutdownSock.send(shutdownCommand);
+    }
+
+
+    /**
+     * @return <code>true</code> iff the runnable is still in the receive loop, <code>false</code> otherwise.
+     */
+    public boolean isRunning() {
+        return running;
     }
 
 
@@ -60,6 +70,7 @@ public class EventHandlerTask implements Runnable {
      */
     @Override
     public void run() {
+        running = true;
         ilog.config("entering receive/handle loop");
 
         while (!Thread.currentThread().isInterrupted()) {
@@ -69,7 +80,7 @@ public class EventHandlerTask implements Runnable {
 
             if (msg == null)
                 continue;
-            if (SHUTDOWN.equals(msg))
+            if (shutdownCommand.equals(msg))
                 break;
 
             // bypass topic
@@ -84,7 +95,10 @@ public class EventHandlerTask implements Runnable {
                 }
         }
 
+        ilog.config("leaving loop");
+
         sock.close();
+        running = false;
     }
 
 
