@@ -3,9 +3,6 @@ package examples;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
-import gr.ntua.vision.monitoring.zmq.ZMQFactory;
-
-import org.zeromq.ZContext;
 
 
 /**
@@ -40,8 +37,7 @@ public class FakeEventConsumer {
      * @param args
      */
     public static void main(final String... args) {
-        final ZMQFactory socketFactory = new ZMQFactory(new ZContext());
-        final VismoEventRegistry registry = new VismoEventRegistry(socketFactory, "tcp://10.0.1.103:56430");
+        final VismoEventRegistry registry = new VismoEventRegistry("tcp://10.0.1.103:56430");
 
         registry.registerToAll(new LoggingHandler());
     }
