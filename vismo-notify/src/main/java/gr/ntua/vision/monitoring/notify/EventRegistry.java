@@ -98,7 +98,8 @@ class EventRegistry {
 
 
     /**
-     * Stop the registry; no new registrations will take place.
+     * This should be called out the end of the application. Stop receiving any events; halt any running event handlers; don't
+     * accept other registrations.
      */
     public void halt() {
         log.config("halting " + tasks.size() + " tasks");
@@ -111,7 +112,7 @@ class EventRegistry {
         for (final Thread t : threads)
             try {
                 t.join();
-            } catch (InterruptedException ignored) {
+            } catch (final InterruptedException ignored) {
                 // NOP
             }
 
@@ -151,14 +152,16 @@ class EventRegistry {
 
 
     /**
+     * Start a new thread, running the task.
+     * 
      * @param task
-     * @return
+     * @return the <code>task</code>.
      */
     private EventHandlerTask start(final EventHandlerTask task) {
         final Thread t = new Thread(task, task.toString());
 
-        tasks.add(task);
         threads.add(t);
+        tasks.add(task);
         t.start();
 
         return task;

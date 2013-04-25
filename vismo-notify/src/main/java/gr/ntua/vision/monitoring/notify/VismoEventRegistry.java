@@ -9,7 +9,8 @@ import org.zeromq.ZContext;
 
 
 /**
- * The default event registry.
+ * The default event registry. For details, see {@link EventRegistry}. Exactly one instance should exist in each event consumer
+ * application.
  */
 public class VismoEventRegistry extends EventRegistry {
     /**
