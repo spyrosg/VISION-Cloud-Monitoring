@@ -145,7 +145,7 @@ abstract class AggregationRule extends PeriodicRule {
      *            the event.
      * @return <code>true</code> iff the
      */
-    protected static boolean isCompleteObsEvent(final MonitoringEvent e) {
+    protected static boolean isOBSEvent(final MonitoringEvent e) {
         return e.get(OBS_FIELD) != null;
     }
 

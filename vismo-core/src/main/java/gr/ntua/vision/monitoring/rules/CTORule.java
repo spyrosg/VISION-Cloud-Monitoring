@@ -322,6 +322,6 @@ public class CTORule extends AggregationRule {
      */
     private static boolean matches(final MonitoringEvent e) {
         // FIXME: add a field to events coming from vismo_dispatch
-        return isCompleteObsEvent(e);
+        return isOBSEvent(e);
     }
 }

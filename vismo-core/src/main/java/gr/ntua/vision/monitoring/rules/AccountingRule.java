@@ -195,7 +195,7 @@ public class AccountingRule extends AggregationRule {
      */
     private static boolean matches(final MonitoringEvent e) {
         // FIXME: add a field to events coming from vismo_dispatch
-        return isCompleteObsEvent(e) || isStorletEngineEvent(e);
+        return isOBSEvent(e) || isStorletEngineEvent(e);
     }
 
 
