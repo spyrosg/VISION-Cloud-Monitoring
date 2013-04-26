@@ -67,6 +67,7 @@ public class VismoService implements Service, UDPListener {
     @Override
     public void collectStatus(final List<String> statuses) {
         statuses.add(String.valueOf(vminfo.getPID()));
+        statuses.add(vminfo.getVersion());
     }
 
 

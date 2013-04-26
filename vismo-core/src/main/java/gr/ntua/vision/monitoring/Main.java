@@ -79,7 +79,7 @@ public class Main {
         if (resp == null)
             System.err.println(PROG + ": service is stopped.");
         else
-            System.err.println(PROG + ": running, pid: " + Integer.parseInt(resp));
+            System.err.println(PROG + ": running, pid: " + resp);
     }
 
 
