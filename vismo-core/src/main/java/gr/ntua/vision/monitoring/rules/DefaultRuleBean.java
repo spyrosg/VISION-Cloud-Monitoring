@@ -21,6 +21,17 @@ public class DefaultRuleBean implements RuleBean {
      * Constructor.
      * 
      * @param name
+     */
+    public DefaultRuleBean(final String name) {
+        this.name = name;
+        this.period = -1;
+    }
+
+
+    /**
+     * Constructor.
+     * 
+     * @param name
      * @param period
      */
     public DefaultRuleBean(final String name, final long period) {
@@ -42,6 +53,14 @@ public class DefaultRuleBean implements RuleBean {
      */
     public long getPeriod() {
         return period;
+    }
+
+
+    /**
+     * @return <code>true</code> if the bean has a positive integer period.
+     */
+    public boolean isPeriodic() {
+        return period <= 0;
     }
 
 

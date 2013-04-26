@@ -62,7 +62,7 @@ public class ClassPathRulesFactory extends AbstractRulesFactory {
 
         final DefaultRuleBean b = (DefaultRuleBean) bean;
 
-        if (b.getPeriod() == 0)
+        if (b.isPeriodic())
             return constructByName(b.getName());
 
         return constructByNameWithArguments(b.getName(), b.getPeriod());
