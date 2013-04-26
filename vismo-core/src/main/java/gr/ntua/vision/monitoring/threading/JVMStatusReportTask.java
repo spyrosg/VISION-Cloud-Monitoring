@@ -69,7 +69,9 @@ public class JVMStatusReportTask extends PeriodicTask {
 
         // cpu load could go higher than 100% because currUpTime
         // and currProcTime are not fetched simultaneously. Limit it to 99%.
-        return Math.min(99.9, 100 * elapsedProcTime / (nCPUs * elapsedUpTime));
+        final double d = Math.min(99.9, 100 * elapsedProcTime / (nCPUs * elapsedUpTime));
+
+        return Double.isNaN(d) ? 0 : d;
     }
 
 
