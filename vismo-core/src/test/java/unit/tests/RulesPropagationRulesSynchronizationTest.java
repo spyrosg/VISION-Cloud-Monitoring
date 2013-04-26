@@ -1,4 +1,4 @@
-package rulespropagation;
+package unit.tests;
 
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
