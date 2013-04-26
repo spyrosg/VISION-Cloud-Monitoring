@@ -84,7 +84,7 @@ public class EventHandlerTask implements Runnable {
             final String message = extractMessage(topicAndMessage);
 
             if (message == null) {
-                ilog.warning("received event with topic; ignoring");
+                ilog.warning("received event without topic; ignoring");
                 continue;
             }
 
