@@ -3,12 +3,9 @@ package endtoend.tests;
 import static org.junit.Assert.assertEquals;
 
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.WebResource.Builder;
-import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 
@@ -130,22 +127,10 @@ public class VisionHTTPClient {
 
     /***/
     private void setupClient() {
-        client.setConnectTimeout(3000);
-        client.setReadTimeout(3000);
+        client.setConnectTimeout(30000);
+        client.setReadTimeout(30000);
 
         client.addFilter(new HTTPBasicAuthFilter(user + "@" + tenant, pass));
         client.addFilter(new LoggingFilter(System.err));
-        client.addFilter(new ClientFilter() {
-            @Override
-            public ClientResponse handle(final ClientRequest request) throws ClientHandlerException {
-                final long start = System.currentTimeMillis();
-                final ClientResponse response = getNext().handle(request);
-                final long end = System.currentTimeMillis();
-
-                System.err.println("req/resp took: " + (end - start) + " ms");
-
-                return response;
-            }
-        });
     }
 }

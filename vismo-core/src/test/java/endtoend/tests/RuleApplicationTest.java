@@ -3,19 +3,17 @@ package endtoend.tests;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
-import gr.ntua.vision.monitoring.zmq.ZMQFactory;
+import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.zeromq.ZContext;
 
 
 /**
  * This is used to test the main rule update functionality. See {@link #verifyRuleApplicationWithEventsConsumption()}.
  */
-@Ignore("requires testbed vpn connectivity")
 public class RuleApplicationTest {
     /***/
     private static final int                     CONSUMERS_PORT     = 56430;
@@ -24,13 +22,13 @@ public class RuleApplicationTest {
     /** the machine's ip */
     private static final String                  HOST_URL           = "10.0.1.101";
     /***/
-    private static final String                  OBJ_NAME           = "my-vismo-test-object-1";
+    private static final String                  OBJ_NAME           = "my-vismo-test-object";
     /***/
     private static final String                  PASS               = "123";
     /***/
     private static final String                  TENANT             = "ntua";
     /***/
-    private static final String                  TEST_CONTAINER     = "vismo-test-end-to-end";
+    private static final String                  TEST_CONTAINER     = "test-1";
     /***/
     private static final String                  USER               = "bill";
     /***/
@@ -40,8 +38,8 @@ public class RuleApplicationTest {
     /***/
     private final PerOperationHandler            PUT_OBJECT_HANDLER = new PerOperationHandler("PUT");
     /***/
-    private final VismoEventRegistry             registry           = new VismoEventRegistry(new ZMQFactory(new ZContext()),
-                                                                            "tcp://" + HOST_URL + ":" + CONSUMERS_PORT);
+    private final VismoEventRegistry             registry           = new VismoEventRegistry("tcp://" + HOST_URL + ":"
+                                                                            + CONSUMERS_PORT);
 
 
     /**
@@ -68,14 +66,14 @@ public class RuleApplicationTest {
     @Before
     public void setUp() {
         setupConsumers();
-        client.createContainer(TEST_CONTAINER);
+        // client.createContainer(TEST_CONTAINER);
     }
 
 
     /***/
     @After
     public void tearDown() {
-        client.deleteContainer(TEST_CONTAINER);
+        // client.deleteContainer(TEST_CONTAINER);
     }
 
 
@@ -91,11 +89,11 @@ public class RuleApplicationTest {
      * 
      * @throws InterruptedException
      */
-    @Ignore("WIP")
+    @Ignore
     @Test
     public void verifyRuleApplicationWithEventsConsumption() throws InterruptedException {
         registry.registerToAll(FOO_RULE_HANDLER);
-        // TODO submitRule("FooRule");
+        // submitRule();
 
         client.putObject(TEST_CONTAINER, OBJ_NAME, "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
         Thread.sleep(2000);
@@ -108,9 +106,19 @@ public class RuleApplicationTest {
         registry.registerToAll(new EventHandler() {
             @Override
             public void handle(final MonitoringEvent me) {
-                System.err.println("receiving: " + me.toString());
+                System.err.println("receiving: " + me.serialize());
             }
         });
+    }
+
+
+    /**
+     * @param topic
+     */
+    private void submitRule(final String topic) {
+        final ThresholdRuleBean bean = new ThresholdRuleBean();
+
+        bean.setTopic(topic);
     }
 
 
