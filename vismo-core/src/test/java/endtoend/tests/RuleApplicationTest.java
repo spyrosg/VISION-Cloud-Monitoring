@@ -7,7 +7,6 @@ import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -89,14 +88,13 @@ public class RuleApplicationTest {
      * 
      * @throws InterruptedException
      */
-    @Ignore
     @Test
     public void verifyRuleApplicationWithEventsConsumption() throws InterruptedException {
         registry.registerToAll(FOO_RULE_HANDLER);
-        // submitRule();
+        submitRule(throughputThresholdRule(5, "my-topic", TENANT, USER));
 
         client.putObject(TEST_CONTAINER, OBJ_NAME, "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
-        Thread.sleep(2000);
+        waitForEventsToBeReceived();
         shouldHaveReceivedEvent(FOO_RULE_HANDLER, 1);
     }
 
@@ -113,12 +111,10 @@ public class RuleApplicationTest {
 
 
     /**
-     * @param topic
+     * @param bean
      */
-    private void submitRule(final String topic) {
-        final ThresholdRuleBean bean = new ThresholdRuleBean();
-
-        bean.setTopic(topic);
+    private void submitRule(final ThresholdRuleBean bean) {
+        client.sumbitRule(bean);
     }
 
 
@@ -134,9 +130,36 @@ public class RuleApplicationTest {
 
 
     /**
+     * @param threshold
+     * @param topic
+     * @param tenant
+     * @param user
+     * @return a {@link ThresholdRuleBean}.
+     */
+    private static ThresholdRuleBean throughputThresholdRule(final double threshold, final String topic, final String tenant,
+            final String user) {
+        final ThresholdRuleBean bean = new ThresholdRuleBean();
+
+        // we're concerned about the upload throughout
+        bean.setMetric("transaction-throughput");
+        bean.setOperation("PUT");
+        // under given container
+        bean.setAggregationUnit(tenant + "," + user);
+        // if it's higher...
+        bean.setPredicate(">=");
+        // than THRESHOLD bytes / second
+        bean.setThreshold(threshold);
+        // generate event with given topic.
+        bean.setTopic(topic);
+
+        return bean;
+    }
+
+
+    /**
      * @throws InterruptedException
      */
     private static void waitForEventsToBeReceived() throws InterruptedException {
-        Thread.sleep(1000);
+        Thread.sleep(3000);
     }
 }
