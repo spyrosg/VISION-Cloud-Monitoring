@@ -25,6 +25,14 @@ public interface Socket {
 
 
     /**
+     * If a message is available to read off the socket, deliver it. Else, return <code>null</code> without waiting.
+     * 
+     * @return the message received, or <code>null</code> on io error.
+     */
+    String receiveNonBlocking();
+
+
+    /**
      * Send the message.
      * 
      * @param message
@@ -32,12 +40,4 @@ public interface Socket {
      * @return <code>true</code> on success, <code>false</code> otherwise.
      */
     boolean send(String message);
-
-
-    /**
-     * If a message is available to read off the socket, deliver it. Else, return <code>null</code> without waiting.
-     * 
-     * @return the message received, or <code>null</code> on io error.
-     */
-    String receiveNonBlocking();
 }

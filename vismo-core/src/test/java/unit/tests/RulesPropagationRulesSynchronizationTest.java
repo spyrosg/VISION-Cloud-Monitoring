@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.sun.jersey.api.client.Client;
@@ -22,6 +23,7 @@ import com.sun.jersey.api.client.WebResource;
 /**
  * @author tmessini
  */
+@Ignore
 public class RulesPropagationRulesSynchronizationTest {
     /***/
     private static final int                         GROUP1_SIZE          = 10;
