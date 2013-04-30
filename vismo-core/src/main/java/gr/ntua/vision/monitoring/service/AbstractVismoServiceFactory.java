@@ -2,12 +2,20 @@ package gr.ntua.vision.monitoring.service;
 
 import gr.ntua.vision.monitoring.VMInfo;
 import gr.ntua.vision.monitoring.VismoConfiguration;
+import gr.ntua.vision.monitoring.resources.RulesResource;
+import gr.ntua.vision.monitoring.rules.ClassPathRulesFactory;
+import gr.ntua.vision.monitoring.rules.DefaultRuleBean;
+import gr.ntua.vision.monitoring.rules.RuleBean;
+import gr.ntua.vision.monitoring.rules.RulesStore;
+import gr.ntua.vision.monitoring.rules.ThresholdRulesFactory;
+import gr.ntua.vision.monitoring.rules.VismoRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
-import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
 import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sources.EventSources;
 import gr.ntua.vision.monitoring.threading.JVMStatusReportTask;
 import gr.ntua.vision.monitoring.threading.PingGroupTask;
+import gr.ntua.vision.monitoring.web.WebAppBuilder;
+import gr.ntua.vision.monitoring.web.WebServer;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import java.io.IOException;
@@ -23,15 +31,17 @@ import org.slf4j.LoggerFactory;
  */
 abstract class AbstractVismoServiceFactory implements ServiceFactory {
     /***/
-    private static final Logger        log        = LoggerFactory.getLogger(AbstractVismoServiceFactory.class);
+    private static final Package       DEFAULT_RULES_PACKAGE = VismoRule.class.getPackage();
     /***/
-    private static final long          ONE_MINUTE = 60 * 1000;
+    private static final Logger        log                   = LoggerFactory.getLogger(AbstractVismoServiceFactory.class);
+    /***/
+    private static final long          ONE_MINUTE            = 60 * 1000;
+    /***/
+    private static final int           PORT                  = 9996;
     /***/
     protected final VismoConfiguration conf;
     /***/
     protected final ZMQFactory         socketFactory;
-    /***/
-    private final VismoRulesEngine     engine;
 
 
     /**
@@ -39,13 +49,10 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
      * 
      * @param conf
      * @param socketFactory
-     * @param engine
      */
-    public AbstractVismoServiceFactory(final VismoConfiguration conf, final ZMQFactory socketFactory,
-            final VismoRulesEngine engine) {
+    public AbstractVismoServiceFactory(final VismoConfiguration conf, final ZMQFactory socketFactory) {
         this.conf = conf;
         this.socketFactory = socketFactory;
-        this.engine = engine;
     }
 
 
@@ -56,6 +63,8 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
     public Service build(final VMInfo vminfo) throws IOException {
         log.info("building service...");
 
+        final RulesStore store = new RulesStore();
+        final VismoRulesEngine engine = new VismoRulesEngine(store);
         final EventSources sources = getEventSources();
 
         log.info("with {}", sources);
@@ -65,10 +74,13 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
         log.info("subscribing sources to rules engine");
         sources.subscribeAll(engine);
 
-        final VismoService service = new VismoService(vminfo, sources, engine, new RulesPropagationManager(engine, 9996));
+        final WebServer server = buildWebServer(PORT, store, engine);
+        final VismoService service = new VismoService(vminfo, sources, engine, server);
 
         addDefaultServiceTasks(vminfo, service);
         log.info("take it from here");
+
+        submitRules(engine);
 
         return service;
     }
@@ -100,4 +112,50 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
      * @return an {@link EventSources} object, already configured.
      */
     protected abstract EventSources getEventSources();
+
+
+    /**
+     * This is used to submit rules to the rules engine at startup time.
+     * 
+     * @param engine
+     *            the rules engine.
+     */
+    protected abstract void submitRules(final VismoRulesEngine engine);
+
+
+    /**
+     * Parse the configuration and load any rules.
+     * 
+     * @param engine
+     */
+    protected void submitRulesFromConf(final VismoRulesEngine engine) {
+        final ClassPathRulesFactory rulesFactory = new ClassPathRulesFactory(engine, DEFAULT_RULES_PACKAGE);
+
+        for (final String rule : conf.getStartupRules()) {
+            final String[] fs = rule.split(":");
+
+            try {
+                final RuleBean bean = fs.length > 1 ? new DefaultRuleBean(fs[0], Long.valueOf(fs[1])) : new DefaultRuleBean(rule);
+
+                rulesFactory.buildFrom(bean).submit();
+            } catch (final Throwable x) {
+                log.warn("cannot load rule specification " + rule + "; continuing", x);
+            }
+        }
+    }
+
+
+    /**
+     * @param port
+     * @param store
+     * @param engine
+     * @return a configured {@link WebServer}.
+     */
+    private static WebServer buildWebServer(final int port, final RulesStore store, final VismoRulesEngine engine) {
+        final WebServer server = new WebServer(port);
+        final RulesResource rulesResource = new RulesResource(new ThresholdRulesFactory(new ClassPathRulesFactory(engine,
+                DEFAULT_RULES_PACKAGE), engine), store);
+
+        return server.withWebAppAt(WebAppBuilder.buildFrom(rulesResource), "/*");
+    }
 }

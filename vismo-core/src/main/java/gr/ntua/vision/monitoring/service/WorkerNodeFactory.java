@@ -18,10 +18,9 @@ public class WorkerNodeFactory extends AbstractVismoServiceFactory {
     /**
      * @param conf
      * @param socketFactory
-     * @param engine
      */
-    public WorkerNodeFactory(final VismoConfiguration conf, final ZMQFactory socketFactory, final VismoRulesEngine engine) {
-        super(conf, socketFactory, engine);
+    public WorkerNodeFactory(final VismoConfiguration conf, final ZMQFactory socketFactory) {
+        super(conf, socketFactory);
     }
 
 
@@ -40,5 +39,14 @@ public class WorkerNodeFactory extends AbstractVismoServiceFactory {
     @Override
     protected EventSources getEventSources() {
         return new EventSourcesFactory(conf, socketFactory).buildForWorker();
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#submitRules(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
+     */
+    @Override
+    protected void submitRules(@SuppressWarnings("unused") final VismoRulesEngine engine) {
+        // NOP
     }
 }

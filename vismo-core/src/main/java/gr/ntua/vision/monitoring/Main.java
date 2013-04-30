@@ -1,8 +1,6 @@
 package gr.ntua.vision.monitoring;
 
 import gr.ntua.vision.monitoring.policy.StaticConfigPolicy;
-import gr.ntua.vision.monitoring.rules.PassThroughRule;
-import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.service.VismoService;
 import gr.ntua.vision.monitoring.udp.UDPClient;
 import gr.ntua.vision.monitoring.udp.UDPFactory;
@@ -37,11 +35,8 @@ public class Main {
      */
     public void start() throws IOException {
         final VMInfo info = new VismoVMInfo();
-        final VismoRulesEngine engine = new VismoRulesEngine();
-        final VismoService service = (VismoService) new StaticConfigPolicy(conf, engine).build(info);
+        final VismoService service = (VismoService) new StaticConfigPolicy(conf).build(info);
         final UDPServer udpServer = new UDPFactory(conf.getUDPPort()).buildServer();
-
-        submitDefaultRulesTo(engine);
 
         udpServer.add(service);
         udpServer.start();
@@ -121,16 +116,5 @@ public class Main {
         System.err.println("  status  report the status of vismo.");
         System.err.println("  stop    stop any running vismo instance.");
         System.err.println("  help    show this help message and exit.");
-    }
-
-
-    /**
-     * This is used to submit the rules that are required to run on all nodes.
-     * 
-     * @param engine
-     *            the engine to submit the rules to.
-     */
-    private static void submitDefaultRulesTo(final VismoRulesEngine engine) {
-        new PassThroughRule(engine).submit();
     }
 }
