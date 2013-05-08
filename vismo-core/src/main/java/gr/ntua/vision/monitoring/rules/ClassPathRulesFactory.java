@@ -1,12 +1,8 @@
 package gr.ntua.vision.monitoring.rules;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +14,11 @@ import org.slf4j.LoggerFactory;
  */
 public class ClassPathRulesFactory extends AbstractRulesFactory {
     /***/
-    private static final Logger   log                 = LoggerFactory.getLogger(ClassPathRulesFactory.class);
+    private static final Logger         log = LoggerFactory.getLogger(ClassPathRulesFactory.class);
     /***/
-    private final HashSet<String> classesUnderPackage = new HashSet<String>();
+    private final Package               pkg;
     /***/
-    private final Package         pkg;
+    private final ClassPathResourceList resourceList;
 
 
     /**
@@ -35,6 +31,7 @@ public class ClassPathRulesFactory extends AbstractRulesFactory {
     public ClassPathRulesFactory(final RulesFactory next, final VismoRulesEngine engine, final Package pkg) {
         super(next, engine);
         this.pkg = pkg;
+        this.resourceList = new ClassPathResourceList();
     }
 
 
@@ -122,8 +119,13 @@ public class ClassPathRulesFactory extends AbstractRulesFactory {
         try {
             return Class.forName(className);
         } catch (final ClassNotFoundException e) {
+            final String fcqn = tryLoadFromPackage(pkg, className);
+
+            if (fcqn == null)
+                throw new IllegalArgumentException("no matching class found for class-name: " + className);
+
             try {
-                return Class.forName(tryLoadFromPackage(pkg, className));
+                return Class.forName(fcqn);
             } catch (final ClassNotFoundException e1) {
                 log.error(className, e);
 
@@ -142,43 +144,25 @@ public class ClassPathRulesFactory extends AbstractRulesFactory {
      *         match.
      */
     private String tryLoadFromPackage(final Package pkg, final String className) {
-        if (classesUnderPackage.isEmpty())
-            classesUnderPackage.addAll(getClassesForPackage(pkg));
+        final String pkgName = pkg.getName().replace(".", "/");
+        final String classSuffix = className + ".class";
 
-        for (final String name : classesUnderPackage) {
-            final int idx = name.lastIndexOf(".");
+        log.trace("pkg-name: '{}', class-name: '{}'", pkgName, className);
 
-            if (idx >= 0) {
-                if (name.substring(idx + 1).equals(className))
-                    return name;
-            } else if (name.equals(className))
-                return name;
-        }
+        for (final String res : resourceList.getResources())
+            if (res.contains(pkgName) && res.endsWith(classSuffix)) {
+                log.trace("resource matching class: {}", res);
 
-        log.warn("no constructor for {}", className);
+                final String fqcn = translateResourceToFQCN(pkg.getName(), res);
+
+                log.trace("fully qualified name: {}", fqcn);
+
+                return fqcn;
+            }
+
+        log.warn("no matching class found for class-name: {}", className);
 
         return null;
-    }
-
-
-    /**
-     * @param pkg
-     * @return the list of class names found in the package.
-     */
-    private static ArrayList<String> getClassesForPackage(final Package pkg) {
-        final ArrayList<String> classes = new ArrayList<String>();
-
-        final String pkgname = pkg.getName();
-        final String relPath = pkgname.replace('.', '/');
-        final URL resource = ClassLoader.getSystemClassLoader().getResource(relPath);
-
-        if (resource == null)
-            throw new RuntimeException("Unexpected problem: No resource for " + relPath);
-
-        log.trace("package '{}' => {}", pkgname, resource);
-        processDirectory(new File(resource.getPath()), pkgname, classes);
-
-        return classes;
     }
 
 
@@ -217,32 +201,6 @@ public class ClassPathRulesFactory extends AbstractRulesFactory {
 
 
     /**
-     * @param directory
-     * @param pkgname
-     * @param classes
-     */
-    private static void processDirectory(final File directory, final String pkgname, final ArrayList<String> classes) {
-        log.trace("for directory ' {}'");
-
-        final String[] files = directory.list();
-
-        for (final String fileName : files) {
-            if (!fileName.endsWith(".class"))
-                continue;
-
-            final String className = pkgname + '.' + fileName.substring(0, fileName.length() - 6);
-
-            classes.add(className);
-
-            final File subdir = new File(directory, fileName);
-
-            if (subdir.isDirectory())
-                processDirectory(subdir, pkgname + "." + fileName, classes);
-        }
-    }
-
-
-    /**
      * Get the classes of given array of objects.
      * 
      * @param args
@@ -259,6 +217,18 @@ public class ClassPathRulesFactory extends AbstractRulesFactory {
                 arr[i] = args[i] != null ? args[i].getClass() : null;
 
         return arr;
+    }
+
+
+    /**
+     * Given the name of a resource in a package, return the fully qualified class name that stands for given resource.
+     * 
+     * @param pkgName
+     * @param res
+     * @return the fully qualified class name of the <code>resource</code>.
+     */
+    private static String translateResourceToFQCN(final String pkgName, final String res) {
+        return res.replace(".class", "").replace("/", ".").replace(pkgName, "@").replaceAll("^[^@]*@", pkgName);
     }
 
 
