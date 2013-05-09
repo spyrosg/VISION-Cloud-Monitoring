@@ -170,7 +170,7 @@ public class VismoRulesEngine implements EventSourceListener {
      * @param r
      */
     private void add(final VismoRule r) {
-        log.debug("submitting {}", r);
+        log.debug("submitted {}", r);
         store.add(r);
     }
 

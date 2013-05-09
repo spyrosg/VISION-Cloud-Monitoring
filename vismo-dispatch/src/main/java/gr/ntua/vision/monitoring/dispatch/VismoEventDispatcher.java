@@ -70,7 +70,7 @@ public class VismoEventDispatcher implements EventDispatcher {
     }
     /***/
     private static final String      dispatchLogProperty = "dispatch.log";
-    /***/
+    /** the log target. */
     private static final Logger      log                 = Logger.getLogger(VismoEventDispatcher.class.getName());
     /** the event builder. */
     private final VismoEventBuilder  builder;
@@ -90,6 +90,17 @@ public class VismoEventDispatcher implements EventDispatcher {
 
     /**
      * Constructor. In most cases, this is the constructor to use.
+     * 
+     * @param serviceName
+     *            the name of the service generating the events.
+     */
+    public VismoEventDispatcher(final String serviceName) {
+        this(new ZMQFactory(new ZContext()), VismoConfiguration.VISMO_CONFIG_FILE, serviceName);
+    }
+
+
+    /**
+     * Constructor.
      * 
      * @param configFile
      *            the vismo configuration file.

@@ -97,17 +97,6 @@ class MapBasedEvent implements MonitoringEvent {
 
 
     /**
-     * Update the key with given value in the event.
-     * 
-     * @param key
-     * @param value
-     */
-    protected void put(final String key, final Object value) {
-        dict.put(key, value);
-    }
-
-
-    /**
      * Check that the map contains event required fields.
      * 
      * @param map

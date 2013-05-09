@@ -1,16 +1,18 @@
 package endtoend.tests;
 
 import static org.junit.Assert.assertEquals;
+import gr.ntua.vision.monitoring.rules.RuleBean;
+
+import javax.ws.rs.core.MediaType;
 
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.WebResource.Builder;
-import com.sun.jersey.api.client.filter.ClientFilter;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.client.filter.LoggingFilter;
+import com.sun.jersey.api.json.JSONConfiguration;
 
 
 /**
@@ -19,7 +21,7 @@ import com.sun.jersey.api.client.filter.LoggingFilter;
  */
 public class VisionHTTPClient {
     /***/
-    private final Client client = new Client();
+    private final Client client;
     /***/
     private final String hostURL;
     /***/
@@ -43,7 +45,7 @@ public class VisionHTTPClient {
         this.tenant = tenant;
         this.user = user;
         this.pass = pass;
-        setupClient();
+        this.client = setupClient();
     }
 
 
@@ -102,6 +104,16 @@ public class VisionHTTPClient {
 
 
     /**
+     * @param bean
+     */
+    public void sumbitRule(final RuleBean bean) {
+        final ClientResponse res = rules().type(MediaType.APPLICATION_JSON).entity(bean).post(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+    }
+
+
+    /**
      * @return a resource pointing to the entry point of <code>Containers</code>.
      */
     protected WebResource containers() {
@@ -118,6 +130,14 @@ public class VisionHTTPClient {
 
 
     /**
+     * @return a resource pointing to the vismo rules api.
+     */
+    protected WebResource rules() {
+        return client.resource("http://" + hostURL + ":9996").path("rules");
+    }
+
+
+    /**
      * @param container
      * @param object
      * @return a {@link Builder}.
@@ -128,24 +148,22 @@ public class VisionHTTPClient {
     }
 
 
-    /***/
-    private void setupClient() {
-        client.setConnectTimeout(3000);
-        client.setReadTimeout(3000);
+    /**
+     * @return a configured jersey http client.
+     */
+    private Client setupClient() {
+        final DefaultClientConfig cc = new DefaultClientConfig();
 
-        client.addFilter(new HTTPBasicAuthFilter(user + "@" + tenant, pass));
-        client.addFilter(new LoggingFilter(System.err));
-        client.addFilter(new ClientFilter() {
-            @Override
-            public ClientResponse handle(final ClientRequest request) throws ClientHandlerException {
-                final long start = System.currentTimeMillis();
-                final ClientResponse response = getNext().handle(request);
-                final long end = System.currentTimeMillis();
+        cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
 
-                System.err.println("req/resp took: " + (end - start) + " ms");
+        final Client c = Client.create(cc);
 
-                return response;
-            }
-        });
+        c.setConnectTimeout(30000);
+        c.setReadTimeout(30000);
+
+        c.addFilter(new HTTPBasicAuthFilter(user + "@" + tenant, pass));
+        c.addFilter(new LoggingFilter(System.err));
+
+        return c;
     }
 }

@@ -3,7 +3,6 @@ package gr.ntua.vision.monitoring.notify;
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.sockets.Socket;
-import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import java.util.logging.Logger;
 
@@ -13,17 +12,17 @@ import java.util.logging.Logger;
  */
 public class EventHandlerTask implements Runnable {
     /** the log target. */
-    private static final Logger ilog     = Logger.getLogger(EventHandlerTask.class.getName());
-    /***/
-    private static final String SHUTDOWN = "shutdown";
+    private static final Logger ilog               = Logger.getLogger(EventHandlerTask.class.getName());
+    /** no of milliseconds to sleep for when receiving an event. */
+    private static final int    OPT_SLEEP_DURATION = 50;
     /** the event factory. */
     private final EventFactory  factory;
     /** the actual handler. */
     private final EventHandler  handler;
-    /***/
-    private final Socket        shutdownSock;
-    /** the socket. */
+    /** the socket to receive messages. */
     private final Socket        sock;
+    /***/
+    private volatile boolean    stop;
 
 
     /**
@@ -31,18 +30,16 @@ public class EventHandlerTask implements Runnable {
      * 
      * @param factory
      *            the event factory.
-     * @param socketFactory
-     * @param addr
-     * @param topic
+     * @param sock
+     *            the socket to receive messages.
      * @param handler
      *            the actual handler.
      */
-    EventHandlerTask(final EventFactory factory, final ZMQFactory socketFactory, final String addr, final String topic,
-            final EventHandler handler) {
+    EventHandlerTask(final EventFactory factory, final Socket sock, final EventHandler handler) {
         this.factory = factory;
-        this.sock = socketFactory.newSubSocket(addr, topic);
-        this.shutdownSock = socketFactory.newPubConnectSocket(addr);
+        this.sock = sock;
         this.handler = handler;
+        this.stop = false;
     }
 
 
@@ -50,8 +47,15 @@ public class EventHandlerTask implements Runnable {
      * Halt the task's execution.
      */
     public void halt() {
-        Thread.currentThread().interrupt();
-        shutdownSock.send(SHUTDOWN);
+        stop = true;
+    }
+
+
+    /**
+     * @return <code>true</code> iff the runnable is still in the receive loop, <code>false</code> otherwise.
+     */
+    public boolean isRunning() {
+        return !stop;
     }
 
 
@@ -62,28 +66,40 @@ public class EventHandlerTask implements Runnable {
     public void run() {
         ilog.config("entering receive/handle loop");
 
-        while (!Thread.currentThread().isInterrupted()) {
-            final String msg = sock.receive();
+        while (!Thread.currentThread().isInterrupted() && !stop) {
+            final String topicAndMessage = sock.receiveNonBlocking();
 
-            ilog.fine("received: " + msg);
+            if (topicAndMessage == null) {
+                try {
+                    Thread.sleep(OPT_SLEEP_DURATION);
+                } catch (final InterruptedException ignored) {
+                    // NOP
+                }
 
-            if (msg == null)
                 continue;
-            if (SHUTDOWN.equals(msg))
-                break;
+            }
 
-            // bypass topic
-            final int topicIndex = msg.indexOf(" ");
-            final MonitoringEvent e = factory.createEvent(msg.substring(topicIndex + 1));
+            ilog.fine("received: " + topicAndMessage);
+
+            final String message = extractMessage(topicAndMessage);
+
+            if (message == null) {
+                ilog.warning("received event without topic; ignoring");
+                continue;
+            }
+
+            final MonitoringEvent e = factory.createEvent(message);
 
             if (e != null)
                 try {
                     handler.handle(e);
                 } catch (final Throwable x) {
+                    ilog.warning("exception: " + x.getMessage());
                     x.printStackTrace();
                 }
         }
 
+        ilog.config("leaving loop");
         sock.close();
     }
 
@@ -94,5 +110,21 @@ public class EventHandlerTask implements Runnable {
     @Override
     public String toString() {
         return "#<EventHandlerTask: " + sock + ">";
+    }
+
+
+    /**
+     * Bypass the topic, return the actual message.
+     * 
+     * @param s
+     * @return the message part of the received string, or <code>null</code> if there's no topic.
+     */
+    private static String extractMessage(final String s) {
+        final int topicIndex = s.indexOf(" ");
+
+        if (topicIndex < 0)
+            return null;
+
+        return s.substring(topicIndex + 1);
     }
 }

@@ -6,7 +6,6 @@ import gr.ntua.vision.monitoring.VismoVMInfo;
 import gr.ntua.vision.monitoring.dispatch.VismoEventDispatcher;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
-import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.service.ClusterHeadNodeFactory;
@@ -95,6 +94,7 @@ public class VismoServiceTest {
                                                            setProperty("mon.group.addr", "228.5.6.7");
                                                            setProperty("mon.group.port", "12345");
                                                            setProperty("mon.ping.period", "60000");
+                                                           setProperty("startup.rules", "");
                                                        }
                                                    };
     /***/
@@ -116,12 +116,17 @@ public class VismoServiceTest {
     public void setUp() throws IOException {
         obs = new FakeObjectService(new VismoEventDispatcher(socketFactory, conf, "fake-obs"));
 
-        final VismoRulesEngine engine = new VismoRulesEngine();
-
-        new PassThroughRule(engine).submit();
-        countRule = new EventCountRule(engine);
-        countRule.submit();
-        service = new ClusterHeadNodeFactory(conf, socketFactory, engine).build(new VismoVMInfo());
+        service = new ClusterHeadNodeFactory(conf, socketFactory) {
+            /**
+             * @see gr.ntua.vision.monitoring.service.ClusterHeadNodeFactory#submitRules(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
+             */
+            @Override
+            protected void submitRules(final VismoRulesEngine engine) {
+                countRule = new EventCountRule(engine);
+                countRule.submit();
+                super.submitRules(engine);
+            }
+        }.build(new VismoVMInfo());
     }
 
 

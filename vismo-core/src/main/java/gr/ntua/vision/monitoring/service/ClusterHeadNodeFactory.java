@@ -1,6 +1,7 @@
 package gr.ntua.vision.monitoring.service;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
+import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sinks.EventSinksFactory;
@@ -18,10 +19,9 @@ public class ClusterHeadNodeFactory extends AbstractVismoServiceFactory {
     /**
      * @param conf
      * @param socketFactory
-     * @param engine
      */
-    public ClusterHeadNodeFactory(final VismoConfiguration conf, final ZMQFactory socketFactory, final VismoRulesEngine engine) {
-        super(conf, socketFactory, engine);
+    public ClusterHeadNodeFactory(final VismoConfiguration conf, final ZMQFactory socketFactory) {
+        super(conf, socketFactory);
     }
 
 
@@ -40,5 +40,15 @@ public class ClusterHeadNodeFactory extends AbstractVismoServiceFactory {
     @Override
     protected EventSources getEventSources() {
         return new EventSourcesFactory(conf, socketFactory).buildForClusterHead();
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#submitRules(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
+     */
+    @Override
+    protected void submitRules(final VismoRulesEngine engine) {
+        submitRulesFromConf(engine);
+        new PassThroughRule(engine).submit();
     }
 }

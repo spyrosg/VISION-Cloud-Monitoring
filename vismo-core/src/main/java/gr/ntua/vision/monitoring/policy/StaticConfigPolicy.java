@@ -2,7 +2,6 @@ package gr.ntua.vision.monitoring.policy;
 
 import gr.ntua.vision.monitoring.VMInfo;
 import gr.ntua.vision.monitoring.VismoConfiguration;
-import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.service.CloudHeadNodeFactory;
 import gr.ntua.vision.monitoring.service.ClusterHeadNodeFactory;
 import gr.ntua.vision.monitoring.service.Service;
@@ -25,8 +24,6 @@ public class StaticConfigPolicy implements NodePolicy {
     private static final Logger      log = LoggerFactory.getLogger(StaticConfigPolicy.class);
     /** the configuration object. */
     private final VismoConfiguration conf;
-    /***/
-    private final VismoRulesEngine   engine;
 
 
     /**
@@ -34,11 +31,9 @@ public class StaticConfigPolicy implements NodePolicy {
      * 
      * @param conf
      *            the configuration object.
-     * @param engine
      */
-    public StaticConfigPolicy(final VismoConfiguration conf, final VismoRulesEngine engine) {
+    public StaticConfigPolicy(final VismoConfiguration conf) {
         this.conf = conf;
-        this.engine = engine;
     }
 
 
@@ -53,11 +48,11 @@ public class StaticConfigPolicy implements NodePolicy {
         final ZMQFactory socketFactory = new ZMQFactory(new ZContext());
 
         if (hostIsCloudHead(vminfo))
-            return new CloudHeadNodeFactory(conf, socketFactory, engine).build(vminfo);
+            return new CloudHeadNodeFactory(conf, socketFactory).build(vminfo);
         else if (hostIsClusterHead(vminfo))
-            return new ClusterHeadNodeFactory(conf, socketFactory, engine).build(vminfo);
+            return new ClusterHeadNodeFactory(conf, socketFactory).build(vminfo);
         else
-            return new WorkerNodeFactory(conf, socketFactory, engine).build(vminfo);
+            return new WorkerNodeFactory(conf, socketFactory).build(vminfo);
     }
 
 

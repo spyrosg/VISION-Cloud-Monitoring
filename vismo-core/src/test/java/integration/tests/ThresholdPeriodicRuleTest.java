@@ -108,7 +108,7 @@ public class ThresholdPeriodicRuleTest {
         assertEquals(1, engine.noRules());
 
         triggerRule();
-        Thread.sleep(RULE_PERIOD);
+        Thread.sleep((long) (1.2 * RULE_PERIOD));
         assertEquals(1, eventSink.size());
         assertIsExpectedEvent(eventSink.get(0));
     }

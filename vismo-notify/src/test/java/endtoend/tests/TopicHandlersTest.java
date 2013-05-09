@@ -109,8 +109,8 @@ public class TopicHandlersTest {
      */
     @After
     public void tearDown() {
-        for (final EventHandlerTask task : tasks)
-            task.halt();
+        registry.halt();
+        inst.halt();
     }
 
 

@@ -1,10 +1,12 @@
 package integration.tests;
 
 import static org.junit.Assert.assertTrue;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.rules.AccountingRule;
 import gr.ntua.vision.monitoring.rules.ClassPathRulesFactory;
 import gr.ntua.vision.monitoring.rules.DefaultRuleBean;
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
+import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.VismoRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 
@@ -15,6 +17,29 @@ import org.junit.Test;
  * 
  */
 public class ClassPathRulesFactoryTest {
+    /**
+     * 
+     */
+    public static class DummyRule extends Rule {
+        /**
+         * Constructor.
+         * 
+         * @param engine
+         */
+        public DummyRule(final VismoRulesEngine engine) {
+            super(engine);
+        }
+
+
+        /**
+         * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
+         */
+        @Override
+        public void performWith(@SuppressWarnings("unused") final MonitoringEvent c) {
+            // NOP
+        }
+    }
+
     /***/
     private final VismoRulesEngine engine = new VismoRulesEngine();
 
@@ -29,6 +54,21 @@ public class ClassPathRulesFactoryTest {
 
         assertTrue(rule != null);
         assertTrue(rule instanceof AccountingRule);
+    }
+
+
+    /***/
+    @Test
+    public void shouldLoadInnerClassRule() {
+        final ClassPathRulesFactory factory = new ClassPathRulesFactory(engine, DummyRule.class.getPackage());
+        final String RULE_NAME = "DummyRule";
+        final DefaultRuleBean bean = new DefaultRuleBean();
+
+        bean.setName(RULE_NAME);
+        final VismoRule rule = factory.buildFrom(bean);
+
+        assertTrue(rule != null);
+        assertTrue(rule instanceof DummyRule);
     }
 
 

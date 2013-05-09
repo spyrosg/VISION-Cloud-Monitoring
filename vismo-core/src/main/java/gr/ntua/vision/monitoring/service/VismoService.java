@@ -2,10 +2,10 @@ package gr.ntua.vision.monitoring.service;
 
 import gr.ntua.vision.monitoring.VMInfo;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
-import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
 import gr.ntua.vision.monitoring.sources.EventSources;
 import gr.ntua.vision.monitoring.threading.PeriodicTask;
 import gr.ntua.vision.monitoring.udp.UDPListener;
+import gr.ntua.vision.monitoring.web.WebServer;
 
 import java.util.List;
 import java.util.Timer;
@@ -19,17 +19,17 @@ import org.slf4j.LoggerFactory;
  */
 public class VismoService implements Service, UDPListener {
     /***/
-    private static final Logger           log   = LoggerFactory.getLogger(VismoService.class);
+    private static final Logger    log   = LoggerFactory.getLogger(VismoService.class);
     /***/
-    private final VismoRulesEngine        engine;
+    private final VismoRulesEngine engine;
     /***/
-    private final RulesPropagationManager manager;
+    private final WebServer        httpServer;
     /***/
-    private final EventSources            sources;
+    private final EventSources     sources;
     /** the timer object. */
-    private final Timer                   timer = new Timer(true);
+    private final Timer            timer = new Timer(true);
     /***/
-    private final VMInfo                  vminfo;
+    private final VMInfo           vminfo;
 
 
     /**
@@ -38,14 +38,13 @@ public class VismoService implements Service, UDPListener {
      * @param vminfo
      * @param sources
      * @param engine
-     * @param manager
+     * @param httpServer
      */
-    public VismoService(final VMInfo vminfo, final EventSources sources, final VismoRulesEngine engine,
-            final RulesPropagationManager manager) {
+    public VismoService(final VMInfo vminfo, final EventSources sources, final VismoRulesEngine engine, final WebServer httpServer) {
         this.vminfo = vminfo;
         this.sources = sources;
         this.engine = engine;
-        this.manager = manager;
+        this.httpServer = httpServer;
     }
 
 
@@ -67,6 +66,7 @@ public class VismoService implements Service, UDPListener {
     @Override
     public void collectStatus(final List<String> statuses) {
         statuses.add(String.valueOf(vminfo.getPID()));
+        statuses.add(vminfo.getVersion());
     }
 
 
@@ -79,7 +79,13 @@ public class VismoService implements Service, UDPListener {
         timer.cancel();
         sources.halt();
         engine.halt();
-        manager.halt();
+
+        try {
+            httpServer.stop();
+        } catch (final Exception e) {
+            log.warn("stopping http server", e);
+            // NOP
+        }
     }
 
 
@@ -91,7 +97,12 @@ public class VismoService implements Service, UDPListener {
         log.info("this is {} with pid {}", this, vminfo.getPID());
         log.debug("starting subsystems");
         sources.start();
-        manager.start();
+
+        try {
+            httpServer.start();
+        } catch (final Exception e) {
+            log.warn("starting http server", e);
+        }
     }
 
 

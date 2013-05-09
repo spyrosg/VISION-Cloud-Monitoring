@@ -11,15 +11,25 @@ public interface Socket {
 
 
     /**
-     * @return
+     * @return <code>true</code> iff this is a zmq pub socket, <code>false</code> otherwise.
      */
     boolean isZMQPUB();
 
 
     /**
+     * Block and wait for a message to receive.
+     * 
      * @return the message received, or <code>null</code> on io error.
      */
     String receive();
+
+
+    /**
+     * If a message is available to read off the socket, deliver it. Else, return <code>null</code> without waiting.
+     * 
+     * @return the message received, or <code>null</code> on io error.
+     */
+    String receiveNonBlocking();
 
 
     /**

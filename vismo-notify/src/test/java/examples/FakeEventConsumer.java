@@ -3,9 +3,6 @@ package examples;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
-import gr.ntua.vision.monitoring.zmq.ZMQFactory;
-
-import org.zeromq.ZContext;
 
 
 /**
@@ -21,27 +18,16 @@ public class FakeEventConsumer {
          */
         @Override
         public void handle(final MonitoringEvent e) {
-            try {
-                final Object special = e.get(FakeEventConsumer.SPECIAL_FIELD);
-
-                if (special != null)
-                    System.err.println(getClass().getSimpleName() + ": " + e.get("originating-machine") + " => " + e.toString());
-            } catch (final Throwable x) {
-                x.printStackTrace();
-            }
+            System.out.println(e.serialize());
         }
     }
-
-    /***/
-    private static final String SPECIAL_FIELD = "transaction-throughput";
 
 
     /**
      * @param args
      */
     public static void main(final String... args) {
-        final ZMQFactory socketFactory = new ZMQFactory(new ZContext());
-        final VismoEventRegistry registry = new VismoEventRegistry(socketFactory, "tcp://10.0.1.103:56430");
+        final VismoEventRegistry registry = new VismoEventRegistry("tcp://10.0.1.101:56430");
 
         registry.registerToAll(new LoggingHandler());
     }

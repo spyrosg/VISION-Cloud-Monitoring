@@ -3,19 +3,16 @@ package endtoend.tests;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
-import gr.ntua.vision.monitoring.zmq.ZMQFactory;
+import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.zeromq.ZContext;
 
 
 /**
  * This is used to test the main rule update functionality. See {@link #verifyRuleApplicationWithEventsConsumption()}.
  */
-@Ignore("requires testbed vpn connectivity")
 public class RuleApplicationTest {
     /***/
     private static final int                     CONSUMERS_PORT     = 56430;
@@ -24,13 +21,13 @@ public class RuleApplicationTest {
     /** the machine's ip */
     private static final String                  HOST_URL           = "10.0.1.101";
     /***/
-    private static final String                  OBJ_NAME           = "my-vismo-test-object-1";
+    private static final String                  OBJ_NAME           = "my-vismo-test-object";
     /***/
     private static final String                  PASS               = "123";
     /***/
     private static final String                  TENANT             = "ntua";
     /***/
-    private static final String                  TEST_CONTAINER     = "vismo-test-end-to-end";
+    private static final String                  TEST_CONTAINER     = "test-1";
     /***/
     private static final String                  USER               = "bill";
     /***/
@@ -40,8 +37,8 @@ public class RuleApplicationTest {
     /***/
     private final PerOperationHandler            PUT_OBJECT_HANDLER = new PerOperationHandler("PUT");
     /***/
-    private final VismoEventRegistry             registry           = new VismoEventRegistry(new ZMQFactory(new ZContext()),
-                                                                            "tcp://" + HOST_URL + ":" + CONSUMERS_PORT);
+    private final VismoEventRegistry             registry           = new VismoEventRegistry("tcp://" + HOST_URL + ":"
+                                                                            + CONSUMERS_PORT);
 
 
     /**
@@ -68,14 +65,14 @@ public class RuleApplicationTest {
     @Before
     public void setUp() {
         setupConsumers();
-        client.createContainer(TEST_CONTAINER);
+        // client.createContainer(TEST_CONTAINER);
     }
 
 
     /***/
     @After
     public void tearDown() {
-        client.deleteContainer(TEST_CONTAINER);
+        // client.deleteContainer(TEST_CONTAINER);
     }
 
 
@@ -91,14 +88,13 @@ public class RuleApplicationTest {
      * 
      * @throws InterruptedException
      */
-    @Ignore("WIP")
     @Test
     public void verifyRuleApplicationWithEventsConsumption() throws InterruptedException {
         registry.registerToAll(FOO_RULE_HANDLER);
-        // TODO submitRule("FooRule");
+        submitRule(throughputThresholdRule(5, "my-topic", TENANT, USER));
 
         client.putObject(TEST_CONTAINER, OBJ_NAME, "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
-        Thread.sleep(2000);
+        waitForEventsToBeReceived();
         shouldHaveReceivedEvent(FOO_RULE_HANDLER, 1);
     }
 
@@ -108,9 +104,17 @@ public class RuleApplicationTest {
         registry.registerToAll(new EventHandler() {
             @Override
             public void handle(final MonitoringEvent me) {
-                System.err.println("receiving: " + me.toString());
+                System.err.println("receiving: " + me.serialize());
             }
         });
+    }
+
+
+    /**
+     * @param bean
+     */
+    private void submitRule(final ThresholdRuleBean bean) {
+        client.sumbitRule(bean);
     }
 
 
@@ -126,9 +130,36 @@ public class RuleApplicationTest {
 
 
     /**
+     * @param threshold
+     * @param topic
+     * @param tenant
+     * @param user
+     * @return a {@link ThresholdRuleBean}.
+     */
+    private static ThresholdRuleBean throughputThresholdRule(final double threshold, final String topic, final String tenant,
+            final String user) {
+        final ThresholdRuleBean bean = new ThresholdRuleBean();
+
+        // we're concerned about the upload throughout
+        bean.setMetric("transaction-throughput");
+        bean.setOperation("PUT");
+        // under given container
+        bean.setAggregationUnit(tenant + "," + user);
+        // if it's higher...
+        bean.setPredicate(">=");
+        // than THRESHOLD bytes / second
+        bean.setThreshold(threshold);
+        // generate event with given topic.
+        bean.setTopic(topic);
+
+        return bean;
+    }
+
+
+    /**
      * @throws InterruptedException
      */
     private static void waitForEventsToBeReceived() throws InterruptedException {
-        Thread.sleep(1000);
+        Thread.sleep(3000);
     }
 }

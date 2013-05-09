@@ -1,4 +1,4 @@
-package rulespropagation;
+package unit.tests;
 
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.rules.propagation.RulesPropagationManager;
@@ -11,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.sun.jersey.api.client.Client;
@@ -21,9 +22,10 @@ import com.sun.jersey.api.client.WebResource;
 /**
  * @author tmessini
  */
+@Ignore
 public class RulesPropagationAddRemoveSimpleTest {
     /***/
-    private static final int                         GROUP_SIZE           = 20;
+    private static final int                         GROUP_SIZE           = 10;
     /***/
     private final static int                         PROBE_PORT           = RulesPropagationAddRemoveSimpleTest.getProbePort();
     /***/
