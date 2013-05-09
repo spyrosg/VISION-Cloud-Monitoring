@@ -61,9 +61,9 @@ public class Main {
             }
 
         if (resp == null)
-            System.err.println(PROG + ": service is stopped.");
+            System.out.println(PROG + ": service is stopped.");
         else
-            System.err.println(PROG + ": running, pid: " + resp);
+            System.out.println(PROG + ": running, pid: " + resp);
     }
 
 
@@ -75,9 +75,9 @@ public class Main {
 
         try {
             client.shutdownVismo();
-            System.err.println(PROG + ": stopping.");
+            System.out.println(PROG + ": stopping.");
         } catch (final SocketTimeoutException e) {
-            System.err.println(PROG + " is stopped.");
+            System.out.println(PROG + " is stopped.");
         }
     }
 

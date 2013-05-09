@@ -11,7 +11,7 @@ VISMO_CONFIG=/etc/visioncloud_vismo.conf
 
 
 is_vismo_running() {
-	java -jar "$VISMO_JAR" "$VISMO_CONFIG" status 2>&1 | grep -q '[0-9]$' 2>/dev/null
+	java -jar "$VISMO_JAR" "$VISMO_CONFIG" status | grep -q 'pid: [0-9]\+'
 }
 
 
