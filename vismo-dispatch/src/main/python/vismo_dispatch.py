@@ -151,7 +151,7 @@ class VismoEventDispatcher(EventDispatcher):
                     event['originating-cluster'] = self.cluster_name
                     event['transaction-latency'] = self.get_latency()
                     event['transaction-duration'] = self.get_transaction_duration()
-                    event['content-size'] = long(self.end_response['content_size'])
+                    event['content-size'] = float(self.end_response['content_size'])
                     event['object'] = self.end_response['obj']
                     event['transaction-throughput'] = self.get_throughput()
                     del event['content_size']
@@ -165,7 +165,7 @@ class VismoEventDispatcher(EventDispatcher):
                     event['originating-machine'] = self.ip
                     event['originating-service'] = self.service_name
                     event['originating-cluster'] = self.cluster_name
-                    event['metadata-size'] = long(self.end_response['metadata_size'])
+                    event['metadata-size'] = float(self.end_response['metadata_size'])
                     event['object'] = self.end_response['obj']
                     del event['metadata_size']
                     del event['obj']
