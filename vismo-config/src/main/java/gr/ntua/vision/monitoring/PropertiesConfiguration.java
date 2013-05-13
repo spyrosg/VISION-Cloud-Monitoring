@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -79,6 +80,11 @@ public abstract class PropertiesConfiguration {
      * @return the value of the property name.
      */
     protected List<String> getAsList(final String name) {
+        final String v = get(name);
+
+        if (v.length() == 0)
+            return Collections.emptyList();
+
         return Arrays.asList(get(name).split(SEP));
     }
 
