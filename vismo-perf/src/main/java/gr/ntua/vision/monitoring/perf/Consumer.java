@@ -60,11 +60,17 @@ public class Consumer {
             if (e == null)
                 return;
 
+            if (noReceivedEvents == 0) // first time or resetted
+                System.out.println("# timestamp, latency, bytes, throughtput");
+
             ++noReceivedEvents;
 
             final long now = System.currentTimeMillis();
+            final double lat = getLatency(now, e);
+            final long bytes = (Long) e.get("bytes");
+            final double throughput = bytes / lat;
 
-            System.out.println("now=" + now + ", ts=" + e.timestamp() + ", latency=" + getLatency(now, e));
+            System.out.println(e.timestamp() + "," + lat + "," + bytes + "," + throughput);
         }
 
 

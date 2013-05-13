@@ -54,8 +54,14 @@ public class Producer {
      * @param noEvents
      */
     void sendEvents(final String topic, final int noEvents) {
+        final long start = System.currentTimeMillis();
+
         for (int i = 0; i < noEvents; ++i)
             service.send(topic);
+
+        final double dur = (System.currentTimeMillis() - start) / 1000.0;
+
+        System.out.println("send " + noEvents + " in " + dur + " seconds (" + noEvents / dur + " ev/sec)");
     }
 
 
