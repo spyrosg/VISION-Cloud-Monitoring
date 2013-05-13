@@ -14,7 +14,7 @@
     <suffixPattern>{}vismo %-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m\n%ex</suffixPattern>
   </appender>
 
-  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>/var/log/vismo.log</file>
     <encoder>
       <pattern>%-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m\n%ex</pattern>

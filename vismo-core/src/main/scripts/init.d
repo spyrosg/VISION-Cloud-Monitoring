@@ -11,7 +11,7 @@ VISMO_CONFIG=/etc/visioncloud_vismo.conf
 
 
 is_vismo_running() {
-	java -jar "$VISMO_JAR" "$VISMO_CONFIG" status 2>&1 | grep -q '[0-9]$' 2>/dev/null
+	java -jar "$VISMO_JAR" "$VISMO_CONFIG" status | grep -q 'pid: [0-9]\+'
 }
 
 
@@ -33,7 +33,8 @@ vismo_start() {
 
 
 vismo_stop() {
-	java -jar "$VISMO_JAR" "$VISMO_CONFIG" stop >/dev/null
+	java -jar "$VISMO_JAR" "$VISMO_CONFIG" stop
+	sleep 1
 
 	if ! `is_vismo_running`; then
 		logger -t vision-vismo "Stopping vismo service: ok"
@@ -46,7 +47,7 @@ vismo_stop() {
 
 
 vismo_status() {
-	java -jar "$VISMO_JAR" "$VISMO_CONFIG" status >/dev/null
+	java -jar "$VISMO_JAR" "$VISMO_CONFIG" status
 	return 0
 }
 
@@ -58,7 +59,7 @@ vismo_restart() {
 
 vismo_probe() {
 	echo "vismo: probe not supported"
-	return 0
+	return 1
 }
 
 
