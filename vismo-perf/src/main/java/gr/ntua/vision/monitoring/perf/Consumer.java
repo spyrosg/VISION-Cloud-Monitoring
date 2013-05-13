@@ -1,6 +1,7 @@
 package gr.ntua.vision.monitoring.perf;
 
 import static gr.ntua.vision.monitoring.perf.Utils.requireFile;
+import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
@@ -109,12 +110,12 @@ public class Consumer {
     /**
      * Constructor.
      * 
-     * @param configFile
+     * @param consumersAddress
      * @param port
      */
-    private Consumer(final String configFile, final int port) {
+    private Consumer(final String consumersAddress, final int port) {
         this.server = new WebServer(port);
-        this.registry = new VismoEventRegistry(configFile);
+        this.registry = new VismoEventRegistry(consumersAddress);
     }
 
 
@@ -206,7 +207,7 @@ public class Consumer {
     public static void main(final String... args) throws Exception {
         if (args.length < 1) {
             System.err.println("arg count");
-            System.err.println(PROG + " config [port:-" + PORT + "]");
+            System.err.println(PROG + " config-file [port:-" + PORT + "]");
             System.exit(1);
         }
 
@@ -214,7 +215,9 @@ public class Consumer {
         final int port = args.length == 2 ? Integer.valueOf(args[1]) : PORT;
 
         requireFile(configFile);
+        final VismoConfiguration conf = new VismoConfiguration(configFile);
+        final String consumersAddress = "tcp://" + conf.getClusterHead() + ":" + conf.getConsumersPort();
 
-        new Consumer(configFile, port).start();
+        new Consumer(consumersAddress, port).start();
     }
 }

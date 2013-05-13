@@ -74,7 +74,7 @@ public class Producer {
     public static void main(final String... args) throws Exception {
         if (args.length < 1) {
             System.err.println("arg count");
-            System.err.println(PROG + " config [port:-" + PORT + "]");
+            System.err.println(PROG + " config-file [port:-" + PORT + "]");
             System.exit(1);
         }
 
