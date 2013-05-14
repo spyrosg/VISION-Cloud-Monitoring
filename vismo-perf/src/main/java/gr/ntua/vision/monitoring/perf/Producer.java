@@ -11,23 +11,23 @@ import gr.ntua.vision.monitoring.web.WebServer;
  */
 public class Producer {
     /***/
-    private static final int        PORT = 9991;
+    private static final int    PORT = 9991;
     /***/
-    private static final String     PROG = "Producer";
+    private static final String PROG = "Producer";
     /***/
-    private final WebServer         server;
+    private final WebServer     server;
     /***/
-    private final FakeObjectService service;
+    private final EventService  service;
 
 
     /**
      * Constructor.
      * 
-     * @param configFile
+     * @param service
      * @param port
      */
-    private Producer(final String configFile, final int port) {
-        this.service = new FakeObjectService(new VismoEventDispatcher(configFile, "producer"));
+    private Producer(final EventService service, final int port) {
+        this.service = service;
         this.server = new WebServer(port);
     }
 
@@ -42,26 +42,30 @@ public class Producer {
 
     /**
      * @param noEvents
+     * @param size
      */
-    void sendEvents(final int noEvents) {
-        for (int i = 0; i < noEvents; ++i)
-            service.send();
+    void sendEvents(final int noEvents, final long size) {
+        final long start = System.currentTimeMillis();
+        service.send(noEvents, size);
+        final double dur = (System.currentTimeMillis() - start) / 1000.0;
+
+        System.out.println("sent " + noEvents + " events of size " + size + " bytes in " + dur + " seconds (" + noEvents / dur
+                + " ev/sec)");
     }
 
 
     /**
      * @param topic
      * @param noEvents
+     * @param size
      */
-    void sendEvents(final String topic, final int noEvents) {
+    void sendEvents(final String topic, final int noEvents, final long size) {
         final long start = System.currentTimeMillis();
-
-        for (int i = 0; i < noEvents; ++i)
-            service.send(topic);
-
+        service.send(topic, noEvents, size);
         final double dur = (System.currentTimeMillis() - start) / 1000.0;
 
-        System.out.println("send " + noEvents + " in " + dur + " seconds (" + noEvents / dur + " ev/sec)");
+        System.out.println("sent " + noEvents + " events of size " + size + " bytes in " + dur + " seconds (" + noEvents / dur
+                + " ev/sec)");
     }
 
 
@@ -89,6 +93,9 @@ public class Producer {
 
         requireFile(configFile);
 
-        new Producer(configFile, port).start();
+        final VismoEventDispatcher dispatcher = new VismoEventDispatcher(configFile, "constant-size-service");
+        final ConstantSizeEventService service = new ConstantSizeEventService(dispatcher);
+
+        new Producer(service, port).start();
     }
 }
