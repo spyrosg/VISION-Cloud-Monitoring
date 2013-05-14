@@ -21,9 +21,7 @@ import javax.ws.rs.core.Response.Status;
 @Produces(MediaType.TEXT_PLAIN)
 public class ProducersCommandResource {
     /***/
-    final Producer      prod;
-    /***/
-    private final Timer t;
+    final Producer prod;
 
 
     /**
@@ -32,7 +30,6 @@ public class ProducersCommandResource {
      * @param prod
      */
     public ProducersCommandResource(final Producer prod) {
-        this.t = new Timer(true);
         this.prod = prod;
     }
 
@@ -49,12 +46,7 @@ public class ProducersCommandResource {
             return Response.status(Status.BAD_REQUEST).entity("cannot send events of size less of " + JSON_DIFF + " bytes\n")
                     .build();
 
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                prod.sendEvents(noEvents, size);
-            }
-        }, 3 * 100);
+        prod.sendEvents(noEvents, size);
 
         return Response.ok("sending " + noEvents + " events\n").build();
     }
@@ -70,19 +62,16 @@ public class ProducersCommandResource {
     @Path("events/{topic}/{no-events}/{size}")
     public Response send(@PathParam("topic") final String topic, @PathParam("no-events") final int noEvents,
             @PathParam("size") final long size) {
-
         if (size < JSON_DIFF)
             return Response.status(Status.BAD_REQUEST).entity("cannot send events of size less of " + JSON_DIFF + " bytes\n")
                     .build();
 
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                prod.sendEvents(topic, noEvents, size);
-            }
-        }, 3 * 100);
+        final long start = System.currentTimeMillis();
+        prod.sendEvents(topic, noEvents, size);
+        final double dur = (System.currentTimeMillis() - start) / 1000.0;
 
-        return Response.ok("sending " + noEvents + " events\n").build();
+        return Response.ok("sent " + noEvents + " events of size " + size + " bytes in " + dur + " seconds (" + noEvents / dur
+                                   + " ev/sec)\n").build();
     }
 
 
@@ -92,7 +81,7 @@ public class ProducersCommandResource {
     @POST
     @Path("halt")
     public Response shutdown() {
-        t.schedule(new TimerTask() {
+        new Timer(true).schedule(new TimerTask() {
             @Override
             public void run() {
                 try {
