@@ -82,18 +82,6 @@ public class ConstantSizeEventService implements EventService {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.perf.EventService#send(int, long)
-     */
-    @Override
-    public void send(final int noEvents, final long size) {
-        final String dummyValue = getStringOf(size - JSON_DIFF);
-
-        for (int i = 0; i < noEvents; ++i)
-            dispatcher.newEvent().field("dummy", dummyValue).send();
-    }
-
-
-    /**
      * @see gr.ntua.vision.monitoring.perf.EventService#send(java.lang.String, int, long)
      */
     @Override

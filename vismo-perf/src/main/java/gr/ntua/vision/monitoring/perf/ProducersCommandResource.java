@@ -35,24 +35,6 @@ public class ProducersCommandResource {
 
 
     /**
-     * @param noEvents
-     * @param size
-     * @return a response.
-     */
-    @POST
-    @Path("events/{no-events}/{size}")
-    public Response send(@PathParam("no-events") final int noEvents, @PathParam("size") final long size) {
-        if (size < JSON_DIFF)
-            return Response.status(Status.BAD_REQUEST).entity("cannot send events of size less of " + JSON_DIFF + " bytes\n")
-                    .build();
-
-        prod.sendEvents(noEvents, size);
-
-        return Response.ok("sending " + noEvents + " events\n").build();
-    }
-
-
-    /**
      * @param topic
      * @param noEvents
      * @param size

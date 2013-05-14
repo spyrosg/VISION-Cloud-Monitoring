@@ -41,20 +41,6 @@ public class Producer {
 
 
     /**
-     * @param noEvents
-     * @param size
-     */
-    void sendEvents(final int noEvents, final long size) {
-        final long start = System.currentTimeMillis();
-        service.send(noEvents, size);
-        final double dur = (System.currentTimeMillis() - start) / 1000.0;
-
-        System.out.println("sent " + noEvents + " events of size " + size + " bytes in " + dur + " seconds (" + noEvents / dur
-                + " ev/sec)");
-    }
-
-
-    /**
      * @param topic
      * @param noEvents
      * @param size
