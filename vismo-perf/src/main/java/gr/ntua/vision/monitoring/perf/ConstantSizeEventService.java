@@ -62,8 +62,6 @@ public class ConstantSizeEventService implements EventService {
     public static final int       JSON_DIFF = 207;
     /** in millis */
     private static final long     PERIOD    = 20;
-    /** events / sec */
-    private static final double   RATE      = 100.0;
     /***/
     private final EventDispatcher dispatcher;
     /***/
@@ -82,11 +80,11 @@ public class ConstantSizeEventService implements EventService {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.perf.EventService#send(java.lang.String, int, long)
+     * @see gr.ntua.vision.monitoring.perf.EventService#send(java.lang.String, double, int, long)
      */
     @Override
-    public void send(final String topic, final int noEvents, final long size) {
-        final double executionDuration = (noEvents / RATE) * 1000; // in millis
+    public void send(final String topic, final double rate, final int noEvents, final long size) {
+        final double executionDuration = (noEvents / rate) * 1000; // in millis
         final double noExecutions = executionDuration / PERIOD;
         final long noEventsPerExecution = (long) (noEvents / noExecutions);
         final CountDownLatch latch = new CountDownLatch((int) noExecutions);

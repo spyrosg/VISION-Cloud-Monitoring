@@ -36,20 +36,21 @@ public class ProducersCommandResource {
 
     /**
      * @param topic
+     * @param rate
      * @param noEvents
      * @param size
      * @return a response.
      */
     @POST
-    @Path("events/{topic}/{no-events}/{size}")
-    public Response send(@PathParam("topic") final String topic, @PathParam("no-events") final int noEvents,
-            @PathParam("size") final long size) {
+    @Path("events/{topic}/{rate}/{no-events}/{size}")
+    public Response send(@PathParam("topic") final String topic, @PathParam("rate") final double rate,
+            @PathParam("no-events") final int noEvents, @PathParam("size") final long size) {
         if (size < JSON_DIFF)
             return Response.status(Status.BAD_REQUEST).entity("cannot send events of size less of " + JSON_DIFF + " bytes\n")
                     .build();
 
         final long start = System.currentTimeMillis();
-        prod.sendEvents(topic, noEvents, size);
+        prod.sendEvents(topic, rate, noEvents, size);
         final double dur = (System.currentTimeMillis() - start) / 1000.0;
 
         return Response.ok("sent " + noEvents + " events of size " + size + " bytes in " + dur + " seconds (" + noEvents / dur

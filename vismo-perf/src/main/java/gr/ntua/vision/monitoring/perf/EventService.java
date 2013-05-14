@@ -9,10 +9,12 @@ public interface EventService {
      * 
      * @param topic
      *            the topic.
+     * @param rate
+     *            the number of events to send in the time unit (events per second).
      * @param noEvents
      *            the number of events to send.
      * @param size
      *            the size of each event in bytes.
      */
-    void send(String topic, int noEvents, long size);
+    void send(String topic, double rate, int noEvents, long size);
 }
