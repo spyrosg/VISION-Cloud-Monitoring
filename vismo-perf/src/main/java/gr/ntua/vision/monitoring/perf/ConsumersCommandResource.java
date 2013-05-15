@@ -56,24 +56,26 @@ public class ConsumersCommandResource {
 
 
     /**
+     * @param size
      * @return r
      */
     @PUT
-    @Path("handlers")
-    public Response newHandler() {
-        final int n = cons.registerHandler();
+    @Path("handlers/{size}")
+    public Response newHandler(@PathParam("size") final int size) {
+        final int n = cons.registerHandler(size);
         return Response.created(URI.create("/" + n)).build();
     }
 
 
     /**
      * @param topic
+     * @param size
      * @return r
      */
     @PUT
-    @Path("handlers/{topic}")
-    public Response newHandler(@PathParam("topic") final String topic) {
-        final int n = cons.registerHandler(topic);
+    @Path("handlers/{topic}/{size}")
+    public Response newHandler(@PathParam("topic") final String topic, @PathParam("size") final int size) {
+        final int n = cons.registerHandler(topic, size);
 
         return Response.created(URI.create("/" + n)).build();
     }

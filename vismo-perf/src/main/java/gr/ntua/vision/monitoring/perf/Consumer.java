@@ -20,6 +20,8 @@ public class Consumer {
      */
     private static class PerfHandler implements EventHandler {
         /***/
+        private final int    eventsPerByte;
+        /***/
         private int          noReceivedEvents;
         /***/
         private final String topic;
@@ -27,9 +29,11 @@ public class Consumer {
 
         /**
          * Constructor.
+         * 
+         * @param eventsPerByte
          */
-        public PerfHandler() {
-            this("*");
+        public PerfHandler(final int eventsPerByte) {
+            this("*", eventsPerByte);
         }
 
 
@@ -37,10 +41,12 @@ public class Consumer {
          * Constructor.
          * 
          * @param topic
+         * @param eventsPerByte
          */
-        public PerfHandler(final String topic) {
+        public PerfHandler(final String topic, final int eventsPerByte) {
             this.topic = topic;
             this.noReceivedEvents = 0;
+            this.eventsPerByte = eventsPerByte;
         }
 
 
@@ -67,10 +73,9 @@ public class Consumer {
 
             final long now = System.currentTimeMillis();
             final double lat = getLatency(now, e);
-            final long bytes = (Long) e.get("bytes");
-            final double throughput = bytes / lat;
+            final double throughput = eventsPerByte / lat;
 
-            System.out.println(e.timestamp() + "," + lat + "," + bytes + "," + throughput);
+            System.out.println(e.timestamp() + "," + lat + "," + eventsPerByte + "," + throughput);
         }
 
 
@@ -160,10 +165,11 @@ public class Consumer {
 
 
     /**
+     * @param size
      * @return n
      */
-    int registerHandler() {
-        final PerfHandler handler = new PerfHandler();
+    int registerHandler(final int size) {
+        final PerfHandler handler = new PerfHandler(size);
 
         registry.registerToAll(handler);
         handlers.add(handler);
@@ -174,10 +180,11 @@ public class Consumer {
 
     /**
      * @param topic
+     * @param size
      * @return n
      */
-    int registerHandler(final String topic) {
-        final PerfHandler handler = new PerfHandler(topic);
+    int registerHandler(final String topic, final int size) {
+        final PerfHandler handler = new PerfHandler(topic, size);
 
         registry.register(topic, handler);
         handlers.add(handler);

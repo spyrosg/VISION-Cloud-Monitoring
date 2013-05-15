@@ -10,7 +10,7 @@ case $1 in
 	no*)
 		curl -v -X GET http://localhost:$PORT/handlers/"$2" ;;
 	new*)
-		curl -v -X PUT http://localhost:$PORT/handlers/"$2" ;;
+		curl -v -X PUT http://localhost:$PORT/handlers/"$2"/"$3" ;;
 	reset*)
 		curl -v -X POST http://localhost:$PORT/handlers/"$2" ;;
 	start*)
