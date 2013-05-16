@@ -4,11 +4,11 @@ import static gr.ntua.vision.monitoring.perf.Utils.requireFile;
 import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
+import gr.ntua.vision.monitoring.notify.EventHandlerTask;
 import gr.ntua.vision.monitoring.notify.VismoEventRegistry;
-import gr.ntua.vision.monitoring.web.WebAppBuilder;
-import gr.ntua.vision.monitoring.web.WebServer;
 
-import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -20,41 +20,20 @@ public class Consumer {
      */
     private static class PerfHandler implements EventHandler {
         /***/
-        private final int    eventsPerByte;
+        private final int            eventSize;
         /***/
-        private int          noReceivedEvents;
-        /***/
-        private final String topic;
+        private final CountDownLatch latch;
 
 
         /**
          * Constructor.
          * 
-         * @param eventsPerByte
+         * @param latch
+         * @param eventSize
          */
-        public PerfHandler(final int eventsPerByte) {
-            this("*", eventsPerByte);
-        }
-
-
-        /**
-         * Constructor.
-         * 
-         * @param topic
-         * @param eventsPerByte
-         */
-        public PerfHandler(final String topic, final int eventsPerByte) {
-            this.topic = topic;
-            this.noReceivedEvents = 0;
-            this.eventsPerByte = eventsPerByte;
-        }
-
-
-        /**
-         * @return the noReceivedEvents
-         */
-        public int getNoReceivedEvents() {
-            return noReceivedEvents;
+        public PerfHandler(final CountDownLatch latch, final int eventSize) {
+            this.latch = latch;
+            this.eventSize = eventSize;
         }
 
 
@@ -66,33 +45,13 @@ public class Consumer {
             if (e == null)
                 return;
 
-            if (noReceivedEvents == 0) // first time or resetted
-                System.out.println("# timestamp, latency, bytes, throughtput");
-
-            ++noReceivedEvents;
+            latch.countDown();
 
             final long now = System.currentTimeMillis();
             final double lat = getLatency(now, e);
-            final double throughput = eventsPerByte / lat;
+            final double throughput = eventSize / lat;
 
-            System.out.println(e.timestamp() + "," + lat + "," + eventsPerByte + "," + throughput);
-        }
-
-
-        /**
-         * 
-         */
-        public void reset() {
-            noReceivedEvents = 0;
-        }
-
-
-        /**
-         * @see java.lang.Object#toString()
-         */
-        @Override
-        public String toString() {
-            return "#<PerfHandler: " + topic + ">";
+            System.out.println(e.timestamp() + "," + lat + "," + eventSize + "," + throughput);
         }
 
 
@@ -107,110 +66,7 @@ public class Consumer {
     }
 
     /***/
-    private static final int             PORT     = 9992;
-    /***/
-    private static final String          PROG     = "Consumer";
-    /***/
-    private final ArrayList<PerfHandler> handlers = new ArrayList<PerfHandler>();
-    /***/
-    private final VismoEventRegistry     registry;
-    /***/
-    private final WebServer              server;
-
-
-    /**
-     * Constructor.
-     * 
-     * @param consumersAddress
-     * @param port
-     */
-    private Consumer(final String consumersAddress, final int port) {
-        this.server = new WebServer(port);
-        this.registry = new VismoEventRegistry(consumersAddress);
-    }
-
-
-    /**
-     * @return s
-     */
-    String getHandlers() {
-        final StringBuilder buf = new StringBuilder();
-
-        for (int i = 0; i < handlers.size(); ++i)
-            buf.append(i).append(": ").append(handlers.get(i)).append("\n");
-
-        return buf.toString();
-    }
-
-
-    /**
-     * @param i
-     * @return n
-     */
-    int getNoReceivingEvents(final int i) {
-        final PerfHandler h = handlers.get(i);
-
-        System.out.println("handler " + h + " has received " + h.getNoReceivedEvents() + " events");
-
-        return h.getNoReceivedEvents();
-    }
-
-
-    /**
-     * @throws Exception
-     */
-    void halt() throws Exception {
-        server.stop();
-    }
-
-
-    /**
-     * @param size
-     * @return n
-     */
-    int registerHandler(final int size) {
-        final PerfHandler handler = new PerfHandler(size);
-
-        registry.registerToAll(handler);
-        handlers.add(handler);
-
-        return handlers.size() - 1;
-    }
-
-
-    /**
-     * @param topic
-     * @param size
-     * @return n
-     */
-    int registerHandler(final String topic, final int size) {
-        final PerfHandler handler = new PerfHandler(topic, size);
-
-        registry.register(topic, handler);
-        handlers.add(handler);
-
-        return handlers.size() - 1;
-    }
-
-
-    /**
-     * @param i
-     */
-    void resetHandler(final int i) {
-        final PerfHandler h = handlers.get(i);
-
-        System.out.println("handler " + h + " reset");
-
-        h.reset();
-    }
-
-
-    /**
-     * @throws Exception
-     */
-    private void start() throws Exception {
-        server.withWebAppAt(WebAppBuilder.buildFrom(new ConsumersCommandResource(this)), "/*").start();
-    }
+    private static final String PROG = "Consumer";
 
 
     /**
@@ -218,19 +74,29 @@ public class Consumer {
      * @throws Exception
      */
     public static void main(final String... args) throws Exception {
-        if (args.length < 1) {
+        if (args.length < 3) {
             System.err.println("arg count");
-            System.err.println(PROG + " config-file [port:-" + PORT + "]");
+            System.err.println(PROG + " config-file topic event-size no-events");
             System.exit(1);
         }
 
         final String configFile = args[0];
-        final int port = args.length == 2 ? Integer.valueOf(args[1]) : PORT;
+        final String topic = args[1];
+        final int eventSize = Integer.valueOf(args[2]);
+        final int noEvents = Integer.valueOf(args[3]);
 
         requireFile(configFile);
+
         final VismoConfiguration conf = new VismoConfiguration(configFile);
         final String consumersAddress = "tcp://" + conf.getClusterHead() + ":" + conf.getConsumersPort();
+        final VismoEventRegistry registry = new VismoEventRegistry(consumersAddress);
+        final CountDownLatch latch = new CountDownLatch(noEvents);
+        final PerfHandler handler = new PerfHandler(latch, eventSize);
+        final EventHandlerTask task = registry.register(topic, handler);
 
-        new Consumer(consumersAddress, port).start();
+        System.out.println("# timestamp, latency, bytes, throughtput");
+        latch.await(5, TimeUnit.MINUTES);
+        task.halt();
+        registry.halt();
     }
 }
