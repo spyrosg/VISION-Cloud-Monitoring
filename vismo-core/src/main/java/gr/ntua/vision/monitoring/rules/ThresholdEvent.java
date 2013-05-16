@@ -105,7 +105,7 @@ class ThresholdEvent implements MonitoringEvent {
         o.put("timestamp", ts);
         o.put("topic", topic);
         o.put("originating-service", originatingService);
-        o.put("originating-machine", vminfo.getAddress());
+        o.put("originating-machine", vminfo.getAddress().getHostAddress());
 
         return o.toJSONString();
     }
