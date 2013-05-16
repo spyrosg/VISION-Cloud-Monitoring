@@ -65,7 +65,7 @@ class ThresholdEvent implements MonitoringEvent {
         if ("timestamp".equals(key))
             return timestamp();
         if ("originating-machine".equals(key))
-            return vminfo.getAddress();
+            return vminfo.getAddress().getHostAddress();
         if ("originating-service".equals(key))
             return originatingService();
 

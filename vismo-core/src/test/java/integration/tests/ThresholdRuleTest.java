@@ -187,6 +187,7 @@ public class ThresholdRuleTest {
         log.debug("asserting event: {}", e);
         assertEquals("throughput-topic", e.topic());
         assertTrue((Double) e.get("value") >= THRESHOLD);
+        assertTrue("originating-machine key should be a String", e.get("originating-machine") instanceof String);
     }
 
 
