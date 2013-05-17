@@ -55,7 +55,7 @@ public class StorletLoggingRuleTest {
         new StorletLoggingRule(engine, PERIOD).submit();
 
         sendEvents(NO_EVENTS_TO_SEND);
-        waitForAggregation();
+        waitAggregation();
         assertHaveExpectedNoEvents();
         assertLastEventIsFromStorletEngineRule();
 
@@ -113,7 +113,7 @@ public class StorletLoggingRuleTest {
     /**
      * @throws InterruptedException
      */
-    private static void waitForAggregation() throws InterruptedException {
-        Thread.sleep((long) (PERIOD * 1.5));
+    private static void waitAggregation() throws InterruptedException {
+        Thread.sleep(3 * PERIOD / 2);
     }
 }

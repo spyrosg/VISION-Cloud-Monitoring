@@ -52,11 +52,11 @@ public class RuleApplicationTest {
         registry.registerToAll(GET_OBJECT_HANDLER);
 
         client.putObject(TEST_CONTAINER, OBJ_NAME, "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
-        waitForEventsToBeReceived();
+        waitEventsToBeReceived();
         shouldHaveReceivedEvent(PUT_OBJECT_HANDLER, 1);
 
         client.getObject(TEST_CONTAINER, OBJ_NAME);
-        waitForEventsToBeReceived();
+        waitEventsToBeReceived();
         shouldHaveReceivedEvent(GET_OBJECT_HANDLER, 1);
     }
 
@@ -94,7 +94,7 @@ public class RuleApplicationTest {
         submitRule(throughputThresholdRule(5, "my-topic", TENANT, USER));
 
         client.putObject(TEST_CONTAINER, OBJ_NAME, "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
-        waitForEventsToBeReceived();
+        waitEventsToBeReceived();
         shouldHaveReceivedEvent(FOO_RULE_HANDLER, 1);
     }
 
@@ -159,7 +159,7 @@ public class RuleApplicationTest {
     /**
      * @throws InterruptedException
      */
-    private static void waitForEventsToBeReceived() throws InterruptedException {
+    private static void waitEventsToBeReceived() throws InterruptedException {
         Thread.sleep(3000);
     }
 }

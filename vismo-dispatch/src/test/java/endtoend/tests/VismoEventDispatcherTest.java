@@ -64,14 +64,14 @@ public class VismoEventDispatcherTest {
     @Test
     public void vismoReceivesEventsThroughDispatcher() throws InterruptedException {
         producer.sendEvents();
-        waitForAllEventsToBeReceived();
+        waitEventsDelivery();
     }
 
 
     /**
      * @throws InterruptedException
      */
-    private static void waitForAllEventsToBeReceived() throws InterruptedException {
+    private static void waitEventsDelivery() throws InterruptedException {
         Thread.sleep(1000);
     }
 }

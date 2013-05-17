@@ -43,7 +43,7 @@ public class VismoAggregationResultTest {
         for (int i = 0; i < 3; ++i)
             service.putEvent("ntua", "bill", "foo", "bar").send();
 
-        Thread.sleep((long) (1.5 * RULE_PERIOD));
+        Thread.sleep((3 * RULE_PERIOD / 2));
         assertEquals(1, eventList.size());
 
         final VismoAggregationResult res = (VismoAggregationResult) eventList.get(0);

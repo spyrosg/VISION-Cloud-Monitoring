@@ -176,7 +176,7 @@ public class VismoServiceTest {
         doGETs(NO_GET_OPS);
         doPUTs(NO_PUT_OPS);
 
-        waitForEventsDelivery(2000);
+        waitEventsDelivery(2000);
         assertThatVismoReceivedEvents();
     }
 
@@ -218,7 +218,7 @@ public class VismoServiceTest {
      * @param n
      * @throws InterruptedException
      */
-    private static void waitForEventsDelivery(final int n) throws InterruptedException {
+    private static void waitEventsDelivery(final int n) throws InterruptedException {
         Thread.sleep(n);
     }
 }
