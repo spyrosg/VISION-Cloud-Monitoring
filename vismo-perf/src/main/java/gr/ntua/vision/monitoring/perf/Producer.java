@@ -45,9 +45,10 @@ public class Producer {
      * @param rate
      * @param noEvents
      * @param size
+     * @return
      */
-    void sendEvents(final String topic, final double rate, final int noEvents, final long size) {
-        service.send(topic, rate, noEvents, size);
+    int sendEvents(final String topic, final double rate, final int noEvents, final long size) {
+        return service.send(topic, rate, noEvents, size);
     }
 
 

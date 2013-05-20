@@ -20,6 +20,8 @@ public class Consumer {
      */
     private static class PerfHandler implements EventHandler {
         /***/
+        int                          noReceivedEvents;
+        /***/
         private final int            eventSize;
         /***/
         private final CountDownLatch latch;
@@ -34,6 +36,7 @@ public class Consumer {
         public PerfHandler(final CountDownLatch latch, final int eventSize) {
             this.latch = latch;
             this.eventSize = eventSize;
+            this.noReceivedEvents = 0;
         }
 
 
@@ -45,6 +48,7 @@ public class Consumer {
             if (e == null)
                 return;
 
+            ++noReceivedEvents;
             latch.countDown();
 
             final long now = System.currentTimeMillis();
@@ -94,7 +98,18 @@ public class Consumer {
         final PerfHandler handler = new PerfHandler(latch, eventSize);
         final EventHandlerTask task = registry.register(topic, handler);
 
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            /**
+             * @see java.lang.Thread#run()
+             */
+            @Override
+            public void run() {
+                System.err.println("# no received events: " + handler.noReceivedEvents);
+            }
+        });
+
         System.out.println("# timestamp, latency, bytes, throughtput");
+        System.err.println("# timestamp, latency, bytes, throughtput");
         latch.await(5, TimeUnit.MINUTES);
         task.halt();
         registry.halt();

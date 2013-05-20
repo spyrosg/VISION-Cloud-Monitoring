@@ -15,6 +15,7 @@ public interface EventService {
      *            the number of events to send.
      * @param size
      *            the size of each event in bytes.
+     * @return
      */
-    void send(String topic, double rate, int noEvents, long size);
+    int send(String topic, double rate, int noEvents, long size);
 }

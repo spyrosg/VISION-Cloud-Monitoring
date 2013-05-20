@@ -16,6 +16,8 @@ public class ConstantSizeEventService implements EventService {
      */
     private static class ConstantRateTask extends TimerTask {
         /***/
+        int                           noSentEvents;
+        /***/
         private final EventDispatcher dispatcher;
         /***/
         private final String          dummyValue;
@@ -43,6 +45,7 @@ public class ConstantSizeEventService implements EventService {
             this.topic = topic;
             this.noEvents = noEvents;
             this.dummyValue = dummyValue;
+            this.noSentEvents = 0;
         }
 
 
@@ -51,8 +54,10 @@ public class ConstantSizeEventService implements EventService {
          */
         @Override
         public void run() {
-            for (int i = 0; i < noEvents; ++i)
+            for (int i = 0; i < noEvents; ++i) {
                 dispatcher.newEvent().field("topic", topic).field("dummy", dummyValue).send();
+                ++noSentEvents;
+            }
 
             latch.countDown();
         }
@@ -83,12 +88,13 @@ public class ConstantSizeEventService implements EventService {
      * @see gr.ntua.vision.monitoring.perf.EventService#send(java.lang.String, double, int, long)
      */
     @Override
-    public void send(final String topic, final double rate, final int noEvents, final long size) {
+    public int send(final String topic, final double rate, final int noEvents, final long size) {
         final double executionDuration = (noEvents / rate) * 1000; // in millis
         final double noExecutions = executionDuration / PERIOD;
-        final long noEventsPerExecution = (long) (noEvents / noExecutions);
-        final CountDownLatch latch = new CountDownLatch((int) noExecutions);
-        final TimerTask task = new ConstantRateTask(dispatcher, latch, topic, noEventsPerExecution, getStringOf(size - JSON_DIFF));
+        final long noEventsPerExecution = (long) Math.ceil(noEvents / noExecutions);
+        final CountDownLatch latch = new CountDownLatch((int) Math.ceil(noExecutions));
+        final ConstantRateTask task = new ConstantRateTask(dispatcher, latch, topic, noEventsPerExecution, getStringOf(size
+                - JSON_DIFF));
 
         System.out.println("execution duration: " + executionDuration + " msec");
         System.out.println("no executions: " + noExecutions);
@@ -103,6 +109,8 @@ public class ConstantSizeEventService implements EventService {
         }
 
         task.cancel();
+        System.out.println("no sent events: " + task.noSentEvents);
+        return task.noSentEvents;
     }
 
 

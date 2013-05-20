@@ -50,11 +50,11 @@ public class ProducersCommandResource {
                     .build();
 
         final long start = System.currentTimeMillis();
-        prod.sendEvents(topic, rate, noEvents, size);
+        final int actualNoSent = prod.sendEvents(topic, rate, noEvents, size);
         final double dur = (System.currentTimeMillis() - start) / 1000.0;
 
-        return Response.ok("sent " + noEvents + " events of size " + size + " bytes in " + dur + " seconds (" + noEvents / dur
-                                   + " ev/sec)\n").build();
+        return Response.ok("sent " + actualNoSent + " events of size " + size + " bytes in " + dur + " seconds (" + noEvents
+                                   / dur + " ev/sec)\n").build();
     }
 
 
