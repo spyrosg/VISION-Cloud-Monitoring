@@ -1,6 +1,6 @@
 #!/bin/bash
 
-prog=$(basename $2)
+prog=$(basename $0)
 CONF=${CONF:-config.properties}
 PORT=${PORT:-9991}
 

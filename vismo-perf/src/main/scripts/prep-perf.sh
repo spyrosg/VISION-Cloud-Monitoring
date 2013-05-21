@@ -7,8 +7,8 @@ TMP_DIR=/tmp/vismo-prep-perf.$$.tmp
 PROD=vismo-perf/src/main/scripts/producer.sh
 STAT=vismo-perf/src/main/scripts/csv-stat.py
 PARSE=vismo-perf/src/main/scripts/parse.awk
-VISMO_JAR=$(echo vismo-core/target/vismo-core-$VERSION.jar)
-PERF_JAR=$(echo vismo-perf/target/vismo-perf-$VERSION.jar)
+export VISMO_JAR=$(echo vismo-core/target/vismo-core-$VERSION.jar)
+export PERF_JAR=$(echo vismo-perf/target/vismo-perf-$VERSION.jar)
 
 function start_producer {
 	"$PROD" start >/dev/null 2>&1 &
