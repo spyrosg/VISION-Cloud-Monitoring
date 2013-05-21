@@ -27,7 +27,8 @@ function run_perf {
 		"$STAT" "$tmp_out" | "$PARSE" >>"$results"
 		sleep 5s
 	done
+
+	rm -f "$tmp_out"
 }
 
-#main 10000 1024 2000 perf-var-rate-results-$(date +'%F').csv
-main 1000 1024 500 perf-var-rate-results-$(date +'%F').csv
+main "$@" perf-var-rate-results-$(date +'%F').csv
