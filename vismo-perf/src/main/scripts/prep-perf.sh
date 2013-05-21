@@ -20,7 +20,7 @@ function stop_producer {
 }
 
 function start_vismo {
-	nohup java -jar "$VISMO_JAR" config.properties start &
+	nohup java -jar "$VISMO_JAR" config.properties start >vismo.log 2>&1 &
 }
 
 function stop_vismo {
