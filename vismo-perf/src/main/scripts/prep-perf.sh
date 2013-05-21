@@ -2,7 +2,7 @@
 
 export LANG=C
 
-VERSION=1.1.5-SNAPSHOT
+VERSION=1.1.6-SNAPSHOT
 TMP_DIR=/tmp/vismo-prep-perf.$$.tmp
 PROD=vismo-perf/src/main/scripts/producer.sh
 STAT=vismo-perf/src/main/scripts/csv-stat.py
@@ -20,7 +20,7 @@ function stop_producer {
 }
 
 function start_vismo {
-	nohup java -jar "$VISMO_JAR" config.properties start >vismo.log 2>&1 &
+	nohup java -jar "$VISMO_JAR" config.properties start >/dev/null 2>&1 &
 }
 
 function stop_vismo {
