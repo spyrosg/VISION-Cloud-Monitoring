@@ -2,7 +2,7 @@
 
 export LANG=C
 
-VERSION.jar=1.1.5-SNAPSHOT
+VERSION=2.1.5-SNAPSHOT
 TMP_DIR=/tmp/vismo-prep-perf.$$.tmp
 PROD=vismo-perf/src/main/scripts/producer.sh
 STAT=vismo-perf/src/main/scripts/csv-stat.py
