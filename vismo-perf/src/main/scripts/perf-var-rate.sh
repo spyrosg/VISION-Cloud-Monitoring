@@ -16,7 +16,7 @@ function run_perf {
 
 	for rate in $(seq 100 50 "$max_rate")
 	do
-		java -cp vismo-perf-*.jar gr.ntua.vision.monitoring.perf.Consumer config.properties "$topic" "$event_size" "$no_events" >"$tmp_out" &
+		java -cp "$PERF_JAR" gr.ntua.vision.monitoring.perf.Consumer config.properties "$topic" "$event_size" "$no_events" >"$tmp_out" &
 		cons_pid=$!
 		sleep 3s
 
