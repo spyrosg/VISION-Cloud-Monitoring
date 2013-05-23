@@ -79,7 +79,7 @@ public class RulesPropagationManager {
     /***/
     private int                            size;
     /** the timer object. */
-    private final Timer                    timer                    = new Timer(true);
+    private final Timer                    timer                    = new Timer();
     /***/
     private final VismoRulesEngine         vismoRulesEngine;
     /***/

@@ -13,7 +13,7 @@ public class VismoGroupMonitoring {
     /***/
     private final VismoGroupServer server;
     /***/
-    private final Timer            timer       = new Timer(true);
+    private final Timer            timer       = new Timer();
 
 
     /**
