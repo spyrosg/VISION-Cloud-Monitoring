@@ -195,7 +195,7 @@ public class VismoRulesEngine implements EventSourceListener {
      * @param rule
      */
     private void schedule(final PeriodicRule rule) {
-        timer.schedule(rule, 0, rule.period());
+        timer.schedule(rule, rule.period(), rule.period());
     }
 
 
