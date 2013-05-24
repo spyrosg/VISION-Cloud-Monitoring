@@ -144,7 +144,7 @@ public class RuleApplicationTest {
         bean.setMetric("transaction-throughput");
         bean.setOperation("PUT");
         // under given container
-        bean.setAggregationUnit(tenant + "," + user);
+        bean.setFilterUnit(tenant + "," + user);
         // if it's higher...
         bean.setPredicate(">=");
         // than THRESHOLD bytes / second

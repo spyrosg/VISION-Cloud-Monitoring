@@ -201,7 +201,7 @@ public class ThresholdRuleTest {
         bean.setMetric("transaction-throughput");
         bean.setOperation("PUT");
         // under given container
-        bean.setAggregationUnit(TENANT + "," + USER + "," + CONTAINER);
+        bean.setFilterUnit(TENANT + "," + USER + "," + CONTAINER);
         // if it's lower
         bean.setPredicate("-my-predicate-");
         // than 5 bytes / second
@@ -225,7 +225,7 @@ public class ThresholdRuleTest {
         bean.setMetric("transaction-throughput");
         bean.setOperation("PUT");
         // under given container
-        bean.setAggregationUnit(tenant + "," + user);
+        bean.setFilterUnit(tenant + "," + user);
         // if it's higher...
         bean.setPredicate(">=");
         // than THRESHOLD bytes / second
@@ -250,7 +250,7 @@ public class ThresholdRuleTest {
         bean.setMetric("transaction-throughput");
         bean.setOperation("PUT");
         // under given container
-        bean.setAggregationUnit(tenant + "," + user + "," + containerName);
+        bean.setFilterUnit(tenant + "," + user + "," + containerName);
         // if it's lower
         bean.setPredicate(">=");
         // than threshold bytes / second

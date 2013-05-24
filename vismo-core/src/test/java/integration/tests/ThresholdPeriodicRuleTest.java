@@ -178,7 +178,7 @@ public class ThresholdPeriodicRuleTest {
         bean.setOperation("PUT");
         bean.setAggregationMethod(AVG_AGGREGATION_METHOD);
         // under given container
-        bean.setAggregationUnit(tenant + "," + user + "," + containerName);
+        bean.setFilterUnit(tenant + "," + user + "," + containerName);
         // if it's higher...
         bean.setPredicate(">=");
         // than THRESHOLD bytes / second
