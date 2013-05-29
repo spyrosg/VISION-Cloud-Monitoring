@@ -1,37 +1,33 @@
 package integration.tests;
 
 import static org.junit.Assert.assertEquals;
+import gr.ntua.vision.monitoring.events.EventFactory;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
+import gr.ntua.vision.monitoring.events.VismoEventFactory;
+import gr.ntua.vision.monitoring.sources.HttpEventResource;
+import gr.ntua.vision.monitoring.web.WebAppBuilder;
+import gr.ntua.vision.monitoring.web.WebServer;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
-import gr.ntua.vision.monitoring.events.EventFactory;
-import gr.ntua.vision.monitoring.events.MonitoringEvent;
-import gr.ntua.vision.monitoring.sockets.Socket;
-import gr.ntua.vision.monitoring.web.WebAppBuilder;
-import gr.ntua.vision.monitoring.web.WebServer;
-
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.RequestBuilder;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.json.JSONConfiguration;
 
-/**
- * TODO: implement like {@link RulesResourceTest}.
- */
+
 public class HttpEventSourceTest {
 	/***/
 	private static final int PORT = 9998;
@@ -58,17 +54,18 @@ public class HttpEventSourceTest {
 	}
 	
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Test
 	public void shouldAcceptEventsThroughPut() throws UnknownHostException{
 		HashMap mapev = new  HashMap();
-		long ts = 123456789L;
-		mapev.put("timestamp", ts);
-		String addr = InetAddress.getLocalHost().getHostAddress();
+		mapev.put("timestamp", 123456789L);
 		mapev.put("originating-service", "service");
-		mapev.put("originating-machine", addr);
+		mapev.put("originating-machine", InetAddress.getLocalHost().getHostAddress());
 		mapev.put("topic", "new event");
-		JSONObject obj = new JSONObject(mapev);
-		final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(obj.toString()).put(ClientResponse.class);
+		final String objRepr = JSONObject.toJSONString(mapev);
+		
+		
+		final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(objRepr).put(ClientResponse.class);
 		assertEquals (ClientResponse.Status.CREATED, res.getClientResponseStatus());
 	}
 
@@ -84,13 +81,11 @@ public class HttpEventSourceTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		
-
 		final WebAppBuilder builder = new WebAppBuilder();
 		/** the event factory. */
 		final EventFactory factory;
-		/** the socket to receive messages. */
-		final Socket sock;
+		
+	
 
 		server = new WebServer(PORT);
 		Application application = builder.addResource(new HttpEventResource())
