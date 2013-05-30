@@ -29,6 +29,9 @@ import com.sun.jersey.api.json.JSONConfiguration;
  * 
  */
 public class HttpEventSourceTest {
+    /*
+     * TODO: make sure a {@link VismoRulesEngine} object receives posted events.
+     */
     /***/
     private static final int    PORT     = 9998;
     /***/

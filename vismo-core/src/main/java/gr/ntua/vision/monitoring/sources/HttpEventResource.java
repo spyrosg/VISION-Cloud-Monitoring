@@ -1,5 +1,6 @@
 package gr.ntua.vision.monitoring.sources;
 
+import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
 
@@ -17,8 +18,14 @@ import javax.ws.rs.core.Response;
  */
 @Path("events")
 public class HttpEventResource implements EventSource {
+    /*
+     * TODO: pass factory to the constructor
+     * TODO: implement {@link #add(EventSourceListener)}.
+     * TODO: move event validation to other method(s).
+     */
+
     /***/
-    private final VismoEventFactory factory = new VismoEventFactory();
+    private final EventFactory factory = new VismoEventFactory();
 
 
     /**
