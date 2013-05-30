@@ -12,47 +12,53 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 
-
+/**
+ * 
+ */
 @Path("events")
 public class HttpEventResource implements EventSource {
-	
-	VismoEventFactory factory = new VismoEventFactory();
-	
-	@PUT	
-	public Response putEvent(String x){
-		try{
-			MonitoringEvent monev= factory.createEvent(x);
-			try{
-				InetAddress IP = monev.originatingIP();
-			    if (IP == null){
-				return Response.status(400).entity("No originating IP").build();
-			    }
-			}catch(UnknownHostException e){
-				return Response.status(400).entity(e.getMessage()).build();
-			}
-			String service = monev.originatingService();
-			if (service == null){
-				return Response.status(400).entity("field originating-service required").build();
-			}
-			Long timest = monev.timestamp();
-			if (timest == null){
-				return Response.status(400).entity("field timestamp required").build();
-			}
-			String topic = monev.topic();
-			if (topic == null){
-				return Response.status(400).entity("field topic required").build();
-			}
-		}catch(java.lang.Error e){
-		    return Response.status(400).entity(e.getMessage()).build();
-		}
-		return Response.created(URI.create("/")).build();
-		
-	}
+    /***/
+    private final VismoEventFactory factory = new VismoEventFactory();
 
-	@Override
-	public void add(EventSourceListener listener) {
-		// TODO Auto-generated method stub
-		
-	}
+
+    /**
+     * @see gr.ntua.vision.monitoring.sources.EventSource#add(gr.ntua.vision.monitoring.sources.EventSourceListener)
+     */
+    @Override
+    public void add(final EventSourceListener listener) {
+        // TODO Auto-generated method stub
+    }
+
+
+    /**
+     * @param body
+     * @return
+     */
+    @PUT
+    public Response putEvent(final String body) {
+        try {
+            final MonitoringEvent monev = factory.createEvent(body);
+
+            try {
+                final InetAddress IP = monev.originatingIP();
+                if (IP == null)
+                    return Response.status(400).entity("No originating IP").build();
+            } catch (final UnknownHostException e) {
+                return Response.status(400).entity(e.getMessage()).build();
+            }
+            final String service = monev.originatingService();
+            if (service == null)
+                return Response.status(400).entity("field originating-service required").build();
+            final Long timest = monev.timestamp();
+            if (timest == null)
+                return Response.status(400).entity("field timestamp required").build();
+            final String topic = monev.topic();
+            if (topic == null)
+                return Response.status(400).entity("field topic required").build();
+        } catch (final java.lang.Error e) {
+            return Response.status(400).entity(e.getMessage()).build();
+        }
+
+        return Response.created(URI.create("/")).build();
+    }
 }
-	
