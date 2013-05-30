@@ -14,6 +14,7 @@ import gr.ntua.vision.monitoring.web.WebServer;
 import helpers.InMemoryEventDispatcher;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.ws.rs.core.MediaType;
 
@@ -84,7 +85,7 @@ public class ThresholdPeriodicRuleTest {
     @Before
     public void setUp() throws Exception {
         engine = new VismoRulesEngine();
-        obs = new FakeObjectService(new InMemoryEventDispatcher(engine, "fake-obs"));
+        obs = new FakeObjectService(new InMemoryEventDispatcher(engine, "fake-obs"), new Random(3331));
         factory = new ThresholdRulesFactory(engine);
 
         engine.appendSink(new InMemoryEventSink(eventSink));
@@ -108,7 +109,7 @@ public class ThresholdPeriodicRuleTest {
         assertEquals(1, engine.noRules());
 
         triggerRule();
-        Thread.sleep((long) (1.2 * RULE_PERIOD));
+        Thread.sleep(6 * RULE_PERIOD / 5);
         assertEquals(1, eventSink.size());
         assertIsExpectedEvent(eventSink.get(0));
     }
@@ -151,8 +152,10 @@ public class ThresholdPeriodicRuleTest {
     /**
      * @param e
      */
+    @SuppressWarnings("null")
     private static void assertIsExpectedEvent(final MonitoringEvent e) {
         log.debug("asserting event: {}", e);
+        assertTrue("event cannot be null", e != null);
         assertEquals(AVERAGE_THROUGHPUT_TOPIC, e.topic());
         assertTrue((Double) e.get("value") >= THRESHOLD);
         assertTrue("originating-machine key should be a String", e.get("originating-machine") instanceof String);
@@ -175,7 +178,7 @@ public class ThresholdPeriodicRuleTest {
         bean.setOperation("PUT");
         bean.setAggregationMethod(AVG_AGGREGATION_METHOD);
         // under given container
-        bean.setAggregationUnit(tenant + "," + user + "," + containerName);
+        bean.setFilterUnit(tenant + "," + user + "," + containerName);
         // if it's higher...
         bean.setPredicate(">=");
         // than THRESHOLD bytes / second

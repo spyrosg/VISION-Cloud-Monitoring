@@ -28,7 +28,7 @@ public class StorletLoggingRuleTest {
     /***/
     private static final int                 NO_EVENTS_TO_SEND = 100;
     /** the rule's period in seconds. */
-    private static final long                PERIOD            = 1000;
+    private static final long                PERIOD            = 500;
     /***/
     private final VismoRulesEngine           engine            = new VismoRulesEngine(new RulesStore());
     /***/
@@ -114,6 +114,6 @@ public class StorletLoggingRuleTest {
      * @throws InterruptedException
      */
     private static void waitForAggregation() throws InterruptedException {
-        Thread.sleep((long) (PERIOD * 1.5));
+        Thread.sleep(6 * PERIOD / 5);
     }
 }

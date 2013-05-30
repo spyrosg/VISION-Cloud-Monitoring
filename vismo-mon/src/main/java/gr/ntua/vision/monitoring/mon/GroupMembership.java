@@ -22,7 +22,7 @@ public class GroupMembership {
     /** the actual group. */
     private final Map<GroupElement, TimerTask> members;
     /** the timer used to schedule removals */
-    private final Timer                        timer = new Timer(true);
+    private final Timer                        timer = new Timer();
 
 
     /**

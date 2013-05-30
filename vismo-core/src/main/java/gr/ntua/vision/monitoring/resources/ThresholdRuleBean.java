@@ -12,7 +12,7 @@ public class ThresholdRuleBean implements RuleBean {
     /***/
     private String aggregationMethod;
     /***/
-    private String aggregationUnit;
+    private String filterUnit;
     /***/
     private String metric;
     /***/
@@ -43,10 +43,10 @@ public class ThresholdRuleBean implements RuleBean {
 
 
     /**
-     * @return the aggregationUnit
+     * @return the filterUnit
      */
-    public String getAggregationUnit() {
-        return aggregationUnit;
+    public String getFilterUnit() {
+        return filterUnit;
     }
 
 
@@ -108,11 +108,11 @@ public class ThresholdRuleBean implements RuleBean {
 
 
     /**
-     * @param aggregationUnit
-     *            the aggregationUnit to set
+     * @param filterUnit
+     *            the filterUnit to set
      */
-    public void setAggregationUnit(final String aggregationUnit) {
-        this.aggregationUnit = aggregationUnit;
+    public void setFilterUnit(final String filterUnit) {
+        this.filterUnit = filterUnit;
     }
 
 

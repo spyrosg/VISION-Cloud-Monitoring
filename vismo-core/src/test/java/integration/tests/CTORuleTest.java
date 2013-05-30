@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -78,7 +79,7 @@ public class CTORuleTest {
     public void setUp() throws IOException {
         conf = new VismoConfiguration(p);
         socketFactory = new ZMQFactory(new ZContext());
-        obs = new FakeObjectService(new VismoEventDispatcher(socketFactory, conf, "fake-obs"));
+        obs = new FakeObjectService(new VismoEventDispatcher(socketFactory, conf, "fake-obs"), new Random(3331));
         service = (VismoService) new ClusterHeadNodeFactory(conf, socketFactory) {
             /**
              * @see gr.ntua.vision.monitoring.service.ClusterHeadNodeFactory#getEventSinks()
@@ -119,7 +120,7 @@ public class CTORuleTest {
         service.start();
 
         sendEvents(10);
-        latch.await(900, TimeUnit.MILLISECONDS);
+        latch.await(6 * PERIOD / 5, TimeUnit.MILLISECONDS);
         assertGotExpectedEvent(handler);
     }
 

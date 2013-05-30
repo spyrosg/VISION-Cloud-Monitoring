@@ -23,7 +23,7 @@ public class ThresholdPeriodicRule extends PeriodicRule {
     /***/
     private static final Logger      log = LoggerFactory.getLogger(ThresholdPeriodicRule.class);
     /***/
-    private final String             aggregationUnit;
+    private final String             filterUnit;
     /***/
     private final ThresholdFold      foldMethod;
     /***/
@@ -50,7 +50,7 @@ public class ThresholdPeriodicRule extends PeriodicRule {
         this.pred = predicateFrom(bean.getPredicate());
         this.operation = bean.getOperation();
         this.metric = requireNotNull(bean.getMetric());
-        this.aggregationUnit = bean.getAggregationUnit();
+        this.filterUnit = bean.getFilterUnit();
         this.thresholdValue = bean.getThreshold();
         this.foldMethod = foldFrom(bean.getAggregationMethod());
     }
@@ -61,7 +61,7 @@ public class ThresholdPeriodicRule extends PeriodicRule {
      */
     @Override
     public void performWith(final MonitoringEvent e) {
-        if (isApplicable(e, metric, operation, aggregationUnit)) {
+        if (isApplicable(e, metric, operation, filterUnit)) {
             log.debug("got applicable: {}", e);
             collect(e);
         }
@@ -73,7 +73,7 @@ public class ThresholdPeriodicRule extends PeriodicRule {
      */
     @Override
     public String toString() {
-        return "#<ThresholdPeriodicRule: " + topic + ", period=" + (period() / 1000) + ", " + metric + " " + pred.name + " "
+        return "#<ThresholdPeriodicRule: " + topic + ", period=" + (period() / 1000.0) + "s, " + metric + " " + pred.name + " "
                 + thresholdValue + ">";
     }
 

@@ -184,6 +184,8 @@ public class AccountingRule extends AggregationRule {
         dict.put("deletes", transformDeleteList(selectDeleteEvents(eventList)));
         dict.put("storlet", transformStorletEvents(selectStorletEngineEvents(eventList)));
         dict.put("topic", TOPIC);
+        dict.put("reads-f", transformReadFederatedList(selectReadFederatedEvents(eventList)));
+        dict.put("writes-f", transformWriteFederatedList(selectWriteFederatedEvents(eventList)));
 
         return dict;
     }
@@ -261,6 +263,15 @@ public class AccountingRule extends AggregationRule {
 
     /**
      * @param eventList
+     * @return
+     */
+    private static ArrayList<HashMap<String, Object>> transformReadFederatedList(final ArrayList<MonitoringEvent> eventList) {
+        return transformByOperation(eventList, "read-f");
+    }
+
+
+    /**
+     * @param eventList
      * @return the list of read events as prescribed by accounting.
      */
     private static ArrayList<HashMap<String, Object>> transformReadList(final ArrayList<MonitoringEvent> eventList) {
@@ -320,6 +331,15 @@ public class AccountingRule extends AggregationRule {
             }
 
         return storletList;
+    }
+
+
+    /**
+     * @param eventList
+     * @return
+     */
+    private static ArrayList<HashMap<String, Object>> transformWriteFederatedList(final ArrayList<MonitoringEvent> eventList) {
+        return transformByOperation(eventList, "write-f");
     }
 
 

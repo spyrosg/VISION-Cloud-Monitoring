@@ -19,7 +19,7 @@ public class ThresholdRule extends Rule {
     /** the log target. */
     private static final Logger      log = LoggerFactory.getLogger(Rule.class);
     /***/
-    private final String             aggregationUnit;
+    private final String             filterUnit;
     /***/
     private final String             metric;
     /***/
@@ -44,7 +44,7 @@ public class ThresholdRule extends Rule {
         this.pred = predicateFrom(bean.getPredicate());
         this.operation = bean.getOperation();
         this.metric = requireNotNull(bean.getMetric());
-        this.aggregationUnit = bean.getAggregationUnit();
+        this.filterUnit = bean.getFilterUnit();
         this.thresholdValue = bean.getThreshold();
     }
 
@@ -54,7 +54,7 @@ public class ThresholdRule extends Rule {
      */
     @Override
     public void performWith(final MonitoringEvent e) {
-        if (!isApplicable(e, metric, operation, aggregationUnit))
+        if (!isApplicable(e, metric, operation, filterUnit))
             return;
 
         log.debug("got applicable: {}", e);

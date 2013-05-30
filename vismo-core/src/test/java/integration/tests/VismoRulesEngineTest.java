@@ -9,8 +9,7 @@ import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
-import gr.ntua.vision.monitoring.sources.EventSource;
-import gr.ntua.vision.monitoring.sources.EventSourceListener;
+import gr.ntua.vision.monitoring.sources.InMemoryEventSource;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -156,50 +155,6 @@ public class VismoRulesEngineTest {
         @Override
         public String toString() {
             return "#<IncRule: " + key + ">";
-        }
-    }
-
-
-    /**
-     * 
-     */
-    private static class InMemoryEventSource implements EventSource {
-        /***/
-        private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
-
-
-        /**
-         * Constructor.
-         */
-        public InMemoryEventSource() {
-            // NOP
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.sources.EventSource#add(gr.ntua.vision.monitoring.sources.EventSourceListener)
-         */
-        @Override
-        public void add(final EventSourceListener listener) {
-            listeners.add(listener);
-        }
-
-
-        /**
-         * @see java.lang.Object#toString()
-         */
-        @Override
-        public String toString() {
-            return "#<InMemoryEventSource>";
-        }
-
-
-        /**
-         * @param e
-         */
-        public void triggerRuleEvaluationWith(final MonitoringEvent e) {
-            for (final EventSourceListener listener : listeners)
-                listener.receive(e);
         }
     }
 
