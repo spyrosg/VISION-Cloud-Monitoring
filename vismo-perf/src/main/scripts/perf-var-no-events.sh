@@ -5,17 +5,17 @@ source vismo-perf/src/main/scripts/prep-perf.sh
 prog=$(basename $0 | sed 's/.sh$//')
 
 function run_perf {
-	local no_events="$1"
+	local max_no_events="$1"
 	local event_size="$2"
-	local max_rate="$3"
+	local rate="$3"
 	local results="$4"
-	local topic="perf-var-rate"
+	local topic="perf-var-no-events"
 	local tmp_out=perf.$$.tmp
 
 	rm -f "$results"
 	echo "# event-size, event-rate, no-events, latency-mean, throughput-mean" >"$results"
 
-	for rate in $(seq 100 50 "$max_rate")
+	for no_events in $(seq 100 50 "$max_no_events")
 	do
 		java -cp "$PERF_JAR" gr.ntua.vision.monitoring.perf.Consumer config.properties "$topic" "$event_size" "$no_events" >"$tmp_out" &
 		cons_pid=$!
