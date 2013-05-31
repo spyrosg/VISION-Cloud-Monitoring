@@ -15,7 +15,7 @@ export PERF_JAR=$(echo vismo-perf/target/vismo-perf-$VERSION.jar)
 function set_config {
 	local my_ip=$(ifconfig -a | awk '/inet\ / { sub(/addr:/, ""); print $2; exit 0 }')
 
-	sed 's/cluster.head = .*$/cluster.head = '$my_ip'/' vismo-perf/src/test/resources/$CONF >config.properties
+	sed 's/cluster.head = .*$/cluster.head = '$my_ip'/' $CONF >config.properties
 }
 
 function start_producer {
