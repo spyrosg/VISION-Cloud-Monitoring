@@ -7,8 +7,16 @@ TMP_DIR=/tmp/vismo-prep-perf.$$.tmp
 PROD=vismo-perf/src/main/scripts/producer.sh
 STAT=vismo-perf/src/main/scripts/csv-stat.py
 PARSE=vismo-perf/src/main/scripts/parse.awk
+CONF=vismo-perf/src/test/resources/config.properties
+
 export VISMO_JAR=$(echo vismo-core/target/vismo-core-$VERSION.jar)
 export PERF_JAR=$(echo vismo-perf/target/vismo-perf-$VERSION.jar)
+
+function set_config {
+	local my_ip=$(ifconfig -a | awk '/inet\ / { sub(/addr:/, ""); print $2; exit 0 }')
+
+	sed 's/cluster.head = .*$/cluster.head = '$my_ip'/' vismo-perf/src/test/resources/$CONF >config.properties
+}
 
 function start_producer {
 	"$PROD" start >/dev/null 2>&1 &
@@ -48,6 +56,7 @@ function warmup_vismo {
 }
 
 function main {
+	set_config
 	start_vismo
 	start_producer
 	warmup_vismo
@@ -56,5 +65,6 @@ function main {
 
 	stop_producer
 	stop_vismo
+	rm -f config.properties
 	return 0
 }
