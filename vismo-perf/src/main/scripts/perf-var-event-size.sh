@@ -9,7 +9,7 @@ function run_perf {
 	local max_event_size="$2"
 	local rate="$3"
 	local results="$4"
-	local topic="perf-var-rate"
+	local topic="perf-var-event-size"
 	local tmp_out=perf.$$.tmp
 
 	rm -f "$results"
