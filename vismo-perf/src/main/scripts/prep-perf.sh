@@ -29,6 +29,8 @@ function stop_producer {
 
 function start_vismo {
 	nohup java -jar "$VISMO_JAR" config.properties start >/dev/null 2>&1 &
+	sleep 3
+	java -jar "$VISMO_JAR" config.properties status || exit 1
 }
 
 function stop_vismo {
