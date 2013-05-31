@@ -163,41 +163,6 @@ class ThresholdRulesTraits {
 
 
     /**
-     * When <code>aggregationUnit</code> is unspecified by the user, this method returns <code>true</code>, since it means that it
-     * applies to all units.
-     * 
-     * @param e
-     * @param aggregationUnit
-     * @return <code>true</code> if the event comes from a matching unit.
-     */
-    static boolean checkAggregationUnit(final MonitoringEvent e, final String aggregationUnit) {
-        if (aggregationUnit == null || aggregationUnit.isEmpty())
-            return true;
-
-        final String[] fs = aggregationUnit.split(",");
-
-        for (int i = 0; i < UNITS.length; ++i) {
-            if (i >= fs.length)
-                continue;
-
-            final String val = fs[i];
-            final String unit = UNITS[i];
-            final Object o = e.get(unit);
-
-            if (o == null)
-                continue;
-
-            log.trace(String.format("unit %s => %s matching %s", unit, o, val));
-
-            if (!o.equals(val))
-                return false;
-        }
-
-        return true;
-    }
-
-
-    /**
      * When <code>operation</code> is unspecified by the user, this method returns <code>true</code>, since it means that it
      * applies to all operations.
      * 
@@ -231,11 +196,46 @@ class ThresholdRulesTraits {
      * @param e
      * @param metric
      * @param operation
-     * @param aggregationUnit
+     * @param filterUnit
      * @return <code>true</code> if this is an event that matches <code>this</code> rule.
      */
-    static boolean isApplicable(final MonitoringEvent e, final String metric, final String operation, final String aggregationUnit) {
-        return e.get(metric) != null && checkOperation(e, operation) && checkAggregationUnit(e, aggregationUnit);
+    static boolean isApplicable(final MonitoringEvent e, final String metric, final String operation, final String filterUnit) {
+        return e.get(metric) != null && checkOperation(e, operation) && isApplicableFilterUnit(e, filterUnit);
+    }
+
+
+    /**
+     * When <code>filterUnit</code> is unspecified by the user, this method returns <code>true</code>, since it means that it
+     * applies to all units.
+     * 
+     * @param e
+     * @param filterUnit
+     * @return <code>true</code> if the event comes from a matching unit.
+     */
+    static boolean isApplicableFilterUnit(final MonitoringEvent e, final String filterUnit) {
+        if (filterUnit == null || filterUnit.isEmpty())
+            return true;
+
+        final String[] fs = filterUnit.split(",");
+
+        for (int i = 0; i < UNITS.length; ++i) {
+            if (i >= fs.length)
+                continue;
+
+            final String val = fs[i];
+            final String unit = UNITS[i];
+            final Object o = e.get(unit);
+
+            if (o == null)
+                continue;
+
+            log.trace(String.format("unit %s => %s matching %s", unit, o, val));
+
+            if (!o.equals(val))
+                return false;
+        }
+
+        return true;
     }
 
 

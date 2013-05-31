@@ -16,21 +16,25 @@ import org.slf4j.LoggerFactory;
  */
 abstract class AggregationRule extends PeriodicRule {
     /***/
-    protected static final String OBS_FIELD        = "transaction-duration";
+    protected static final String OBS_FIELD               = "transaction-duration";
     /***/
-    private static final String   DELETE_OPERATION = "DELETE";
+    private static final String   DELETE_OPERATION        = "DELETE";
     /***/
-    private static final String   GET_OPERATION    = "GET";
+    private static final String   GET_FEDERATED_OPERATION = "GET_F";
     /***/
-    private static final Logger   log              = LoggerFactory.getLogger(AggregationRule.class);
+    private static final String   GET_OPERATION           = "GET";
     /***/
-    private static final String   OPERATION_FIELD  = "operation";
+    private static final Logger   log                     = LoggerFactory.getLogger(AggregationRule.class);
     /***/
-    private static final String   PUT_OPERATION    = "PUT";
+    private static final String   OPERATION_FIELD         = "operation";
     /***/
-    private static final String   SRE_SERVICE      = "SRE";
+    private static final String   PUT_FEDERATED_OPERATION = "PUT_F";
     /***/
-    private static final String   STORLET_KEY      = "storletType";
+    private static final String   PUT_OPERATION           = "PUT";
+    /***/
+    private static final String   SRE_SERVICE             = "SRE";
+    /***/
+    private static final String   STORLET_KEY             = "storletType";
     /***/
     protected final String        topic;
 
@@ -199,6 +203,15 @@ abstract class AggregationRule extends PeriodicRule {
 
     /**
      * @param eventList
+     * @return
+     */
+    protected static ArrayList<MonitoringEvent> selectReadFederatedEvents(final List< ? extends MonitoringEvent> eventList) {
+        return selectEventsByOperation(eventList, GET_FEDERATED_OPERATION);
+    }
+
+
+    /**
+     * @param eventList
      * @return the list of events that match only the given operation.
      */
     protected static ArrayList<MonitoringEvent> selectStorletEngineEvents(final List< ? extends MonitoringEvent> eventList) {
@@ -220,6 +233,15 @@ abstract class AggregationRule extends PeriodicRule {
      */
     protected static ArrayList<MonitoringEvent> selectWriteEvents(final List< ? extends MonitoringEvent> eventList) {
         return selectEventsByOperation(eventList, PUT_OPERATION);
+    }
+
+
+    /**
+     * @param eventList
+     * @return
+     */
+    protected static ArrayList<MonitoringEvent> selectWriteFederatedEvents(final List< ? extends MonitoringEvent> eventList) {
+        return selectEventsByOperation(eventList, PUT_FEDERATED_OPERATION);
     }
 
 
