@@ -64,8 +64,6 @@ if __name__ == '__main__':
         with open(sys.argv[1]) as inp:
             read_csv(inp, latency_est, throughput_est)
 
-        latency_stats = [latency_est.min(), latency_est.mean(), latency_est.std_dev(), latency_est.max()]
-        print('\t'.join(map(lambda x: str(x).replace('.', ','), latency_stats)))
-
-        throughput_stats = [throughput_est.min(), throughput_est.mean(), throughput_est.std_dev(), throughput_est.max()]
-        print('\t'.join(map(lambda x: str(x).replace('.', ','), throughput_stats)))
+        stats = [latency_est.min(), latency_est.mean(), latency_est.std_dev(), latency_est.max(),
+            throughput_est.min(), throughput_est.mean(), throughput_est.std_dev(), throughput_est.max()]
+        print('\t'.join(map(lambda x: str(x).replace('.', ','), stats)))
