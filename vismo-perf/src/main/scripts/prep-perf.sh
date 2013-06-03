@@ -6,7 +6,6 @@ VERSION=1.1.6-SNAPSHOT
 TMP_DIR=/tmp/vismo-prep-perf.$$.tmp
 PROD=vismo-perf/src/main/scripts/producer.sh
 STAT=vismo-perf/src/main/scripts/csv-stat.py
-PARSE=vismo-perf/src/main/scripts/parse.awk
 CONF=vismo-perf/src/test/resources/config.properties
 
 export VISMO_JAR=$(echo vismo-core/target/vismo-core-$VERSION.jar)

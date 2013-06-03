@@ -13,7 +13,7 @@ function run_perf {
 	local tmp_out=perf.$$.tmp
 
 	rm -f "$results"
-	echo "# event-size, event-rate, no-events, latency-mean, throughput-mean" >"$results"
+	echo -e "#event-size\tevent-rate\tno-events\tlatency-min\tlatency-mean\tlatency-stddev\tlatench-max\tthroughput-min\tthroughput-mean\tthroughput-stddev\tthroughput-max" >"$results"
 
 	for event_size in $(seq 512 256 "$max_event_size")
 	do
@@ -24,8 +24,8 @@ function run_perf {
 		generate_events "$topic" "$rate" "$no_events" "$event_size"
 		wait $cons_pid
 
-		echo -n $event_size,$rate,$no_events, >>"$results"
-		"$STAT" "$tmp_out" | "$PARSE" >>"$results"
+		echo -e -n $event_size\t$rate\t$no_events\t >>"$results"
+		"$STAT" "$tmp_out" >>"$results"
 		sleep 5s
 	done
 
