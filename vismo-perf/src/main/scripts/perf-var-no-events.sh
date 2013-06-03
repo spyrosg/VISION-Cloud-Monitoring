@@ -24,7 +24,7 @@ function run_perf {
 		generate_events "$topic" "$rate" "$no_events" "$event_size"
 		wait $cons_pid
 
-		echo -e -n $event_size\t$rate\t$no_events\t >>"$results"
+		echo -e -n "$event_size\t$rate\t$no_events\t" >>"$results"
 		"$STAT" "$tmp_out" >>"$results"
 		sleep 5s
 	done
