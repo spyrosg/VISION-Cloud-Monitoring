@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring.service;
 
 import gr.ntua.vision.monitoring.VMInfo;
 import gr.ntua.vision.monitoring.VismoConfiguration;
+import gr.ntua.vision.monitoring.resources.InternalMetricsResource;
 import gr.ntua.vision.monitoring.resources.RulesResource;
 import gr.ntua.vision.monitoring.rules.ClassPathRulesFactory;
 import gr.ntua.vision.monitoring.rules.DefaultRuleBean;
@@ -21,6 +22,8 @@ import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.List;
+
+import javax.ws.rs.core.Application;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,7 +158,8 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
         final WebServer server = new WebServer(port);
         final RulesResource rulesResource = new RulesResource(new ThresholdRulesFactory(new ClassPathRulesFactory(engine,
                 DEFAULT_RULES_PACKAGE), engine), store);
+        final Application app = WebAppBuilder.buildFrom(rulesResource, new InternalMetricsResource());
 
-        return server.withWebAppAt(WebAppBuilder.buildFrom(rulesResource), "/*");
+        return server.withWebAppAt(app, "/*");
     }
 }
