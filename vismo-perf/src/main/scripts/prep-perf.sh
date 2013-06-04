@@ -57,7 +57,7 @@ function warmup_vismo {
 }
 
 function vismo_memory_used {
-	$(curl -X POST http://localhost:9996/mon/mem 2>/dev/null | vismo-perf/src/main/scripts/mem.awk)
+	echo $(curl -X POST http://localhost:9996/mon/mem 2>/dev/null | vismo-perf/src/main/scripts/mem.awk)
 }
 
 function vismo_gc {
