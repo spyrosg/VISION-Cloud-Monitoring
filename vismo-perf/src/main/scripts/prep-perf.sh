@@ -56,6 +56,14 @@ function warmup_vismo {
 	sleep $timeout
 }
 
+function vismo_memory_used {
+	return $(curl -X POST http://localhost:9996/mon/mem 2>/dev/null | vismo-perf/src/main/scripts/mem.awk)
+}
+
+function vismo_gc {
+	curl -X POST http://localhost:9996/mon/gc >/dev/null 2>&1
+}
+
 function main {
 	set_config
 	start_vismo
