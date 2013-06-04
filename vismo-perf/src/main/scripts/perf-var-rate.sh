@@ -19,7 +19,7 @@ function run_perf {
 	vismo_gc
 	local mem_after=($vismo_memory_used)
 
-	echo -e "0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t$mem_before)\t$mem_after" >>"$results"
+	echo -e "0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t$mem_before\t$mem_after" >>"$results"
 
 	for rate in $(seq 100 50 "$max_rate")
 	do
