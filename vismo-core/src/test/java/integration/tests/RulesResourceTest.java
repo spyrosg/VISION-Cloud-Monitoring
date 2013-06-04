@@ -1,7 +1,5 @@
 package integration.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.resources.RulesResource;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
 import gr.ntua.vision.monitoring.rules.ClassPathRulesFactory;
@@ -10,50 +8,41 @@ import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.ThresholdRulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
-import gr.ntua.vision.monitoring.web.WebServer;
 
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
 
 
 /**
  * This is used to test the addition/deletion of rules through the HTTP interface.
  */
-public class RulesResourceTest {
+public class RulesResourceTest extends JerseyResourceTest {
     /***/
-    private static final int    PORT       = 9998;
-    /***/
-    private static final String ROOT_URL   = "http://localhost:" + PORT;
-    /***/
-    private final Client        client;
-    /***/
-    private final RulesStore    rulesStore = new RulesStore();
-    /***/
-    private WebServer           server;
+    private final RulesStore rulesStore = new RulesStore();
 
-    {
-        final ClientConfig cc = new DefaultClientConfig();
 
-        cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
-        client = Client.create(cc);
+    /**
+     * @see integration.tests.JerseyResourceTest#setUp()
+     */
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+
+        final WebAppBuilder builder = new WebAppBuilder();
+        final VismoRulesEngine engine = new VismoRulesEngine(rulesStore);
+        final ClassPathRulesFactory clsPathfactory = new ClassPathRulesFactory(engine, PassThroughRule.class.getPackage());
+        final ThresholdRulesFactory factory = new ThresholdRulesFactory(clsPathfactory, engine);
+        final Application rulesApp = builder.addResource(new RulesResource(factory, rulesStore)).build();
+
+        configureServer(rulesApp, "/*");
+        startServer();
     }
 
 
     /***/
-    @Test
-    public void httpDELETEShouldRemoveExistingRuleFromStore() {
+    public void testHttpDELETEShouldRemoveExistingRuleFromStore() {
         final ClientResponse res = root().path("rules").path("AccountingRule").path("10000").post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
@@ -67,8 +56,7 @@ public class RulesResourceTest {
 
 
     /***/
-    @Test
-    public void httpGETShouldListStoredRules() {
+    public void testHttpGETShouldListStoredRules() {
         postRule(getBean());
         postRule("AccountingRule", 30 * 1000);
         postRule("StorletLoggingRule", 60 * 1000);
@@ -83,8 +71,7 @@ public class RulesResourceTest {
 
 
     /***/
-    @Test
-    public void httpPOSTSholdStoreDefaultRule() {
+    public void testHttpPOSTSholdStoreDefaultRule() {
         final ClientResponse res = postRule("AccountingRule", 10000);
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
@@ -96,8 +83,7 @@ public class RulesResourceTest {
 
 
     /***/
-    @Test
-    public void httpPOSTShouldStoreThresholdRule() {
+    public void testHttpPOSTShouldStoreThresholdRule() {
         final ThresholdRuleBean bean = getBean();
         final ClientResponse res = postRule(bean);
 
@@ -110,38 +96,8 @@ public class RulesResourceTest {
 
 
     /***/
-    @Ignore
-    @Test
-    public void httpPUTShouldUpdateRule() {
-        throw new AssertionError("TODO");
-    }
-
-
-    /**
-     * @throws Exception
-     */
-    @Before
-    public void setUp() throws Exception {
-        final WebAppBuilder builder = new WebAppBuilder();
-        final VismoRulesEngine engine = new VismoRulesEngine(rulesStore);
-        final ClassPathRulesFactory clsPathfactory = new ClassPathRulesFactory(engine, PassThroughRule.class.getPackage());
-        final ThresholdRulesFactory factory = new ThresholdRulesFactory(clsPathfactory, engine);
-        final Application rulesApp = builder.addResource(new RulesResource(factory, rulesStore)).build();
-
-        server = new WebServer(PORT);
-        server.withWebAppAt(rulesApp, "/*");
-
-        server.start();
-    }
-
-
-    /**
-     * @throws Exception
-     */
-    @After
-    public void tearDown() throws Exception {
-        if (server != null)
-            server.stop();
+    public void testHttpPUTShouldUpdateRule() {
+        // TODO
     }
 
 
@@ -178,14 +134,6 @@ public class RulesResourceTest {
      */
     private ClientResponse postRule(final ThresholdRuleBean bean) {
         return root().path("rules").type(MediaType.APPLICATION_JSON).entity(bean).post(ClientResponse.class);
-    }
-
-
-    /**
-     * @return a web resource pointing to the server's root.
-     */
-    private WebResource root() {
-        return client.resource(ROOT_URL);
     }
 
 
