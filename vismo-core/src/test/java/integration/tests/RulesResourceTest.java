@@ -30,11 +30,10 @@ public class RulesResourceTest extends JerseyResourceTest {
     public void setUp() throws Exception {
         super.setUp();
 
-        final WebAppBuilder builder = new WebAppBuilder();
         final VismoRulesEngine engine = new VismoRulesEngine(rulesStore);
         final ClassPathRulesFactory clsPathfactory = new ClassPathRulesFactory(engine, PassThroughRule.class.getPackage());
         final ThresholdRulesFactory factory = new ThresholdRulesFactory(clsPathfactory, engine);
-        final Application rulesApp = builder.addResource(new RulesResource(factory, rulesStore)).build();
+        final Application rulesApp = WebAppBuilder.buildFrom(new RulesResource(factory, rulesStore));
 
         configureServer(rulesApp, "/*");
         startServer();
