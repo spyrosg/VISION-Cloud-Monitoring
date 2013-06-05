@@ -4,12 +4,15 @@ import static org.junit.Assert.assertEquals;
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
+import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
+import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
 import gr.ntua.vision.monitoring.sources.HttpEventResource;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import gr.ntua.vision.monitoring.web.WebServer;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.ws.rs.core.Application;
@@ -32,18 +35,18 @@ import com.sun.jersey.api.json.JSONConfiguration;
  * 
  */
 public class HttpEventSourceTest {
-    /*
-     * TODO: make sure a {@link VismoRulesEngine} object receives posted events.
-     */
     /***/
-    private static final int    PORT     = 9998;
+    private static final int           PORT     = 9998;
     /***/
-    private static final String ROOT_URL = "http://localhost:" + PORT;
+    private static final String        ROOT_URL = "http://localhost:" + PORT;
     /***/
-    private final Client        client;
+    private final Client               client;
     /***/
-    private WebServer           server;
-    
+    private VismoRulesEngine           engine;
+    /***/
+    private WebServer                  server;
+    /***/
+    private ArrayList<MonitoringEvent> sink;
 
     {
         final ClientConfig cc = new DefaultClientConfig();
@@ -54,16 +57,32 @@ public class HttpEventSourceTest {
 
 
     /**
+     * @throws UnknownHostException
+     */
+    @Test
+    public void rulesEngineShouldReceivePostedEvent() throws UnknownHostException {
+        final String eventRepr = getDefaultEvent();
+        final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(eventRepr)
+                .put(ClientResponse.class);
+
+        // TODO: implement in HttpEventResource
+        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+        assertEquals("engine should have received at least one event", 1, sink.size());
+    }
+
+
+    /**
      * @throws Exception
      */
     @Before
     public void setUp() throws Exception {
-        final WebAppBuilder builder = new WebAppBuilder();
         final EventFactory factory = new VismoEventFactory();
-        final Application application = builder.addResource(new HttpEventResource(factory)).build();
+        final Application application = WebAppBuilder.buildFrom(new HttpEventResource(factory));
 
         server = new WebServer(PORT).withWebAppAt(application, "/*");
         server.start();
+        engine = new VismoRulesEngine();
+        engine.appendSink(new InMemoryEventSink(sink = new ArrayList<MonitoringEvent>()));
     }
 
 
@@ -72,14 +91,8 @@ public class HttpEventSourceTest {
      */
     @Test
     public void shouldAcceptEventsThroughPut() throws UnknownHostException {
-        final HashMap<String, Object> mapev = new HashMap<String, Object>();
-        mapev.put("timestamp", 123456789L);
-        mapev.put("originating-service", "service");
-        mapev.put("originating-machine", InetAddress.getLocalHost().getHostAddress());
-        mapev.put("topic", "new event");
-
-        final String objRepr = JSONObject.toJSONString(mapev);
-        final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(objRepr)
+        final String eventRepr = getDefaultEvent();
+        final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(eventRepr)
                 .put(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
@@ -93,23 +106,6 @@ public class HttpEventSourceTest {
 
         assertEquals("server should reject invalid events", ClientResponse.Status.BAD_REQUEST, res.getClientResponseStatus());
     }
-    
-    /**
-     * @throws UnknownHostException */
-    @Test
-    public void VismoRulesEngineReceiveEvent() throws UnknownHostException{
-    	final EventFactory factory = new VismoEventFactory();
-    	final HttpEventResource HttpEventResource = new HttpEventResource(factory);
-    	final HashMap<String, Object> mapev = new HashMap<String, Object>();
-        mapev.put("timestamp", 123456789L);
-        mapev.put("originating-service", "service");
-        mapev.put("originating-machine", InetAddress.getLocalHost().getHostAddress());
-        mapev.put("topic", "new event");
-
-        final String objRepr = JSONObject.toJSONString(mapev);
-    	final MonitoringEvent ev = factory.createEvent(objRepr);
-    	assertEquals(ClientResponse.Status.CREATED, HttpEventResource.receiveEvent(ev));
-    }
 
 
     /**
@@ -119,6 +115,9 @@ public class HttpEventSourceTest {
     public void tearDown() throws Exception {
         if (server != null)
             server.stop();
+
+        if (engine != null)
+            engine.halt();
     }
 
 
@@ -127,5 +126,20 @@ public class HttpEventSourceTest {
      */
     private WebResource root() {
         return client.resource(ROOT_URL);
+    }
+
+
+    /**
+     * @return the json representation of a {@link MonitoringEvent}.
+     * @throws UnknownHostException
+     */
+    private static String getDefaultEvent() throws UnknownHostException {
+        final HashMap<String, Object> mapev = new HashMap<String, Object>();
+        mapev.put("timestamp", System.currentTimeMillis());
+        mapev.put("originating-service", "service");
+        mapev.put("originating-machine", InetAddress.getLocalHost().getHostAddress());
+        mapev.put("topic", "new event");
+
+        return JSONObject.toJSONString(mapev);
     }
 }
