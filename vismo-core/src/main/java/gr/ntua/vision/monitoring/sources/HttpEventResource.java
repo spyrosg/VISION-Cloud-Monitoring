@@ -89,10 +89,10 @@ public class HttpEventResource implements EventSource {
      * @return
      */
     public Response eventValidation(MonitoringEvent ev){
-            ValidateIP(ev);
-            ValidateOriginatingService(ev);
-            ValidateEventTimestamp(ev);
-            ValidateEventTopic(ev);
+            validateIP(ev);
+            validateOriginatingService(ev);
+            validateEventTimestamp(ev);
+            validateEventTopic(ev);
             
             return Response.created(URI.create("/")).build();
     }
@@ -104,7 +104,7 @@ public class HttpEventResource implements EventSource {
      * 
      * @return
      */
-    public Response ValidateIP(MonitoringEvent ev){
+    public Response validateIP(MonitoringEvent ev){
     	try {
             final InetAddress IP = ev.originatingIP();
             if (IP == null)
@@ -123,7 +123,7 @@ public class HttpEventResource implements EventSource {
      * 
      * @return
      */
-    public Response ValidateOriginatingService(MonitoringEvent ev){
+    public Response validateOriginatingService(MonitoringEvent ev){
     	final String service = ev.originatingService();
         if (service == null)
             return Response.status(400).entity("field originating-service required").build();
@@ -138,7 +138,7 @@ public class HttpEventResource implements EventSource {
      * 
      * @return
      */
-    public Response ValidateEventTimestamp(MonitoringEvent ev){
+    public Response validateEventTimestamp(MonitoringEvent ev){
     	final Long timest = ev.timestamp();
         if (timest == null)
             return Response.status(400).entity("field timestamp required").build();
@@ -153,7 +153,7 @@ public class HttpEventResource implements EventSource {
      * 
      * @return
      */
-    public Response ValidateEventTopic(MonitoringEvent ev){
+    public Response validateEventTopic(MonitoringEvent ev){
     	final String topic = ev.topic();
         if (topic == null)
             return Response.status(400).entity("field topic required").build();

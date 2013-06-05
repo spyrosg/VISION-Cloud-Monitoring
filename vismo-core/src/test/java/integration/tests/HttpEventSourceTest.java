@@ -1,6 +1,9 @@
 package integration.tests;
 
 import static org.junit.Assert.assertEquals;
+import gr.ntua.vision.monitoring.events.EventFactory;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
+import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.sources.HttpEventResource;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import gr.ntua.vision.monitoring.web.WebServer;
@@ -40,6 +43,7 @@ public class HttpEventSourceTest {
     private final Client        client;
     /***/
     private WebServer           server;
+    
 
     {
         final ClientConfig cc = new DefaultClientConfig();
@@ -55,7 +59,8 @@ public class HttpEventSourceTest {
     @Before
     public void setUp() throws Exception {
         final WebAppBuilder builder = new WebAppBuilder();
-        final Application application = builder.addResource(new HttpEventResource()).build();
+        final EventFactory factory = new VismoEventFactory();
+        final Application application = builder.addResource(new HttpEventResource(factory)).build();
 
         server = new WebServer(PORT).withWebAppAt(application, "/*");
         server.start();
@@ -87,6 +92,23 @@ public class HttpEventSourceTest {
         final ClientResponse res = root().path("events").entity("{ \"foo\" : 3 }").put(ClientResponse.class);
 
         assertEquals("server should reject invalid events", ClientResponse.Status.BAD_REQUEST, res.getClientResponseStatus());
+    }
+    
+    /**
+     * @throws UnknownHostException */
+    @Test
+    public void VismoRulesEngineReceiveEvent() throws UnknownHostException{
+    	final EventFactory factory = new VismoEventFactory();
+    	final HttpEventResource HttpEventResource = new HttpEventResource(factory);
+    	final HashMap<String, Object> mapev = new HashMap<String, Object>();
+        mapev.put("timestamp", 123456789L);
+        mapev.put("originating-service", "service");
+        mapev.put("originating-machine", InetAddress.getLocalHost().getHostAddress());
+        mapev.put("topic", "new event");
+
+        final String objRepr = JSONObject.toJSONString(mapev);
+    	final MonitoringEvent ev = factory.createEvent(objRepr);
+    	assertEquals(ClientResponse.Status.CREATED, HttpEventResource.receiveEvent(ev));
     }
 
 
