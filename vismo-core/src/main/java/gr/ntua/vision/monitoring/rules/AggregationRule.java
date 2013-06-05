@@ -203,7 +203,7 @@ abstract class AggregationRule extends PeriodicRule {
 
     /**
      * @param eventList
-     * @return
+     * @return an {@link ArrayList}.
      */
     protected static ArrayList<MonitoringEvent> selectReadFederatedEvents(final List< ? extends MonitoringEvent> eventList) {
         return selectEventsByOperation(eventList, GET_FEDERATED_OPERATION);
@@ -238,7 +238,7 @@ abstract class AggregationRule extends PeriodicRule {
 
     /**
      * @param eventList
-     * @return
+     * @return an {@link ArrayList}.
      */
     protected static ArrayList<MonitoringEvent> selectWriteFederatedEvents(final List< ? extends MonitoringEvent> eventList) {
         return selectEventsByOperation(eventList, PUT_FEDERATED_OPERATION);

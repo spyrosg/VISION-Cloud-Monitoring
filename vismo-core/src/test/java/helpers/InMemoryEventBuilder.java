@@ -4,16 +4,11 @@ import gr.ntua.vision.monitoring.dispatch.EventBuilder;
 
 import java.util.HashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 /**
  * 
  */
 public class InMemoryEventBuilder implements EventBuilder {
-    /***/
-    private static final Logger           log = LoggerFactory.getLogger(InMemoryEventBuilder.class);
     /***/
     private final InMemoryEventDispatcher dispatcher;
     /***/
