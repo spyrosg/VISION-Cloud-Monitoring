@@ -51,4 +51,13 @@ public abstract class Rule implements VismoRule {
     protected void send(final MonitoringEvent e) {
         engine.send(e);
     }
+
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "#<" + getClass().getSimpleName() + ">";
+    }
 }
