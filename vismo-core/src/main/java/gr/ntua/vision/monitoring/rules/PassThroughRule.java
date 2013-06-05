@@ -4,7 +4,7 @@ import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 
 /**
- * 
+ * This rule is used to pass the events "as-is".
  */
 public class PassThroughRule extends Rule {
     /**
@@ -23,14 +23,5 @@ public class PassThroughRule extends Rule {
     @Override
     public void performWith(final MonitoringEvent e) {
         send(e);
-    }
-
-
-    /**
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return "#<PassThroughRule>";
     }
 }

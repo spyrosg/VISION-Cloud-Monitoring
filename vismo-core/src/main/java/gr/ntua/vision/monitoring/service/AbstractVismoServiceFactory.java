@@ -13,7 +13,6 @@ import gr.ntua.vision.monitoring.rules.VismoRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sources.EventSources;
-import gr.ntua.vision.monitoring.threading.JVMStatusReportTask;
 import gr.ntua.vision.monitoring.threading.PingGroupTask;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import gr.ntua.vision.monitoring.web.WebServer;
@@ -37,8 +36,6 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
     private static final Package       DEFAULT_RULES_PACKAGE = VismoRule.class.getPackage();
     /***/
     private static final Logger        log                   = LoggerFactory.getLogger(AbstractVismoServiceFactory.class);
-    /***/
-    private static final long          ONE_MINUTE            = 60 * 1000;
     /***/
     private static final int           PORT                  = 9996;
     /***/
@@ -96,7 +93,6 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
      */
     protected void addDefaultServiceTasks(final VMInfo info, final VismoService service) throws UnknownHostException {
         log.debug("adding default tasks");
-        service.addTask(new JVMStatusReportTask(ONE_MINUTE));
         service.addTask(new PingGroupTask(conf, info.getVersion()));
     }
 

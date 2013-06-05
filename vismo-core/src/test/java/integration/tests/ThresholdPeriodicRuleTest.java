@@ -1,7 +1,5 @@
 package integration.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.RulesResource;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
@@ -10,7 +8,6 @@ import gr.ntua.vision.monitoring.rules.ThresholdRulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
-import gr.ntua.vision.monitoring.web.WebServer;
 import helpers.InMemoryEventDispatcher;
 
 import java.util.ArrayList;
@@ -18,24 +15,16 @@ import java.util.Random;
 
 import javax.ws.rs.core.MediaType;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
 
 
 /**
  * 
  */
-public class ThresholdPeriodicRuleTest {
+public class ThresholdPeriodicRuleTest extends JerseyResourceTest {
     /***/
     private static final String              AVERAGE_THROUGHPUT_TOPIC = "average-throughput-topic";
     /***/
@@ -47,10 +36,6 @@ public class ThresholdPeriodicRuleTest {
     /***/
     private static final int                 NO_EVENTS                = 10;
     /***/
-    private static final int                 PORT                     = 9998;
-    /***/
-    private static final String              ROOT_URL                 = "http://localhost:" + PORT;
-    /***/
     private static final long                RULE_PERIOD              = 500;
     /***/
     private static final String              TENANT                   = "ntua";
@@ -59,8 +44,6 @@ public class ThresholdPeriodicRuleTest {
     /***/
     private static final String              USER                     = "vassilis";
     /***/
-    private final Client                     client;
-    /***/
     private VismoRulesEngine                 engine;
     /***/
     private final ArrayList<MonitoringEvent> eventSink                = new ArrayList<MonitoringEvent>();
@@ -68,39 +51,28 @@ public class ThresholdPeriodicRuleTest {
     private ThresholdRulesFactory            factory;
     /***/
     private FakeObjectService                obs;
-    /***/
-    private WebServer                        server;
-
-    {
-        final ClientConfig cc = new DefaultClientConfig();
-
-        cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
-        client = Client.create(cc);
-    }
 
 
     /**
-     * @throws Exception
+     * @see integration.tests.JerseyResourceTest#setUp()
      */
-    @Before
+    @Override
     public void setUp() throws Exception {
+        super.setUp();
+
         engine = new VismoRulesEngine();
         obs = new FakeObjectService(new InMemoryEventDispatcher(engine, "fake-obs"), new Random(3331));
         factory = new ThresholdRulesFactory(engine);
-
         engine.appendSink(new InMemoryEventSink(eventSink));
-
-        server = new WebServer(PORT);
-        server.withWebAppAt(WebAppBuilder.buildFrom(new RulesResource(factory, new RulesStore())), "/*");
-        server.start();
+        configureServer(WebAppBuilder.buildFrom(new RulesResource(factory, new RulesStore())), "/*");
+        startServer();
     }
 
 
     /**
      * @throws InterruptedException
      */
-    @Test
-    public void submitRuleShouldProduceEventWithContainerAggregationUnit() throws InterruptedException {
+    public void testSubmitRuleShouldProduceEventWithContainerAggregationUnit() throws InterruptedException {
         assertEquals(0, engine.noRules());
 
         final ClientResponse res = submitRule(averageThroughputThresholdRule(TENANT, USER, CONTAINER));
@@ -112,24 +84,6 @@ public class ThresholdPeriodicRuleTest {
         Thread.sleep(6 * RULE_PERIOD / 5);
         assertEquals(1, eventSink.size());
         assertIsExpectedEvent(eventSink.get(0));
-    }
-
-
-    /**
-     * @throws Exception
-     */
-    @After
-    public void tearDown() throws Exception {
-        if (server != null)
-            server.stop();
-    }
-
-
-    /**
-     * @return a web resource pointing to the server's root.
-     */
-    private WebResource root() {
-        return client.resource(ROOT_URL);
     }
 
 

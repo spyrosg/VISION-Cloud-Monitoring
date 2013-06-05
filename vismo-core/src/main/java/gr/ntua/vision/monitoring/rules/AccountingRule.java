@@ -263,7 +263,7 @@ public class AccountingRule extends AggregationRule {
 
     /**
      * @param eventList
-     * @return
+     * @return an {@link ArrayList}.
      */
     private static ArrayList<HashMap<String, Object>> transformReadFederatedList(final ArrayList<MonitoringEvent> eventList) {
         return transformByOperation(eventList, "read-f");
@@ -336,7 +336,7 @@ public class AccountingRule extends AggregationRule {
 
     /**
      * @param eventList
-     * @return
+     * @return an {@link ArrayList}.
      */
     private static ArrayList<HashMap<String, Object>> transformWriteFederatedList(final ArrayList<MonitoringEvent> eventList) {
         return transformByOperation(eventList, "write-f");
