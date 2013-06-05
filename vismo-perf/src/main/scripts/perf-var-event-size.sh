@@ -31,4 +31,4 @@ function run_perf {
 	rm -f "$tmp_out"
 }
 
-main "$@" $prog-$(date +'%F').csv
+main "$@" $prog-$(date -Iseconds).csv
