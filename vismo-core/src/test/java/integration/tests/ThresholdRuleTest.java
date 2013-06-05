@@ -1,7 +1,5 @@
 package integration.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.RulesResource;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
@@ -10,48 +8,33 @@ import gr.ntua.vision.monitoring.rules.ThresholdRulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
-import gr.ntua.vision.monitoring.web.WebServer;
 import helpers.InMemoryEventDispatcher;
 
 import java.util.ArrayList;
 
 import javax.ws.rs.core.MediaType;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
 
 
 /**
  * This is used to validate that a newly added rule can run and produce events in the rules' engine. The specific rule constructed
  * and submitted generates events when a request's throughput is too high.
  */
-public class ThresholdRuleTest {
+public class ThresholdRuleTest extends JerseyResourceTest {
     /***/
     private static final String              CONTAINER = "test-container";
     /***/
     private static final Logger              log       = LoggerFactory.getLogger(ThresholdRuleTest.class);
-    /***/
-    private static final int                 PORT      = 9998;
-    /***/
-    private static final String              ROOT_URL  = "http://localhost:" + PORT;
     /***/
     private static final String              TENANT    = "ntua";
     /***/
     private static final double              THRESHOLD = 5;
     /***/
     private static final String              USER      = "vassilis";
-    /***/
-    private final Client                     client;
     /***/
     private VismoRulesEngine                 engine;
     /***/
@@ -60,37 +43,27 @@ public class ThresholdRuleTest {
     private ThresholdRulesFactory            factory;
     /***/
     private FakeObjectService                obs;
-    /***/
-    private WebServer                        server;
-
-    {
-        final ClientConfig cc = new DefaultClientConfig();
-
-        cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
-        client = Client.create(cc);
-    }
 
 
     /**
-     * @throws Exception
+     * @see integration.tests.JerseyResourceTest#setUp()
      */
-    @Before
+    @Override
     public void setUp() throws Exception {
+        super.setUp();
+
         engine = new VismoRulesEngine();
         obs = new FakeObjectService(new InMemoryEventDispatcher(engine, "fake-obs"));
         factory = new ThresholdRulesFactory(engine);
 
         engine.appendSink(new InMemoryEventSink(eventSink));
-
-        server = new WebServer(PORT);
-        server.withWebAppAt(WebAppBuilder.buildFrom(new RulesResource(factory, new RulesStore())), "/*");
-        server.start();
+        configureServer(WebAppBuilder.buildFrom(new RulesResource(factory, new RulesStore())), "/*");
+        startServer();
     }
 
 
     /***/
-    @Test
-    public void shouldRejectSubmittedRuleOfInvalidSpecification() {
+    public void testShouldRejectSubmittedRuleOfInvalidSpecification() {
         assertEquals(0, engine.noRules());
 
         final ClientResponse res = submitRule(invalidSpecificationRule());
@@ -101,8 +74,7 @@ public class ThresholdRuleTest {
 
 
     /***/
-    @Test
-    public void submittedRuleShouldNotProduceEventWhenNotMatching() {
+    public void testSubmittedRuleShouldNotProduceEventWhenNotMatching() {
         assertEquals(0, engine.noRules());
 
         final ClientResponse res = submitRule(throughputThresholdRule(TENANT, USER, "-dummy-"));
@@ -116,8 +88,7 @@ public class ThresholdRuleTest {
 
 
     /***/
-    @Test
-    public void submittedRuleShouldProduceEventWithContainerAggregationUnit() {
+    public void testSubmittedRuleShouldProduceEventWithContainerAggregationUnit() {
         assertEquals(0, engine.noRules());
 
         final ClientResponse res = submitRule(throughputThresholdRule(TENANT, USER, CONTAINER));
@@ -132,8 +103,7 @@ public class ThresholdRuleTest {
 
 
     /***/
-    @Test
-    public void submittedRuleShouldProduceEventWithUserAggregationUnit() {
+    public void testSubmittedRuleShouldProduceEventWithUserAggregationUnit() {
         assertEquals(0, engine.noRules());
 
         final ClientResponse res = submitRule(throughputThresholdRule(TENANT, USER));
@@ -144,24 +114,6 @@ public class ThresholdRuleTest {
         triggerRule();
         assertEquals(1, eventSink.size());
         assertIsExpectedEvent(eventSink.get(0));
-    }
-
-
-    /**
-     * @throws Exception
-     */
-    @After
-    public void tearDown() throws Exception {
-        if (server != null)
-            server.stop();
-    }
-
-
-    /**
-     * @return a web resource pointing to the server's root.
-     */
-    private WebResource root() {
-        return client.resource(ROOT_URL);
     }
 
 
