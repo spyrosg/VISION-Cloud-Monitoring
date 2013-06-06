@@ -46,7 +46,8 @@ public class HttpEventSourceTest {
     /***/
     private WebServer                  server;
     /***/
-    private ArrayList<MonitoringEvent> sink = new ArrayList<MonitoringEvent>();
+    private ArrayList<MonitoringEvent> sink;
+    
 
     {
         final ClientConfig cc = new DefaultClientConfig();
@@ -65,8 +66,11 @@ public class HttpEventSourceTest {
         final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(eventRepr)
                 .put(ClientResponse.class);
         
+        final EventFactory factory = new VismoEventFactory();
+        final HttpEventResource httpres = new HttpEventResource(factory);
+        final MonitoringEvent e = factory.createEvent(eventRepr);
+        httpres.addEventToVismoRulesEngine(sink, engine, e);
 
-        // TODO: implement in HttpEventResource
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
         assertEquals("engine should have received at least one event", 1, sink.size());   
     }
@@ -78,12 +82,12 @@ public class HttpEventSourceTest {
     @Before
     public void setUp() throws Exception {
         final EventFactory factory = new VismoEventFactory();
-        final Application application = WebAppBuilder.buildFrom(new HttpEventResource(factory,sink));
-
+        final Application application = WebAppBuilder.buildFrom(new HttpEventResource(factory));
+        
         server = new WebServer(PORT).withWebAppAt(application, "/*");
         server.start();
         engine = new VismoRulesEngine();
-        engine.appendSink(new InMemoryEventSink(sink));
+        engine.appendSink(new InMemoryEventSink(sink = new ArrayList<MonitoringEvent>()));
     }
 
 

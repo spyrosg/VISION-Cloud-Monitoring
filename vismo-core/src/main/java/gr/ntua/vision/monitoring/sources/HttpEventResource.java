@@ -2,12 +2,8 @@ package gr.ntua.vision.monitoring.sources;
 
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
-import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
-import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
-
-import integration.tests.HttpEventSourceTest;
 
 import java.net.InetAddress;
 import java.net.URI;
@@ -28,15 +24,7 @@ public class HttpEventResource implements EventSource {
     private final EventFactory                   factory;
     /** the listeners lists. */
     private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
-    /***/
-    private EventSource                          source;
     
-    
-    private VismoRulesEngine                     engine = new VismoRulesEngine();
-    
-    private EventSink                            sink;
-    
-    private ArrayList<MonitoringEvent> sinks;
     
     
     
@@ -52,9 +40,8 @@ public class HttpEventResource implements EventSource {
      * @param factory
      * @param sink
      */
-    public HttpEventResource(final EventFactory factory, final ArrayList<MonitoringEvent> sinks) {
+    public HttpEventResource(final EventFactory factory) {
         this.factory = factory;
-        this.sinks = sinks;
     }
     
     
@@ -65,8 +52,8 @@ public class HttpEventResource implements EventSource {
      */
     @Override
     public void add(final EventSourceListener listener) {
-        source.add(listener);
         listeners.add(listener);
+        
     }
 
 
@@ -79,7 +66,6 @@ public class HttpEventResource implements EventSource {
         try {
             final MonitoringEvent monev = factory.createEvent(body);
             eventValidation(monev); 
-            addEventToVismoRulesEngine(monev);
         } catch (final java.lang.Error e) {
             return Response.status(400).entity(e.getMessage()).build();
         }
@@ -88,12 +74,14 @@ public class HttpEventResource implements EventSource {
     }
     
     
-    public void addEventToVismoRulesEngine(final MonitoringEvent e){
-    	
-    	engine.receive(e);
-    	sinks.add(0, e);
-    	engine.appendSink(sink);
+    public void addEventToVismoRulesEngine(final ArrayList<MonitoringEvent> sink, final VismoRulesEngine engine, final MonitoringEvent e){
+    	final InMemoryEventSink sinks = new InMemoryEventSink(sink);
+    	engine.appendSink(new InMemoryEventSink(sink));
+    	sinks.send(e);
     	}
+    
+    
+    
 
 
     /**
