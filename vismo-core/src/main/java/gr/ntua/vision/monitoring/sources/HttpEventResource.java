@@ -2,6 +2,12 @@ package gr.ntua.vision.monitoring.sources;
 
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
+import gr.ntua.vision.monitoring.rules.RulesStore;
+import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
+import gr.ntua.vision.monitoring.sinks.EventSink;
+import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
+
+import integration.tests.HttpEventSourceTest;
 
 import java.net.InetAddress;
 import java.net.URI;
@@ -24,16 +30,34 @@ public class HttpEventResource implements EventSource {
     private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
     /***/
     private EventSource                          source;
+    
+    
+    private VismoRulesEngine                     engine = new VismoRulesEngine();
+    
+    private EventSink                            sink;
+    
+    private ArrayList<MonitoringEvent> sinks;
+    
+    
+    
+   
+   
+    
+   
 
 
     /**
      * Constructor
      * 
      * @param factory
+     * @param sink
      */
-    public HttpEventResource(final EventFactory factory) {
+    public HttpEventResource(final EventFactory factory, final ArrayList<MonitoringEvent> sinks) {
         this.factory = factory;
+        this.sinks = sinks;
     }
+    
+    
 
 
     /**
@@ -54,13 +78,22 @@ public class HttpEventResource implements EventSource {
     public Response putEvent(final String body) {
         try {
             final MonitoringEvent monev = factory.createEvent(body);
-            eventValidation(monev);
+            eventValidation(monev); 
+            addEventToVismoRulesEngine(monev);
         } catch (final java.lang.Error e) {
             return Response.status(400).entity(e.getMessage()).build();
         }
 
         return Response.created(URI.create("/")).build();
     }
+    
+    
+    public void addEventToVismoRulesEngine(final MonitoringEvent e){
+    	
+    	engine.receive(e);
+    	sinks.add(0, e);
+    	engine.appendSink(sink);
+    	}
 
 
     /**
