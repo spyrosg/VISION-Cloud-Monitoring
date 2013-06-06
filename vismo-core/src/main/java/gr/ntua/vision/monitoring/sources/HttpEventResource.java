@@ -45,7 +45,7 @@ public class HttpEventResource implements EventSource {
     }
     
     
-
+ 
 
     /**
      * @see gr.ntua.vision.monitoring.sources.EventSource#add(gr.ntua.vision.monitoring.sources.EventSourceListener)
