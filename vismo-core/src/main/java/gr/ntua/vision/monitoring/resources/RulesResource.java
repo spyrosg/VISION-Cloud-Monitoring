@@ -63,7 +63,7 @@ public class RulesResource {
      * @return a response of status 200.
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces("application/json; qs=0.9")
     public List<RuleIdBean> listRulesAsJSON() {
         final ArrayList<RuleIdBean> ids = new ArrayList<RuleIdBean>();
 
