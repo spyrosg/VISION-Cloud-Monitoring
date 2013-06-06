@@ -76,7 +76,7 @@ public class HttpEventResource implements EventSource {
     
     public void addEventToVismoRulesEngine(final ArrayList<MonitoringEvent> sink, final VismoRulesEngine engine, final MonitoringEvent e){
     	final InMemoryEventSink sinks = new InMemoryEventSink(sink);
-    	engine.appendSink(new InMemoryEventSink(sink));
+    	engine.appendSink(sinks);
     	sinks.send(e);
     	}
     
