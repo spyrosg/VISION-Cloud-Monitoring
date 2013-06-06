@@ -7,6 +7,8 @@ import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.VismoRule;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -61,8 +63,27 @@ public class RulesResource {
      * @return a response of status 200.
      */
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<RuleIdBean> listRulesAsJSON() {
+        final ArrayList<RuleIdBean> ids = new ArrayList<RuleIdBean>();
+
+        store.forEach(new RuleOperation() {
+            @Override
+            public void run(final VismoRule rule) {
+                ids.add(new RuleIdBean(rule.id()));
+            }
+        });
+
+        return ids;
+    }
+
+
+    /**
+     * @return a response of status 200.
+     */
+    @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response listRules() {
+    public Response listRulesAsText() {
         final StringBuilder buf = new StringBuilder();
 
         store.forEach(new RuleOperation() {
