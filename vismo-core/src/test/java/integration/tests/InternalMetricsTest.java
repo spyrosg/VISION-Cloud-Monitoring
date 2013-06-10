@@ -1,8 +1,12 @@
 package integration.tests;
 
+import gr.ntua.vision.monitoring.resources.CPUUsageBean;
 import gr.ntua.vision.monitoring.resources.InternalMetricsResource;
 import gr.ntua.vision.monitoring.resources.MemoryUsageBean;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
+
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
@@ -24,6 +28,21 @@ public class InternalMetricsTest extends JerseyResourceTest {
 
         configureServer(app, "/*");
         startServer();
+    }
+
+
+    /**
+     * 
+     */
+    public void testShouldReturnHostAverageCPULoad() {
+        final ClientResponse res = root().path("mon").path("cpu").accept(MediaType.APPLICATION_JSON).post(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
+
+        final CPUUsageBean u = res.getEntity(CPUUsageBean.class);
+        final OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+
+        assertEquals(osBean.getSystemLoadAverage(), u.getHostCPULoad());
     }
 
 

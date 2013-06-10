@@ -13,6 +13,17 @@ import javax.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 public class InternalMetricsResource {
     /**
+     * @return a {@link CPUUsageBean}.
+     */
+    @SuppressWarnings("static-method")
+    @POST
+    @Path("cpu")
+    public CPUUsageBean averageCPULoad() {
+        return CPUUsageBean.get();
+    }
+
+
+    /**
      * @return a {@link MemoryUsageBean}.
      */
     @SuppressWarnings("static-method")
