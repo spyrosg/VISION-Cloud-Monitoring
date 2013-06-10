@@ -3,7 +3,7 @@ package gr.ntua.vision.monitoring.sources;
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
-import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
+import gr.ntua.vision.monitoring.sinks.EventSink;
 
 import java.net.InetAddress;
 import java.net.URI;
@@ -24,7 +24,11 @@ public class HttpEventResource implements EventSource {
     private final EventFactory                   factory;
     /** the listeners lists. */
     private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
-    
+    /***/
+    private VismoRulesEngine                     engine;
+    /***/
+    private EventSink                            sink;
+   
     
     
     
@@ -39,13 +43,16 @@ public class HttpEventResource implements EventSource {
      * 
      * @param factory
      * @param sink
+     * @param engine
      */
-    public HttpEventResource(final EventFactory factory) {
+    public HttpEventResource(final EventFactory factory, final EventSink sink, final VismoRulesEngine engine) {
         this.factory = factory;
+        this.sink = sink;
+        this.engine = engine;
     }
     
     
- 
+
 
     /**
      * @see gr.ntua.vision.monitoring.sources.EventSource#add(gr.ntua.vision.monitoring.sources.EventSourceListener)
@@ -53,7 +60,6 @@ public class HttpEventResource implements EventSource {
     @Override
     public void add(final EventSourceListener listener) {
         listeners.add(listener);
-        
     }
 
 
@@ -66,6 +72,7 @@ public class HttpEventResource implements EventSource {
         try {
             final MonitoringEvent monev = factory.createEvent(body);
             eventValidation(monev); 
+            engineReceivePostedEvent(monev);
         } catch (final java.lang.Error e) {
             return Response.status(400).entity(e.getMessage()).build();
         }
@@ -73,16 +80,12 @@ public class HttpEventResource implements EventSource {
         return Response.created(URI.create("/")).build();
     }
     
-    
-    public void addEventToVismoRulesEngine(final ArrayList<MonitoringEvent> sink, final VismoRulesEngine engine, final MonitoringEvent e){
-    	final InMemoryEventSink sinks = new InMemoryEventSink(sink);
-    	engine.appendSink(sinks);
-    	sinks.send(e);
+    public void engineReceivePostedEvent(final MonitoringEvent e){
+    	engine.receive(e);
+    	sink.send(e);
     	}
     
     
-    
-
 
     /**
      * Validate event's fields

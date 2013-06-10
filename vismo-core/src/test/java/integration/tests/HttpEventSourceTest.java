@@ -5,8 +5,12 @@ import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
+import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
+import gr.ntua.vision.monitoring.sources.EventSource;
+import gr.ntua.vision.monitoring.sources.EventSourceListener;
 import gr.ntua.vision.monitoring.sources.HttpEventResource;
+import gr.ntua.vision.monitoring.sources.InMemoryEventSource;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import gr.ntua.vision.monitoring.web.WebServer;
 
@@ -21,7 +25,7 @@ import javax.ws.rs.core.MediaType;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test; 
+import org.junit.Test;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -34,7 +38,7 @@ import com.sun.jersey.api.json.JSONConfiguration;
 /**
  * 
  */
-public class HttpEventSourceTest {
+public class HttpEventSourceTest implements EventSource {
     /***/
     private static final int           PORT     = 9998;
     /***/
@@ -47,15 +51,24 @@ public class HttpEventSourceTest {
     private WebServer                  server;
     /***/
     private ArrayList<MonitoringEvent> sink;
+    /***/
+    private EventSourceListener        listener;
+    /***/
+    private EventSource                evsource;
+    /***/
+    private EventSink                  esink;
+    
+   
+    
+  
+    
     
 
     {
         final ClientConfig cc = new DefaultClientConfig();
-
         cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
         client = Client.create(cc);
     }
-
 
     /**
      * @throws UnknownHostException
@@ -65,11 +78,8 @@ public class HttpEventSourceTest {
         final String eventRepr = getDefaultEvent();
         final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(eventRepr)
                 .put(ClientResponse.class);
-        
-        final EventFactory factory = new VismoEventFactory();
-        final HttpEventResource httpres = new HttpEventResource(factory);
-        final MonitoringEvent e = factory.createEvent(eventRepr);
-        httpres.addEventToVismoRulesEngine(sink, engine, e);
+       
+       
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
         assertEquals("engine should have received at least one event", 1, sink.size());   
@@ -82,12 +92,18 @@ public class HttpEventSourceTest {
     @Before
     public void setUp() throws Exception {
         final EventFactory factory = new VismoEventFactory();
-        final Application application = WebAppBuilder.buildFrom(new HttpEventResource(factory));
+        sink = new ArrayList<MonitoringEvent>();
+        esink = new InMemoryEventSink(sink);
+        evsource = new InMemoryEventSource();
+        evsource.add(listener);
+        engine = new VismoRulesEngine();
+        engine.appendSink(esink);
+        engine.registerToSource(evsource);
+        final Application application = WebAppBuilder.buildFrom(new HttpEventResource(factory,esink,engine));
+        
         
         server = new WebServer(PORT).withWebAppAt(application, "/*");
-        server.start();
-        engine = new VismoRulesEngine();
-        engine.appendSink(new InMemoryEventSink(sink = new ArrayList<MonitoringEvent>()));
+        server.start(); 
     }
 
 
@@ -147,4 +163,11 @@ public class HttpEventSourceTest {
 
         return JSONObject.toJSONString(mapev);
     }
+
+
+	@Override
+	public void add(EventSourceListener listener) {
+		// TODO Auto-generated method stub
+		
+	}
 }
