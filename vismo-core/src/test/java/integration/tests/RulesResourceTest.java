@@ -143,9 +143,7 @@ public class RulesResourceTest extends JerseyResourceTest {
         final ThresholdRuleBean bean = new ThresholdRuleBean();
 
         bean.setTopic("my-topic");
-        bean.setMetric("latency");
-        bean.setPredicate(">");
-        bean.setThreshold(1.3);
+        bean.addRequirement("latency", ">", 1.3);
 
         return bean;
     }
@@ -159,11 +157,9 @@ public class RulesResourceTest extends JerseyResourceTest {
         final ThresholdRuleBean bean = new ThresholdRuleBean();
 
         bean.setTopic("my-topic");
-        bean.setMetric("latency");
-        bean.setPredicate(">");
-        bean.setThreshold(1.3);
         bean.setPeriod(period);
         bean.setAggregationMethod("sum");
+        bean.addRequirement("latency", ">", 1.3);
 
         return bean;
     }

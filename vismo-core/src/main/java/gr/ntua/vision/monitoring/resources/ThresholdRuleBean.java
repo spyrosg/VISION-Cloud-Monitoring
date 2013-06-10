@@ -4,33 +4,52 @@ import gr.ntua.vision.monitoring.rules.RuleBean;
 import gr.ntua.vision.monitoring.rules.ThresholdPeriodicRule;
 import gr.ntua.vision.monitoring.rules.ThresholdRule;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * This is just a data holder, the exchange media format for {@link ThresholdRule}s or {@link ThresholdPeriodicRule}s.
  */
 public class ThresholdRuleBean implements RuleBean {
     /***/
-    private String aggregationMethod;
+    private String                          aggregationMethod;
     /***/
-    private String filterUnit;
+    private String                          filterUnit;
     /***/
-    private String metric;
+    private String                          operation;
     /***/
-    private String operation;
+    private long                            period = -1;
     /***/
-    private long   period = -1;
+    private List<ThresholdRequirementBean> requirements;
     /***/
-    private String predicate;
-    /***/
-    private double threshold;
-    /***/
-    private String topic;
+    private String                          topic;
 
 
     /**
      * Default constructor.
      */
     public ThresholdRuleBean() {
+    }
+
+
+    /**
+     * @param metric
+     * @param predicate
+     * @param threshold
+     * @return <code>this</code>.
+     */
+    public ThresholdRuleBean addRequirement(final String metric, final String predicate, final double threshold) {
+        final List<ThresholdRequirementBean> list = getRequirements() != null ? getRequirements()
+                                                                              : new ArrayList<ThresholdRequirementBean>();
+        final ThresholdRequirementBean req = new ThresholdRequirementBean();
+
+        req.setMetric(metric);
+        req.setPredicate(predicate);
+        req.setThreshold(threshold);
+        list.add(req);
+
+        return this;
     }
 
 
@@ -51,14 +70,6 @@ public class ThresholdRuleBean implements RuleBean {
 
 
     /**
-     * @return the metric
-     */
-    public String getMetric() {
-        return metric;
-    }
-
-
-    /**
      * @return the operation
      */
     public String getOperation() {
@@ -75,18 +86,10 @@ public class ThresholdRuleBean implements RuleBean {
 
 
     /**
-     * @return the predicate
+     * @return the requirements
      */
-    public String getPredicate() {
-        return predicate;
-    }
-
-
-    /**
-     * @return the threshold
-     */
-    public double getThreshold() {
-        return threshold;
+    public List<ThresholdRequirementBean> getRequirements() {
+        return requirements;
     }
 
 
@@ -117,15 +120,6 @@ public class ThresholdRuleBean implements RuleBean {
 
 
     /**
-     * @param metric
-     *            the metric to set
-     */
-    public void setMetric(final String metric) {
-        this.metric = metric;
-    }
-
-
-    /**
      * @param operation
      *            the operation to set
      */
@@ -144,20 +138,11 @@ public class ThresholdRuleBean implements RuleBean {
 
 
     /**
-     * @param predicate
-     *            the predicate to set
+     * @param requirements
+     *            the requirements to set
      */
-    public void setPredicate(final String predicate) {
-        this.predicate = predicate;
-    }
-
-
-    /**
-     * @param threshold
-     *            the threshold to set
-     */
-    public void setThreshold(final double threshold) {
-        this.threshold = threshold;
+    public void setRequirements(final List<ThresholdRequirementBean> requirements) {
+        this.requirements = requirements;
     }
 
 

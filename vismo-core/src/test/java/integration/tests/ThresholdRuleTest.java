@@ -149,17 +149,10 @@ public class ThresholdRuleTest extends JerseyResourceTest {
     private static ThresholdRuleBean invalidSpecificationRule() {
         final ThresholdRuleBean bean = new ThresholdRuleBean();
 
-        // we're concerned about the upload throughout
-        bean.setMetric("transaction-throughput");
         bean.setOperation("PUT");
-        // under given container
         bean.setFilterUnit(TENANT + "," + USER + "," + CONTAINER);
-        // if it's lower
-        bean.setPredicate("-my-predicate-");
-        // than 5 bytes / second
-        bean.setThreshold(THRESHOLD);
-        // generate event with given topic.
         bean.setTopic("throughput-topic");
+        bean.addRequirement("transaction-throughput", "-my-predicate-", THRESHOLD);
 
         return bean;
     }
@@ -173,17 +166,10 @@ public class ThresholdRuleTest extends JerseyResourceTest {
     private static ThresholdRuleBean throughputThresholdRule(final String tenant, final String user) {
         final ThresholdRuleBean bean = new ThresholdRuleBean();
 
-        // we're concerned about the upload throughout
-        bean.setMetric("transaction-throughput");
         bean.setOperation("PUT");
-        // under given container
         bean.setFilterUnit(tenant + "," + user);
-        // if it's higher...
-        bean.setPredicate(">=");
-        // than THRESHOLD bytes / second
-        bean.setThreshold(THRESHOLD);
-        // generate event with given topic.
         bean.setTopic("throughput-topic");
+        bean.addRequirement("transaction-throughput", ">=", THRESHOLD);
 
         return bean;
     }
@@ -198,17 +184,10 @@ public class ThresholdRuleTest extends JerseyResourceTest {
     private static ThresholdRuleBean throughputThresholdRule(final String tenant, final String user, final String containerName) {
         final ThresholdRuleBean bean = new ThresholdRuleBean();
 
-        // we're concerned about the upload throughout
-        bean.setMetric("transaction-throughput");
         bean.setOperation("PUT");
-        // under given container
         bean.setFilterUnit(tenant + "," + user + "," + containerName);
-        // if it's lower
-        bean.setPredicate(">=");
-        // than threshold bytes / second
-        bean.setThreshold(THRESHOLD);
-        // generate event with given topic.
         bean.setTopic("throughput-topic");
+        bean.addRequirement("transaction-throughput", ">=", THRESHOLD);
 
         return bean;
     }

@@ -140,17 +140,10 @@ public class RuleApplicationTest {
             final String user) {
         final ThresholdRuleBean bean = new ThresholdRuleBean();
 
-        // we're concerned about the upload throughout
-        bean.setMetric("transaction-throughput");
         bean.setOperation("PUT");
-        // under given container
         bean.setFilterUnit(tenant + "," + user);
-        // if it's higher...
-        bean.setPredicate(">=");
-        // than THRESHOLD bytes / second
-        bean.setThreshold(threshold);
-        // generate event with given topic.
         bean.setTopic(topic);
+        bean.addRequirement("transaction-throughput", ">=", threshold);
 
         return bean;
     }
