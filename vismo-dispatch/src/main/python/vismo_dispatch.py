@@ -213,13 +213,9 @@ if __name__ == '__main__':
 
     mon = VismoEventDispatcher('foo')
 
-    def mon_send_data(operation, tag, tenant, user, container, obj, content_size=0):
+    def mon_send_data(operation, tag, tenant, user, container, obj, content_size=0, metadata_size=0):
         mon.send(status='SUCCESS', tag=tag, operation=operation, tenant=tenant, user=user,
-                container=container, obj=obj, content_size=content_size)
-
-    def mon_send_metadata(operation, tag, tenant, user, container, obj, mdsize=None):
-        mon.send(status='SUCCESS', tag=tag, operation=operation, tenant=tenant, user=user,
-                container=container, obj=obj, metadata_size=mdsize)
+                container=container, obj=obj, content_size=content_size, metadata_size=metadata_size)
 
     def send_put(tenant, user, container, obj):
         t = int(1000 * time())
@@ -239,25 +235,9 @@ if __name__ == '__main__':
         mon_send_data('PUT_MULTI', 'start-response', tenant, user, container, obj)
         mon_send_data('PUT_MULTI', 'end-response', tenant, user, container, obj, 500)
 
-    def send_put_metadata(tenant, user, container, obj):
-        t = int(1000 * time())
-        mon_send_metadata('PUT_METADATA', 'start-request', tenant, user, container, obj)
-        mon_send_metadata('PUT_METADATA', 'start-response', tenant, user, container, obj)
-        mon_send_metadata('PUT_METADATA', 'end-response', tenant, user, container, obj, 500)
-
-    def send_get_metadata(tenant, user, container, obj):
-        t = int(1000 * time())
-        mon_send_metadata('GET_METADATA', 'start-request', tenant, user, container, obj)
-        mon_send_metadata('GET_METADATA', 'start-response', tenant, user, container, obj)
-        mon_send_metadata('GET_METADATA', 'end-response', tenant, user, container, obj, 567)
-
     if sys.argv[1] == 'multi':
         for i in range(int(sys.argv[2])):
             send_put_multi('ntua', 'vassilis', 'test-container', 'foo')
-    elif sys.argv[1] == 'meta':
-        for i in range(int(sys.argv[2]) / 2):
-            send_put_metadata('ntua', 'vassilis', 'test-container-meta', 'foo')
-            send_get_metadata('ntua', 'vassilis', 'test-container-meta', 'foo')
     else:
         for i in range(int(sys.argv[2]) / 2):
             send_put('ntua', 'vassilis', 'test-container', 'foo')
