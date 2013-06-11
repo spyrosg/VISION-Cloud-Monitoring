@@ -142,39 +142,33 @@ class VismoEventDispatcher(EventDispatcher):
 
         if self.start_request and self.start_response and self.end_response:
             try:
+                event = dict(self.end_response)
+                event['id'] = str(uuid4())
+                event['timestamp'] = int(1000 * time())
+                event['originating-machine'] = self.ip
+                event['originating-service'] = self.service_name
+                event['originating-cluster'] = self.cluster_name
+                event['transaction-latency'] = self.get_transaction_latency()
+                event['transaction-duration'] = self.get_transaction_duration()
+                event['object'] = self.end_response['obj']
+                del event['obj']
+                del event['tag']
+
                 if 'content_size' in self.end_response:
-                    event = dict(self.end_response)
-                    event['id'] = str(uuid4())
-                    event['timestamp'] = int(1000 * time())
-                    event['originating-machine'] = self.ip
-                    event['originating-service'] = self.service_name
-                    event['originating-cluster'] = self.cluster_name
-                    event['transaction-latency'] = self.get_latency()
-                    event['transaction-duration'] = self.get_transaction_duration()
                     event['content-size'] = float(self.end_response['content_size'])
-                    event['object'] = self.end_response['obj']
-                    event['transaction-throughput'] = self.get_throughput()
                     del event['content_size']
-                    del event['obj']
-                    del event['tag']
-                    self._send(event)
-                elif 'metadata_size' in self.end_response:
-                    event = dict(self.end_response)
-                    event['id'] = str(uuid4())
-                    event['timestamp'] = int(1000 * time())
-                    event['originating-machine'] = self.ip
-                    event['originating-service'] = self.service_name
-                    event['originating-cluster'] = self.cluster_name
+
+                if 'metadata_size' in self.end_response:
                     event['metadata-size'] = float(self.end_response['metadata_size'])
-                    event['object'] = self.end_response['obj']
                     del event['metadata_size']
-                    del event['obj']
-                    del event['tag']
-                    self._send(event)
+
+                event['transaction-throughput'] = self.get_transaction_throughput()
+
+                self._send(event)
             finally:
                 self.start_request, self.start_response, self.end_response = None, None, None
 
-    def get_latency(self):
+    def get_transaction_latency(self):
         """
             Latency here is defined as the time duration from the time the system received
             the start request event till the time the system is ready to start serving the
@@ -198,14 +192,14 @@ class VismoEventDispatcher(EventDispatcher):
 
         return (t2 - t1) / 1000
 
-    def get_throughput(self):
+    def get_transaction_throughput(self):
         """
             Throughput is defined as the the number of bytes served in the unit of time.
             Transaction size is measured in bytes, transaction_time in seconds.
             Output value is in bytes per second.
         """
 
-        size = float(self.end_response['content_size'])
+        size = float(self.end_response.get('content_size', 0))
         duration = self.get_transaction_duration()
 
         if abs(duration) <= 5e-9:
@@ -223,9 +217,9 @@ if __name__ == '__main__':
         mon.send(status='SUCCESS', tag=tag, operation=operation, tenant=tenant, user=user,
                 container=container, obj=obj, content_size=content_size)
 
-    def mon_send_metadata(operation, tag, tenant, user, container, obj, key=None, val=None):
+    def mon_send_metadata(operation, tag, tenant, user, container, obj, mdsize=None):
         mon.send(status='SUCCESS', tag=tag, operation=operation, tenant=tenant, user=user,
-                container=container, obj=obj, metadata_size=val)
+                container=container, obj=obj, metadata_size=mdsize)
 
     def send_put(tenant, user, container, obj):
         t = int(1000 * time())
@@ -249,13 +243,13 @@ if __name__ == '__main__':
         t = int(1000 * time())
         mon_send_metadata('PUT_METADATA', 'start-request', tenant, user, container, obj)
         mon_send_metadata('PUT_METADATA', 'start-response', tenant, user, container, obj)
-        mon_send_metadata('PUT_METADATA', 'end-response', tenant, user, container, obj, 'foo', 500)
+        mon_send_metadata('PUT_METADATA', 'end-response', tenant, user, container, obj, 500)
 
     def send_get_metadata(tenant, user, container, obj):
         t = int(1000 * time())
         mon_send_metadata('GET_METADATA', 'start-request', tenant, user, container, obj)
         mon_send_metadata('GET_METADATA', 'start-response', tenant, user, container, obj)
-        mon_send_metadata('GET_METADATA', 'end-response', tenant, user, container, obj, 'bar', 567)
+        mon_send_metadata('GET_METADATA', 'end-response', tenant, user, container, obj, 567)
 
     if sys.argv[1] == 'multi':
         for i in range(int(sys.argv[2])):
