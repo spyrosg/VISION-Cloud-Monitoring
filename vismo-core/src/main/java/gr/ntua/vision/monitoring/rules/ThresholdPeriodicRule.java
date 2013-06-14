@@ -91,7 +91,8 @@ public class ThresholdPeriodicRule extends PeriodicRule {
 
         log.debug(String.format("have violation of metric %s '%s', offending value %s", foldMethod, metric, aggregatedValue));
 
-        return new ThresholdEvent(id(), eventsList.get(0).originatingService(), topic, aggregatedValue);
+        // FIXME: return new ThresholdEvent(id(), eventsList.get(0).originatingService(), topic, aggregatedValue);
+        return null;
     }
 
 

@@ -17,7 +17,7 @@ public class ThresholdRulesFactory extends AbstractRulesFactory {
     /** the log target. */
     private static final Logger   log            = LoggerFactory.getLogger(ThresholdRulesFactory.class);
     /** the list of fields that should have a value in the provided beans. */
-    private static final String[] requiredFields = { "topic", "predicate", "threshold", "metric" };
+    private static final String[] requiredFields = { "topic", "requirements" };
 
 
     /**

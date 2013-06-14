@@ -163,22 +163,6 @@ class ThresholdRulesTraits {
 
 
     /**
-     * When <code>operation</code> is unspecified by the user, this method returns <code>true</code>, since it means that it
-     * applies to all operations.
-     * 
-     * @param e
-     * @param operation
-     * @return <code>true</code> if the event comes from a matching operation.
-     */
-    static boolean checkOperation(final MonitoringEvent e, final String operation) {
-        if (operation == null || operation.isEmpty())
-            return true;
-
-        return operation.equals(e.get("operation"));
-    }
-
-
-    /**
      * @param method
      * @return a {@link ThresholdFold}.
      * @throws ThresholdRuleValidationError
@@ -194,13 +178,14 @@ class ThresholdRulesTraits {
 
     /**
      * @param e
-     * @param metric
-     * @param operation
      * @param filterUnit
-     * @return <code>true</code> if this is an event that matches <code>this</code> rule.
+     * @param operation
+     * @param list
+     * @return <code>true</code> iff the monitoring event matches all of the requirements, <code>false</code> otherwise.
      */
-    static boolean isApplicable(final MonitoringEvent e, final String metric, final String operation, final String filterUnit) {
-        return e.get(metric) != null && checkOperation(e, operation) && isApplicableFilterUnit(e, filterUnit);
+    static boolean isApplicable(final MonitoringEvent e, final String filterUnit, final String operation,
+            final ThresholdRequirementList list) {
+        return isApplicableFilterUnit(e, filterUnit) && isApplicableOperation(e, operation) && list.isApplicable(e);
     }
 
 
@@ -240,6 +225,22 @@ class ThresholdRulesTraits {
 
 
     /**
+     * When <code>operation</code> is unspecified by the user, this method returns <code>true</code>, since it means that it
+     * applies to all operations.
+     * 
+     * @param e
+     * @param operation
+     * @return <code>true</code> if the event comes from a matching operation.
+     */
+    static boolean isApplicableOperation(final MonitoringEvent e, final String operation) {
+        if (operation == null || operation.isEmpty())
+            return true;
+
+        return operation.equals(e.get("operation"));
+    }
+
+
+    /**
      * @param predicate
      * @return a {@link ThresholdPredicate}.
      * @throws ThresholdRuleValidationError
@@ -264,6 +265,16 @@ class ThresholdRulesTraits {
             throw new ThresholdRuleValidationError("empty");
 
         return s;
+    }
+
+
+    /**
+     * @param e
+     * @param list
+     * @return the violiations list.
+     */
+    static ViolationsList thresholdExceededBy(final MonitoringEvent e, final ThresholdRequirementList list) {
+        return list.haveViolations(e);
     }
 
 

@@ -27,7 +27,7 @@ class ThresholdEvent implements MonitoringEvent {
     /***/
     private final long               ts;
     /***/
-    private final double             valueExceeded;
+    private final ViolationsList     violations;
 
 
     /**
@@ -36,13 +36,14 @@ class ThresholdEvent implements MonitoringEvent {
      * @param ruleId
      * @param originatingService
      * @param topic
-     * @param valueExceeded
+     * @param violations
      */
-    public ThresholdEvent(final String ruleId, final String originatingService, final String topic, final double valueExceeded) {
+    public ThresholdEvent(final String ruleId, final String originatingService, final String topic,
+            final ViolationsList violations) {
         this.ruleId = ruleId;
         this.originatingService = originatingService;
         this.topic = topic;
-        this.valueExceeded = valueExceeded;
+        this.violations = violations;
         this.ts = System.currentTimeMillis();
         this.id = UUID.randomUUID().toString();
     }
@@ -53,8 +54,8 @@ class ThresholdEvent implements MonitoringEvent {
      */
     @Override
     public Object get(final String key) {
-        if ("value".equals(key))
-            return valueExceeded;
+        if ("violations".equals(key))
+            return violations;
         if ("rule-id".equals(key))
             return ruleId;
         if ("id".equals(key))
@@ -101,7 +102,7 @@ class ThresholdEvent implements MonitoringEvent {
 
         o.put("id", id);
         o.put("rule-id", ruleId);
-        o.put("value", valueExceeded);
+        o.put("violations", violations);
         o.put("timestamp", ts);
         o.put("topic", topic);
         o.put("originating-service", originatingService);
@@ -134,6 +135,7 @@ class ThresholdEvent implements MonitoringEvent {
      */
     @Override
     public String toString() {
-        return "#<ThresholdEvent: " + ruleId + " of topic: " + topic + " at timestamp: " + ts + ", value: " + valueExceeded + ">";
+        return "#<ThresholdEvent: " + ruleId + " of topic: " + topic + " at timestamp: " + ts + ", violation: " + violations
+                + ">";
     }
 }

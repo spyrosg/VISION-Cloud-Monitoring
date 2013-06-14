@@ -62,6 +62,32 @@ public class ThresholdRuleTest extends JerseyResourceTest {
     }
 
 
+    /**
+     * 
+     */
+    public void testShouldProduceMultiRequirementsResult() {
+        final String TOPIC = "throughput-latency-topic";
+        assertEquals(0, engine.noRules());
+
+        final ThresholdRuleBean bean = new ThresholdRuleBean();
+
+        bean.setOperation("PUT");
+        bean.setFilterUnit(TENANT + "," + USER);
+        bean.setTopic(TOPIC);
+        bean.addRequirement("transaction-throughput", ">=", 1.0);
+        bean.addRequirement("transaction-latency", ">=", 0.05);
+
+        final ClientResponse res = submitRule(bean);
+
+        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+        assertEquals(1, engine.noRules());
+
+        triggerRule();
+        assertEquals(1, eventSink.size());
+        assertIsExpectedEvent(eventSink.get(0), TOPIC);
+    }
+
+
     /***/
     public void testShouldRejectSubmittedRuleOfInvalidSpecification() {
         assertEquals(0, engine.noRules());
@@ -75,9 +101,11 @@ public class ThresholdRuleTest extends JerseyResourceTest {
 
     /***/
     public void testSubmittedRuleShouldNotProduceEventWhenNotMatching() {
+        final String TOPIC = "throughput-topic";
+
         assertEquals(0, engine.noRules());
 
-        final ClientResponse res = submitRule(throughputThresholdRule(TENANT, USER, "-dummy-"));
+        final ClientResponse res = submitRule(throughputThresholdRule(TOPIC, TENANT, USER, "-dummy-"));
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
         assertEquals(1, engine.noRules());
@@ -89,21 +117,25 @@ public class ThresholdRuleTest extends JerseyResourceTest {
 
     /***/
     public void testSubmittedRuleShouldProduceEventWithContainerAggregationUnit() {
+        final String TOPIC = "throughput-topic";
+
         assertEquals(0, engine.noRules());
 
-        final ClientResponse res = submitRule(throughputThresholdRule(TENANT, USER, CONTAINER));
+        final ClientResponse res = submitRule(throughputThresholdRule(TOPIC, TENANT, USER, CONTAINER));
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
         assertEquals(1, engine.noRules());
 
         triggerRule();
         assertEquals(1, eventSink.size());
-        assertIsExpectedEvent(eventSink.get(0));
+        assertIsExpectedEvent(eventSink.get(0), TOPIC);
     }
 
 
     /***/
     public void testSubmittedRuleShouldProduceEventWithUserAggregationUnit() {
+        final String TOPIC = "throughput-topic";
+
         assertEquals(0, engine.noRules());
 
         final ClientResponse res = submitRule(throughputThresholdRule(TENANT, USER));
@@ -113,7 +145,7 @@ public class ThresholdRuleTest extends JerseyResourceTest {
 
         triggerRule();
         assertEquals(1, eventSink.size());
-        assertIsExpectedEvent(eventSink.get(0));
+        assertIsExpectedEvent(eventSink.get(0), TOPIC);
     }
 
 
@@ -134,11 +166,11 @@ public class ThresholdRuleTest extends JerseyResourceTest {
 
     /**
      * @param e
+     * @param topic
      */
-    private static void assertIsExpectedEvent(final MonitoringEvent e) {
+    private static void assertIsExpectedEvent(final MonitoringEvent e, final String topic) {
         log.debug("asserting event: {}", e);
-        assertEquals("throughput-topic", e.topic());
-        assertTrue((Double) e.get("value") >= THRESHOLD);
+        assertEquals(topic, e.topic());
         assertTrue("originating-machine key should be a String", e.get("originating-machine") instanceof String);
     }
 
@@ -176,17 +208,19 @@ public class ThresholdRuleTest extends JerseyResourceTest {
 
 
     /**
+     * @param topic
      * @param tenant
      * @param user
      * @param containerName
      * @return a {@link ThresholdRuleBean}.
      */
-    private static ThresholdRuleBean throughputThresholdRule(final String tenant, final String user, final String containerName) {
+    private static ThresholdRuleBean throughputThresholdRule(final String topic, final String tenant, final String user,
+            final String containerName) {
         final ThresholdRuleBean bean = new ThresholdRuleBean();
 
         bean.setOperation("PUT");
         bean.setFilterUnit(tenant + "," + user + "," + containerName);
-        bean.setTopic("throughput-topic");
+        bean.setTopic(topic);
         bean.addRequirement("transaction-throughput", ">=", THRESHOLD);
 
         return bean;

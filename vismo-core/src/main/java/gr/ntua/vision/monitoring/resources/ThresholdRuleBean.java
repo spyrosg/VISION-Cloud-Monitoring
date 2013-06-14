@@ -13,17 +13,17 @@ import java.util.List;
  */
 public class ThresholdRuleBean implements RuleBean {
     /***/
-    private String                          aggregationMethod;
+    private String                         aggregationMethod;
     /***/
-    private String                          filterUnit;
+    private String                         filterUnit;
     /***/
-    private String                          operation;
+    private String                         operation;
     /***/
-    private long                            period = -1;
+    private long                           period       = -1;
     /***/
-    private List<ThresholdRequirementBean> requirements;
+    private List<ThresholdRequirementBean> requirements = new ArrayList<ThresholdRequirementBean>();
     /***/
-    private String                          topic;
+    private String                         topic;
 
 
     /**
@@ -41,7 +41,7 @@ public class ThresholdRuleBean implements RuleBean {
      */
     public ThresholdRuleBean addRequirement(final String metric, final String predicate, final double threshold) {
         final List<ThresholdRequirementBean> list = getRequirements() != null ? getRequirements()
-                                                                              : new ArrayList<ThresholdRequirementBean>();
+                                                                             : new ArrayList<ThresholdRequirementBean>();
         final ThresholdRequirementBean req = new ThresholdRequirementBean();
 
         req.setMetric(metric);
