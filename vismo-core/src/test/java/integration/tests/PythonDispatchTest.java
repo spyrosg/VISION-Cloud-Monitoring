@@ -84,41 +84,6 @@ public class PythonDispatchTest {
 
 
     /***/
-    private static class MetadataEventsListener extends VerifyingEventsListener {
-        /***/
-        private static final String GET            = "GET_METADATA";
-        /***/
-        private static final String PUT            = "PUT_METADATA";
-        /***/
-        private static final String REQUIRED_FIELD = "metadata-size";
-
-
-        /**
-         * Constructor.
-         * 
-         * @param noExpectedEvents
-         */
-        public MetadataEventsListener(final int noExpectedEvents) {
-            super(noExpectedEvents);
-        }
-
-
-        /**
-         * @see integration.tests.PythonDispatchTest.VerifyingEventsListener#verifyEventsHelper()
-         */
-        @Override
-        public void verifyEventsHelper() {
-            for (final MonitoringEvent e : events) {
-                if (!(PUT.equals(e.get("operation")) || GET.equals(e.get("operation"))))
-                    throw new AssertionError("received unexpected event: " + e + " which is not about metadata");
-                if (e.get(REQUIRED_FIELD) == null)
-                    throw new AssertionError("received unexpected event: " + e + " with no field '" + REQUIRED_FIELD + "'");
-            }
-        }
-    }
-
-
-    /***/
     private static class MultiUploadEvents extends VerifyingEventsListener {
         /***/
         private static final String MULTI_PUT_OPERATION = "PUT_MULTI";
@@ -185,8 +150,6 @@ public class PythonDispatchTest {
 
     /***/
     private static final Logger     log                    = LoggerFactory.getLogger(PythonDispatchTest.class);
-    /** this is the flag for updating/getting metadata events. */
-    private static final String     META                   = "meta";
     /***/
     private static final String     MINIMUM_PYTHON_VERSION = "2.6";
     /** this is the flag used to push multi upload events. */
@@ -220,21 +183,6 @@ public class PythonDispatchTest {
         source = new VismoEventSource(factory.newBoundPullSocket(conf.getProducersPoint()), factory.newConnectedPushSocket(conf
                 .getProducersPoint()));
         source.start();
-    }
-
-
-    /**
-     * @throws InterruptedException
-     * @throws IOException
-     */
-    @Test
-    public void shouldReceivedMetadataEvents() throws IOException, InterruptedException {
-        listener = new MetadataEventsListener(NO_EVENTS_TO_SEND);
-        source.add(listener);
-
-        runPythonVismoDispatch(META);
-        Thread.sleep(1000);
-        listener.verifyEvents();
     }
 
 
