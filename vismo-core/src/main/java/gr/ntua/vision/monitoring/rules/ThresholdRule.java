@@ -1,8 +1,6 @@
 package gr.ntua.vision.monitoring.rules;
 
 import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.isApplicable;
-import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.requireNotNull;
-import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.thresholdExceededBy;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
 
@@ -34,7 +32,7 @@ public class ThresholdRule extends Rule {
      */
     public ThresholdRule(final VismoRulesEngine engine, final ThresholdRuleBean bean) {
         super(engine);
-        this.topic = requireNotNull(bean.getTopic());
+        this.topic = bean.getTopic();
         this.operation = bean.getOperation();
         this.filterUnit = bean.getFilterUnit();
         this.requirements = ThresholdRequirementList.from(bean.getRequirements());
@@ -51,7 +49,7 @@ public class ThresholdRule extends Rule {
 
         log.debug("got applicable: {}", e);
 
-        final ViolationsList violations = thresholdExceededBy(e, requirements);
+        final ViolationsList violations = thresholdExceededBy(e);
 
         if (violations.size() > 0) {
             log.debug("have: {}", violations);
@@ -66,5 +64,14 @@ public class ThresholdRule extends Rule {
     @Override
     public String toString() {
         return "#<ThresholdRule: " + topic + ", on " + filterUnit + " with " + requirements.size() + " requirements>";
+    }
+
+
+    /**
+     * @param e
+     * @return the violiations list.
+     */
+    private ViolationsList thresholdExceededBy(final MonitoringEvent e) {
+        return requirements.haveViolations(e);
     }
 }

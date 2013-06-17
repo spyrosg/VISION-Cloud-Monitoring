@@ -26,6 +26,24 @@ public class ThresholdRequirementList {
 
 
     /**
+     * @param events
+     * @return
+     */
+    public ViolationsList haveViolations(final List<MonitoringEvent> events) {
+        final ViolationsList violList = new ViolationsList();
+
+        for (final ThresholdRequirement req : list) {
+            final Violation v = req.isViolated(events);
+
+            if (v != null)
+                violList.add(v);
+        }
+
+        return violList;
+    }
+
+
+    /**
      * @param e
      * @return
      */

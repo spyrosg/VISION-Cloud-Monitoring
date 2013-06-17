@@ -158,8 +158,7 @@ public class RulesResourceTest extends JerseyResourceTest {
 
         bean.setTopic("my-topic");
         bean.setPeriod(period);
-        bean.setAggregationMethod("sum");
-        bean.addRequirement("latency", ">", 1.3);
+        bean.addRequirement("latency", "sum", ">", 1.3);
 
         return bean;
     }

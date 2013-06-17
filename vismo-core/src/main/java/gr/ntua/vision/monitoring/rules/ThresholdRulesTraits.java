@@ -1,7 +1,12 @@
 package gr.ntua.vision.monitoring.rules;
 
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
+import gr.ntua.vision.monitoring.resources.ThresholdRequirementBean;
+import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleValidationError;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,148 +16,14 @@ import org.slf4j.LoggerFactory;
  * 
  */
 class ThresholdRulesTraits {
+    /** the list of fields that should have a value in the provided beans. */
+    private static final String[] beanFields        = { "topic", "requirements" };
     /***/
-    public enum ThresholdFold {
-        /***/
-        AVG("avg") {
-            @Override
-            public double perform(final double[] arr) {
-                if (arr.length == 0)
-                    return 0;
-                if (arr.length == 1)
-                    return arr[0];
-
-                return ThresholdFold.SUM.perform(arr) / arr.length;
-            }
-        },
-        /***/
-        MAX("max") {
-            @Override
-            public double perform(final double[] arr) {
-                if (arr.length == 0)
-                    return Double.POSITIVE_INFINITY;
-                if (arr.length == 1)
-                    return arr[0];
-
-                double max = arr[0];
-
-                for (int i = 0; i < arr.length; ++i)
-                    if (arr[i] > max)
-                        max = arr[i];
-
-                return max;
-            }
-        },
-        /***/
-        MIN("min") {
-            @Override
-            public double perform(final double[] arr) {
-                if (arr.length == 0)
-                    return Double.NEGATIVE_INFINITY;
-                if (arr.length == 1)
-                    return arr[0];
-
-                double min = arr[0];
-
-                for (int i = 0; i < arr.length; ++i)
-                    if (arr[i] < min)
-                        min = arr[i];
-
-                return min;
-            }
-        },
-        /***/
-        SUM("sum") {
-            @Override
-            public double perform(final double[] arr) {
-                double sum = 0;
-
-                for (int i = 0; i < arr.length; ++i)
-                    sum += arr[i];
-
-                return sum;
-            }
-        };
-
-        /***/
-        public final String name;
-
-
-        /**
-         * Constructor.
-         * 
-         * @param name
-         */
-        private ThresholdFold(final String name) {
-            this.name = name;
-        }
-
-
-        /**
-         * @param arr
-         * @return the application result.
-         */
-        public abstract double perform(final double[] arr);
-    }
-
-
+    private static final Logger   log               = LoggerFactory.getLogger(ThresholdRulesTraits.class);
     /***/
-    public enum ThresholdPredicate {
-        /***/
-        GE(">=") {
-            @Override
-            public boolean perform(final double x, final double y) {
-                return x >= y;
-            }
-        },
-        /***/
-        GT(">") {
-            @Override
-            public boolean perform(final double x, final double y) {
-                return x > y;
-            }
-        },
-        /***/
-        LE("<=") {
-            @Override
-            public boolean perform(final double x, final double y) {
-                return x <= y;
-            }
-        },
-        /***/
-        LT("<") {
-            @Override
-            public boolean perform(final double x, final double y) {
-                return x < y;
-            }
-        };
-
-        /***/
-        public final String name;
-
-
-        /**
-         * Constructor.
-         * 
-         * @param name
-         */
-        private ThresholdPredicate(final String name) {
-            this.name = name;
-        }
-
-
-        /**
-         * @param x
-         * @param y
-         * @return the evaluation result of the operation.
-         */
-        public abstract boolean perform(final double x, final double y);
-    }
-
+    private static final String[] requirementFields = { "metric", "predicate", "threshold" };
     /***/
-    private static final Logger   log   = LoggerFactory.getLogger(ThresholdRulesTraits.class);
-    /***/
-    private static final String[] UNITS = { "tenant", "user", "container", "object" };
+    private static final String[] UNITS             = { "tenant", "user", "container", "object" };
 
 
     /**
@@ -163,16 +34,17 @@ class ThresholdRulesTraits {
 
 
     /**
-     * @param method
-     * @return a {@link ThresholdFold}.
-     * @throws ThresholdRuleValidationError
+     * @param engine
+     * @param bean
+     * @return
      */
-    static ThresholdFold foldFrom(final String method) throws ThresholdRuleValidationError {
-        for (final ThresholdFold p : ThresholdFold.values())
-            if (p.name.equals(method))
-                return p;
+    public static VismoRule build(final VismoRulesEngine engine, final ThresholdRuleBean bean) {
+        validate(bean);
 
-        throw new ThresholdRuleValidationError("unsupported aggregation method: " + method);
+        if (bean.getPeriod() > 0)
+            return new ThresholdPeriodicRule(engine, bean);
+
+        return new ThresholdRule(engine, bean);
     }
 
 
@@ -197,7 +69,7 @@ class ThresholdRulesTraits {
      * @param filterUnit
      * @return <code>true</code> if the event comes from a matching unit.
      */
-    static boolean isApplicableFilterUnit(final MonitoringEvent e, final String filterUnit) {
+    private static boolean isApplicableFilterUnit(final MonitoringEvent e, final String filterUnit) {
         if (filterUnit == null || filterUnit.isEmpty())
             return true;
 
@@ -232,7 +104,7 @@ class ThresholdRulesTraits {
      * @param operation
      * @return <code>true</code> if the event comes from a matching operation.
      */
-    static boolean isApplicableOperation(final MonitoringEvent e, final String operation) {
+    private static boolean isApplicableOperation(final MonitoringEvent e, final String operation) {
         if (operation == null || operation.isEmpty())
             return true;
 
@@ -241,50 +113,46 @@ class ThresholdRulesTraits {
 
 
     /**
-     * @param predicate
-     * @return a {@link ThresholdPredicate}.
-     * @throws ThresholdRuleValidationError
+     * Check that all required fields have an actual value.
+     * 
+     * @param o
+     * @param fields
+     * @throws SecurityException
      */
-    static ThresholdPredicate predicateFrom(final String predicate) throws ThresholdRuleValidationError {
-        for (final ThresholdPredicate p : ThresholdPredicate.values())
-            if (p.name.equals(predicate))
-                return p;
+    private static void validate(final Object o, final String[] fields) throws SecurityException {
+        for (final String field : fields) {
+            final String getterName = "get" + Character.toUpperCase(field.charAt(0)) + field.substring(1);
 
-        throw new ThresholdRuleValidationError("unsupported predicate: " + predicate);
+            final Method m;
+
+            try {
+                m = o.getClass().getDeclaredMethod(getterName);
+            } catch (final NoSuchMethodException e) {
+                log.warn("validating field " + field + " failed; ignoring", e);
+                continue;
+            }
+
+            try {
+                if (m.invoke(o) == null) // no value provided
+                    throw new ThresholdRuleValidationError("'" + field + "' field is required");
+            } catch (final IllegalAccessException e) {
+                log.warn("validating field " + field + " failed; ignoring", e);
+            } catch (final IllegalArgumentException e) {
+                log.warn("validating field " + field + " failed; ignoring", e);
+            } catch (final InvocationTargetException e) {
+                log.warn("validating field " + field + " failed; ignoring", e);
+            }
+        }
     }
 
 
     /**
-     * @param s
-     * @return <code>s</code> if the string can be considered non empty.
-     * @throws ThresholdRuleValidationError
-     *             when the string is empty.
+     * @param bean
      */
-    static String requireNotNull(final String s) {
-        if (s == null || s.isEmpty())
-            throw new ThresholdRuleValidationError("empty");
+    private static void validate(final ThresholdRuleBean bean) {
+        validate(bean, beanFields);
 
-        return s;
-    }
-
-
-    /**
-     * @param e
-     * @param list
-     * @return the violiations list.
-     */
-    static ViolationsList thresholdExceededBy(final MonitoringEvent e, final ThresholdRequirementList list) {
-        return list.haveViolations(e);
-    }
-
-
-    /**
-     * @param pred
-     * @param eventValue
-     * @param thresholdValue
-     * @return <code>true</code> when <code>eventValue</code> has exceeded <code>thresholdValue</code>.
-     */
-    static boolean thresholdExceededBy(final ThresholdPredicate pred, final double eventValue, final double thresholdValue) {
-        return pred.perform(eventValue, thresholdValue);
+        for (final ThresholdRequirementBean rbean : bean.getRequirements())
+            validate(rbean, requirementFields);
     }
 }

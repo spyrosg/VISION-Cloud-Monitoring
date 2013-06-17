@@ -5,6 +5,8 @@ package gr.ntua.vision.monitoring.resources;
  */
 public class ThresholdRequirementBean {
     /***/
+    private String aggregationMethod;
+    /***/
     private String metric;
     /***/
     private String predicate;
@@ -16,6 +18,14 @@ public class ThresholdRequirementBean {
      * Constructor.
      */
     public ThresholdRequirementBean() {
+    }
+
+
+    /**
+     * @return the aggregationMethod
+     */
+    public String getAggregationMethod() {
+        return aggregationMethod;
     }
 
 
@@ -40,6 +50,15 @@ public class ThresholdRequirementBean {
      */
     public double getThreshold() {
         return threshold;
+    }
+
+
+    /**
+     * @param aggregationMethod
+     *            the aggregationMethod to set
+     */
+    public void setAggregationMethod(final String aggregationMethod) {
+        this.aggregationMethod = aggregationMethod;
     }
 
 

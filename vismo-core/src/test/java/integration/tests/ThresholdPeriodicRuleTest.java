@@ -111,7 +111,6 @@ public class ThresholdPeriodicRuleTest extends JerseyResourceTest {
         log.debug("asserting event: {}", e);
         assertTrue("event cannot be null", e != null);
         assertEquals(AVERAGE_THROUGHPUT_TOPIC, e.topic());
-        assertTrue((Double) e.get("value") >= THRESHOLD);
         assertTrue("originating-machine key should be a String", e.get("originating-machine") instanceof String);
     }
 
@@ -128,10 +127,9 @@ public class ThresholdPeriodicRuleTest extends JerseyResourceTest {
 
         bean.setPeriod(RULE_PERIOD);
         bean.setOperation("PUT");
-        bean.setAggregationMethod(AVG_AGGREGATION_METHOD);
         bean.setFilterUnit(tenant + "," + user + "," + containerName);
         bean.setTopic(AVERAGE_THROUGHPUT_TOPIC);
-        bean.addRequirement("transaction-throughput", ">=", THRESHOLD);
+        bean.addRequirement("transaction-throughput", AVG_AGGREGATION_METHOD, ">=", THRESHOLD);
 
         return bean;
     }

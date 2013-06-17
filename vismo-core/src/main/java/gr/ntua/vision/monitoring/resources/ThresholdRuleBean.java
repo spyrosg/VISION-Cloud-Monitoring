@@ -13,8 +13,6 @@ import java.util.List;
  */
 public class ThresholdRuleBean implements RuleBean {
     /***/
-    private String                         aggregationMethod;
-    /***/
     private String                         filterUnit;
     /***/
     private String                         operation;
@@ -54,10 +52,25 @@ public class ThresholdRuleBean implements RuleBean {
 
 
     /**
-     * @return the aggregationMethod
+     * @param metric
+     * @param aggregationMethod
+     * @param predicate
+     * @param threshold
+     * @return <code>this</code>.
      */
-    public String getAggregationMethod() {
-        return aggregationMethod;
+    public ThresholdRuleBean addRequirement(final String metric, final String aggregationMethod, final String predicate,
+            final double threshold) {
+        final List<ThresholdRequirementBean> list = getRequirements() != null ? getRequirements()
+                                                                             : new ArrayList<ThresholdRequirementBean>();
+        final ThresholdRequirementBean req = new ThresholdRequirementBean();
+
+        req.setMetric(metric);
+        req.setAggregationMethod(aggregationMethod);
+        req.setPredicate(predicate);
+        req.setThreshold(threshold);
+        list.add(req);
+
+        return this;
     }
 
 
@@ -98,15 +111,6 @@ public class ThresholdRuleBean implements RuleBean {
      */
     public String getTopic() {
         return topic;
-    }
-
-
-    /**
-     * @param aggregationMethod
-     *            the aggregationMethod to set
-     */
-    public void setAggregationMethod(final String aggregationMethod) {
-        this.aggregationMethod = aggregationMethod;
     }
 
 
