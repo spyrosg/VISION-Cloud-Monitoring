@@ -2,8 +2,6 @@ package gr.ntua.vision.monitoring.sources;
 
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
-import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
-import gr.ntua.vision.monitoring.sinks.EventSink;
 
 import java.net.InetAddress;
 import java.net.URI;
@@ -24,34 +22,16 @@ public class HttpEventResource implements EventSource {
     private final EventFactory                   factory;
     /** the listeners lists. */
     private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
-    /***/
-    private VismoRulesEngine                     engine;
-    /***/
-    private EventSink                            sink;
-   
-    
-    
-    
-   
-   
-    
-   
 
 
     /**
      * Constructor
      * 
      * @param factory
-     * @param sink
-     * @param engine
      */
-    public HttpEventResource(final EventFactory factory, final EventSink sink, final VismoRulesEngine engine) {
+    public HttpEventResource(final EventFactory factory) {
         this.factory = factory;
-        this.sink = sink;
-        this.engine = engine;
     }
-    
-    
 
 
     /**
@@ -71,21 +51,15 @@ public class HttpEventResource implements EventSource {
     public Response putEvent(final String body) {
         try {
             final MonitoringEvent monev = factory.createEvent(body);
-            eventValidation(monev); 
-            engineReceivePostedEvent(monev);
+
+            eventValidation(monev);
         } catch (final java.lang.Error e) {
             return Response.status(400).entity(e.getMessage()).build();
         }
 
         return Response.created(URI.create("/")).build();
     }
-    
-    public void engineReceivePostedEvent(final MonitoringEvent e){
-    	engine.receive(e);
-    	sink.send(e);
-    	}
-    
-    
+
 
     /**
      * Validate event's fields

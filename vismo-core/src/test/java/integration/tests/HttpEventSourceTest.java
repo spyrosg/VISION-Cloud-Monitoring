@@ -1,16 +1,12 @@
 package integration.tests;
 
 import static org.junit.Assert.assertEquals;
-import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
+import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
-import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
-import gr.ntua.vision.monitoring.sources.EventSource;
-import gr.ntua.vision.monitoring.sources.EventSourceListener;
 import gr.ntua.vision.monitoring.sources.HttpEventResource;
-import gr.ntua.vision.monitoring.sources.InMemoryEventSource;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import gr.ntua.vision.monitoring.web.WebServer;
 
@@ -38,37 +34,26 @@ import com.sun.jersey.api.json.JSONConfiguration;
 /**
  * 
  */
-public class HttpEventSourceTest implements EventSource {
+public class HttpEventSourceTest {
     /***/
-    private static final int           PORT     = 9998;
+    private static final int                 PORT     = 9998;
     /***/
-    private static final String        ROOT_URL = "http://localhost:" + PORT;
+    private static final String              ROOT_URL = "http://localhost:" + PORT;
     /***/
-    private final Client               client;
+    private final Client                     client;
     /***/
-    private VismoRulesEngine           engine;
+    private final VismoRulesEngine           engine   = new VismoRulesEngine();
     /***/
-    private WebServer                  server;
+    private WebServer                        server;
     /***/
-    private ArrayList<MonitoringEvent> sink;
-    /***/
-    private EventSourceListener        listener;
-    /***/
-    private EventSource                evsource;
-    /***/
-    private EventSink                  esink;
-    
-   
-    
-  
-    
-    
+    private final ArrayList<MonitoringEvent> sink     = new ArrayList<MonitoringEvent>();
 
     {
         final ClientConfig cc = new DefaultClientConfig();
         cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
         client = Client.create(cc);
     }
+
 
     /**
      * @throws UnknownHostException
@@ -78,11 +63,9 @@ public class HttpEventSourceTest implements EventSource {
         final String eventRepr = getDefaultEvent();
         final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(eventRepr)
                 .put(ClientResponse.class);
-       
-       
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
-        assertEquals("engine should have received at least one event", 1, sink.size());   
+        assertEquals("engine should have received at least one event", 1, sink.size());
     }
 
 
@@ -91,19 +74,15 @@ public class HttpEventSourceTest implements EventSource {
      */
     @Before
     public void setUp() throws Exception {
-        final EventFactory factory = new VismoEventFactory();
-        sink = new ArrayList<MonitoringEvent>();
-        esink = new InMemoryEventSink(sink);
-        evsource = new InMemoryEventSource();
-        evsource.add(listener);
-        engine = new VismoRulesEngine();
-        engine.appendSink(esink);
-        engine.registerToSource(evsource);
-        final Application application = WebAppBuilder.buildFrom(new HttpEventResource(factory,esink,engine));
-        
-        
+        final HttpEventResource eventSource = new HttpEventResource(new VismoEventFactory());
+        final Application application = WebAppBuilder.buildFrom(eventSource);
+
+        eventSource.add(engine);
+        engine.appendSink(new InMemoryEventSink(sink));
+        new PassThroughRule(engine).submit();
+
         server = new WebServer(PORT).withWebAppAt(application, "/*");
-        server.start(); 
+        server.start();
     }
 
 
@@ -163,11 +142,4 @@ public class HttpEventSourceTest implements EventSource {
 
         return JSONObject.toJSONString(mapev);
     }
-
-
-	@Override
-	public void add(EventSourceListener listener) {
-		// TODO Auto-generated method stub
-		
-	}
 }
