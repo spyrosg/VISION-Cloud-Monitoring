@@ -1,14 +1,8 @@
 package gr.ntua.vision.monitoring.rules;
 
-import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.foldFrom;
 import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.isApplicable;
-import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.predicateFrom;
-import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.requireNotNull;
-import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.thresholdExceededBy;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
-import gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.ThresholdFold;
-import gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.ThresholdPredicate;
 
 import java.util.List;
 
@@ -21,21 +15,15 @@ import org.slf4j.LoggerFactory;
  */
 public class ThresholdPeriodicRule extends PeriodicRule {
     /***/
-    private static final Logger      log = LoggerFactory.getLogger(ThresholdPeriodicRule.class);
+    private static final Logger            log = LoggerFactory.getLogger(ThresholdPeriodicRule.class);
     /***/
-    private final String             filterUnit;
+    private final String                   filterUnit;
     /***/
-    private final ThresholdFold      foldMethod;
+    private final String                   operation;
     /***/
-    private final String             metric;
+    private final ThresholdRequirementList requirements;
     /***/
-    private final String             operation;
-    /***/
-    private final ThresholdPredicate pred;
-    /***/
-    private final double             thresholdValue;
-    /***/
-    private final String             topic;
+    private final String                   topic;
 
 
     /**
@@ -46,13 +34,10 @@ public class ThresholdPeriodicRule extends PeriodicRule {
      */
     public ThresholdPeriodicRule(final VismoRulesEngine engine, final ThresholdRuleBean bean) {
         super(engine, bean.getPeriod());
-        this.topic = requireNotNull(bean.getTopic());
-        this.pred = predicateFrom(bean.getPredicate());
+        this.topic = bean.getTopic();
         this.operation = bean.getOperation();
-        this.metric = requireNotNull(bean.getMetric());
         this.filterUnit = bean.getFilterUnit();
-        this.thresholdValue = bean.getThreshold();
-        this.foldMethod = foldFrom(bean.getAggregationMethod());
+        this.requirements = ThresholdRequirementList.from(bean.getRequirements());
     }
 
 
@@ -61,10 +46,11 @@ public class ThresholdPeriodicRule extends PeriodicRule {
      */
     @Override
     public void performWith(final MonitoringEvent e) {
-        if (isApplicable(e, metric, operation, filterUnit)) {
-            log.debug("got applicable: {}", e);
-            collect(e);
-        }
+        if (!isApplicable(e, filterUnit, operation, requirements))
+            return;
+
+        log.debug("got applicable: {}", e);
+        collect(e);
     }
 
 
@@ -73,8 +59,8 @@ public class ThresholdPeriodicRule extends PeriodicRule {
      */
     @Override
     public String toString() {
-        return "#<ThresholdPeriodicRule: " + topic + ", period=" + (period() / 1000.0) + "s, " + metric + " " + pred.name + " "
-                + thresholdValue + ">";
+        return "#<ThresholdPeriodicRule: " + topic + ", period=" + (period() / 1000.0) + "s, " + ", on " + filterUnit + " with "
+                + requirements.size() + " requirements>";
     }
 
 
@@ -84,27 +70,25 @@ public class ThresholdPeriodicRule extends PeriodicRule {
     @Override
     protected MonitoringEvent aggregate(final List<MonitoringEvent> eventsList, @SuppressWarnings("unused") final long tStart,
             @SuppressWarnings("unused") final long tEnd) {
-        final double aggregatedValue = performFold(eventsList);
+        final ViolationsList violations = thresholdExceededBy(eventsList);
 
-        if (!thresholdExceededBy(pred, aggregatedValue, thresholdValue))
-            return null;
+        if (violations.size() > 0) {
+            log.debug("have: {}", violations);
+            // log.debug(String.format("have violation of metric %s '%s', offending value %s", foldMethod, metric,
+            // aggregatedValue));
 
-        log.debug(String.format("have violation of metric %s '%s', offending value %s", foldMethod, metric, aggregatedValue));
+            return new ThresholdEvent(id(), eventsList.get(0).originatingService(), topic, violations);
+        }
 
-        return new ThresholdEvent(id(), eventsList.get(0).originatingService(), topic, aggregatedValue);
+        return null;
     }
 
 
     /**
-     * @param eventsList
-     * @return the fold application value.
+     * @param events
+     * @return the violiations list.
      */
-    private double performFold(final List<MonitoringEvent> eventsList) {
-        final double arr[] = new double[eventsList.size()];
-
-        for (int i = 0; i < arr.length; ++i)
-            arr[i] = (Double) eventsList.get(i).get(metric);
-
-        return foldMethod.perform(arr);
+    private ViolationsList thresholdExceededBy(final List<MonitoringEvent> events) {
+        return requirements.haveViolations(events);
     }
 }

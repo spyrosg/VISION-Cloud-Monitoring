@@ -10,18 +10,18 @@ public class RuleIdBean {
 
     /**
      * Constructor.
-     * 
-     * @param id
      */
-    public RuleIdBean(String id) {
-        this.id = id;
+    public RuleIdBean() {
     }
 
 
     /**
      * Constructor.
+     * 
+     * @param id
      */
-    public RuleIdBean() {
+    public RuleIdBean(final String id) {
+        this.id = id;
     }
 
 
@@ -37,7 +37,7 @@ public class RuleIdBean {
      * @param id
      *            the id to set
      */
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 

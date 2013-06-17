@@ -4,27 +4,24 @@ import gr.ntua.vision.monitoring.rules.RuleBean;
 import gr.ntua.vision.monitoring.rules.ThresholdPeriodicRule;
 import gr.ntua.vision.monitoring.rules.ThresholdRule;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * This is just a data holder, the exchange media format for {@link ThresholdRule}s or {@link ThresholdPeriodicRule}s.
  */
 public class ThresholdRuleBean implements RuleBean {
     /***/
-    private String aggregationMethod;
+    private String                         filterUnit;
     /***/
-    private String filterUnit;
+    private String                         operation;
     /***/
-    private String metric;
+    private long                           period       = -1;
     /***/
-    private String operation;
+    private List<ThresholdRequirementBean> requirements = new ArrayList<ThresholdRequirementBean>();
     /***/
-    private long   period = -1;
-    /***/
-    private String predicate;
-    /***/
-    private double threshold;
-    /***/
-    private String topic;
+    private String                         topic;
 
 
     /**
@@ -35,10 +32,45 @@ public class ThresholdRuleBean implements RuleBean {
 
 
     /**
-     * @return the aggregationMethod
+     * @param metric
+     * @param predicate
+     * @param threshold
+     * @return <code>this</code>.
      */
-    public String getAggregationMethod() {
-        return aggregationMethod;
+    public ThresholdRuleBean addRequirement(final String metric, final String predicate, final double threshold) {
+        final List<ThresholdRequirementBean> list = getRequirements() != null ? getRequirements()
+                                                                             : new ArrayList<ThresholdRequirementBean>();
+        final ThresholdRequirementBean req = new ThresholdRequirementBean();
+
+        req.setMetric(metric);
+        req.setPredicate(predicate);
+        req.setThreshold(threshold);
+        list.add(req);
+
+        return this;
+    }
+
+
+    /**
+     * @param metric
+     * @param aggregationMethod
+     * @param predicate
+     * @param threshold
+     * @return <code>this</code>.
+     */
+    public ThresholdRuleBean addRequirement(final String metric, final String aggregationMethod, final String predicate,
+            final double threshold) {
+        final List<ThresholdRequirementBean> list = getRequirements() != null ? getRequirements()
+                                                                             : new ArrayList<ThresholdRequirementBean>();
+        final ThresholdRequirementBean req = new ThresholdRequirementBean();
+
+        req.setMetric(metric);
+        req.setAggregationMethod(aggregationMethod);
+        req.setPredicate(predicate);
+        req.setThreshold(threshold);
+        list.add(req);
+
+        return this;
     }
 
 
@@ -47,14 +79,6 @@ public class ThresholdRuleBean implements RuleBean {
      */
     public String getFilterUnit() {
         return filterUnit;
-    }
-
-
-    /**
-     * @return the metric
-     */
-    public String getMetric() {
-        return metric;
     }
 
 
@@ -75,18 +99,10 @@ public class ThresholdRuleBean implements RuleBean {
 
 
     /**
-     * @return the predicate
+     * @return the requirements
      */
-    public String getPredicate() {
-        return predicate;
-    }
-
-
-    /**
-     * @return the threshold
-     */
-    public double getThreshold() {
-        return threshold;
+    public List<ThresholdRequirementBean> getRequirements() {
+        return requirements;
     }
 
 
@@ -99,29 +115,11 @@ public class ThresholdRuleBean implements RuleBean {
 
 
     /**
-     * @param aggregationMethod
-     *            the aggregationMethod to set
-     */
-    public void setAggregationMethod(final String aggregationMethod) {
-        this.aggregationMethod = aggregationMethod;
-    }
-
-
-    /**
      * @param filterUnit
      *            the filterUnit to set
      */
     public void setFilterUnit(final String filterUnit) {
         this.filterUnit = filterUnit;
-    }
-
-
-    /**
-     * @param metric
-     *            the metric to set
-     */
-    public void setMetric(final String metric) {
-        this.metric = metric;
     }
 
 
@@ -144,20 +142,11 @@ public class ThresholdRuleBean implements RuleBean {
 
 
     /**
-     * @param predicate
-     *            the predicate to set
+     * @param requirements
+     *            the requirements to set
      */
-    public void setPredicate(final String predicate) {
-        this.predicate = predicate;
-    }
-
-
-    /**
-     * @param threshold
-     *            the threshold to set
-     */
-    public void setThreshold(final double threshold) {
-        this.threshold = threshold;
+    public void setRequirements(final List<ThresholdRequirementBean> requirements) {
+        this.requirements = requirements;
     }
 
 
