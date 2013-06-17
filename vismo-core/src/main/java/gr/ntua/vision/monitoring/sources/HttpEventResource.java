@@ -3,6 +3,7 @@ package gr.ntua.vision.monitoring.sources;
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
+
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
@@ -16,12 +17,17 @@ import javax.ws.rs.core.Response;
 /**
  * 
  */
+/**
+ * @author makis
+ *
+ */
 @Path("events")
 public class HttpEventResource implements EventSource {
     /***/
     private final EventFactory                   factory;
     /** the listeners lists. */
     private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
+    
 
 
     /**
@@ -51,6 +57,8 @@ public class HttpEventResource implements EventSource {
     public Response putEvent(final String body) {
         try {
             final MonitoringEvent monev = factory.createEvent(body);
+            //notify listeners of the event
+            notifyAll(monev);
 
             eventValidation(monev);
         } catch (final java.lang.Error e) {
@@ -59,6 +67,20 @@ public class HttpEventResource implements EventSource {
 
         return Response.created(URI.create("/")).build();
     }
+    
+    /**
+     * Notify any listeners of the incoming message.
+     * 
+     * @param e
+     *            the event received.
+     */
+    private void notifyAll(final MonitoringEvent e) {
+        for (final EventSourceListener listener : listeners)
+            listener.receive(e);
+    }
+
+    
+    
 
 
     /**
