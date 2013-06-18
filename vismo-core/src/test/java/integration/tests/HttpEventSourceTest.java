@@ -1,107 +1,86 @@
 package integration.tests;
 
-import static org.junit.Assert.assertEquals;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
-import gr.ntua.vision.monitoring.events.VismoEventFactory;
+import gr.ntua.vision.monitoring.resources.HttpEventResource;
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
-import gr.ntua.vision.monitoring.sources.HttpEventResource;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
-import gr.ntua.vision.monitoring.web.WebServer;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 
 import org.json.simple.JSONObject;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
 
 
 /**
  * 
  */
-public class HttpEventSourceTest {
+public class HttpEventSourceTest extends JerseyResourceTest {
     /***/
-    private static final int                 PORT     = 9998;
+    private VismoRulesEngine                 engine;
     /***/
-    private static final String              ROOT_URL = "http://localhost:" + PORT;
-    /***/
-    private final Client                     client;
-    /***/
-    private final VismoRulesEngine           engine   = new VismoRulesEngine();
-    /***/
-    private WebServer                        server;
-    /***/
-    private final ArrayList<MonitoringEvent> sink     = new ArrayList<MonitoringEvent>();
+    private final ArrayList<MonitoringEvent> sink = new ArrayList<MonitoringEvent>();
 
-    {
-        final ClientConfig cc = new DefaultClientConfig();
-        cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
-        client = Client.create(cc);
+
+    /**
+     * @see integration.tests.JerseyResourceTest#setUp()
+     */
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+
+        final HttpEventResource eventSource = new HttpEventResource();
+
+        engine = new VismoRulesEngine();
+        new PassThroughRule(engine).submit();
+        engine.appendSink(new InMemoryEventSink(sink));
+        eventSource.add(engine);
+
+        configureServer(WebAppBuilder.buildFrom(eventSource), "/*");
+        startServer();
     }
 
 
     /**
-     * @throws UnknownHostException
+     * @see integration.tests.JerseyResourceTest#tearDown()
      */
-    @Test
-    public void rulesEngineShouldReceivePostedEvent() throws UnknownHostException {
-        final String eventRepr = getDefaultEvent();
+    @Override
+    public void tearDown() throws Exception {
+        if (engine != null)
+            engine.halt();
+
+        super.tearDown();
+    }
+
+
+    /***/
+    public void testRulesEngineShouldReceivePostedEvent() {
+        final String eventRepr = getEvent();
         final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(eventRepr)
                 .put(ClientResponse.class);
 
-        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
         assertEquals("engine should have received at least one event", 1, sink.size());
     }
 
 
-    /**
-     * @throws Exception
-     */
-    @Before
-    public void setUp() throws Exception {
-        final HttpEventResource eventSource = new HttpEventResource(new VismoEventFactory());
-        final Application application = WebAppBuilder.buildFrom(eventSource);
-
-        eventSource.add(engine);
-        engine.appendSink(new InMemoryEventSink(sink));
-        new PassThroughRule(engine).submit();
-
-        server = new WebServer(PORT).withWebAppAt(application, "/*");
-        server.start();
-    }
-
-
-    /**
-     * @throws UnknownHostException
-     */
-    @Test
-    public void shouldAcceptEventsThroughPut() throws UnknownHostException {
-        final String eventRepr = getDefaultEvent();
+    /***/
+    public void testShouldAcceptEventsThroughPut() {
+        final String eventRepr = getEvent();
         final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(eventRepr)
                 .put(ClientResponse.class);
 
-        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
     }
 
 
     /***/
-    @Test
-    public void shouldRejectInvalidEvents() {
+    public void testShouldRejectInvalidEvents() {
         final ClientResponse res = root().path("events").entity("{ \"foo\" : 3 }").put(ClientResponse.class);
 
         assertEquals("server should reject invalid events", ClientResponse.Status.BAD_REQUEST, res.getClientResponseStatus());
@@ -109,37 +88,14 @@ public class HttpEventSourceTest {
 
 
     /**
-     * @throws Exception
-     */
-    @After
-    public void tearDown() throws Exception {
-        if (server != null)
-            server.stop();
-
-        if (engine != null)
-            engine.halt();
-    }
-
-
-    /**
-     * @return a web resource pointing to the server's root.
-     */
-    private WebResource root() {
-        return client.resource(ROOT_URL);
-    }
-
-
-    /**
      * @return the json representation of a {@link MonitoringEvent}.
-     * @throws UnknownHostException
      */
-    private static String getDefaultEvent() throws UnknownHostException {
-        final HashMap<String, Object> mapev = new HashMap<String, Object>();
-        mapev.put("timestamp", System.currentTimeMillis());
-        mapev.put("originating-service", "service");
-        mapev.put("originating-machine", InetAddress.getLocalHost().getHostAddress());
-        mapev.put("topic", "new event");
+    private static String getEvent() {
+        final HashMap<String, Object> map = new HashMap<String, Object>();
 
-        return JSONObject.toJSONString(mapev);
+        map.put("originating-service", "service");
+        map.put("topic", "new event");
+
+        return JSONObject.toJSONString(map);
     }
 }
