@@ -19,6 +19,8 @@ import javax.ws.rs.core.Response;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -26,9 +28,7 @@ import org.json.simple.parser.ParseException;
  */
 @Path("events")
 public class HttpEventResource implements EventSource {
-    /**
-     * 
-     */
+    /***/
     @SuppressWarnings("serial")
     private static class EventValidationError extends RuntimeException {
         /**
@@ -41,10 +41,11 @@ public class HttpEventResource implements EventSource {
         }
     }
     /***/
+    private static final Logger                  log       = LoggerFactory.getLogger(HttpEventResource.class);
+    /***/
     private final EventFactory                   factory;
     /** the listeners lists. */
     private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
-
     /***/
     private final JSONParser                     parser;
 
@@ -73,6 +74,7 @@ public class HttpEventResource implements EventSource {
      */
     @Override
     public void add(final EventSourceListener listener) {
+        log.debug("registering listener {}", listener);
         listeners.add(listener);
     }
 
@@ -90,7 +92,7 @@ public class HttpEventResource implements EventSource {
         try {
             json = (Map<String, Object>) parser.parse(body);
         } catch (final ParseException e) {
-            return Response.status(400).entity(e.getMessage()).build();
+            return badRequest(e.getMessage());
         }
 
         try {
@@ -100,7 +102,7 @@ public class HttpEventResource implements EventSource {
             json.put("originating-machine", req.getRemoteAddr());
             notifyAll(factory.createEvent(JSONObject.toJSONString(json)));
         } catch (final EventValidationError e) {
-            return badRequest(e);
+            return badRequest(e.getMessage());
         }
 
         return Response.status(Response.Status.NO_CONTENT).build();
@@ -120,11 +122,11 @@ public class HttpEventResource implements EventSource {
 
 
     /**
-     * @param e
+     * @param msg
      * @return the {@link Response}.
      */
-    private static Response badRequest(final EventValidationError e) {
-        return Response.status(Response.Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN).entity(e.getMessage()).build();
+    private static Response badRequest(final String msg) {
+        return Response.status(Response.Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN).entity(msg).build();
     }
 
 
