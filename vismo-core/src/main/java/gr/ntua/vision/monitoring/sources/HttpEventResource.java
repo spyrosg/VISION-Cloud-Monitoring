@@ -2,7 +2,7 @@ package gr.ntua.vision.monitoring.sources;
 
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
-
+import gr.ntua.vision.monitoring.events.VismoEventFactory;
 
 import java.net.InetAddress;
 import java.net.URI;
@@ -17,17 +17,20 @@ import javax.ws.rs.core.Response;
 /**
  * 
  */
-/**
- * @author makis
- *
- */
 @Path("events")
 public class HttpEventResource implements EventSource {
     /***/
     private final EventFactory                   factory;
     /** the listeners lists. */
     private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
-    
+
+
+    /**
+     * Constructor.
+     */
+    public HttpEventResource() {
+        this(new VismoEventFactory());
+    }
 
 
     /**
@@ -56,18 +59,18 @@ public class HttpEventResource implements EventSource {
     @PUT
     public Response putEvent(final String body) {
         try {
-            final MonitoringEvent monev = factory.createEvent(body);
-            //notify listeners of the event
-            notifyAll(monev);
+            final MonitoringEvent e = factory.createEvent(body);
 
-            eventValidation(monev);
-        } catch (final java.lang.Error e) {
+            validateEvent(e);
+            notifyAll(e);
+        } catch (final Error e) {
             return Response.status(400).entity(e.getMessage()).build();
         }
 
         return Response.created(URI.create("/")).build();
     }
-    
+
+
     /**
      * Notify any listeners of the incoming message.
      * 
@@ -79,9 +82,6 @@ public class HttpEventResource implements EventSource {
             listener.receive(e);
     }
 
-    
-    
-
 
     /**
      * Validate event's fields
@@ -89,7 +89,7 @@ public class HttpEventResource implements EventSource {
      * @param ev
      * @return the response.
      */
-    private static Response eventValidation(final MonitoringEvent ev) {
+    private static Response validateEvent(final MonitoringEvent ev) {
         validateIP(ev);
         validateOriginatingService(ev);
         validateEventTimestamp(ev);

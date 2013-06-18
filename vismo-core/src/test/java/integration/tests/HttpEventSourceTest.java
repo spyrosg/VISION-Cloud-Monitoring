@@ -1,65 +1,39 @@
 package integration.tests;
 
-import static org.junit.Assert.assertEquals;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
-import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
 import gr.ntua.vision.monitoring.sources.HttpEventResource;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
-import gr.ntua.vision.monitoring.web.WebServer;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 
 import org.json.simple.JSONObject;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
 
 
 /**
  * 
  */
-public class HttpEventSourceTest {
+public class HttpEventSourceTest extends JerseyResourceTest {
     /***/
-    private static final int                 PORT     = 9998;
+    private final VismoRulesEngine           engine = new VismoRulesEngine();
     /***/
-    private static final String              ROOT_URL = "http://localhost:" + PORT;
-    /***/
-    private final Client                     client;
-    /***/
-    private final VismoRulesEngine           engine   = new VismoRulesEngine();
-    /***/
-    private WebServer                        server;
-    /***/
-    private final ArrayList<MonitoringEvent> sink     = new ArrayList<MonitoringEvent>();
-
-    {
-        final ClientConfig cc = new DefaultClientConfig();
-        cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
-        client = Client.create(cc);
-    }
+    private final ArrayList<MonitoringEvent> sink   = new ArrayList<MonitoringEvent>();
 
 
     /**
      * @throws UnknownHostException
      */
-    @Test
-    public void rulesEngineShouldReceivePostedEvent() throws UnknownHostException {
+    public void testRulesEngineShouldReceivePostedEvent() throws UnknownHostException {
         final String eventRepr = getDefaultEvent();
         final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(eventRepr)
                 .put(ClientResponse.class);
@@ -70,19 +44,20 @@ public class HttpEventSourceTest {
 
 
     /**
-     * @throws Exception
+     * @see integration.tests.JerseyResourceTest#setUp()
      */
-    @Before
+    @Override
     public void setUp() throws Exception {
-        final HttpEventResource eventSource = new HttpEventResource(new VismoEventFactory());
-        final Application application = WebAppBuilder.buildFrom(eventSource);
+        super.setUp();
+
+        final HttpEventResource eventSource = new HttpEventResource();
 
         eventSource.add(engine);
         engine.appendSink(new InMemoryEventSink(sink));
         new PassThroughRule(engine).submit();
 
-        server = new WebServer(PORT).withWebAppAt(application, "/*");
-        server.start();
+        configureServer(WebAppBuilder.buildFrom(eventSource), "/*");
+        startServer();
     }
 
 
@@ -109,23 +84,14 @@ public class HttpEventSourceTest {
 
 
     /**
-     * @throws Exception
+     * @see integration.tests.JerseyResourceTest#tearDown()
      */
-    @After
+    @Override
     public void tearDown() throws Exception {
-        if (server != null)
-            server.stop();
-
         if (engine != null)
             engine.halt();
-    }
 
-
-    /**
-     * @return a web resource pointing to the server's root.
-     */
-    private WebResource root() {
-        return client.resource(ROOT_URL);
+        super.tearDown();
     }
 
 
