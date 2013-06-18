@@ -6,14 +6,19 @@ import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.sources.EventSource;
 import gr.ntua.vision.monitoring.sources.EventSourceListener;
 
-import java.net.InetAddress;
-import java.net.URI;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 
 /**
@@ -21,10 +26,27 @@ import javax.ws.rs.core.Response;
  */
 @Path("events")
 public class HttpEventResource implements EventSource {
+    /**
+     * 
+     */
+    @SuppressWarnings("serial")
+    private static class EventValidationError extends RuntimeException {
+        /**
+         * Constructor.
+         * 
+         * @param message
+         */
+        public EventValidationError(final String message) {
+            super(message);
+        }
+    }
     /***/
     private final EventFactory                   factory;
     /** the listeners lists. */
     private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
+
+    /***/
+    private final JSONParser                     parser;
 
 
     /**
@@ -42,6 +64,7 @@ public class HttpEventResource implements EventSource {
      */
     public HttpEventResource(final EventFactory factory) {
         this.factory = factory;
+        this.parser = new JSONParser();
     }
 
 
@@ -55,21 +78,32 @@ public class HttpEventResource implements EventSource {
 
 
     /**
+     * @param req
      * @param body
      * @return the response.
      */
+    @SuppressWarnings("unchecked")
     @PUT
-    public Response putEvent(final String body) {
-        try {
-            final MonitoringEvent e = factory.createEvent(body);
+    public Response putEvent(final @Context HttpServletRequest req, final String body) {
+        final Map<String, Object> json;
 
-            validateEvent(e);
-            notifyAll(e);
-        } catch (final Error e) {
+        try {
+            json = (Map<String, Object>) parser.parse(body);
+        } catch (final ParseException e) {
             return Response.status(400).entity(e.getMessage()).build();
         }
 
-        return Response.created(URI.create("/")).build();
+        try {
+            requireField("topic", json);
+            requireField("originating-service", json);
+            json.put("timestamp", System.currentTimeMillis());
+            json.put("originating-machine", req.getRemoteAddr());
+            notifyAll(factory.createEvent(JSONObject.toJSONString(json)));
+        } catch (final EventValidationError e) {
+            return badRequest(e);
+        }
+
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 
 
@@ -86,81 +120,22 @@ public class HttpEventResource implements EventSource {
 
 
     /**
-     * Validate event's fields
-     * 
-     * @param ev
-     * @return the response.
+     * @param e
+     * @return the {@link Response}.
      */
-    private static Response validateEvent(final MonitoringEvent ev) {
-        validateIP(ev);
-        validateOriginatingService(ev);
-        validateEventTimestamp(ev);
-        validateEventTopic(ev);
-
-        return Response.created(URI.create("/")).build();
+    private static Response badRequest(final EventValidationError e) {
+        return Response.status(Response.Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN).entity(e.getMessage()).build();
     }
 
 
     /**
-     * Validate Event's Timestamp
+     * Assert that the require field is not missing from the map.
      * 
-     * @param ev
-     * @return the response.
+     * @param field
+     * @param map
      */
-    private static Response validateEventTimestamp(final MonitoringEvent ev) {
-        final Long timest = ev.timestamp();
-        if (timest == null)
-            return Response.status(400).entity("field timestamp required").build();
-
-        return Response.created(URI.create("/")).build();
-    }
-
-
-    /**
-     * Validate Event's topic
-     * 
-     * @param ev
-     * @return the response.
-     */
-    private static Response validateEventTopic(final MonitoringEvent ev) {
-        final String topic = ev.topic();
-        if (topic == null)
-            return Response.status(400).entity("field topic required").build();
-
-        return Response.created(URI.create("/")).build();
-    }
-
-
-    /**
-     * Validating Event IP
-     * 
-     * @param ev
-     * @return the response.
-     */
-    private static Response validateIP(final MonitoringEvent ev) {
-        try {
-            final InetAddress IP = ev.originatingIP();
-            if (IP == null)
-                return Response.status(400).entity("No originating IP").build();
-        } catch (final UnknownHostException e) {
-            return Response.status(400).entity(e.getMessage()).build();
-        }
-
-        return Response.created(URI.create("/")).build();
-    }
-
-
-    /**
-     * Validate Event's Originating Service
-     * 
-     * @param ev
-     * @return the response.
-     */
-    private static Response validateOriginatingService(final MonitoringEvent ev) {
-        final String service = ev.originatingService();
-        if (service == null)
-            return Response.status(400).entity("field originating-service required").build();
-
-        return Response.created(URI.create("/")).build();
+    private static void requireField(final String field, final Map<String, Object> map) {
+        if (!map.containsKey(field))
+            throw new EventValidationError("field '" + field + "' is required");
     }
 }

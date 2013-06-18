@@ -7,15 +7,12 @@ import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.ws.rs.core.MediaType;
 
 import org.json.simple.JSONObject;
-import org.junit.Test;
 
 import com.sun.jersey.api.client.ClientResponse;
 
@@ -25,9 +22,9 @@ import com.sun.jersey.api.client.ClientResponse;
  */
 public class HttpEventSourceTest extends JerseyResourceTest {
     /***/
-    private final VismoRulesEngine           engine = new VismoRulesEngine();
+    private VismoRulesEngine                 engine;
     /***/
-    private final ArrayList<MonitoringEvent> sink   = new ArrayList<MonitoringEvent>();
+    private final ArrayList<MonitoringEvent> sink = new ArrayList<MonitoringEvent>();
 
 
     /**
@@ -39,34 +36,13 @@ public class HttpEventSourceTest extends JerseyResourceTest {
 
         final HttpEventResource eventSource = new HttpEventResource();
 
-        eventSource.add(engine);
-        engine.appendSink(new InMemoryEventSink(sink));
+        engine = new VismoRulesEngine();
         new PassThroughRule(engine).submit();
+        engine.appendSink(new InMemoryEventSink(sink));
+        eventSource.add(engine);
 
         configureServer(WebAppBuilder.buildFrom(eventSource), "/*");
         startServer();
-    }
-
-
-    /**
-     * @throws UnknownHostException
-     */
-    @Test
-    public void shouldAcceptEventsThroughPut() throws UnknownHostException {
-        final String eventRepr = getDefaultEvent();
-        final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(eventRepr)
-                .put(ClientResponse.class);
-
-        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
-    }
-
-
-    /***/
-    @Test
-    public void shouldRejectInvalidEvents() {
-        final ClientResponse res = root().path("events").entity("{ \"foo\" : 3 }").put(ClientResponse.class);
-
-        assertEquals("server should reject invalid events", ClientResponse.Status.BAD_REQUEST, res.getClientResponseStatus());
     }
 
 
@@ -82,30 +58,44 @@ public class HttpEventSourceTest extends JerseyResourceTest {
     }
 
 
-    /**
-     * @throws UnknownHostException
-     */
-    public void testRulesEngineShouldReceivePostedEvent() throws UnknownHostException {
-        final String eventRepr = getDefaultEvent();
+    /***/
+    public void testRulesEngineShouldReceivePostedEvent() {
+        final String eventRepr = getEvent();
         final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(eventRepr)
                 .put(ClientResponse.class);
 
-        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
         assertEquals("engine should have received at least one event", 1, sink.size());
+    }
+
+
+    /***/
+    public void testShouldAcceptEventsThroughPut() {
+        final String eventRepr = getEvent();
+        final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(eventRepr)
+                .put(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
+    }
+
+
+    /***/
+    public void testShouldRejectInvalidEvents() {
+        final ClientResponse res = root().path("events").entity("{ \"foo\" : 3 }").put(ClientResponse.class);
+
+        assertEquals("server should reject invalid events", ClientResponse.Status.BAD_REQUEST, res.getClientResponseStatus());
     }
 
 
     /**
      * @return the json representation of a {@link MonitoringEvent}.
-     * @throws UnknownHostException
      */
-    private static String getDefaultEvent() throws UnknownHostException {
-        final HashMap<String, Object> mapev = new HashMap<String, Object>();
-        mapev.put("timestamp", System.currentTimeMillis());
-        mapev.put("originating-service", "service");
-        mapev.put("originating-machine", InetAddress.getLocalHost().getHostAddress());
-        mapev.put("topic", "new event");
+    private static String getEvent() {
+        final HashMap<String, Object> map = new HashMap<String, Object>();
 
-        return JSONObject.toJSONString(mapev);
+        map.put("originating-service", "service");
+        map.put("topic", "new event");
+
+        return JSONObject.toJSONString(map);
     }
 }
