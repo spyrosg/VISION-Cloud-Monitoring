@@ -1,10 +1,10 @@
 package integration.tests;
 
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
+import gr.ntua.vision.monitoring.resources.HttpEventResource;
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
-import gr.ntua.vision.monitoring.sources.HttpEventResource;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
 
 import java.net.InetAddress;
@@ -28,19 +28,6 @@ public class HttpEventSourceTest extends JerseyResourceTest {
     private final VismoRulesEngine           engine = new VismoRulesEngine();
     /***/
     private final ArrayList<MonitoringEvent> sink   = new ArrayList<MonitoringEvent>();
-
-
-    /**
-     * @throws UnknownHostException
-     */
-    public void testRulesEngineShouldReceivePostedEvent() throws UnknownHostException {
-        final String eventRepr = getDefaultEvent();
-        final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(eventRepr)
-                .put(ClientResponse.class);
-
-        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
-        assertEquals("engine should have received at least one event", 1, sink.size());
-    }
 
 
     /**
@@ -92,6 +79,19 @@ public class HttpEventSourceTest extends JerseyResourceTest {
             engine.halt();
 
         super.tearDown();
+    }
+
+
+    /**
+     * @throws UnknownHostException
+     */
+    public void testRulesEngineShouldReceivePostedEvent() throws UnknownHostException {
+        final String eventRepr = getDefaultEvent();
+        final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(eventRepr)
+                .put(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+        assertEquals("engine should have received at least one event", 1, sink.size());
     }
 
 

@@ -1,8 +1,10 @@
-package gr.ntua.vision.monitoring.sources;
+package gr.ntua.vision.monitoring.resources;
 
 import gr.ntua.vision.monitoring.events.EventFactory;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
+import gr.ntua.vision.monitoring.sources.EventSource;
+import gr.ntua.vision.monitoring.sources.EventSourceListener;
 
 import java.net.InetAddress;
 import java.net.URI;
