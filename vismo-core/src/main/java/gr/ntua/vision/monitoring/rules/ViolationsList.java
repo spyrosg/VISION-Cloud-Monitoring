@@ -29,9 +29,27 @@ public class ViolationsList {
 
 
     /**
+     * @param i
+     * @return the violation at index.
+     */
+    public Violation get(final int i) {
+        return list.get(i);
+    }
+
+
+    /**
      * @return the list size.
      */
     public int size() {
         return list.size();
+    }
+
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return list.toString();
     }
 }
