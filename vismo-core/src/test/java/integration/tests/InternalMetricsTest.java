@@ -42,7 +42,7 @@ public class InternalMetricsTest extends JerseyResourceTest {
         final CPUUsageBean u = res.getEntity(CPUUsageBean.class);
         final OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
 
-        assertEquals(osBean.getSystemLoadAverage(), u.getHostCPULoad());
+        assertEquals(osBean.getSystemLoadAverage(), u.getHostCPULoad(), 0.5);
     }
 
 
