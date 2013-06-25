@@ -161,7 +161,7 @@ public class PythonDispatchTest {
     /***/
     private static final String     PY_DISPATCH            = "../vismo-dispatch/src/main/python/vismo_dispatch.py";
     /***/
-    private static final String     PYTHON                 = "/usr/bin/python2";
+    private static final String     PYTHON;
     /***/
     private static final String     VISMO_CONFIG_FILE      = "src/test/resources/vismo-config.properties";
     /***/
@@ -173,6 +173,9 @@ public class PythonDispatchTest {
     /***/
     private VismoEventSource        source;
 
+    static {
+    	PYTHON = selectPython();
+    }
 
     /**
      * @throws IOException
@@ -235,11 +238,22 @@ public class PythonDispatchTest {
     @BeforeClass
     public static void assertEnvironmentHasUsablePython() throws IOException, InterruptedException {
         log.debug("checking minimum python version");
+        selectPython();
         requirePython(MINIMUM_PYTHON_VERSION);
     }
 
 
-    /**
+    private static String selectPython() {
+    	final String os = System.getProperty("os.name");
+    	
+    	if (os.toLowerCase().contains("windows"))
+    		return "c:\\Program Files\\Python\\python.exe";
+    	
+    	return "/usr/bin/python2";
+	}
+
+
+	/**
      * @param version
      * @throws IOException
      * @throws InterruptedException

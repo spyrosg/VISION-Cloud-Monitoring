@@ -3,7 +3,7 @@
 
 from __future__ import print_function
 
-import socket, struct, fcntl, sys
+import socket, struct, sys
 from os import getpid, getenv
 from time import time
 from pyjavaproperties import Properties
@@ -31,6 +31,8 @@ def get_public_ip(iface='eth0'):
     ifreq = struct.pack('16sH14s', iface, socket.AF_INET, '\x00'*14)
 
     try:
+    	import fcntl
+    	
         res = fcntl.ioctl(sockfd, SIOCGIFADDR, ifreq)
     except:
         return None
