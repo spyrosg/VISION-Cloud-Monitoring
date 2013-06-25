@@ -186,12 +186,19 @@ public class AccountingRule extends AggregationRule {
         dict.put("topic", TOPIC);
         dict.put("reads-f", transformReadFederatedList(selectReadFederatedEvents(eventList)));
         dict.put("writes-f", transformWriteFederatedList(selectWriteFederatedEvents(eventList)));
+        dict.put("multis", transformWriteMultiList(selectWriteMultiEvents(eventList)));
+
 
         return dict;
     }
 
 
-    /**
+    private static Object transformWriteMultiList(ArrayList<MonitoringEvent> eventList) {
+        return transformByOperation(eventList, "multi");
+	}
+
+
+	/**
      * @param e
      * @return <code>true</code> iff is an obs or storlet event.
      */
