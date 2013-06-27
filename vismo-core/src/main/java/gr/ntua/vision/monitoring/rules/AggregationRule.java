@@ -263,8 +263,6 @@ abstract class AggregationRule extends PeriodicRule {
         for (final MonitoringEvent e : eventList) {
             final String val = (String) e.get(OPERATION_FIELD);
 
-            log.trace("event op={}", val);
-
             if (operation.equalsIgnoreCase(val))
                 newList.add(e);
         }
