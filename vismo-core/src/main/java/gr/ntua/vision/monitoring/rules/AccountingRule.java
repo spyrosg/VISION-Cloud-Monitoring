@@ -263,6 +263,9 @@ public class AccountingRule extends AggregationRule {
         o.put("replicas", 1);
 
         o.put("size", e.get("content-size"));
+        
+        if (e.get("metadata-size") != null)
+        	o.put("mdSize", e.get("metadata-size"));
 
         return o;
     }
