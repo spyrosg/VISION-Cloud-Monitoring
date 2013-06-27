@@ -110,6 +110,9 @@ public class PythonDispatchTest {
 
                 if (e.get("transaction-throughput") == null)
                     throw new AssertionError("received unexpected event: " + e + " with no field 'transaction-throughput'");
+                
+                if (e.get("multi") == null)
+                	throw new AssertionError("received unexpected event: " + e + " with no field 'multi'");
             }
         }
     }
@@ -135,6 +138,9 @@ public class PythonDispatchTest {
 
                 if (e.get("transaction-throughput") == null)
                     throw new AssertionError("received unexpected event: " + e + " with no field 'transaction-throughput'");
+                
+                if (e.get("multi") == null)
+                	throw new AssertionError("received unexpected event: " + e + " with no field 'multi'");
             }
         }
 
@@ -153,11 +159,11 @@ public class PythonDispatchTest {
     /***/
     private static final String     MINIMUM_PYTHON_VERSION = "2.6";
     /** this is the flag used to push multi upload events. */
-    private static final String     MULTI                  = "multi";
+    private static final String     MULTI_COMMAND                  = "multi";
     /***/
     private static final int        NO_EVENTS_TO_SEND      = 100;
     /** this is the flag for plain put/get events. */
-    private static final String     PLAIN                  = "plain";
+    private static final String     PLAIN_COMMAND                  = "plain";
     /***/
     private static final String     PY_DISPATCH            = "../vismo-dispatch/src/main/python/vismo_dispatch.py";
     /***/
@@ -195,10 +201,10 @@ public class PythonDispatchTest {
      */
     @Test
     public void shouldReceiveMultiUploadEvents() throws IOException, InterruptedException {
-        listener = new MultiUploadEvents(NO_EVENTS_TO_SEND);
+        listener = new MultiUploadEvents(2 * NO_EVENTS_TO_SEND);
         source.add(listener);
 
-        runPythonVismoDispatch(MULTI);
+        runPythonVismoDispatch(MULTI_COMMAND);
         Thread.sleep(1000);
         listener.verifyEvents();
     }
@@ -215,7 +221,7 @@ public class PythonDispatchTest {
         listener = new PlainEventsListener(NO_EVENTS_TO_SEND);
         source.add(listener);
 
-        runPythonVismoDispatch(PLAIN);
+        runPythonVismoDispatch(PLAIN_COMMAND);
         Thread.sleep(1000);
         listener.verifyEvents();
     }

@@ -157,14 +157,22 @@ class VismoEventDispatcher(EventDispatcher):
                 del event['tag']
 
                 if 'content_size' in self.end_response:
-                    event['content-size'] = float(self.end_response['content_size'])
+                    event['content-size'] = int(self.end_response['content_size'])
                     del event['content_size']
 
                 if 'metadata_size' in self.end_response:
-                    event['metadata-size'] = float(self.end_response['metadata_size'])
+                    event['metadata-size'] = int(self.end_response['metadata_size'])
                     del event['metadata_size']
 
                 event['transaction-throughput'] = self.get_transaction_throughput()
+
+                if self.end_response['operation'].startswith('PUT_MULTI'):
+                    event['multi'] = True
+                    event['completed'] = self.end_response['operation'] == 'PUT_MULTI_COMPLETED'
+                    event['operation'] = 'PUT_MULTI'
+                else:
+                    event['multi'] = False
+                    event['completed'] = False
 
                 self._send(event)
             finally:
@@ -236,6 +244,10 @@ if __name__ == '__main__':
         mon_send_data('PUT_MULTI', 'start-request', tenant, user, container, obj)
         mon_send_data('PUT_MULTI', 'start-response', tenant, user, container, obj)
         mon_send_data('PUT_MULTI', 'end-response', tenant, user, container, obj, 500)
+
+        mon_send_data('PUT_MULTI', 'start-request', tenant, user, container, obj)
+        mon_send_data('PUT_MULTI', 'start-response', tenant, user, container, obj)
+        mon_send_data('PUT_MULTI_COMPLETED', 'end-response', tenant, user, container, obj, 500)
 
     if sys.argv[1] == 'multi':
         for i in range(int(sys.argv[2])):
