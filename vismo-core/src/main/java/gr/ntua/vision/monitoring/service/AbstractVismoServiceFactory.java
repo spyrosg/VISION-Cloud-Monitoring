@@ -15,7 +15,6 @@ import gr.ntua.vision.monitoring.rules.VismoRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sources.EventSources;
-import gr.ntua.vision.monitoring.threading.PingGroupTask;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import gr.ntua.vision.monitoring.web.WebServer;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
@@ -95,7 +94,6 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
      */
     protected void addDefaultServiceTasks(final VMInfo info, final VismoService service) throws UnknownHostException {
         log.debug("adding default tasks");
-        service.addTask(new PingGroupTask(conf, info.getVersion()));
     }
 
 

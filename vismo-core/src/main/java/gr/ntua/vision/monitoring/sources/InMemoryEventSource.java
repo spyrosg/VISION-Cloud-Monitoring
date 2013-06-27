@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 
 /**
- * @author tmessini
+ * 
  */
 public class InMemoryEventSource implements EventSource {
     /***/
