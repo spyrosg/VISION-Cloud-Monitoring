@@ -234,7 +234,11 @@ abstract class AggregationRule extends PeriodicRule {
      * @return the list of write events.
      */
     protected static ArrayList<MonitoringEvent> selectWriteEvents(final List< ? extends MonitoringEvent> eventList) {
-        return selectEventsByOperation(eventList, PUT_OPERATION);
+        final ArrayList<MonitoringEvent> list = selectEventsByOperation(eventList, PUT_OPERATION);
+        
+        list.addAll(selectEventsByOperation(eventList, PUT_MULTI_OPERATION));
+        
+        return list;
     }
 
 
@@ -269,9 +273,4 @@ abstract class AggregationRule extends PeriodicRule {
 
         return newList;
     }
-
-
-	protected static ArrayList<MonitoringEvent> selectWriteMultiEvents(List<? extends MonitoringEvent> eventList) {
-		return selectEventsByOperation(eventList, PUT_MULTI_OPERATION);
-	}
 }

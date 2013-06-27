@@ -186,16 +186,9 @@ public class AccountingRule extends AggregationRule {
         dict.put("topic", TOPIC);
         dict.put("reads-f", transformReadFederatedList(selectReadFederatedEvents(eventList)));
         dict.put("writes-f", transformWriteFederatedList(selectWriteFederatedEvents(eventList)));
-        dict.put("multis", transformWriteMultiList(selectWriteMultiEvents(eventList)));
-
 
         return dict;
     }
-
-
-    private static Object transformWriteMultiList(ArrayList<MonitoringEvent> eventList) {
-        return transformByOperation(eventList, "multi");
-	}
 
 
 	/**
@@ -247,6 +240,8 @@ public class AccountingRule extends AggregationRule {
         final HashMap<String, Object> o = new HashMap<String, Object>();
         final long ts = e.timestamp();
         final double duration = MILLIS * (Double) e.get("transaction-duration");
+        final Boolean multiPart = (Boolean) e.get("multi");
+        final Boolean completed = (Boolean) e.get("completed");
 
         o.put("tStart", (long) (ts - duration));
         o.put("tEnd", ts);
@@ -266,6 +261,14 @@ public class AccountingRule extends AggregationRule {
         
         if (e.get("metadata-size") != null)
         	o.put("mdSize", e.get("metadata-size"));
+        
+        if (multiPart == null) {
+        	o.put("multi", false);
+        	o.put("completed", false);
+        } else {
+        	o.put("multi", multiPart);
+        	o.put("completed", completed != null ? completed : false);
+        }
 
         return o;
     }
