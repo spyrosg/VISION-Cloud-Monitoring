@@ -27,7 +27,7 @@ public class ThresholdRequirementList {
 
     /**
      * @param events
-     * @return
+     * @return the possibly empty list of violations.
      */
     public ViolationsList haveViolations(final List<MonitoringEvent> events) {
         final ViolationsList violList = new ViolationsList();
@@ -45,7 +45,7 @@ public class ThresholdRequirementList {
 
     /**
      * @param e
-     * @return
+     * @return the possbily empty list of violations.
      */
     public ViolationsList haveViolations(final MonitoringEvent e) {
         final ViolationsList violList = new ViolationsList();

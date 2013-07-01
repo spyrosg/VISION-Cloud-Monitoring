@@ -110,9 +110,9 @@ public class PythonDispatchTest {
 
                 if (e.get("transaction-throughput") == null)
                     throw new AssertionError("received unexpected event: " + e + " with no field 'transaction-throughput'");
-                
+
                 if (e.get("multi") == null)
-                	throw new AssertionError("received unexpected event: " + e + " with no field 'multi'");
+                    throw new AssertionError("received unexpected event: " + e + " with no field 'multi'");
             }
         }
     }
@@ -138,9 +138,9 @@ public class PythonDispatchTest {
 
                 if (e.get("transaction-throughput") == null)
                     throw new AssertionError("received unexpected event: " + e + " with no field 'transaction-throughput'");
-                
+
                 if (e.get("multi") == null)
-                	throw new AssertionError("received unexpected event: " + e + " with no field 'multi'");
+                    throw new AssertionError("received unexpected event: " + e + " with no field 'multi'");
             }
         }
 
@@ -159,11 +159,11 @@ public class PythonDispatchTest {
     /***/
     private static final String     MINIMUM_PYTHON_VERSION = "2.6";
     /** this is the flag used to push multi upload events. */
-    private static final String     MULTI_COMMAND                  = "multi";
+    private static final String     MULTI_COMMAND          = "multi";
     /***/
     private static final int        NO_EVENTS_TO_SEND      = 100;
     /** this is the flag for plain put/get events. */
-    private static final String     PLAIN_COMMAND                  = "plain";
+    private static final String     PLAIN_COMMAND          = "plain";
     /***/
     private static final String     PY_DISPATCH            = "../vismo-dispatch/src/main/python/vismo_dispatch.py";
     /***/
@@ -180,8 +180,9 @@ public class PythonDispatchTest {
     private VismoEventSource        source;
 
     static {
-    	PYTHON = selectPython();
+        PYTHON = selectPython();
     }
+
 
     /**
      * @throws IOException
@@ -249,17 +250,7 @@ public class PythonDispatchTest {
     }
 
 
-    private static String selectPython() {
-    	final String os = System.getProperty("os.name");
-    	
-    	if (os.toLowerCase().contains("windows"))
-    		return "c:\\Program Files\\Python\\python.exe";
-    	
-    	return "/usr/bin/python2";
-	}
-
-
-	/**
+    /**
      * @param version
      * @throws IOException
      * @throws InterruptedException
@@ -323,5 +314,18 @@ public class PythonDispatchTest {
             reader.close();
             writer.close();
         }
+    }
+
+
+    /**
+     * @return the full path to the "python" command.
+     */
+    private static String selectPython() {
+        final String os = System.getProperty("os.name");
+
+        if (os.toLowerCase().contains("windows"))
+            return "c:\\Program Files\\Python\\python.exe";
+
+        return "/usr/bin/python2";
     }
 }

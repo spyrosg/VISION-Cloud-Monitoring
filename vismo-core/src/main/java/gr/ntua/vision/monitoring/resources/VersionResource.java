@@ -8,19 +8,33 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+
+/**
+ * 
+ */
 @Path("version")
 public class VersionResource {
-	/***/
-	private final VMInfo vminfo;
+    /***/
+    private final VMInfo vminfo;
 
-	public VersionResource(VMInfo vminfo) {
-		this.vminfo = vminfo;
-	}
 
-	@GET
-	@Consumes(MediaType.TEXT_PLAIN)
-	@Produces(MediaType.TEXT_PLAIN)
-	public String versionString() {
-		return vminfo.getVersion();
-	}
+    /**
+     * Constructor.
+     * 
+     * @param vminfo
+     */
+    public VersionResource(final VMInfo vminfo) {
+        this.vminfo = vminfo;
+    }
+
+
+    /**
+     * @return the system version as a string.
+     */
+    @GET
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN)
+    public String versionString() {
+        return vminfo.getVersion();
+    }
 }

@@ -191,7 +191,7 @@ public class AccountingRule extends AggregationRule {
     }
 
 
-	/**
+    /**
      * @param e
      * @return <code>true</code> iff is an obs or storlet event.
      */
@@ -258,16 +258,16 @@ public class AccountingRule extends AggregationRule {
         o.put("replicas", 1);
 
         o.put("size", e.get("content-size"));
-        
+
         if (e.get("metadata-size") != null)
-        	o.put("mdSize", e.get("metadata-size"));
-        
+            o.put("mdSize", e.get("metadata-size"));
+
         if (multiPart == null) {
-        	o.put("multi", false);
-        	o.put("completed", false);
+            o.put("multi", false);
+            o.put("completed", false);
         } else {
-        	o.put("multi", multiPart);
-        	o.put("completed", completed != null ? completed : false);
+            o.put("multi", multiPart);
+            o.put("completed", completed != null ? completed : false);
         }
 
         return o;

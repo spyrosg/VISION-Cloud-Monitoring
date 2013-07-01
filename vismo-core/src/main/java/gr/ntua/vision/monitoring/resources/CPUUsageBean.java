@@ -44,7 +44,7 @@ public class CPUUsageBean {
 
 
     /**
-     * @return
+     * @return the {@link CPUUsageBean} object.
      */
     public static CPUUsageBean get() {
         final CPUUsageBean bean = new CPUUsageBean();

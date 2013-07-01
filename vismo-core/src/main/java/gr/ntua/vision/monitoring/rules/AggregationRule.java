@@ -24,13 +24,13 @@ abstract class AggregationRule extends PeriodicRule {
     /***/
     private static final String   GET_OPERATION           = "GET";
     /***/
-    private static final String   PUT_MULTI_OPERATION     = "PUT_MULTI";
-    /***/
     private static final Logger   log                     = LoggerFactory.getLogger(AggregationRule.class);
     /***/
     private static final String   OPERATION_FIELD         = "operation";
     /***/
     private static final String   PUT_FEDERATED_OPERATION = "PUT_F";
+    /***/
+    private static final String   PUT_MULTI_OPERATION     = "PUT_MULTI";
     /***/
     private static final String   PUT_OPERATION           = "PUT";
     /***/
@@ -235,9 +235,9 @@ abstract class AggregationRule extends PeriodicRule {
      */
     protected static ArrayList<MonitoringEvent> selectWriteEvents(final List< ? extends MonitoringEvent> eventList) {
         final ArrayList<MonitoringEvent> list = selectEventsByOperation(eventList, PUT_OPERATION);
-        
+
         list.addAll(selectEventsByOperation(eventList, PUT_MULTI_OPERATION));
-        
+
         return list;
     }
 

@@ -20,7 +20,6 @@ import gr.ntua.vision.monitoring.web.WebServer;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.List;
 
 import javax.ws.rs.core.Application;
@@ -88,16 +87,6 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
 
 
     /**
-     * @param service
-     * @param info
-     * @throws UnknownHostException
-     */
-    protected void addDefaultServiceTasks(final VMInfo info, final VismoService service) throws UnknownHostException {
-        log.debug("adding default tasks");
-    }
-
-
-    /**
      * Provides the event sinks for <code>this</code> service.
      * 
      * @return the list of {@link EventSink}s object, already configured.
@@ -145,18 +134,30 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
 
 
     /**
+     * @param service
+     * @param info
+     */
+    protected static void addDefaultServiceTasks(@SuppressWarnings("unused") final VMInfo info,
+            @SuppressWarnings("unused") final VismoService service) {
+        log.debug("adding default tasks");
+    }
+
+
+    /**
      * @param port
-     * @param vminfo 
+     * @param vminfo
      * @param store
      * @param engine
      * @return a configured {@link WebServer}.
      */
-    private static WebServer buildWebServer(final int port, VMInfo vminfo, final RulesStore store, final VismoRulesEngine engine) {
+    private static WebServer buildWebServer(final int port, final VMInfo vminfo, final RulesStore store,
+            final VismoRulesEngine engine) {
         final WebServer server = new WebServer(port);
         final RulesResource rulesResource = new RulesResource(new ThresholdRulesFactory(new ClassPathRulesFactory(engine,
                 DEFAULT_RULES_PACKAGE), engine), store);
         final HttpEventResource eventSource = new HttpEventResource();
-        final Application app = WebAppBuilder.buildFrom(rulesResource, new InternalMetricsResource(), new VersionResource(vminfo), eventSource);
+        final Application app = WebAppBuilder.buildFrom(rulesResource, new InternalMetricsResource(),
+                                                        new VersionResource(vminfo), eventSource);
 
         eventSource.add(engine);
 
