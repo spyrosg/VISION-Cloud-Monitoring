@@ -13,6 +13,7 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 
 
 /**
@@ -42,7 +43,7 @@ public class RulesResourceTest extends JerseyResourceTest {
 
     /***/
     public void testHttpDELETEShouldRemoveExistingRuleFromStore() {
-        final ClientResponse res = root().path("rules").path("AccountingRule").path("10000").post(ClientResponse.class);
+        final ClientResponse res = resource().path("AccountingRule").path("10000").post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
 
@@ -101,11 +102,20 @@ public class RulesResourceTest extends JerseyResourceTest {
 
 
     /**
+     * @see integration.tests.JerseyResourceTest#resource()
+     */
+    @Override
+    protected WebResource resource() {
+        return root().path("rules");
+    }
+
+
+    /**
      * @param ruleId
      * @return the {@link ClientResponse}.
      */
     private ClientResponse deleteRule(final String ruleId) {
-        return root().path("rules").path(ruleId).accept(MediaType.TEXT_PLAIN).delete(ClientResponse.class);
+        return resource().path(ruleId).accept(MediaType.TEXT_PLAIN).delete(ClientResponse.class);
     }
 
 
@@ -113,7 +123,7 @@ public class RulesResourceTest extends JerseyResourceTest {
      * @return the {@link ClientResponse}.
      */
     private ClientResponse getRules() {
-        return root().path("rules").get(ClientResponse.class);
+        return resource().get(ClientResponse.class);
     }
 
 
@@ -123,7 +133,7 @@ public class RulesResourceTest extends JerseyResourceTest {
      * @return the {@link ClientResponse}.
      */
     private ClientResponse postRule(final String name, final long period) {
-        return root().path("rules").path(name).path(String.valueOf(period)).post(ClientResponse.class);
+        return resource().path(name).path(String.valueOf(period)).post(ClientResponse.class);
     }
 
 
@@ -132,7 +142,7 @@ public class RulesResourceTest extends JerseyResourceTest {
      * @return the {@link ClientResponse}.
      */
     private ClientResponse postRule(final ThresholdRuleBean bean) {
-        return root().path("rules").type(MediaType.APPLICATION_JSON).entity(bean).post(ClientResponse.class);
+        return resource().type(MediaType.APPLICATION_JSON).entity(bean).post(ClientResponse.class);
     }
 
 

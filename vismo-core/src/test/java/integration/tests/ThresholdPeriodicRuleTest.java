@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 
 
 /**
@@ -88,11 +89,20 @@ public class ThresholdPeriodicRuleTest extends JerseyResourceTest {
 
 
     /**
+     * @see integration.tests.JerseyResourceTest#resource()
+     */
+    @Override
+    protected WebResource resource() {
+        return root().path("rules");
+    }
+
+
+    /**
      * @param bean
      * @return the {@link ClientResponse}.
      */
     private ClientResponse submitRule(final ThresholdRuleBean bean) {
-        return root().path("rules").type(MediaType.APPLICATION_JSON).entity(bean).post(ClientResponse.class);
+        return resource().type(MediaType.APPLICATION_JSON).entity(bean).post(ClientResponse.class);
     }
 
 

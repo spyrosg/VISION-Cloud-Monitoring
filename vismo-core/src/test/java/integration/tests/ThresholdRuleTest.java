@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 
 
 /**
@@ -146,6 +147,15 @@ public class ThresholdRuleTest extends JerseyResourceTest {
         triggerRule();
         assertEquals(1, eventSink.size());
         assertIsExpectedEvent(eventSink.get(0), TOPIC);
+    }
+
+
+    /**
+     * @see integration.tests.JerseyResourceTest#resource()
+     */
+    @Override
+    protected WebResource resource() {
+        return root().path("rules");
     }
 
 

@@ -12,6 +12,7 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 
 
 /**
@@ -55,5 +56,14 @@ public class InternalMetricsTest extends JerseyResourceTest {
         final MemoryUsageBean u = res.getEntity(MemoryUsageBean.class);
 
         assertTrue(u.getFreeMemoryInBytes() > 0);
+    }
+
+
+    /**
+     * @see integration.tests.JerseyResourceTest#resource()
+     */
+    @Override
+    protected WebResource resource() {
+        return root().path("mon");
     }
 }

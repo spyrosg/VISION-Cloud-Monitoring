@@ -15,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import org.json.simple.JSONObject;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 
 
 /**
@@ -61,8 +62,7 @@ public class HttpEventSourceTest extends JerseyResourceTest {
     /***/
     public void testRulesEngineShouldReceivePostedEvent() {
         final String eventRepr = getEvent();
-        final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(eventRepr)
-                .put(ClientResponse.class);
+        final ClientResponse res = resource().accept(MediaType.APPLICATION_JSON).entity(eventRepr).put(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
         assertEquals("engine should have received at least one event", 1, sink.size());
@@ -72,8 +72,7 @@ public class HttpEventSourceTest extends JerseyResourceTest {
     /***/
     public void testShouldAcceptEventsThroughPut() {
         final String eventRepr = getEvent();
-        final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(eventRepr)
-                .put(ClientResponse.class);
+        final ClientResponse res = resource().accept(MediaType.APPLICATION_JSON).entity(eventRepr).put(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
     }
@@ -81,9 +80,18 @@ public class HttpEventSourceTest extends JerseyResourceTest {
 
     /***/
     public void testShouldRejectInvalidEvents() {
-        final ClientResponse res = root().path("events").entity("{ \"foo\" : 3 }").put(ClientResponse.class);
+        final ClientResponse res = resource().entity("{ \"foo\" : 3 }").put(ClientResponse.class);
 
         assertEquals("server should reject invalid events", ClientResponse.Status.BAD_REQUEST, res.getClientResponseStatus());
+    }
+
+
+    /**
+     * @see integration.tests.JerseyResourceTest#resource()
+     */
+    @Override
+    protected WebResource resource() {
+        return root().path("events");
     }
 
 

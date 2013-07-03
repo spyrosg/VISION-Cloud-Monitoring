@@ -64,6 +64,12 @@ public abstract class JerseyResourceTest extends TestCase {
 
 
     /**
+     * @return a handle to the resource.
+     */
+    protected abstract WebResource resource();
+
+
+    /**
      * @return a web resource pointing to the server's root.
      */
     protected WebResource root() {
