@@ -68,16 +68,15 @@ public class ThresholdPeriodicRule extends PeriodicRule {
      * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List, long, long)
      */
     @Override
-    protected MonitoringEvent aggregate(final List<MonitoringEvent> eventsList, @SuppressWarnings("unused") final long tStart,
-            @SuppressWarnings("unused") final long tEnd) {
-        final ViolationsList violations = thresholdExceededBy(eventsList);
+    protected MonitoringEvent aggregate(final List<MonitoringEvent> list, final long tStart, final long tEnd) {
+        final ViolationsList violations = thresholdExceededBy(list);
 
         if (violations.size() > 0) {
             log.debug("have: {}", violations);
             // log.debug(String.format("have violation of metric %s '%s', offending value %s", foldMethod, metric,
             // aggregatedValue));
 
-            return new ThresholdEvent(id(), eventsList.get(0).originatingService(), topic, violations);
+            return new ThresholdEvent(id(), list.get(0).originatingService(), topic, violations);
         }
 
         return null;

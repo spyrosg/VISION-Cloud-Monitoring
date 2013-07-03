@@ -15,7 +15,7 @@ import org.json.simple.JSONObject;
  */
 class MapBasedEvent implements MonitoringEvent {
     /***/
-    private static final List<String> requiredFields = Arrays.asList("timestamp", "originating-service", "originating-machine");
+    private static final List<String> REQUIRED_FIELDS = Arrays.asList("timestamp", "originating-service", "originating-machine");
     /** the dictionary of key/values. */
     private final Map<String, Object> dict;
 
@@ -27,7 +27,7 @@ class MapBasedEvent implements MonitoringEvent {
      *            a dictionary of key/values.
      */
     MapBasedEvent(final Map<String, Object> dict) {
-        assertHaveRequiredFields(dict, requiredFields);
+        assertHaveFields(dict, REQUIRED_FIELDS);
         this.dict = new HashMap<String, Object>(dict);
     }
 
@@ -103,7 +103,7 @@ class MapBasedEvent implements MonitoringEvent {
      *            the map to check.
      * @param requiredFields
      */
-    protected static void assertHaveRequiredFields(final Map<String, Object> map, final List<String> requiredFields) {
+    protected static void assertHaveFields(final Map<String, Object> map, final List<String> requiredFields) {
         for (final String field : requiredFields)
             requireField(map, field);
     }

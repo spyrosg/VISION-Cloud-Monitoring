@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.UUID;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 
@@ -99,10 +100,21 @@ class ThresholdEvent implements MonitoringEvent {
     @Override
     public String serialize() {
         final JSONObject o = new JSONObject();
+        final JSONArray arr = new JSONArray();
+
+        for (int i = 0; i < violations.size(); ++i) {
+            final Violation v = violations.get(i);
+            final JSONObject o1 = new JSONObject();
+
+            o1.put("value", v.eventValue);
+            o1.put("metric", v.metric);
+            o1.put("threshold", v.threshold);
+            arr.add(o1);
+        }
 
         o.put("id", id);
         o.put("rule-id", ruleId);
-        o.put("violations", violations);
+        o.put("violations", arr);
         o.put("timestamp", ts);
         o.put("topic", topic);
         o.put("originating-service", originatingService);
@@ -135,7 +147,7 @@ class ThresholdEvent implements MonitoringEvent {
      */
     @Override
     public String toString() {
-        return "#<ThresholdEvent: " + ruleId + " of topic: " + topic + " at timestamp: " + ts + ", violation: " + violations
+        return "#<ThresholdEvent: " + ruleId + " of topic: " + topic + " at timestamp: " + ts + ", violations: " + violations
                 + ">";
     }
 }

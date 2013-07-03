@@ -31,7 +31,7 @@ abstract class NoEventsCheckingHandler implements EventHandler {
     /**
      * @param e
      */
-    protected void receivedEvent(@SuppressWarnings("unused") final MonitoringEvent e) {
+    protected void receivedEvent(final MonitoringEvent e) {
         ++noReceivedEvents;
     }
 }

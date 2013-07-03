@@ -5,6 +5,7 @@ import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.resources.HttpEventResource;
 import gr.ntua.vision.monitoring.resources.InternalMetricsResource;
 import gr.ntua.vision.monitoring.resources.RulesResource;
+import gr.ntua.vision.monitoring.resources.VersionResource;
 import gr.ntua.vision.monitoring.rules.ClassPathRulesFactory;
 import gr.ntua.vision.monitoring.rules.DefaultRuleBean;
 import gr.ntua.vision.monitoring.rules.RuleBean;
@@ -14,13 +15,11 @@ import gr.ntua.vision.monitoring.rules.VismoRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sources.EventSources;
-import gr.ntua.vision.monitoring.threading.PingGroupTask;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import gr.ntua.vision.monitoring.web.WebServer;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.List;
 
 import javax.ws.rs.core.Application;
@@ -75,7 +74,7 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
         log.info("subscribing sources to rules engine");
         sources.subscribeAll(engine);
 
-        final WebServer server = buildWebServer(PORT, store, engine);
+        final WebServer server = buildWebServer(PORT, vminfo, store, engine);
         final VismoService service = new VismoService(vminfo, sources, engine, server);
 
         addDefaultServiceTasks(vminfo, service);
@@ -84,17 +83,6 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
         submitRules(engine);
 
         return service;
-    }
-
-
-    /**
-     * @param service
-     * @param info
-     * @throws UnknownHostException
-     */
-    protected void addDefaultServiceTasks(final VMInfo info, final VismoService service) throws UnknownHostException {
-        log.debug("adding default tasks");
-        service.addTask(new PingGroupTask(conf, info.getVersion()));
     }
 
 
@@ -146,17 +134,29 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
 
 
     /**
+     * @param service
+     * @param info
+     */
+    protected static void addDefaultServiceTasks(final VMInfo info, final VismoService service) {
+        log.debug("adding default tasks");
+    }
+
+
+    /**
      * @param port
+     * @param vminfo
      * @param store
      * @param engine
      * @return a configured {@link WebServer}.
      */
-    private static WebServer buildWebServer(final int port, final RulesStore store, final VismoRulesEngine engine) {
+    private static WebServer buildWebServer(final int port, final VMInfo vminfo, final RulesStore store,
+            final VismoRulesEngine engine) {
         final WebServer server = new WebServer(port);
         final RulesResource rulesResource = new RulesResource(new ThresholdRulesFactory(new ClassPathRulesFactory(engine,
                 DEFAULT_RULES_PACKAGE), engine), store);
         final HttpEventResource eventSource = new HttpEventResource();
-        final Application app = WebAppBuilder.buildFrom(rulesResource, new InternalMetricsResource(), eventSource);
+        final Application app = WebAppBuilder.buildFrom(rulesResource, new InternalMetricsResource(),
+                                                        new VersionResource(vminfo), eventSource);
 
         eventSource.add(engine);
 

@@ -36,9 +36,9 @@ public class ThresholdRequirement {
 
                 double max = arr[0];
 
-                for (int i = 0; i < arr.length; ++i)
-                    if (arr[i] > max)
-                        max = arr[i];
+                for (final double element : arr)
+                    if (element > max)
+                        max = element;
 
                 return max;
             }
@@ -54,9 +54,9 @@ public class ThresholdRequirement {
 
                 double min = arr[0];
 
-                for (int i = 0; i < arr.length; ++i)
-                    if (arr[i] < min)
-                        min = arr[i];
+                for (final double element : arr)
+                    if (element < min)
+                        min = element;
 
                 return min;
             }
@@ -67,8 +67,8 @@ public class ThresholdRequirement {
             public double perform(final double[] arr) {
                 double sum = 0;
 
-                for (int i = 0; i < arr.length; ++i)
-                    sum += arr[i];
+                for (final double element : arr)
+                    sum += element;
 
                 return sum;
             }
@@ -201,8 +201,10 @@ public class ThresholdRequirement {
 
 
     /**
+     * Check that the event concerns the specified metric.
+     * 
      * @param e
-     * @return
+     * @return <code>true</code> iff the event is about the specified metric, <code>false</code> otherwise.
      */
     public boolean isApplicable(final MonitoringEvent e) {
         return e.get(metric) != null;
@@ -211,7 +213,8 @@ public class ThresholdRequirement {
 
     /**
      * @param events
-     * @return
+     *            the list of events to check for violation metrics.
+     * @return the particular monitored metric violation or <code>null</code>, or <code>null</code>.
      */
     public Violation isViolated(final List<MonitoringEvent> events) {
         final double observedValue = performFold(events);
@@ -223,7 +226,8 @@ public class ThresholdRequirement {
 
     /**
      * @param e
-     * @return
+     *            the event to check for violation metrics.
+     * @return the particular monitored metric violation or <code>null</code>, or <code>null</code>.
      */
     public Violation isViolated(final MonitoringEvent e) {
         final double observedValue = (Double) e.get(metric);

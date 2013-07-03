@@ -34,9 +34,11 @@ class ThresholdRulesTraits {
 
 
     /**
+     * Construct and return a rule, based on the bean input.
+     * 
      * @param engine
      * @param bean
-     * @return
+     * @return a thresold rule object.
      */
     public static VismoRule build(final VismoRulesEngine engine, final ThresholdRuleBean bean) {
         validate(bean);

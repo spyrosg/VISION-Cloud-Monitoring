@@ -5,11 +5,11 @@ package gr.ntua.vision.monitoring.rules;
  */
 public class Violation {
     /***/
-    public final double  eventValue;
+    public final double eventValue;
     /***/
-    public final String  metric;
+    public final String metric;
     /***/
-    private final double threshold;
+    public final double threshold;
 
 
     /**

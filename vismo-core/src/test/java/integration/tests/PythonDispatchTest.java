@@ -110,6 +110,9 @@ public class PythonDispatchTest {
 
                 if (e.get("transaction-throughput") == null)
                     throw new AssertionError("received unexpected event: " + e + " with no field 'transaction-throughput'");
+
+                if (e.get("multi") == null)
+                    throw new AssertionError("received unexpected event: " + e + " with no field 'multi'");
             }
         }
     }
@@ -135,6 +138,9 @@ public class PythonDispatchTest {
 
                 if (e.get("transaction-throughput") == null)
                     throw new AssertionError("received unexpected event: " + e + " with no field 'transaction-throughput'");
+
+                if (e.get("multi") == null)
+                    throw new AssertionError("received unexpected event: " + e + " with no field 'multi'");
             }
         }
 
@@ -153,15 +159,15 @@ public class PythonDispatchTest {
     /***/
     private static final String     MINIMUM_PYTHON_VERSION = "2.6";
     /** this is the flag used to push multi upload events. */
-    private static final String     MULTI                  = "multi";
+    private static final String     MULTI_COMMAND          = "multi";
     /***/
     private static final int        NO_EVENTS_TO_SEND      = 100;
     /** this is the flag for plain put/get events. */
-    private static final String     PLAIN                  = "plain";
+    private static final String     PLAIN_COMMAND          = "plain";
     /***/
     private static final String     PY_DISPATCH            = "../vismo-dispatch/src/main/python/vismo_dispatch.py";
     /***/
-    private static final String     PYTHON                 = "/usr/bin/python2";
+    private static final String     PYTHON;
     /***/
     private static final String     VISMO_CONFIG_FILE      = "src/test/resources/vismo-config.properties";
     /***/
@@ -172,6 +178,10 @@ public class PythonDispatchTest {
     private VerifyingEventsListener listener;
     /***/
     private VismoEventSource        source;
+
+    static {
+        PYTHON = selectPython();
+    }
 
 
     /**
@@ -192,10 +202,10 @@ public class PythonDispatchTest {
      */
     @Test
     public void shouldReceiveMultiUploadEvents() throws IOException, InterruptedException {
-        listener = new MultiUploadEvents(NO_EVENTS_TO_SEND);
+        listener = new MultiUploadEvents(2 * NO_EVENTS_TO_SEND);
         source.add(listener);
 
-        runPythonVismoDispatch(MULTI);
+        runPythonVismoDispatch(MULTI_COMMAND);
         Thread.sleep(1000);
         listener.verifyEvents();
     }
@@ -212,7 +222,7 @@ public class PythonDispatchTest {
         listener = new PlainEventsListener(NO_EVENTS_TO_SEND);
         source.add(listener);
 
-        runPythonVismoDispatch(PLAIN);
+        runPythonVismoDispatch(PLAIN_COMMAND);
         Thread.sleep(1000);
         listener.verifyEvents();
     }
@@ -235,6 +245,7 @@ public class PythonDispatchTest {
     @BeforeClass
     public static void assertEnvironmentHasUsablePython() throws IOException, InterruptedException {
         log.debug("checking minimum python version");
+        selectPython();
         requirePython(MINIMUM_PYTHON_VERSION);
     }
 
@@ -303,5 +314,18 @@ public class PythonDispatchTest {
             reader.close();
             writer.close();
         }
+    }
+
+
+    /**
+     * @return the full path to the "python" command.
+     */
+    private static String selectPython() {
+        final String os = System.getProperty("os.name");
+
+        if (os.toLowerCase().contains("windows"))
+            return "c:\\Program Files\\Python\\python.exe";
+
+        return "/usr/bin/python2";
     }
 }

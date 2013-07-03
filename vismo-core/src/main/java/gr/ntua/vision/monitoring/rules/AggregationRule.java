@@ -30,6 +30,8 @@ abstract class AggregationRule extends PeriodicRule {
     /***/
     private static final String   PUT_FEDERATED_OPERATION = "PUT_F";
     /***/
+    private static final String   PUT_MULTI_OPERATION     = "PUT_MULTI";
+    /***/
     private static final String   PUT_OPERATION           = "PUT";
     /***/
     private static final String   SRE_SERVICE             = "SRE";
@@ -232,7 +234,11 @@ abstract class AggregationRule extends PeriodicRule {
      * @return the list of write events.
      */
     protected static ArrayList<MonitoringEvent> selectWriteEvents(final List< ? extends MonitoringEvent> eventList) {
-        return selectEventsByOperation(eventList, PUT_OPERATION);
+        final ArrayList<MonitoringEvent> list = selectEventsByOperation(eventList, PUT_OPERATION);
+
+        list.addAll(selectEventsByOperation(eventList, PUT_MULTI_OPERATION));
+
+        return list;
     }
 
 
@@ -256,8 +262,6 @@ abstract class AggregationRule extends PeriodicRule {
 
         for (final MonitoringEvent e : eventList) {
             final String val = (String) e.get(OPERATION_FIELD);
-
-            log.trace("event op={}", val);
 
             if (operation.equalsIgnoreCase(val))
                 newList.add(e);

@@ -156,14 +156,14 @@ public class StorletLoggingRule extends AggregationRule {
      * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List, long, long)
      */
     @Override
-    protected MonitoringEvent aggregate(final List<MonitoringEvent> eventsList, final long tStart, final long tEnd) {
+    protected MonitoringEvent aggregate(final List<MonitoringEvent> list, final long tStart, final long tEnd) {
         final HashMap<String, Object> dict = new HashMap<String, Object>();
 
         dict.put("topic", TOPIC);
-        dict.put("originating-service", eventsList.get(0).originatingService());
+        dict.put("originating-service", list.get(0).originatingService());
         dict.put("tStart", tStart);
         dict.put("tEnd", tEnd);
-        dict.put("groups", toMap(aggregateOverMessages(eventsList)));
+        dict.put("groups", toMap(aggregateOverMessages(list)));
 
         return new VismoAggregationResult(dict);
     }

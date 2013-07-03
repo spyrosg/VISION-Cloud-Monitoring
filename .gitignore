@@ -7,3 +7,4 @@ target/
 git.properties
 
 .DS_Store
+/bin

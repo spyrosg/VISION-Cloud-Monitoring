@@ -156,10 +156,10 @@ public class AccountingRule extends AggregationRule {
      * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List, long, long)
      */
     @Override
-    protected MonitoringEvent aggregate(final List<MonitoringEvent> eventsList, final long tStart, final long tEnd) {
-        final HashMap<String, Object> dict = getAccountingEventObject(eventsList);
+    protected MonitoringEvent aggregate(final List<MonitoringEvent> list, final long tStart, final long tEnd) {
+        final HashMap<String, Object> dict = getAccountingEventObject(list);
 
-        addRequiredFields(dict, eventsList.get(0));
+        addRequiredFields(dict, list.get(0));
 
         final VismoAggregationResult res = new VismoAggregationResult(dict);
 
@@ -240,6 +240,8 @@ public class AccountingRule extends AggregationRule {
         final HashMap<String, Object> o = new HashMap<String, Object>();
         final long ts = e.timestamp();
         final double duration = MILLIS * (Double) e.get("transaction-duration");
+        final Boolean multiPart = (Boolean) e.get("multi");
+        final Boolean completed = (Boolean) e.get("completed");
 
         o.put("tStart", (long) (ts - duration));
         o.put("tEnd", ts);
@@ -256,6 +258,17 @@ public class AccountingRule extends AggregationRule {
         o.put("replicas", 1);
 
         o.put("size", e.get("content-size"));
+
+        if (e.get("metadata-size") != null)
+            o.put("mdSize", e.get("metadata-size"));
+
+        if (multiPart == null) {
+            o.put("multi", false);
+            o.put("completed", false);
+        } else {
+            o.put("multi", multiPart);
+            o.put("completed", completed != null ? completed : false);
+        }
 
         return o;
     }
