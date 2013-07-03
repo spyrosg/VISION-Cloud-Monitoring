@@ -156,10 +156,10 @@ public class AccountingRule extends AggregationRule {
      * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List, long, long)
      */
     @Override
-    protected MonitoringEvent aggregate(final List<MonitoringEvent> eventsList, final long tStart, final long tEnd) {
-        final HashMap<String, Object> dict = getAccountingEventObject(eventsList);
+    protected MonitoringEvent aggregate(final List<MonitoringEvent> list, final long tStart, final long tEnd) {
+        final HashMap<String, Object> dict = getAccountingEventObject(list);
 
-        addRequiredFields(dict, eventsList.get(0));
+        addRequiredFields(dict, list.get(0));
 
         final VismoAggregationResult res = new VismoAggregationResult(dict);
 

@@ -138,13 +138,13 @@ public class ClassPathRulesFactory extends AbstractRulesFactory {
     /**
      * Try to find the given class by name in the specified package.
      * 
-     * @param pkg
+     * @param pckg
      * @param className
      * @return the fully qualified java name the corresponds to the given <code>className</code>, <code>null</code> if there's no
      *         match.
      */
-    private String tryLoadFromPackage(final Package pkg, final String className) {
-        final String pkgName = pkg.getName().replace(".", "/");
+    private String tryLoadFromPackage(final Package pckg, final String className) {
+        final String pkgName = pckg.getName().replace(".", "/");
         final String classSuffix = className + ".class";
 
         log.trace("pkg-name: '{}', class-name: '{}'", pkgName, className);
@@ -153,7 +153,7 @@ public class ClassPathRulesFactory extends AbstractRulesFactory {
             if (res.contains(pkgName) && res.endsWith(classSuffix)) {
                 log.trace("resource matching class: {}", res);
 
-                final String fqcn = translateResourceToFQCN(pkg.getName(), res);
+                final String fqcn = translateResourceToFQCN(pckg.getName(), res);
 
                 log.trace("fully qualified name: {}", fqcn);
 

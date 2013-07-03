@@ -35,7 +35,7 @@ public class ClassPathRulesFactoryTest {
          * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
          */
         @Override
-        public void performWith(@SuppressWarnings("unused") final MonitoringEvent c) {
+        public void performWith(final MonitoringEvent c) {
             // NOP
         }
     }

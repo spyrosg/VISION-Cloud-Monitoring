@@ -46,7 +46,7 @@ public class WorkerNodeFactory extends AbstractVismoServiceFactory {
      * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#submitRules(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
      */
     @Override
-    protected void submitRules(@SuppressWarnings("unused") final VismoRulesEngine engine) {
+    protected void submitRules(final VismoRulesEngine engine) {
         // NOP
     }
 }

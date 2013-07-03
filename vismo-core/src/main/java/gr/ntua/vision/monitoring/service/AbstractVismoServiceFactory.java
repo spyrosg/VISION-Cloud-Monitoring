@@ -137,8 +137,7 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
      * @param service
      * @param info
      */
-    protected static void addDefaultServiceTasks(@SuppressWarnings("unused") final VMInfo info,
-            @SuppressWarnings("unused") final VismoService service) {
+    protected static void addDefaultServiceTasks(final VMInfo info, final VismoService service) {
         log.debug("adding default tasks");
     }
 

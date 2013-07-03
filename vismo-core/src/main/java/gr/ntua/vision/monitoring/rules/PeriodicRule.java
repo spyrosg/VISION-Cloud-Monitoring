@@ -98,7 +98,7 @@ public abstract class PeriodicRule extends TimerTask implements VismoRule {
     /**
      * This is called at the end of each period.
      * 
-     * @param eventsList
+     * @param list
      *            the list of monitoringEvents to aggregate over.
      * @param tStart
      *            the start of the aggregation period (actually the <em>collection</em> period).
@@ -106,7 +106,7 @@ public abstract class PeriodicRule extends TimerTask implements VismoRule {
      *            the end of the aggregation period.
      * @return the aggregation result, if any.
      */
-    protected abstract MonitoringEvent aggregate(final List<MonitoringEvent> eventsList, final long tStart, final long tEnd);
+    protected abstract MonitoringEvent aggregate(final List<MonitoringEvent> list, final long tStart, final long tEnd);
 
 
     /**

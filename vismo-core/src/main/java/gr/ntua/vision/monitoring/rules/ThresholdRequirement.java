@@ -36,9 +36,9 @@ public class ThresholdRequirement {
 
                 double max = arr[0];
 
-                for (int i = 0; i < arr.length; ++i)
-                    if (arr[i] > max)
-                        max = arr[i];
+                for (final double element : arr)
+                    if (element > max)
+                        max = element;
 
                 return max;
             }
@@ -54,9 +54,9 @@ public class ThresholdRequirement {
 
                 double min = arr[0];
 
-                for (int i = 0; i < arr.length; ++i)
-                    if (arr[i] < min)
-                        min = arr[i];
+                for (final double element : arr)
+                    if (element < min)
+                        min = element;
 
                 return min;
             }
@@ -67,8 +67,8 @@ public class ThresholdRequirement {
             public double perform(final double[] arr) {
                 double sum = 0;
 
-                for (int i = 0; i < arr.length; ++i)
-                    sum += arr[i];
+                for (final double element : arr)
+                    sum += element;
 
                 return sum;
             }
