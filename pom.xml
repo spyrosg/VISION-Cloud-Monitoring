@@ -23,6 +23,7 @@
     <module>vismo-web</module>
     <module>vismo-sockets</module>
     <module>vismo-perf</module>
+    <module>vismo-queues</module>
   </modules>
 
   <properties>

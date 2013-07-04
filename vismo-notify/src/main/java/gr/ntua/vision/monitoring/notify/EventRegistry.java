@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  * own thread, without blocking the rest of the application or other handlers. This also means that the event handlers will be
  * notified asynchronously to the main client program loop.
  */
-class EventRegistry {
+class EventRegistry implements Registry {
     /**
      * A custom log formatter. The format should match the following logback notation:
      * <code>%-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m\n%ex</code>.
@@ -121,14 +121,9 @@ class EventRegistry {
 
 
     /**
-     * Register the handler to receive events only of the given topic.
-     * 
-     * @param topic
-     *            the event topic.
-     * @param handler
-     *            the handler.
-     * @return the {@link EventHandlerTask} for the given handler.
+     * @see gr.ntua.vision.monitoring.notify.Registry#register(java.lang.String, gr.ntua.vision.monitoring.notify.EventHandler)
      */
+    @Override
     public EventHandlerTask register(final String topic, final EventHandler handler) {
         final Socket sock = socketFactory.newSubSocket(addr, topic);
         final EventHandlerTask task = new EventHandlerTask(new VismoEventFactory(), sock, handler);
@@ -140,12 +135,9 @@ class EventRegistry {
 
 
     /**
-     * Register the handler to receive events from all topics.
-     * 
-     * @param handler
-     *            the handler.
-     * @return the {@link EventHandlerTask} for the given handler.
+     * @see gr.ntua.vision.monitoring.notify.Registry#registerToAll(gr.ntua.vision.monitoring.notify.EventHandler)
      */
+    @Override
     public EventHandlerTask registerToAll(final EventHandler handler) {
         return register("", handler);
     }
