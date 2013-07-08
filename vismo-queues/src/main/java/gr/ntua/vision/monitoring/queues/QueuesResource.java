@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -65,10 +65,10 @@ public class QueuesResource {
     /**
      * @param queueName
      * @param topic
-     * @return
+     * @return the {@link Response} object.
      */
     @Path("{queue}/{topic}")
-    @POST
+    @PUT
     public Response registerQueue(@PathParam("queue") final String queueName, @PathParam("topic") final String topic) {
         try {
             final TopicedQueue q = registry.register(queueName, topic);

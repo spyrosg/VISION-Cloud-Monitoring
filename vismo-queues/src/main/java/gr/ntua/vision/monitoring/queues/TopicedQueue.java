@@ -1,13 +1,22 @@
 package gr.ntua.vision.monitoring.queues;
 
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
+
+
 /**
  *
  */
 public class TopicedQueue {
     /***/
-    public final String name;
+    public final String                                name;
     /***/
-    public final String topic;
+    public final String                                topic;
+    /***/
+    private final LinkedBlockingQueue<MonitoringEvent> queue;
 
 
     /**
@@ -19,6 +28,23 @@ public class TopicedQueue {
     public TopicedQueue(final String name, final String topic) {
         this.name = name;
         this.topic = topic;
+        this.queue = new LinkedBlockingQueue<MonitoringEvent>(100); // FIXME
+    }
+
+
+    /**
+     * Add another event in the queue. If there's no more room, first remove and discard the oldest inserted element.
+     * 
+     * @param e
+     *            the event.
+     * @see java.util.AbstractQueue#add(java.lang.Object)
+     */
+    public void add(final MonitoringEvent e) {
+        if (queue.offer(e))
+            return;
+
+        queue.remove();
+        queue.add(e);
     }
 
 
@@ -58,6 +84,20 @@ public class TopicedQueue {
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + ((topic == null) ? 0 : topic.hashCode());
         return result;
+    }
+
+
+    /**
+     * This is used to remove the available elements of the queue and pass them back to the caller.
+     * 
+     * @return a list of available elements in the queue.
+     */
+    public List<MonitoringEvent> removeEvents() {
+        final CopyOnWriteArrayList<MonitoringEvent> copy = new CopyOnWriteArrayList<MonitoringEvent>();
+
+        queue.drainTo(copy);
+
+        return copy;
     }
 
 

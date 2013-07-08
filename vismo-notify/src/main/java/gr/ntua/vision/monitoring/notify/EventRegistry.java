@@ -97,10 +97,11 @@ class EventRegistry implements Registry {
     }
 
 
+   
     /**
-     * This should be called out the end of the application. Stop receiving any events; halt any running event handlers; don't
-     * accept other registrations.
+     * @see gr.ntua.vision.monitoring.notify.Registry#halt()
      */
+    @Override
     public void halt() {
         log.config("halting " + tasks.size() + " tasks");
 

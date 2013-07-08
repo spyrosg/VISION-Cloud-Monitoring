@@ -24,4 +24,11 @@ public interface Registry {
      * @return the {@link EventHandlerTask} for the given handler.
      */
     EventHandlerTask register(String topic, EventHandler handler);
+
+
+    /**
+     * This should be called out the end of the application. Stop receiving any events; halt any running event handlers; don't
+     * accept other registrations.
+     */
+    void halt();
 }

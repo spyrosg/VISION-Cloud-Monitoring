@@ -33,6 +33,13 @@ public class QueuesResourceTest extends JerseyResourceTest {
 
         registry = new QueuesRegistry(new Registry() {
             @Override
+            public void halt() {
+                // TODO Auto-generated method stub
+
+            }
+
+
+            @Override
             public EventHandlerTask register(final String topic, final EventHandler handler) {
                 // TODO Auto-generated method stub
                 return null;
@@ -61,7 +68,7 @@ public class QueuesResourceTest extends JerseyResourceTest {
         @SuppressWarnings("unchecked")
         final List<String> topics = res.getEntity(List.class);
 
-        assertEquals(4, topics.size());
+        assertEquals(5, topics.size());
     }
 
 
@@ -69,7 +76,7 @@ public class QueuesResourceTest extends JerseyResourceTest {
      * @throws Exception
      */
     public void testShouldListUserQueues() throws Exception {
-        final ClientResponse res = resource().path("my-queue").path("reads").post(ClientResponse.class);
+        final ClientResponse res = createQueue("my-queue", "reads");
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
 
@@ -87,9 +94,20 @@ public class QueuesResourceTest extends JerseyResourceTest {
     /**
      * @throws Exception
      */
+    public void testShouldReceiveTopicedEvents() throws Exception {
+        final ClientResponse res = resource().get(ClientResponse.class);
+
+        // TODO
+
+    }
+
+
+    /**
+     * @throws Exception
+     */
     public void testShouldRejectInvalidTopicRequests() throws Exception {
         final String TOPIC = "my-topic";
-        final ClientResponse res = resource().path("my-queue").path(TOPIC).post(ClientResponse.class);
+        final ClientResponse res = createQueue("my-queue", TOPIC);
 
         assertEquals(ClientResponse.Status.BAD_REQUEST, res.getClientResponseStatus());
     }
@@ -101,5 +119,17 @@ public class QueuesResourceTest extends JerseyResourceTest {
     @Override
     protected WebResource resource() {
         return root().path("queues");
+    }
+
+
+    /**
+     * Create a queue.
+     * 
+     * @param topic
+     * @param queueName
+     * @return the client's response.
+     */
+    private ClientResponse createQueue(final String queueName, final String topic) {
+        return resource().path(queueName).path(topic).put(ClientResponse.class);
     }
 }
