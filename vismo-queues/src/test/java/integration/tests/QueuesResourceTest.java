@@ -1,8 +1,5 @@
 package integration.tests;
 
-import gr.ntua.vision.monitoring.notify.EventHandler;
-import gr.ntua.vision.monitoring.notify.EventHandlerTask;
-import gr.ntua.vision.monitoring.notify.Registry;
 import gr.ntua.vision.monitoring.queues.QueuesRegistry;
 import gr.ntua.vision.monitoring.queues.QueuesResource;
 import gr.ntua.vision.monitoring.queues.TopicedQueueBean;
@@ -11,6 +8,8 @@ import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
+
+import unit.tests.InMemoryEventRegistry;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -21,7 +20,9 @@ import com.sun.jersey.api.client.WebResource;
  */
 public class QueuesResourceTest extends JerseyResourceTest {
     /***/
-    private QueuesRegistry registry;
+    private InMemoryEventRegistry eventGenerator;
+    /***/
+    private QueuesRegistry        registry;
 
 
     /**
@@ -31,27 +32,8 @@ public class QueuesResourceTest extends JerseyResourceTest {
     public void setUp() throws Exception {
         super.setUp();
 
-        registry = new QueuesRegistry(new Registry() {
-            @Override
-            public void halt() {
-                // TODO Auto-generated method stub
-
-            }
-
-
-            @Override
-            public EventHandlerTask register(final String topic, final EventHandler handler) {
-                // TODO Auto-generated method stub
-                return null;
-            }
-
-
-            @Override
-            public EventHandlerTask registerToAll(final EventHandler handler) {
-                // TODO Auto-generated method stub
-                return null;
-            }
-        });
+        eventGenerator = new InMemoryEventRegistry();
+        registry = new QueuesRegistry(eventGenerator);
         configureServer(WebAppBuilder.buildFrom(new QueuesResource(registry)), "/*");
         startServer();
     }
@@ -95,10 +77,18 @@ public class QueuesResourceTest extends JerseyResourceTest {
      * @throws Exception
      */
     public void testShouldReceiveTopicedEvents() throws Exception {
-        final ClientResponse res = resource().get(ClientResponse.class);
+        final ClientResponse res = createQueue("my-queue", "reads");
 
-        // TODO
+        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+        eventGenerator.pushEvents(10);
 
+        final ClientResponse res1 = resource().path("my-queue").get(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.OK, res1.getClientResponseStatus());
+
+        final String s = res1.getEntity(String.class);
+
+        System.out.println(s);
     }
 
 

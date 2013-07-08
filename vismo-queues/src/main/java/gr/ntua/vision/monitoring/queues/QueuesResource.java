@@ -1,5 +1,7 @@
 package gr.ntua.vision.monitoring.queues;
 
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +18,7 @@ import javax.ws.rs.core.Response.Status;
 
 
 /**
- *
+ * TODO: make the interface CDMI compliant.
  */
 @Path("queues")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -59,6 +61,24 @@ public class QueuesResource {
             beans.add(TopicedQueue.toBean(q));
 
         return beans;
+    }
+
+
+    /**
+     * @param queueName
+     * @return
+     */
+    @Path("{queue}")
+    @GET
+    public Response readQueue(@PathParam("queue") final String queueName) {
+        try {
+            final List<MonitoringEvent> events = registry.getEvents(queueName);
+
+            // TODO: should return a json response.
+            return Response.ok(events.toString()).build();
+        } catch (final NoSuchQueueException e) {
+            return Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity(e.getMessage()).build();
+        }
     }
 
 

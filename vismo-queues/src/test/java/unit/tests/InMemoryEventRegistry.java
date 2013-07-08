@@ -36,7 +36,10 @@ public class InMemoryEventRegistry implements Registry {
 
 
     /**
+     * Generate some dummy monitoring events.
+     * 
      * @param noEvents
+     *            the number of events to generate.
      */
     public void pushEvents(final int noEvents) {
         for (final EventHandler handler : handlers)
@@ -44,7 +47,6 @@ public class InMemoryEventRegistry implements Registry {
                 handler.handle(new MonitoringEvent() {
                     @Override
                     public Object get(final String key) {
-                        // TODO Auto-generated method stub
                         return null;
                     }
 
@@ -63,7 +65,6 @@ public class InMemoryEventRegistry implements Registry {
 
                     @Override
                     public String serialize() {
-                        // TODO Auto-generated method stub
                         return null;
                     }
 
@@ -76,7 +77,6 @@ public class InMemoryEventRegistry implements Registry {
 
                     @Override
                     public String topic() {
-                        // TODO Auto-generated method stub
                         return null;
                     }
                 });
