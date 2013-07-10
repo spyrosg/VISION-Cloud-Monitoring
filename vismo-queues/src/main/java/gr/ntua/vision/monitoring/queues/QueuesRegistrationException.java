@@ -4,13 +4,13 @@ package gr.ntua.vision.monitoring.queues;
  *
  */
 @SuppressWarnings("serial")
-public class QueuesRegistrationError extends RuntimeException {
+public class QueuesRegistrationException extends RuntimeException {
     /**
      * Constructor.
      * 
      * @param message
      */
-    public QueuesRegistrationError(final String message) {
+    public QueuesRegistrationException(final String message) {
         super(message);
     }
 }

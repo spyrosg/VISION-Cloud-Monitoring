@@ -1,7 +1,5 @@
 package gr.ntua.vision.monitoring.queues;
 
-import gr.ntua.vision.monitoring.events.MonitoringEvent;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,17 +63,19 @@ public class QueuesResource {
 
 
     /**
+     * Get the list of available events in the queue.
+     * 
      * @param queueName
-     * @return
+     *            the name of the queue.
+     * @return the list of events as a json array.
      */
     @Path("{queue}")
     @GET
     public Response readQueue(@PathParam("queue") final String queueName) {
         try {
-            final List<MonitoringEvent> events = registry.getEvents(queueName);
+            final String entity = registry.eventsToJSONString(queueName);
 
-            // TODO: should return a json response.
-            return Response.ok(events.toString()).build();
+            return Response.ok(entity).build();
         } catch (final NoSuchQueueException e) {
             return Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity(e.getMessage()).build();
         }
@@ -94,7 +94,7 @@ public class QueuesResource {
             final TopicedQueue q = registry.register(queueName, topic);
 
             return Response.created(URI.create("/")).entity(TopicedQueue.toBean(q)).build();
-        } catch (final QueuesRegistrationError e) {
+        } catch (final QueuesRegistrationException e) {
             return Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity(e.getMessage()).build();
         }
     }

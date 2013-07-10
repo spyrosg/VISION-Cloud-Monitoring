@@ -15,9 +15,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class QueuesRegistry {
     /**
-     *
+     * The handler that passes events down to a queue.
      */
-    private static class FooHandler implements EventHandler {
+    private static class TopicQueueHandler implements EventHandler {
         /***/
         private final TopicedQueue q;
 
@@ -27,7 +27,7 @@ public class QueuesRegistry {
          * 
          * @param q
          */
-        public FooHandler(final TopicedQueue q) {
+        public TopicQueueHandler(final TopicedQueue q) {
             this.q = q;
         }
 
@@ -40,6 +40,7 @@ public class QueuesRegistry {
             q.add(e);
         }
     }
+
     /** the available topics. */
     private static final List<String> AVAILABLE_TOPICS = Arrays.asList("reads", "writes", "topics", "storlets", "*");
     /** the list of registered queues. */
@@ -56,6 +57,19 @@ public class QueuesRegistry {
     public QueuesRegistry(final Registry registry) {
         this.registry = registry;
         this.queuesList = new ArrayList<TopicedQueue>();
+    }
+
+
+    /**
+     * Return the JSON representation of the list. NOTE that this is a workaround, since the {@link MonitoringEvent}s have not a
+     * definite schema.
+     * 
+     * @param queueName
+     *            the name of queue to retrieve events from.
+     * @return the string json representation of events in the queues.
+     */
+    public String eventsToJSONString(final String queueName) {
+        return toJSONString(getEvents(queueName));
     }
 
 
@@ -110,18 +124,18 @@ public class QueuesRegistry {
      * @param topic
      *            the topic to subscribe to.
      * @return the queue object that will be receiving events for given topic.
-     * @throws QueuesRegistrationError
+     * @throws QueuesRegistrationException
      *             when the topic is not available or a queue with the same name already exists.
      */
-    public TopicedQueue register(final String queueName, final String topic) throws QueuesRegistrationError {
+    public TopicedQueue register(final String queueName, final String topic) throws QueuesRegistrationException {
         requireAvailabe(topic);
 
         final TopicedQueue q = new TopicedQueue(queueName, topic);
 
         if (queuesList.contains(q))
-            throw new QueuesRegistrationError("queue already exists: " + queueName);
+            throw new QueuesRegistrationException("queue already exists: " + queueName);
 
-        registry.register(topic, new FooHandler(q));
+        registry.register(topic, new TopicQueueHandler(q));
         queuesList.add(q);
 
         return q;
@@ -145,10 +159,35 @@ public class QueuesRegistry {
 
     /**
      * @param topic
-     * @throws QueuesRegistrationError
+     * @throws QueuesRegistrationException
      */
-    private static void requireAvailabe(final String topic) throws QueuesRegistrationError {
+    private static void requireAvailabe(final String topic) throws QueuesRegistrationException {
         if (!isAvailableTopic(topic))
-            throw new QueuesRegistrationError("topic not available or invalid: " + topic);
+            throw new QueuesRegistrationException("topic not available or invalid: " + topic);
+    }
+
+
+    /**
+     * Return the JSON representation of the list. NOTE that this is a workaround, since the {@link MonitoringEvent}s have
+     * 
+     * @param list
+     *            the list of events.
+     * @return a json array as well formated json a string.
+     */
+    private static String toJSONString(final List<MonitoringEvent> list) {
+        final StringBuilder buf = new StringBuilder();
+
+        buf.append("[");
+
+        for (int i = 0; i < list.size(); ++i) {
+            buf.append(list.get(i).serialize());
+
+            if (i < list.size() - 1)
+                buf.append(",");
+        }
+
+        buf.append("]");
+
+        return buf.toString();
     }
 }

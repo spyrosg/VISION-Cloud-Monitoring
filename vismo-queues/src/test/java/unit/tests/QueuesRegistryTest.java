@@ -39,7 +39,7 @@ public class QueuesRegistryTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        eventGenerator = new InMemoryEventRegistry();
+        eventGenerator = new InMemoryEventRegistry("foo");
         registry = new QueuesRegistry(eventGenerator);
     }
 

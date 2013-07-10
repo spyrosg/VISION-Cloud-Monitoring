@@ -8,6 +8,10 @@ import gr.ntua.vision.monitoring.notify.Registry;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.json.simple.JSONObject;
 
 
 /**
@@ -15,13 +19,18 @@ import java.util.ArrayList;
  */
 public class InMemoryEventRegistry implements Registry {
     /***/
+    final String                          topic;
+    /***/
     private final ArrayList<EventHandler> handlers;
 
 
     /**
      * Constructor.
+     * 
+     * @param topic
      */
-    public InMemoryEventRegistry() {
+    public InMemoryEventRegistry(final String topic) {
+        this.topic = topic;
         this.handlers = new ArrayList<EventHandler>(1);
     }
 
@@ -65,7 +74,13 @@ public class InMemoryEventRegistry implements Registry {
 
                     @Override
                     public String serialize() {
-                        return null;
+                        final Map<String, Object> dict = new HashMap<String, Object>();
+
+                        dict.put("timestamp", timestamp());
+                        dict.put("topic", topic());
+                        dict.put("originating-service", originatingService());
+
+                        return JSONObject.toJSONString(dict);
                     }
 
 
@@ -77,7 +92,7 @@ public class InMemoryEventRegistry implements Registry {
 
                     @Override
                     public String topic() {
-                        return null;
+                        return topic;
                     }
                 });
     }
@@ -87,7 +102,7 @@ public class InMemoryEventRegistry implements Registry {
      * @see gr.ntua.vision.monitoring.notify.Registry#register(java.lang.String, gr.ntua.vision.monitoring.notify.EventHandler)
      */
     @Override
-    public EventHandlerTask register(final String topic, final EventHandler handler) {
+    public EventHandlerTask register(final String topic1, final EventHandler handler) {
         handlers.add(handler);
         return null;
     }

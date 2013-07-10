@@ -20,6 +20,8 @@ import com.sun.jersey.api.client.WebResource;
  */
 public class QueuesResourceTest extends JerseyResourceTest {
     /***/
+    private static final String   MY_QUEUE = "my-queue";
+    /***/
     private InMemoryEventRegistry eventGenerator;
     /***/
     private QueuesRegistry        registry;
@@ -32,7 +34,7 @@ public class QueuesResourceTest extends JerseyResourceTest {
     public void setUp() throws Exception {
         super.setUp();
 
-        eventGenerator = new InMemoryEventRegistry();
+        eventGenerator = new InMemoryEventRegistry(MY_QUEUE);
         registry = new QueuesRegistry(eventGenerator);
         configureServer(WebAppBuilder.buildFrom(new QueuesResource(registry)), "/*");
         startServer();
@@ -58,7 +60,7 @@ public class QueuesResourceTest extends JerseyResourceTest {
      * @throws Exception
      */
     public void testShouldListUserQueues() throws Exception {
-        final ClientResponse res = createQueue("my-queue", "reads");
+        final ClientResponse res = createQueue(MY_QUEUE, "reads");
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
 
@@ -77,12 +79,12 @@ public class QueuesResourceTest extends JerseyResourceTest {
      * @throws Exception
      */
     public void testShouldReceiveTopicedEvents() throws Exception {
-        final ClientResponse res = createQueue("my-queue", "reads");
+        final ClientResponse res = createQueue(MY_QUEUE, "reads");
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
         eventGenerator.pushEvents(10);
 
-        final ClientResponse res1 = resource().path("my-queue").get(ClientResponse.class);
+        final ClientResponse res1 = resource().path(MY_QUEUE).get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK, res1.getClientResponseStatus());
 
@@ -97,7 +99,7 @@ public class QueuesResourceTest extends JerseyResourceTest {
      */
     public void testShouldRejectInvalidTopicRequests() throws Exception {
         final String TOPIC = "my-topic";
-        final ClientResponse res = createQueue("my-queue", TOPIC);
+        final ClientResponse res = createQueue(MY_QUEUE, TOPIC);
 
         assertEquals(ClientResponse.Status.BAD_REQUEST, res.getClientResponseStatus());
     }
