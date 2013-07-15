@@ -9,33 +9,16 @@ import java.util.UUID;
  *
  */
 public class TopicedQueueBean {
-
-    /*
-     * 
-     * "objectType" : "application/cdmi-queue",
-      "objectID" : "00007E7F00104BE66AB53A9572F9F51E",
-
-    "objectName" : "MyQueue",
-    "parentURI " : "/MyContainer/",
-     "parentID" : "0000706D0010B84FAD185C425D8B537E",
-    "domainURI" : "/cdmi_domains/MyDomain/",
-    "capabilitiesURI" : "/cdmi_capabilities/queue/",
-    "completionStatus" : "Complete",
-    "metadata" : {
-    },
-    "queueValues" : ""
-    */
-
     /***/
     private static final String              CAPABILITIES_URI     = "/cdmi_capabilities/queue/";
     /***/
     private static final String              COMPLETE_STATUS      = "Complete";
     /***/
-    private static final String              DEFAULT_DOMAIN       = "/cdmi_domains/";
-    /***/
     private static final Map<String, Object> DEFAULT_METADATA     = Collections.emptyMap();
     /***/
     private static final String              DEFAULT_QUEUE_VALUES = "";
+    /***/
+    private static final String              DOMAIN_PREFIX        = "/cdmi_domains/";
     /***/
     private static final String              OBJECT_TYPE          = CDMIQueueMediaTypes.APPLICATION_CDMI_QUEUE;
     /***/
@@ -43,27 +26,27 @@ public class TopicedQueueBean {
     /***/
     private static final String              PARENT_ROOT_ID       = UUID.randomUUID().toString();
 
-    /***/
+    /** mandatory. */
     private String                           capabilitiesURI;
-    /***/
+    /** mandatory. */
     private String                           completionStatus;
-    /***/
+    /** mandatory. */
     private String                           domainURI;
-    /***/
+    /** mandatory. */
     private Map<String, Object>              metadata;
-    /***/
+    /** mandatory. */
     private String                           objectID;
-    /***/
+    /** mandatory. */
     private String                           objectName;
-    /***/
+    /** mandatory. */
     private String                           objectType;
-    /***/
+    /** mandatory. */
     private String                           parentID;
-    /***/
+    /** mandatory. */
     private String                           parentURI;
-    /***/
+    /** mandatory. */
     private String                           queueValues;
-    /***/
+    /** extension. */
     private String                           topic;
 
 
@@ -75,11 +58,21 @@ public class TopicedQueueBean {
         this.objectID = UUID.randomUUID().toString();
         this.parentID = PARENT_ROOT_ID;
         this.parentURI = PARENT_ROOT;
-        this.domainURI = DEFAULT_DOMAIN;
         this.capabilitiesURI = CAPABILITIES_URI;
         this.completionStatus = COMPLETE_STATUS;
         this.metadata = DEFAULT_METADATA;
         this.queueValues = DEFAULT_QUEUE_VALUES;
+    }
+
+
+    /**
+     * Constructor.
+     * 
+     * @param objectName
+     */
+    public TopicedQueueBean(final String objectName) {
+        this();
+        this.objectName = objectName;
     }
 
 
@@ -103,7 +96,7 @@ public class TopicedQueueBean {
      * @return the domainURI
      */
     public String getDomainURI() {
-        return domainURI;
+        return domainURI != null ? domainURI : DOMAIN_PREFIX + this.objectName + "/";
     }
 
 

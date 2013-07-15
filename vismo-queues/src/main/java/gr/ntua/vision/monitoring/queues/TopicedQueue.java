@@ -106,9 +106,8 @@ public class TopicedQueue {
      * @return the corresponding {@link TopicedQueueBean}.
      */
     public static TopicedQueueBean toBean(final TopicedQueue q) {
-        final TopicedQueueBean bean = new TopicedQueueBean();
+        final TopicedQueueBean bean = new TopicedQueueBean(q.name);
 
-        bean.setObjectName(q.name);
         bean.setTopic(q.topic);
 
         return bean;

@@ -5,6 +5,7 @@ import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.APPLICATION_C
 //import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.X_CDMI_VERSION;
 import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.X_CDMI;
 import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.X_CDMI_VERSION;
+import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class QueuesResource {
         try {
             final TopicedQueue q = registry.register(queueName, topic);
 
-            return cdmiResponse(TopicedQueue.toBean(q));
+            return cdmiCreateQueueResponse(TopicedQueue.toBean(q));
         } catch (final QueuesRegistrationException e) {
             return Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity(e.getMessage()).build();
         }
@@ -98,9 +99,7 @@ public class QueuesResource {
     @GET
     public Response readQueue(@PathParam("queue") final String queueName) {
         try {
-            final String entity = registry.eventsToJSONString(queueName);
-
-            return Response.ok(entity).build();
+            return cdmiReadQueueResponse(queueName, registry.getEvents(queueName));
         } catch (final NoSuchQueueException e) {
             return Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity(e.getMessage()).build();
         }
@@ -111,7 +110,19 @@ public class QueuesResource {
      * @param bean
      * @return the cdmi successfully created queue response.
      */
-    private static Response cdmiResponse(final TopicedQueueBean bean) {
+    private static Response cdmiCreateQueueResponse(final TopicedQueueBean bean) {
         return Response.created(URI.create("/")).header(X_CDMI, X_CDMI_VERSION).entity(bean).build();
+    }
+
+
+    /**
+     * @param queueName
+     * @param list
+     * @return the cdmi successfully created queue response.
+     */
+    private static Response cdmiReadQueueResponse(final String queueName, final List<MonitoringEvent> list) {
+        final TopicedQueueListBean bean = new TopicedQueueListBean(queueName);
+
+        return Response.ok(bean).header(X_CDMI, X_CDMI_VERSION).build();
     }
 }
