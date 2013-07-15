@@ -108,7 +108,7 @@ public class QueuesResource {
 
 
     /**
-     * @param o
+     * @param bean 
      * @return
      */
     private static Response cdmiResponse(final TopicedQueueBean bean) {

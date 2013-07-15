@@ -1,5 +1,7 @@
 package gr.ntua.vision.monitoring.queues;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -25,44 +27,44 @@ public class TopicedQueueBean {
     */
 
     /***/
-    private static final String CAPABILITIES_URI     = "/cdmi_capabilities/queue/";
+    private static final String              CAPABILITIES_URI     = "/cdmi_capabilities/queue/";
     /***/
-    private static final String COMPLETE_STATUS      = "Complete";
+    private static final String              COMPLETE_STATUS      = "Complete";
     /***/
-    private static final String DEFAULT_DOMAIN       = "/cdmi_domains/";
+    private static final String              DEFAULT_DOMAIN       = "/cdmi_domains/";
     /***/
-    private static final Object DEFAULT_METADATA     = "{}";
+    private static final Map<String, Object> DEFAULT_METADATA     = Collections.emptyMap();
     /***/
-    private static final String DEFAULT_QUEUE_VALUES = "";
+    private static final String              DEFAULT_QUEUE_VALUES = "";
     /***/
-    private static final String OBJECT_TYPE          = CDMIQueueMediaTypes.APPLICATION_CDMI_QUEUE;
+    private static final String              OBJECT_TYPE          = CDMIQueueMediaTypes.APPLICATION_CDMI_QUEUE;
     /***/
-    private static final String PARENT_ROOT          = "/";
+    private static final String              PARENT_ROOT          = "/";
     /***/
-    private static final String PARENT_ROOT_ID       = UUID.randomUUID().toString();
+    private static final String              PARENT_ROOT_ID       = UUID.randomUUID().toString();
 
     /***/
-    private String              capabilitiesURI;
+    private String                           capabilitiesURI;
     /***/
-    private String              completionStatus;
+    private String                           completionStatus;
     /***/
-    private String              domainURI;
+    private String                           domainURI;
     /***/
-    private Object              metadata;
+    private Map<String, Object>              metadata;
     /***/
-    private String              objectID;
+    private String                           objectID;
     /***/
-    private String              objectName;
+    private String                           objectName;
     /***/
-    private String              objectType;
+    private String                           objectType;
     /***/
-    private String              parentID;
+    private String                           parentID;
     /***/
-    private String              parentURI;
+    private String                           parentURI;
     /***/
-    private String              queueValues;
+    private String                           queueValues;
     /***/
-    private String              topic;
+    private String                           topic;
 
 
     /**
@@ -108,7 +110,7 @@ public class TopicedQueueBean {
     /**
      * @return the metadata
      */
-    public Object getMetadata() {
+    public Map<String, Object> getMetadata() {
         return metadata;
     }
 
@@ -200,7 +202,7 @@ public class TopicedQueueBean {
      * @param metadata
      *            the metadata to set
      */
-    public void setMetadata(final Object metadata) {
+    public void setMetadata(final Map<String, Object> metadata) {
         this.metadata = metadata;
     }
 

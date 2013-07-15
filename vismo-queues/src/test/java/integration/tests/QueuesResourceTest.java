@@ -69,19 +69,7 @@ public class QueuesResourceTest extends JerseyResourceTest {
 
         assertEquals(APPLICATION_CDMI_QUEUE, headers.getFirst(HttpHeaders.CONTENT_TYPE));
         assertEquals(X_CDMI_VERSION, headers.getFirst(X_CDMI));
-
-        final TopicedQueueBean bean = res.getEntity(TopicedQueueBean.class);
-
-        assertEquals(APPLICATION_CDMI_QUEUE, bean.getObjectType());
-        assertNotNull(bean.getObjectID());
-        assertEquals(QUEUE_NAME, bean.getObjectName());
-        assertEquals("/", bean.getParentURI());
-        assertNotNull(bean.getParentID());
-        assertEquals("/cdmi_domains/", bean.getDomainURI());
-        assertEquals("/cdmi_capabilities/queue/", bean.getCapabilitiesURI());
-        assertEquals("Complete", bean.getCompletionStatus());
-        assertEquals("{}", bean.getMetadata());
-        assertEquals("", bean.getQueueValues());
+        assertResponseIsCDMICompliant(QUEUE_NAME, res.getEntity(TopicedQueueBean.class));
     }
 
 
@@ -177,5 +165,23 @@ public class QueuesResourceTest extends JerseyResourceTest {
      */
     private ClientResponse createQueue(final String queueName, final String topic) {
         return resource().path(queueName).path(topic).put(ClientResponse.class);
+    }
+
+
+    /**
+     * @param queueName
+     * @param bean
+     */
+    private static void assertResponseIsCDMICompliant(final String queueName, final TopicedQueueBean bean) {
+        assertEquals(APPLICATION_CDMI_QUEUE, bean.getObjectType());
+        assertNotNull(bean.getObjectID());
+        assertEquals(queueName, bean.getObjectName());
+        assertEquals("/", bean.getParentURI());
+        assertNotNull(bean.getParentID());
+        assertEquals("/cdmi_domains/", bean.getDomainURI());
+        assertEquals("/cdmi_capabilities/queue/", bean.getCapabilitiesURI());
+        assertEquals("Complete", bean.getCompletionStatus());
+        assertEquals(0, bean.getMetadata().size());
+        assertEquals("", bean.getQueueValues());
     }
 }
