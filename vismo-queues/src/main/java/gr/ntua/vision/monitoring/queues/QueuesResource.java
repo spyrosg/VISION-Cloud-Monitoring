@@ -43,6 +43,24 @@ public class QueuesResource {
 
 
     /**
+     * @param queueName
+     * @param topic
+     * @return the {@link Response} object.
+     */
+    @Path("{queue}/{topic}")
+    @PUT
+    public Response createQueue(@PathParam("queue") final String queueName, @PathParam("topic") final String topic) {
+        try {
+            final TopicedQueue q = registry.register(queueName, topic);
+
+            return cdmiResponse(TopicedQueue.toBean(q));
+        } catch (final QueuesRegistrationException e) {
+            return Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity(e.getMessage()).build();
+        }
+    }
+
+
+    /**
      * @return the list of available topics.
      * @see gr.ntua.vision.monitoring.queues.QueuesRegistry#listAvailableTopics()
      */
@@ -84,24 +102,6 @@ public class QueuesResource {
 
             return Response.ok(entity).build();
         } catch (final NoSuchQueueException e) {
-            return Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity(e.getMessage()).build();
-        }
-    }
-
-
-    /**
-     * @param queueName
-     * @param topic
-     * @return the {@link Response} object.
-     */
-    @Path("{queue}/{topic}")
-    @PUT
-    public Response registerQueue(@PathParam("queue") final String queueName, @PathParam("topic") final String topic) {
-        try {
-            final TopicedQueue q = registry.register(queueName, topic);
-
-            return cdmiResponse(TopicedQueue.toBean(q));
-        } catch (final QueuesRegistrationException e) {
             return Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity(e.getMessage()).build();
         }
     }
