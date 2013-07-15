@@ -108,7 +108,7 @@ public class TopicedQueue {
     public static TopicedQueueBean toBean(final TopicedQueue q) {
         final TopicedQueueBean bean = new TopicedQueueBean();
 
-        bean.setName(q.name);
+        bean.setObjectName(q.name);
         bean.setTopic(q.topic);
 
         return bean;

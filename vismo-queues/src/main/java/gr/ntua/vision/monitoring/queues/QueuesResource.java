@@ -1,5 +1,11 @@
 package gr.ntua.vision.monitoring.queues;
 
+import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.APPLICATION_CDMI_QUEUE;
+// import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.X_CDMI;
+//import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.X_CDMI_VERSION;
+import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.X_CDMI;
+import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.X_CDMI_VERSION;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,13 +22,13 @@ import javax.ws.rs.core.Response.Status;
 
 
 /**
- * TODO: make the interface CDMI compliant.
+ * CDMI Notification Queues interface.
  */
 @Path("queues")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
+@Consumes(APPLICATION_CDMI_QUEUE)
+@Produces(APPLICATION_CDMI_QUEUE)
 public class QueuesResource {
-    /***/
+    /** the event registry. */
     private final QueuesRegistry registry;
 
 
@@ -42,6 +48,7 @@ public class QueuesResource {
      */
     @GET
     @Path("topics")
+    @Produces(MediaType.APPLICATION_JSON)
     public List<String> getAvailableTopics() {
         return registry.listAvailableTopics();
     }
@@ -93,9 +100,18 @@ public class QueuesResource {
         try {
             final TopicedQueue q = registry.register(queueName, topic);
 
-            return Response.created(URI.create("/")).entity(TopicedQueue.toBean(q)).build();
+            return cdmiResponse(TopicedQueue.toBean(q));
         } catch (final QueuesRegistrationException e) {
             return Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity(e.getMessage()).build();
         }
+    }
+
+
+    /**
+     * @param o
+     * @return
+     */
+    private static Response cdmiResponse(final TopicedQueueBean bean) {
+        return Response.created(URI.create("/")).header(X_CDMI, X_CDMI_VERSION).entity(bean).build();
     }
 }

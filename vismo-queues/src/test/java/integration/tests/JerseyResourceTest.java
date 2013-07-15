@@ -22,16 +22,9 @@ public abstract class JerseyResourceTest extends TestCase {
     /***/
     private static final String ROOT_URL = "http://localhost:" + PORT;
     /***/
-    private final Client        client;
+    private Client              client;
     /***/
     private WebServer           server;
-
-    {
-        final ClientConfig cc = new DefaultClientConfig();
-
-        cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
-        client = Client.create(cc);
-    }
 
 
     /**
@@ -40,6 +33,12 @@ public abstract class JerseyResourceTest extends TestCase {
     @Override
     public void setUp() throws Exception {
         server = new WebServer(PORT);
+
+        final ClientConfig cc = new DefaultClientConfig();
+
+        configureClient(cc);
+
+        client = Client.create(cc);
     }
 
 
@@ -50,6 +49,15 @@ public abstract class JerseyResourceTest extends TestCase {
     public void tearDown() throws Exception {
         if (server != null)
             server.stop();
+    }
+
+
+    /**
+     * @param cc
+     */
+    @SuppressWarnings("static-method")
+    protected void configureClient(final ClientConfig cc) {
+        cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
     }
 
 
