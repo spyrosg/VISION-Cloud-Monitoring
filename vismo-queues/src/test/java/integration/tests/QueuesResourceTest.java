@@ -60,8 +60,7 @@ public class QueuesResourceTest extends JerseyResourceTest {
      */
     public void testShouldCreateCDMIQueue() throws Exception {
         final String QUEUE_NAME = "q1";
-        final ClientResponse res = resource().path(QUEUE_NAME).path("*").accept(APPLICATION_CDMI_QUEUE_TYPE)
-                .type(APPLICATION_CDMI_QUEUE_TYPE).header(X_CDMI, X_CDMI_VERSION).put(ClientResponse.class);
+        final ClientResponse res = createQueue(QUEUE_NAME, "*");
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
 
@@ -157,14 +156,15 @@ public class QueuesResourceTest extends JerseyResourceTest {
 
 
     /**
-     * Create a queue.
+     * Create a queue, with a CDMI compliant call.
      * 
-     * @param topic
      * @param queueName
+     * @param topic
      * @return the client's response.
      */
     private ClientResponse createQueue(final String queueName, final String topic) {
-        return resource().path(queueName).path(topic).put(ClientResponse.class);
+        return resource().path(queueName).path(topic).accept(APPLICATION_CDMI_QUEUE_TYPE).type(APPLICATION_CDMI_QUEUE_TYPE)
+                .header(X_CDMI, X_CDMI_VERSION).put(ClientResponse.class);
     }
 
 

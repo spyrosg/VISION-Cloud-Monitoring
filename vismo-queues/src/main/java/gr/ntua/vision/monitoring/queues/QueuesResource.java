@@ -108,8 +108,8 @@ public class QueuesResource {
 
 
     /**
-     * @param bean 
-     * @return
+     * @param bean
+     * @return the cdmi successfully created queue response.
      */
     private static Response cdmiResponse(final TopicedQueueBean bean) {
         return Response.created(URI.create("/")).header(X_CDMI, X_CDMI_VERSION).entity(bean).build();
