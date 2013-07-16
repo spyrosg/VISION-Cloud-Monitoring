@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  *
  */
-public class TopicedQueueListBean extends TopicedQueueBean {
+public class CDMIQueueListBean extends CDMIQueueBean {
     /***/
     private List<Map<String, Object>> value;
 
@@ -16,7 +16,7 @@ public class TopicedQueueListBean extends TopicedQueueBean {
     /**
      * Constructor.
      */
-    public TopicedQueueListBean() {
+    public CDMIQueueListBean() {
         super();
         this.value = Collections.emptyList();
     }
@@ -27,7 +27,7 @@ public class TopicedQueueListBean extends TopicedQueueBean {
      * 
      * @param objectName
      */
-    public TopicedQueueListBean(final String objectName) {
+    public CDMIQueueListBean(final String objectName) {
         super(objectName);
         this.value = Collections.emptyList();
     }

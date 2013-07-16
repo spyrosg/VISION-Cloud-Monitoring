@@ -31,7 +31,7 @@ import unit.tests.InMemoryEventRegistry.MyEvent;
 @Path("queues")
 @Consumes(APPLICATION_CDMI_QUEUE)
 @Produces(APPLICATION_CDMI_QUEUE)
-public class QueuesResource {
+public class CDMIQueuesResource {
     /** the event registry. */
     private final QueuesRegistry registry;
 
@@ -41,7 +41,7 @@ public class QueuesResource {
      * 
      * @param registry
      */
-    public QueuesResource(final QueuesRegistry registry) {
+    public CDMIQueuesResource(final QueuesRegistry registry) {
         this.registry = registry;
     }
 
@@ -55,9 +55,9 @@ public class QueuesResource {
     @PUT
     public Response createQueue(@PathParam("queue") final String queueName, @PathParam("topic") final String topic) {
         try {
-            final TopicedQueue q = registry.register(queueName, topic);
+            final CDMINotificationQueue q = registry.register(queueName, topic);
 
-            return cdmiCreateQueueResponse(TopicedQueue.toBean(q));
+            return cdmiCreateQueueResponse(CDMINotificationQueue.toBean(q));
         } catch (final QueuesRegistrationException e) {
             return Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity(e.getMessage()).build();
         }
@@ -81,11 +81,11 @@ public class QueuesResource {
      * @see gr.ntua.vision.monitoring.queues.QueuesRegistry#list()
      */
     @GET
-    public List<TopicedQueueBean> listQueues() {
-        final ArrayList<TopicedQueueBean> beans = new ArrayList<TopicedQueueBean>();
+    public List<CDMIQueueBean> listQueues() {
+        final ArrayList<CDMIQueueBean> beans = new ArrayList<CDMIQueueBean>();
 
-        for (final TopicedQueue q : registry.list())
-            beans.add(TopicedQueue.toBean(q));
+        for (final CDMINotificationQueue q : registry.list())
+            beans.add(CDMINotificationQueue.toBean(q));
 
         return beans;
     }
@@ -113,7 +113,7 @@ public class QueuesResource {
      * @param bean
      * @return the cdmi successfully created queue response.
      */
-    private static Response cdmiCreateQueueResponse(final TopicedQueueBean bean) {
+    private static Response cdmiCreateQueueResponse(final CDMIQueueBean bean) {
         return Response.created(URI.create("/")).header(X_CDMI, X_CDMI_VERSION).entity(bean).build();
     }
 
@@ -124,7 +124,7 @@ public class QueuesResource {
      * @return the cdmi successfully created queue response.
      */
     private static Response cdmiReadQueueResponse(final String queueName, final List<MonitoringEvent> list) {
-        final TopicedQueueListBean bean = new TopicedQueueListBean(queueName);
+        final CDMIQueueListBean bean = new CDMIQueueListBean(queueName);
         final ArrayList<Map<String, Object>> values = new ArrayList<Map<String, Object>>(list.size());
 
         for (final MonitoringEvent e : list)

@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  *
  */
-public class TopicedQueueBean {
+public class CDMIQueueBean {
     /***/
     private static final String              CAPABILITIES_URI     = "/cdmi_capabilities/queue/";
     /***/
@@ -53,7 +53,7 @@ public class TopicedQueueBean {
     /**
      * Constructor.
      */
-    public TopicedQueueBean() {
+    public CDMIQueueBean() {
         this.objectType = OBJECT_TYPE;
         this.objectID = UUID.randomUUID().toString();
         this.parentID = PARENT_ROOT_ID;
@@ -70,7 +70,7 @@ public class TopicedQueueBean {
      * 
      * @param objectName
      */
-    public TopicedQueueBean(final String objectName) {
+    public CDMIQueueBean(final String objectName) {
         this();
         this.objectName = objectName;
     }

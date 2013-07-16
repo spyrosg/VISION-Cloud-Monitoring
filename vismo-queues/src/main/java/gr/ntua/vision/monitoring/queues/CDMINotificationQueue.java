@@ -10,7 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  *
  */
-public class TopicedQueue {
+public class CDMINotificationQueue {
     /***/
     public final String                                name;
     /***/
@@ -25,7 +25,7 @@ public class TopicedQueue {
      * @param name
      * @param topic
      */
-    public TopicedQueue(final String name, final String topic) {
+    public CDMINotificationQueue(final String name, final String topic) {
         this.name = name;
         this.topic = topic;
         this.queue = new LinkedBlockingQueue<MonitoringEvent>(100); // FIXME
@@ -59,7 +59,7 @@ public class TopicedQueue {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final TopicedQueue other = (TopicedQueue) obj;
+        final CDMINotificationQueue other = (CDMINotificationQueue) obj;
         if (name == null) {
             if (other.name != null)
                 return false;
@@ -103,10 +103,10 @@ public class TopicedQueue {
 
     /**
      * @param q
-     * @return the corresponding {@link TopicedQueueBean}.
+     * @return the corresponding {@link CDMIQueueBean}.
      */
-    public static TopicedQueueBean toBean(final TopicedQueue q) {
-        final TopicedQueueBean bean = new TopicedQueueBean(q.name);
+    public static CDMIQueueBean toBean(final CDMINotificationQueue q) {
+        final CDMIQueueBean bean = new CDMIQueueBean(q.name);
 
         bean.setTopic(q.topic);
 

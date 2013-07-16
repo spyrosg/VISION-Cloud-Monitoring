@@ -12,7 +12,7 @@ import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 
 
 /**
- * This is used to provide serialization/deserialization for the CDMI Queue Object media type.
+ * This is used to provide serialization/deserialization for the CDMI Queue media type.
  */
 @Provider
 @Consumes(CDMIQueueMediaTypes.APPLICATION_CDMI_QUEUE)

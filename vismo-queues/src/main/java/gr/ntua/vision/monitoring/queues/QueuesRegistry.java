@@ -19,7 +19,7 @@ public class QueuesRegistry {
      */
     private static class TopicQueueHandler implements EventHandler {
         /***/
-        private final TopicedQueue q;
+        private final CDMINotificationQueue q;
 
 
         /**
@@ -27,7 +27,7 @@ public class QueuesRegistry {
          * 
          * @param q
          */
-        public TopicQueueHandler(final TopicedQueue q) {
+        public TopicQueueHandler(final CDMINotificationQueue q) {
             this.q = q;
         }
 
@@ -42,11 +42,11 @@ public class QueuesRegistry {
     }
 
     /** the available topics. */
-    private static final List<String> AVAILABLE_TOPICS = Arrays.asList("reads", "writes", "topics", "storlets", "*");
+    private static final List<String>         AVAILABLE_TOPICS = Arrays.asList("reads", "writes", "topics", "storlets", "*");
     /** the list of registered queues. */
-    private final List<TopicedQueue>  queuesList;
+    private final List<CDMINotificationQueue> queuesList;
     /** the actual registry. */
-    private final Registry            registry;
+    private final Registry                    registry;
 
 
     /**
@@ -56,7 +56,7 @@ public class QueuesRegistry {
      */
     public QueuesRegistry(final Registry registry) {
         this.registry = registry;
-        this.queuesList = new ArrayList<TopicedQueue>();
+        this.queuesList = new ArrayList<CDMINotificationQueue>();
     }
 
 
@@ -83,7 +83,7 @@ public class QueuesRegistry {
      *             when no queue with specified name exists
      */
     public List<MonitoringEvent> getEvents(final String queueName) throws NoSuchQueueException {
-        for (final TopicedQueue q : queuesList)
+        for (final CDMINotificationQueue q : queuesList)
             if (q.name.equals(queueName))
                 return q.removeEvents();
 
@@ -102,8 +102,8 @@ public class QueuesRegistry {
     /**
      * @return the list of queues.
      */
-    public List<TopicedQueue> list() {
-        return new CopyOnWriteArrayList<TopicedQueue>(queuesList);
+    public List<CDMINotificationQueue> list() {
+        return new CopyOnWriteArrayList<CDMINotificationQueue>(queuesList);
     }
 
 
@@ -127,10 +127,10 @@ public class QueuesRegistry {
      * @throws QueuesRegistrationException
      *             when the topic is not available or a queue with the same name already exists.
      */
-    public TopicedQueue register(final String queueName, final String topic) throws QueuesRegistrationException {
+    public CDMINotificationQueue register(final String queueName, final String topic) throws QueuesRegistrationException {
         requireAvailabe(topic);
 
-        final TopicedQueue q = new TopicedQueue(queueName, topic);
+        final CDMINotificationQueue q = new CDMINotificationQueue(queueName, topic);
 
         if (queuesList.contains(q))
             throw new QueuesRegistrationException("queue already exists: " + queueName);
