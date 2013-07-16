@@ -79,6 +79,22 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
     /**
      * @throws Exception
      */
+    public void testShouldDeleteCDMIQueue() throws Exception {
+        final String QUEUE_NAME = "q1";
+
+        assertEquals(ClientResponse.Status.CREATED, createCDMIQueue(QUEUE_NAME, "*").getClientResponseStatus());
+
+        final ClientResponse res = deleteCDMIQueue(QUEUE_NAME);
+        final MultivaluedMap<String, String> headers = res.getHeaders();
+
+        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
+        assertEquals(X_CDMI_VERSION, headers.getFirst(X_CDMI));
+    }
+
+
+    /**
+     * @throws Exception
+     */
     public void testShouldListAvailableTopics() throws Exception {
         final ClientResponse res = resource().path("topics").accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
 
@@ -95,18 +111,14 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
      * @throws Exception
      */
     public void testShouldListUserQueues() throws Exception {
-        final ClientResponse res = createCDMIQueue(MY_QUEUE, "writes");
+        assertEquals(ClientResponse.Status.CREATED, createCDMIQueue(MY_QUEUE, "writes").getClientResponseStatus());
 
-        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
-
-        final ClientResponse res1 = resource().accept(APPLICATION_CDMI_QUEUE_TYPE).type(APPLICATION_CDMI_QUEUE_TYPE)
+        final ClientResponse res = resource().accept(APPLICATION_CDMI_QUEUE_TYPE).type(APPLICATION_CDMI_QUEUE_TYPE)
                 .header(X_CDMI, X_CDMI_VERSION).get(ClientResponse.class);
-
-        assertEquals(ClientResponse.Status.OK, res1.getClientResponseStatus());
-
         @SuppressWarnings("unchecked")
-        final List<CDMIQueueBean> queues = res1.getEntity(List.class);
+        final List<CDMIQueueBean> queues = res.getEntity(List.class);
 
+        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
         assertEquals(1, queues.size());
     }
 
@@ -116,19 +128,17 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
      */
     public void testShouldReadCDMINotificationsOffTheQueue() throws Exception {
         final int NO_EVENTS = 10;
-        final ClientResponse res = createCDMIQueue(MY_QUEUE, MY_TOPIC);
 
-        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+        assertEquals(ClientResponse.Status.CREATED, createCDMIQueue(MY_QUEUE, MY_TOPIC).getClientResponseStatus());
         eventGenerator.pushEvents(NO_EVENTS);
 
-        final ClientResponse res1 = readCDMIQueue(MY_QUEUE);
+        final ClientResponse res = readCDMIQueue(MY_QUEUE);
+        final MultivaluedMap<String, String> headers = res.getHeaders();
 
-        assertEquals(ClientResponse.Status.OK, res1.getClientResponseStatus());
-        final MultivaluedMap<String, String> headers = res1.getHeaders();
-
+        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
         assertEquals(APPLICATION_CDMI_QUEUE, headers.getFirst(HttpHeaders.CONTENT_TYPE));
         assertEquals(X_CDMI_VERSION, headers.getFirst(X_CDMI));
-        assertIsCDMICompliantResponse(MY_QUEUE, MY_TOPIC, res1.getEntity(CDMIQueueListBean.class), NO_EVENTS);
+        assertIsCDMICompliantResponse(MY_QUEUE, MY_TOPIC, res.getEntity(CDMIQueueListBean.class), NO_EVENTS);
     }
 
 
@@ -172,6 +182,17 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
     private ClientResponse createCDMIQueue(final String queueName, final String topic) {
         return resource().path(queueName).path(topic).accept(APPLICATION_CDMI_QUEUE_TYPE).type(APPLICATION_CDMI_QUEUE_TYPE)
                 .header(X_CDMI, X_CDMI_VERSION).put(ClientResponse.class);
+    }
+
+
+    /**
+     * Delete a queue, with a CDMI compliant call.
+     * 
+     * @param queueName
+     * @return the {@link ClientResponse} object.
+     */
+    private ClientResponse deleteCDMIQueue(final String queueName) {
+        return resource().path(queueName).header(X_CDMI, X_CDMI_VERSION).delete(ClientResponse.class);
     }
 
 

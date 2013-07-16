@@ -158,4 +158,13 @@ public class InMemoryEventRegistry implements Registry {
     public EventHandlerTask registerToAll(final EventHandler handler) {
         throw new UnsupportedOperationException();
     }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.notify.Registry#unregister(gr.ntua.vision.monitoring.notify.EventHandler)
+     */
+    @Override
+    public void unregister(final EventHandler handler) {
+        // NOP
+    }
 }

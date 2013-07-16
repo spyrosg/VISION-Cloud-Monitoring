@@ -8,7 +8,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 
 /**
- * This is used to handle the registration/read/deregistration of a CDMI notification queue.
+ * This is used to collect all events for a specified topic. The queue can set a cap on the number of notifications to hold.
  */
 public class CDMINotificationQueue {
     /** the name of the queue. */
@@ -37,16 +37,16 @@ public class CDMINotificationQueue {
     /**
      * Add another event in the queue. If there's no more room, first remove and discard the oldest inserted element.
      * 
-     * @param e
+     * @param notification
      *            the event.
      * @see java.util.AbstractQueue#add(java.lang.Object)
      */
-    public void add(final MonitoringEvent e) {
-        if (queue.offer(e))
+    public void add(final MonitoringEvent notification) {
+        if (queue.offer(notification))
             return;
 
         queue.remove();
-        queue.add(e);
+        queue.add(notification);
     }
 
 
@@ -94,7 +94,7 @@ public class CDMINotificationQueue {
      * 
      * @return a list of available elements in the queue.
      */
-    public List<MonitoringEvent> removeEvents() {
+    public List<MonitoringEvent> removeNotifications() {
         final CopyOnWriteArrayList<MonitoringEvent> copy = new CopyOnWriteArrayList<MonitoringEvent>();
 
         queue.drainTo(copy);

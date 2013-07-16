@@ -97,7 +97,6 @@ class EventRegistry implements Registry {
     }
 
 
-   
     /**
      * @see gr.ntua.vision.monitoring.notify.Registry#halt()
      */
@@ -141,6 +140,19 @@ class EventRegistry implements Registry {
     @Override
     public EventHandlerTask registerToAll(final EventHandler handler) {
         return register("", handler);
+    }
+
+
+    /**
+     * @see gr.ntua.vision.monitoring.notify.Registry#unregister(gr.ntua.vision.monitoring.notify.EventHandler)
+     */
+    @Override
+    public void unregister(final EventHandler handler) {
+        for (int i = 0; i < tasks.size(); ++i)
+            if (tasks.get(i).handler == handler) {
+                tasks.get(i).halt();
+                break;
+            }
     }
 
 

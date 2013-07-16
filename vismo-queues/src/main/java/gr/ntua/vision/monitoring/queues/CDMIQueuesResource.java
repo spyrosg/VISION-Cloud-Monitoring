@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -66,6 +67,24 @@ public class CDMIQueuesResource {
 
 
     /**
+     * @param queueName
+     * @return the {@link Response} object.
+     */
+    @Path("{queue}")
+    @DELETE
+    public Response deleteQueue(@PathParam("queue") final String queueName) {
+        try {
+            registry.unregister(queueName);
+
+            return Response.noContent().header(X_CDMI, X_CDMI_VERSION).build();
+        } catch (final NoSuchQueueException e) {
+            return Response.status(Status.BAD_REQUEST).header(X_CDMI, X_CDMI_VERSION).type(MediaType.TEXT_PLAIN_TYPE)
+                    .entity(e.getMessage()).build();
+        }
+    }
+
+
+    /**
      * @return the list of available topics.
      * @see gr.ntua.vision.monitoring.queues.QueuesRegistry#listAvailableTopics()
      */
@@ -78,6 +97,8 @@ public class CDMIQueuesResource {
 
 
     /**
+     * Node: this is an extension to CDMI.
+     * 
      * @return the list of queues.
      * @see gr.ntua.vision.monitoring.queues.QueuesRegistry#list()
      */

@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring.queues;
 
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
+import gr.ntua.vision.monitoring.notify.EventHandlerTask;
 import gr.ntua.vision.monitoring.notify.Registry;
 
 import java.util.ArrayList;
@@ -15,6 +16,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * {@link Registry}.
  */
 public class QueuesRegistry {
+    // TODO: add corresponding handlers for each topic.
+    // TODO: handle more than one queue for the same topic.
+
     /**
      * The handler that passes events down to a queue.
      */
@@ -43,11 +47,13 @@ public class QueuesRegistry {
     }
 
     /** the available topics. */
-    private static final List<String>         AVAILABLE_TOPICS = Arrays.asList("reads", "writes", "topics", "storlets", "*");
+    private static final List<String>              AVAILABLE_TOPICS = Arrays.asList("reads", "writes", "topics", "storlets", "*");
+    /***/
+    private final ArrayList<TopicQueueHandler>     handlers;
     /** the list of registered queues. */
-    private final List<CDMINotificationQueue> queuesList;
+    private final ArrayList<CDMINotificationQueue> queuesList;
     /** the actual registry. */
-    private final Registry                    registry;
+    private final Registry                         registry;
 
 
     /**
@@ -58,6 +64,7 @@ public class QueuesRegistry {
     public QueuesRegistry(final Registry registry) {
         this.registry = registry;
         this.queuesList = new ArrayList<CDMINotificationQueue>();
+        this.handlers = new ArrayList<QueuesRegistry.TopicQueueHandler>();
     }
 
 
@@ -86,7 +93,7 @@ public class QueuesRegistry {
     public List<MonitoringEvent> getEvents(final String queueName) throws NoSuchQueueException {
         for (final CDMINotificationQueue q : queuesList)
             if (q.name.equals(queueName))
-                return q.removeEvents();
+                return q.removeNotifications();
 
         throw new NoSuchQueueException("no such queue available: " + queueName);
     }
@@ -136,10 +143,28 @@ public class QueuesRegistry {
         if (queuesList.contains(q))
             throw new QueuesRegistrationException("queue already exists: " + queueName);
 
-        registry.register(topic, new TopicQueueHandler(q));
+        final TopicQueueHandler handler = new TopicQueueHandler(q);
+        final EventHandlerTask task = registry.register(topic, handler);
+
         queuesList.add(q);
+        handlers.add(handler);
 
         return q;
+    }
+
+
+    /**
+     * @param queueName
+     */
+    public void unregister(final String queueName) {
+        final CDMINotificationQueue q = new CDMINotificationQueue(queueName, "*");
+        final int idx = queuesList.indexOf(q);
+
+        if (idx == -1)
+            throw new NoSuchQueueException("no such queue available: " + queueName);
+
+        queuesList.remove(idx);
+        registry.unregister(handlers.remove(idx));
     }
 
 
