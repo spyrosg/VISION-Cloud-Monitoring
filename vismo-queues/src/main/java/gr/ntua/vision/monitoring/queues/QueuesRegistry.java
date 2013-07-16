@@ -11,7 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
- *
+ * This is wrapper over a {@link Registry}.
  */
 public class QueuesRegistry {
     /**
@@ -100,7 +100,7 @@ public class QueuesRegistry {
 
 
     /**
-     * @return the list of queues.
+     * @return a list of queues.
      */
     public List<CDMINotificationQueue> list() {
         return new CopyOnWriteArrayList<CDMINotificationQueue>(queuesList);

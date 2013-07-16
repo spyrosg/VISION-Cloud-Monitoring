@@ -6,10 +6,12 @@ import java.util.Map;
 
 
 /**
- *
+ * A bean which is delivered to the user by jersey when reading a CDMI queue.
+ * 
+ * @see CDMIQueueListBean
  */
 public class CDMIQueueListBean extends CDMIQueueBean {
-    /***/
+    /** mandatory. */
     private List<Map<String, Object>> value;
 
 

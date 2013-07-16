@@ -4,7 +4,7 @@ import javax.ws.rs.core.MediaType;
 
 
 /**
- * CDMI Queue Object Resource media types.
+ * CDMI Queue media types.
  */
 public class CDMIQueueMediaTypes extends MediaType {
     /***/

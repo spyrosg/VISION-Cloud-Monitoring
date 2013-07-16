@@ -8,14 +8,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 
 /**
- *
+ * This is used to handle the registration/read/deregistration of a CDMI notification queue.
  */
 public class CDMINotificationQueue {
-    /***/
+    /** the name of the queue. */
     public final String                                name;
-    /***/
+    /** the topic of the queue. */
     public final String                                topic;
-    /***/
+    /** the list of available events. */
     private final LinkedBlockingQueue<MonitoringEvent> queue;
 
 
@@ -23,7 +23,9 @@ public class CDMINotificationQueue {
      * Constructor.
      * 
      * @param name
+     *            the name of the queue.
      * @param topic
+     *            the topic of the queue.
      */
     public CDMINotificationQueue(final String name, final String topic) {
         this.name = name;

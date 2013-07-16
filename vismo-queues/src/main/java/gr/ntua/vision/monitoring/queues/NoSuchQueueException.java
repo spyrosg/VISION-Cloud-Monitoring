@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.queues;
 
 /**
- *
+ * Exception thrown when a user asks for a non existent queue.
  */
 @SuppressWarnings("serial")
 public class NoSuchQueueException extends RuntimeException {

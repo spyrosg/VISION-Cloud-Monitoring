@@ -26,7 +26,7 @@ import unit.tests.InMemoryEventRegistry.MyEvent;
 
 
 /**
- * CDMI Notification Queues interface.
+ * The CDMI Queue interface. This is the controller that stands between the client and the event registry.
  */
 @Path("queues")
 @Consumes(APPLICATION_CDMI_QUEUE)
@@ -59,7 +59,8 @@ public class CDMIQueuesResource {
 
             return cdmiCreateQueueResponse(CDMINotificationQueue.toBean(q));
         } catch (final QueuesRegistrationException e) {
-            return Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity(e.getMessage()).build();
+            return Response.status(Status.BAD_REQUEST).header(X_CDMI, X_CDMI_VERSION).type(MediaType.TEXT_PLAIN_TYPE)
+                    .entity(e.getMessage()).build();
         }
     }
 
@@ -104,7 +105,8 @@ public class CDMIQueuesResource {
         try {
             return cdmiReadQueueResponse(queueName, registry.getEvents(queueName));
         } catch (final NoSuchQueueException e) {
-            return Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity(e.getMessage()).build();
+            return Response.status(Status.BAD_REQUEST).header(X_CDMI, X_CDMI_VERSION).type(MediaType.TEXT_PLAIN_TYPE)
+                    .entity(e.getMessage()).build();
         }
     }
 

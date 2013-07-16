@@ -6,7 +6,7 @@ import java.util.UUID;
 
 
 /**
- *
+ * A bean which is delivered to the user by jersey when creating a CDMI queue.
  */
 public class CDMIQueueBean {
     /***/
