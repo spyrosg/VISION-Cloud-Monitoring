@@ -11,7 +11,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
- * This is wrapper over a {@link Registry}.
+ * This is used to handle the registration/read/deregistration of a CDMI notification queue. This is wrapper over a
+ * {@link Registry}.
  */
 public class QueuesRegistry {
     /**

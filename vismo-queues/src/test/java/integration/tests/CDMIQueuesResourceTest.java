@@ -28,7 +28,7 @@ import com.sun.jersey.api.client.config.ClientConfig;
 /**
  * 
  */
-public class QueuesResourceTest extends JerseyResourceTest {
+public class CDMIQueuesResourceTest extends JerseyResourceTest {
     /***/
     private static final String   MY_QUEUE = "my-queue";
     /***/
