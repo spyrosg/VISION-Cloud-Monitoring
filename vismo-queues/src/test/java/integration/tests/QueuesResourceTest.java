@@ -12,6 +12,7 @@ import gr.ntua.vision.monitoring.queues.TopicedQueueListBean;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -31,6 +32,8 @@ public class QueuesResourceTest extends JerseyResourceTest {
     /***/
     private static final String   MY_QUEUE = "my-queue";
     /***/
+    private static final String   MY_TOPIC = "reads";
+    /***/
     private InMemoryEventRegistry eventGenerator;
     /***/
     private QueuesRegistry        registry;
@@ -43,7 +46,7 @@ public class QueuesResourceTest extends JerseyResourceTest {
     public void setUp() throws Exception {
         super.setUp();
 
-        eventGenerator = new InMemoryEventRegistry(MY_QUEUE);
+        eventGenerator = new InMemoryEventRegistry(MY_TOPIC);
         registry = new QueuesRegistry(eventGenerator);
 
         final WebAppBuilder builder = new WebAppBuilder();
@@ -69,7 +72,7 @@ public class QueuesResourceTest extends JerseyResourceTest {
 
         assertEquals(APPLICATION_CDMI_QUEUE, headers.getFirst(HttpHeaders.CONTENT_TYPE));
         assertEquals(X_CDMI_VERSION, headers.getFirst(X_CDMI));
-        assertResponseIsCDMICompliant(QUEUE_NAME, res.getEntity(TopicedQueueBean.class));
+        assertIsCDMICompliantResponse(QUEUE_NAME, res.getEntity(TopicedQueueBean.class), 0);
     }
 
 
@@ -92,7 +95,7 @@ public class QueuesResourceTest extends JerseyResourceTest {
      * @throws Exception
      */
     public void testShouldListUserQueues() throws Exception {
-        final ClientResponse res = createCDMIQueue(MY_QUEUE, "reads");
+        final ClientResponse res = createCDMIQueue(MY_QUEUE, "writes");
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
 
@@ -111,11 +114,12 @@ public class QueuesResourceTest extends JerseyResourceTest {
     /**
      * @throws Exception
      */
-    public void testShouldReadEventsOffTheQueue() throws Exception {
-        final ClientResponse res = createCDMIQueue(MY_QUEUE, "reads");
+    public void testShouldReadCDMINotificationsOffTheQueue() throws Exception {
+        final int NO_EVENTS = 10;
+        final ClientResponse res = createCDMIQueue(MY_QUEUE, MY_TOPIC);
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
-        eventGenerator.pushEvents(10);
+        eventGenerator.pushEvents(NO_EVENTS);
 
         final ClientResponse res1 = readCDMIQueue(MY_QUEUE);
 
@@ -124,8 +128,7 @@ public class QueuesResourceTest extends JerseyResourceTest {
 
         assertEquals(APPLICATION_CDMI_QUEUE, headers.getFirst(HttpHeaders.CONTENT_TYPE));
         assertEquals(X_CDMI_VERSION, headers.getFirst(X_CDMI));
-
-        assertResponseIsCDMICompliant(MY_QUEUE, res1.getEntity(TopicedQueueListBean.class));
+        assertIsCDMICompliantResponse(MY_QUEUE, MY_TOPIC, res1.getEntity(TopicedQueueListBean.class), NO_EVENTS);
     }
 
 
@@ -186,9 +189,29 @@ public class QueuesResourceTest extends JerseyResourceTest {
 
     /**
      * @param queueName
+     * @param topic
      * @param bean
+     * @param noExpectedEvents
      */
-    private static void assertResponseIsCDMICompliant(final String queueName, final TopicedQueueBean bean) {
+    private static void assertIsCDMICompliantResponse(final String queueName, final String topic,
+            final TopicedQueueListBean bean, final int noExpectedEvents) {
+        assertIsCDMICompliantResponse(queueName, bean, noExpectedEvents);
+        assertEquals(noExpectedEvents, bean.getValue().size());
+
+        for (final Map<String, Object> event : bean.getValue()) {
+            assertEquals(topic, event.get("topic"));
+            assertNotNull(event.get("originating-service"));
+        }
+    }
+
+
+    /**
+     * @param queueName
+     * @param bean
+     * @param noExpectedEvents
+     */
+    private static void assertIsCDMICompliantResponse(final String queueName, final TopicedQueueBean bean,
+            final int noExpectedEvents) {
         assertEquals(APPLICATION_CDMI_QUEUE, bean.getObjectType());
         assertNotNull(bean.getObjectID());
         assertEquals(queueName, bean.getObjectName());
@@ -198,16 +221,10 @@ public class QueuesResourceTest extends JerseyResourceTest {
         assertEquals("/cdmi_capabilities/queue/", bean.getCapabilitiesURI());
         assertEquals("Complete", bean.getCompletionStatus());
         assertEquals(0, bean.getMetadata().size());
-        assertEquals("", bean.getQueueValues());
-    }
 
-
-    /**
-     * @param queueName
-     * @param bean
-     */
-    private static void assertResponseIsCDMICompliant(final String queueName, final TopicedQueueListBean bean) {
-        assertResponseIsCDMICompliant(queueName, (TopicedQueueBean) bean);
-        assertEquals(0, bean.getValue().size());
+        if (noExpectedEvents > 0)
+            assertEquals("1-" + noExpectedEvents, bean.getQueueValues());
+        else
+            assertEquals("", bean.getQueueValues());
     }
 }

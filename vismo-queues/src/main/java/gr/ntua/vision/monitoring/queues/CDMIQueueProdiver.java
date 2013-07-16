@@ -57,5 +57,4 @@ public class CDMIQueueProdiver extends JacksonJsonProvider {
     private static boolean isCDMIQueueType(final MediaType mediaType) {
         return CDMIQueueMediaTypes.APPLICATION_CDMI_QUEUE_TYPE.equals(mediaType);
     }
-
 }

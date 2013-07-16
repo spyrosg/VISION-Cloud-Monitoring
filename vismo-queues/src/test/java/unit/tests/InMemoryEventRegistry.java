@@ -11,13 +11,90 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.simple.JSONObject;
-
 
 /**
  *
  */
 public class InMemoryEventRegistry implements Registry {
+    /***/
+    public static class MyEvent implements MonitoringEvent {
+        /***/
+        public final Map<String, Object> dict;
+
+
+        /**
+         * Constructor.
+         * 
+         * @param dict
+         */
+        public MyEvent(final Map<String, Object> dict) {
+            this.dict = dict;
+        }
+
+
+        /**
+         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#get(java.lang.String)
+         */
+        @Override
+        public Object get(final String key) {
+            return dict.get(key);
+        }
+
+
+        /**
+         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#originatingIP()
+         */
+        @Override
+        public InetAddress originatingIP() throws UnknownHostException {
+            return InetAddress.getByName((String) dict.get("originating-machine"));
+        }
+
+
+        /**
+         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#originatingService()
+         */
+        @Override
+        public String originatingService() {
+            return (String) dict.get("originating-service");
+        }
+
+
+        /**
+         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#serialize()
+         */
+        @Override
+        public String serialize() {
+            return toString();
+        }
+
+
+        /**
+         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#timestamp()
+         */
+        @Override
+        public long timestamp() {
+            return (Long) dict.get("timestamp");
+        }
+
+
+        /**
+         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#topic()
+         */
+        @Override
+        public String topic() {
+            return null;
+        }
+
+
+        /**
+         * @see java.lang.Object#toString()
+         */
+        @Override
+        public String toString() {
+            return "#<MyEvent: " + dict + ">";
+        }
+    }
+
     /***/
     final String                          topic;
     /***/
@@ -52,49 +129,15 @@ public class InMemoryEventRegistry implements Registry {
      */
     public void pushEvents(final int noEvents) {
         for (final EventHandler handler : handlers)
-            for (int i = 0; i < noEvents; ++i)
-                handler.handle(new MonitoringEvent() {
-                    @Override
-                    public Object get(final String key) {
-                        return null;
-                    }
+            for (int i = 0; i < noEvents; ++i) {
+                final HashMap<String, Object> m = new HashMap<String, Object>();
 
+                m.put("timestamp", System.currentTimeMillis());
+                m.put("topic", topic);
+                m.put("originating-service", "localhost");
 
-                    @Override
-                    public InetAddress originatingIP() throws UnknownHostException {
-                        return InetAddress.getLocalHost();
-                    }
-
-
-                    @Override
-                    public String originatingService() {
-                        return "in-memory-event-registry";
-                    }
-
-
-                    @Override
-                    public String serialize() {
-                        final Map<String, Object> dict = new HashMap<String, Object>();
-
-                        dict.put("timestamp", timestamp());
-                        dict.put("topic", topic());
-                        dict.put("originating-service", originatingService());
-
-                        return JSONObject.toJSONString(dict);
-                    }
-
-
-                    @Override
-                    public long timestamp() {
-                        return System.currentTimeMillis();
-                    }
-
-
-                    @Override
-                    public String topic() {
-                        return topic;
-                    }
-                });
+                handler.handle(new MyEvent(m));
+            }
     }
 
 

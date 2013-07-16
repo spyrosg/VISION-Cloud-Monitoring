@@ -1,9 +1,8 @@
 package gr.ntua.vision.monitoring.queues;
 
-import gr.ntua.vision.monitoring.events.MonitoringEvent;
-
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -11,7 +10,7 @@ import java.util.List;
  */
 public class TopicedQueueListBean extends TopicedQueueBean {
     /***/
-    private List<MonitoringEvent> value;
+    private List<Map<String, Object>> value;
 
 
     /**
@@ -37,7 +36,7 @@ public class TopicedQueueListBean extends TopicedQueueBean {
     /**
      * @return the value
      */
-    public List<MonitoringEvent> getValue() {
+    public List<Map<String, Object>> getValue() {
         return value;
     }
 
@@ -46,7 +45,7 @@ public class TopicedQueueListBean extends TopicedQueueBean {
      * @param value
      *            the value to set
      */
-    public void setValue(final List<MonitoringEvent> value) {
+    public void setValue(final List<Map<String, Object>> value) {
         this.value = value;
     }
 }

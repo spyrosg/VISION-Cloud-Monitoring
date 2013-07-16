@@ -10,6 +10,7 @@ import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -20,6 +21,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
+import unit.tests.InMemoryEventRegistry.MyEvent;
 
 
 /**
@@ -122,6 +125,13 @@ public class QueuesResource {
      */
     private static Response cdmiReadQueueResponse(final String queueName, final List<MonitoringEvent> list) {
         final TopicedQueueListBean bean = new TopicedQueueListBean(queueName);
+        final ArrayList<Map<String, Object>> values = new ArrayList<Map<String, Object>>(list.size());
+
+        for (final MonitoringEvent e : list)
+            values.add(((MyEvent) e).dict);
+
+        bean.setQueueValues("1-" + list.size());
+        bean.setValue(values);
 
         return Response.ok(bean).header(X_CDMI, X_CDMI_VERSION).build();
     }
