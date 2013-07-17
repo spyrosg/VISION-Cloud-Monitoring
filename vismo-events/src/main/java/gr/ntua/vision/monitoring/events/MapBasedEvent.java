@@ -2,33 +2,31 @@ package gr.ntua.vision.monitoring.events;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
 
 
 /**
- * An implementation of vismo events based on {@link Map}s.
+ * The default implementation of {@link MonitoringEvent}'s, based on {@link Map}s.
  */
 class MapBasedEvent implements MonitoringEvent {
     /***/
-    private static final List<String> REQUIRED_FIELDS = Arrays.asList("timestamp", "originating-service", "originating-machine");
-    /** the dictionary of key/values. */
-    private final Map<String, Object> dict;
+    private static String[]           REQUIRED_FIELDS = { "timestamp", "originating-service", "originating-machine" };
+    /** the map. */
+    private final Map<String, Object> map;
 
 
     /**
      * Constructor.
      * 
-     * @param dict
-     *            a dictionary of key/values.
+     * @param map
+     *            a map of key/values.
      */
-    MapBasedEvent(final Map<String, Object> dict) {
-        assertHaveFields(dict, REQUIRED_FIELDS);
-        this.dict = new HashMap<String, Object>(dict);
+    MapBasedEvent(final Map<String, Object> map) {
+        assertHaveFields(map, REQUIRED_FIELDS);
+        this.map = new HashMap<String, Object>(map);
     }
 
 
@@ -37,7 +35,7 @@ class MapBasedEvent implements MonitoringEvent {
      */
     @Override
     public Object get(final String key) {
-        return dict.get(key);
+        return map.get(key);
     }
 
 
@@ -47,7 +45,7 @@ class MapBasedEvent implements MonitoringEvent {
      */
     @Override
     public InetAddress originatingIP() throws UnknownHostException {
-        return InetAddress.getByName((String) dict.get("originating-machine"));
+        return InetAddress.getByName((String) map.get("originating-machine"));
     }
 
 
@@ -56,7 +54,7 @@ class MapBasedEvent implements MonitoringEvent {
      */
     @Override
     public String originatingService() {
-        return (String) dict.get("originating-service");
+        return (String) map.get("originating-service");
     }
 
 
@@ -65,7 +63,7 @@ class MapBasedEvent implements MonitoringEvent {
      */
     @Override
     public String serialize() {
-        return JSONObject.toJSONString(dict);
+        return JSONObject.toJSONString(map);
     }
 
 
@@ -74,7 +72,7 @@ class MapBasedEvent implements MonitoringEvent {
      */
     @Override
     public long timestamp() {
-        return (Long) dict.get("timestamp");
+        return (Long) map.get("timestamp");
     }
 
 
@@ -83,7 +81,7 @@ class MapBasedEvent implements MonitoringEvent {
      */
     @Override
     public String topic() {
-        return (String) dict.get("topic");
+        return (String) map.get("topic");
     }
 
 
@@ -103,7 +101,7 @@ class MapBasedEvent implements MonitoringEvent {
      *            the map to check.
      * @param requiredFields
      */
-    protected static void assertHaveFields(final Map<String, Object> map, final List<String> requiredFields) {
+    protected static void assertHaveFields(final Map<String, Object> map, final String[] requiredFields) {
         for (final String field : requiredFields)
             requireField(map, field);
     }
