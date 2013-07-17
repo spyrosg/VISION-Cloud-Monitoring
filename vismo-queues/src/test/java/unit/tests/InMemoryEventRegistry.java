@@ -18,7 +18,6 @@ public class InMemoryEventRegistry implements Registry {
     final String                          topic;
     /***/
     private final VismoEventFactory       factory = new VismoEventFactory();
-
     /***/
     private final ArrayList<EventHandler> handlers;
 
@@ -52,7 +51,7 @@ public class InMemoryEventRegistry implements Registry {
     public void pushEvents(final int noEvents) {
         for (final EventHandler handler : handlers)
             for (int i = 0; i < noEvents; ++i)
-                handler.handle(newEvent());
+                handler.handle(newObsGETEvent());
     }
 
 
@@ -71,7 +70,8 @@ public class InMemoryEventRegistry implements Registry {
      */
     @Override
     public EventHandlerTask registerToAll(final EventHandler handler) {
-        throw new UnsupportedOperationException();
+        handlers.add(handler);
+        return null;
     }
 
 
@@ -87,13 +87,14 @@ public class InMemoryEventRegistry implements Registry {
     /**
      * @return a {@link MonitoringEvent}.
      */
-    private MonitoringEvent newEvent() {
+    private MonitoringEvent newObsGETEvent() {
         final HashMap<String, Object> m = new HashMap<String, Object>();
 
         m.put("timestamp", System.currentTimeMillis());
         m.put("topic", topic);
         m.put("originating-machine", "localhost");
-        m.put("originating-service", getClass().getSimpleName());
+        m.put("originating-service", "object_service");
+        m.put("operation", "GET");
 
         return factory.createEvent(m);
     }

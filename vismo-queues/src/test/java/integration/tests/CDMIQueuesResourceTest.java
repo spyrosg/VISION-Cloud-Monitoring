@@ -103,7 +103,7 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
         @SuppressWarnings("unchecked")
         final List<String> topics = res.getEntity(List.class);
 
-        assertEquals(5, topics.size());
+        assertEquals(4, topics.size());
     }
 
 

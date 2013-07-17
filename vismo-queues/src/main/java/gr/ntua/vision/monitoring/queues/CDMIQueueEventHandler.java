@@ -3,10 +3,11 @@ package gr.ntua.vision.monitoring.queues;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
 
+
 /**
  * The handler that passes events down to a queue.
  */
-class TopicQueueHandler implements EventHandler {
+abstract class CDMIQueueEventHandler implements EventHandler {
     /***/
     private final CDMINotificationQueue q;
 
@@ -16,16 +17,17 @@ class TopicQueueHandler implements EventHandler {
      * 
      * @param q
      */
-    public TopicQueueHandler(final CDMINotificationQueue q) {
+    public CDMIQueueEventHandler(final CDMINotificationQueue q) {
         this.q = q;
     }
 
 
     /**
-     * @see gr.ntua.vision.monitoring.notify.EventHandler#handle(gr.ntua.vision.monitoring.events.MonitoringEvent)
+     * Collect a notification.
+     * 
+     * @param notification
      */
-    @Override
-    public void handle(final MonitoringEvent e) {
-        q.add(e);
+    protected void collect(final MonitoringEvent notification) {
+        q.add(notification);
     }
 }

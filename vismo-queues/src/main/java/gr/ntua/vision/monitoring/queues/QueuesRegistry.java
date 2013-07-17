@@ -4,7 +4,6 @@ import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.Registry;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -18,13 +17,12 @@ import org.json.simple.parser.ParseException;
  * {@link Registry}.
  */
 public class QueuesRegistry {
-    // TODO: add corresponding handlers for each topic.
     // TODO: handle more than one queue for the same topic.
 
     /** the available topics. */
-    private static final List<String>              AVAILABLE_TOPICS = Arrays.asList("reads", "writes", "topics", "storlets", "*");
+    private static final String[]                  AVAILABLE_TOPICS = { "reads", "writes", "storlets", "*" };
     /** reference to the event handlers. */
-    private final ArrayList<TopicQueueHandler>     handlers;
+    private final ArrayList<CDMIQueueEventHandler> handlers;
     /***/
     private final JSONParser                       parser           = new JSONParser();
     /** the list of registered queues. */
@@ -41,7 +39,7 @@ public class QueuesRegistry {
     public QueuesRegistry(final Registry registry) {
         this.registry = registry;
         this.queuesList = new ArrayList<CDMINotificationQueue>();
-        this.handlers = new ArrayList<TopicQueueHandler>();
+        this.handlers = new ArrayList<CDMIQueueEventHandler>();
     }
 
 
@@ -113,7 +111,7 @@ public class QueuesRegistry {
      * @return the list of available topics.
      */
     @SuppressWarnings("static-method")
-    public List<String> listAvailableTopics() {
+    public String[] listAvailableTopics() {
         return AVAILABLE_TOPICS;
     }
 
@@ -137,9 +135,22 @@ public class QueuesRegistry {
         if (queuesList.contains(q))
             throw new QueuesRegistrationException("queue already exists: " + queueName);
 
-        final TopicQueueHandler handler = new TopicQueueHandler(q);
+        final CDMIQueueEventHandler handler;
 
-        registry.register(topic, handler);
+        if (topic.equals("reads")) {
+            handler = new ObsGETEventHandler(q);
+            registry.register(topic, handler);
+        } else if (topic.equals("writes")) {
+            handler = new ObsPUTEventHandler(q);
+            registry.register(topic, handler);
+        } else if (topic.equals("stortles")) {
+            handler = new StortletsEventHandler(q);
+            registry.register(topic, handler);
+        } else {
+            handler = new MatchAllEventHandler(q);
+            registry.registerToAll(handler);
+        }
+
         queuesList.add(q);
         handlers.add(handler);
 

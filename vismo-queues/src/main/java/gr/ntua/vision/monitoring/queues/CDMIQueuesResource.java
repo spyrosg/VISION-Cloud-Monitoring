@@ -86,7 +86,7 @@ public class CDMIQueuesResource {
     @GET
     @Path("topics")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<String> getAvailableTopics() {
+    public String[] getAvailableTopics() {
         return registry.listAvailableTopics();
     }
 
