@@ -1,7 +1,6 @@
 package gr.ntua.vision.monitoring.queues;
 
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
-import gr.ntua.vision.monitoring.notify.EventHandler;
 import gr.ntua.vision.monitoring.notify.Registry;
 
 import java.util.ArrayList;
@@ -21,33 +20,6 @@ import org.json.simple.parser.ParseException;
 public class QueuesRegistry {
     // TODO: add corresponding handlers for each topic.
     // TODO: handle more than one queue for the same topic.
-
-    /**
-     * The handler that passes events down to a queue.
-     */
-    private static class TopicQueueHandler implements EventHandler {
-        /***/
-        private final CDMINotificationQueue q;
-
-
-        /**
-         * Constructor.
-         * 
-         * @param q
-         */
-        public TopicQueueHandler(final CDMINotificationQueue q) {
-            this.q = q;
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.notify.EventHandler#handle(gr.ntua.vision.monitoring.events.MonitoringEvent)
-         */
-        @Override
-        public void handle(final MonitoringEvent e) {
-            q.add(e);
-        }
-    }
 
     /** the available topics. */
     private static final List<String>              AVAILABLE_TOPICS = Arrays.asList("reads", "writes", "topics", "storlets", "*");
@@ -69,7 +41,7 @@ public class QueuesRegistry {
     public QueuesRegistry(final Registry registry) {
         this.registry = registry;
         this.queuesList = new ArrayList<CDMINotificationQueue>();
-        this.handlers = new ArrayList<QueuesRegistry.TopicQueueHandler>();
+        this.handlers = new ArrayList<TopicQueueHandler>();
     }
 
 

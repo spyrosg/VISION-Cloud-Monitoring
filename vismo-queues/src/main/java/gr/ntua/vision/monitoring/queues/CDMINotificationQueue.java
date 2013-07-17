@@ -30,7 +30,7 @@ public class CDMINotificationQueue {
     public CDMINotificationQueue(final String name, final String topic) {
         this.name = name;
         this.topic = topic;
-        this.queue = new LinkedBlockingQueue<MonitoringEvent>(100); // FIXME
+        this.queue = new LinkedBlockingQueue<MonitoringEvent>(100); // FIXME: size
     }
 
 
