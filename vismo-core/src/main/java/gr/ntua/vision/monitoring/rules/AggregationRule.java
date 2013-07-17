@@ -81,9 +81,10 @@ abstract class AggregationRule extends PeriodicRule {
      * @param dict
      * @param e
      */
-    protected static void addRequiredFields(final HashMap<String, Object> dict, final MonitoringEvent e) {
+    protected void addRequiredFields(final HashMap<String, Object> dict, final MonitoringEvent e) {
         dict.put("timestamp", System.currentTimeMillis());
         dict.put("originating-service", e.originatingService());
+        dict.put("topic", topic);
 
         try {
             dict.put("originating-machine", e.originatingIP().getHostAddress());
