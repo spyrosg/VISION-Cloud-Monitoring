@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
+import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.rules.PeriodicRule;
 import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.RulesStore;
@@ -11,9 +12,8 @@ import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
 import gr.ntua.vision.monitoring.sources.InMemoryEventSource;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Before;
@@ -29,86 +29,6 @@ import org.junit.Test;
  * </ol>
  */
 public class VismoRulesEngineTest {
-    /**
-     * A minimal event implementation, with one just key/value pair.
-     */
-    private static class DummyEvent implements MonitoringEvent {
-        /***/
-        private final String key;
-        /***/
-        private final Object val;
-
-
-        /**
-         * Constructor.
-         * 
-         * @param key
-         * @param val
-         */
-        public DummyEvent(final String key, final Object val) {
-            this.key = key;
-            this.val = val;
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#get(java.lang.String)
-         */
-        @Override
-        public Object get(final String k) {
-            if (this.key.equals(k))
-                return val;
-
-            return null;
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#originatingIP()
-         */
-        @Override
-        public InetAddress originatingIP() throws UnknownHostException {
-            return null;
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#originatingService()
-         */
-        @Override
-        public String originatingService() {
-            return null;
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#serialize()
-         */
-        @Override
-        public String serialize() {
-            return toString();
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#timestamp()
-         */
-        @Override
-        public long timestamp() {
-            return 0;
-        }
-
-
-        /**
-         * @see gr.ntua.vision.monitoring.events.MonitoringEvent#topic()
-         */
-        @Override
-        public String topic() {
-            return null;
-        }
-    }
-
-
     /**
      * A rule to increment the field of an event.
      */
@@ -145,7 +65,7 @@ public class VismoRulesEngineTest {
         public void performWith(final MonitoringEvent e) {
             final int val = (Integer) e.get(key);
 
-            send(new DummyEvent(key, val + 1));
+            send(newEvent(key, val + 1));
         }
 
 
@@ -207,7 +127,7 @@ public class VismoRulesEngineTest {
             final ArrayList<Integer> intList = new ArrayList<Integer>(list.size());
             extract(intList, list);
 
-            return new DummyEvent(key, sum(intList));
+            return newEvent(key, sum(intList));
         }
 
 
@@ -244,6 +164,8 @@ public class VismoRulesEngineTest {
         }
     }
 
+    /***/
+    private static final VismoEventFactory   factory     = new VismoEventFactory();
     /** the object under test. */
     private VismoRulesEngine                 engine;
     /** this is where the events should end up. */
@@ -284,9 +206,11 @@ public class VismoRulesEngineTest {
     }
 
 
-    /***/
+    /**
+     * @throws InterruptedException
+     */
     @Test
-    public void itShouldEvaluateAnAsynchronousRule() {
+    public void itShouldEvaluateAnAsynchronousRule() throws InterruptedException {
         final String KEY = "foo";
         final int VAL1 = 2;
         final int VAL2 = 3;
@@ -294,8 +218,8 @@ public class VismoRulesEngineTest {
         final long TIMEOUT = 150;
 
         new IntSumRule(engine, RULE_PERIOD, KEY).submit();
-        source.triggerRuleEvaluationWith(new DummyEvent(KEY, VAL1));
-        source.triggerRuleEvaluationWith(new DummyEvent(KEY, VAL2));
+        source.triggerRuleEvaluationWith(newEvent(KEY, VAL1));
+        source.triggerRuleEvaluationWith(newEvent(KEY, VAL2));
 
         assertEquals(0, eventsStore.size());
         waitTimerToTriggerRuleAggregation(TIMEOUT);
@@ -314,7 +238,7 @@ public class VismoRulesEngineTest {
         final int VAL = 0;
 
         new IncRule(engine, KEY).submit();
-        source.triggerRuleEvaluationWith(new DummyEvent(KEY, VAL));
+        source.triggerRuleEvaluationWith(newEvent(KEY, VAL));
 
         assertEquals(1, eventsStore.size());
 
@@ -344,13 +268,27 @@ public class VismoRulesEngineTest {
 
 
     /**
-     * @param n
+     * @param key
+     * @param val
+     * @return a new {@link MonitoringEvent}.
      */
-    private static void waitTimerToTriggerRuleAggregation(final long n) {
-        try {
-            Thread.sleep(n);
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-        }
+    static MonitoringEvent newEvent(final String key, final Object val) {
+        final HashMap<String, Object> map = new HashMap<String, Object>();
+
+        map.put(key, val);
+        map.put("timestamp", System.currentTimeMillis());
+        map.put("originating-service", VismoRulesEngineTest.class.getSimpleName());
+        map.put("originating-machine", "localhost");
+
+        return factory.createEvent(map);
+    }
+
+
+    /**
+     * @param n
+     * @throws InterruptedException
+     */
+    private static void waitTimerToTriggerRuleAggregation(final long n) throws InterruptedException {
+        Thread.sleep(n);
     }
 }

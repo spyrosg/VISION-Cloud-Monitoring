@@ -53,7 +53,7 @@ public class ThresholdRule extends Rule {
 
         if (violations.size() > 0) {
             log.debug("have: {}", violations);
-            send(new ThresholdEvent(id(), e.originatingService(), topic, violations));
+            send(ThresholdEventFactory.newEvent(id(), topic, e, violations));
         }
     }
 

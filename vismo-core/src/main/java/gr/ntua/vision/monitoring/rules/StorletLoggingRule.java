@@ -165,7 +165,7 @@ public class StorletLoggingRule extends AggregationRule {
         dict.put("tEnd", tEnd);
         dict.put("groups", toMap(aggregateOverMessages(list)));
 
-        return new VismoAggregationResult(dict);
+        return newAggregationEvent(dict);
     }
 
 

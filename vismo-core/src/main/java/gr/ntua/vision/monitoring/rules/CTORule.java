@@ -84,12 +84,10 @@ public class CTORule extends AggregationRule {
 
         addRequiredFields(dict, list.get(0));
 
-        final VismoAggregationResult res = new VismoAggregationResult(dict);
+        dict.put("tStart", tStart);
+        dict.put("tEnd", tEnd);
 
-        res.settStart(tStart);
-        res.settEnd(tEnd);
-
-        return res;
+        return newAggregationEvent(dict);
     }
 
 
