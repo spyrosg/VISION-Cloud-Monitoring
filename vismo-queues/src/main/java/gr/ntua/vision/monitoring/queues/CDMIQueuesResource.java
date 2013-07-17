@@ -1,8 +1,6 @@
 package gr.ntua.vision.monitoring.queues;
 
 import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.APPLICATION_CDMI_QUEUE;
-// import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.X_CDMI;
-//import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.X_CDMI_VERSION;
 import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.X_CDMI;
 import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.X_CDMI_VERSION;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
@@ -22,8 +20,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
-import unit.tests.InMemoryEventRegistry.MyEvent;
 
 
 /**
