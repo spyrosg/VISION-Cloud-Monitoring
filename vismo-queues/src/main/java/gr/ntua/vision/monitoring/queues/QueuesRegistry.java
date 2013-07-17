@@ -2,13 +2,16 @@ package gr.ntua.vision.monitoring.queues;
 
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.EventHandler;
-import gr.ntua.vision.monitoring.notify.EventHandlerTask;
 import gr.ntua.vision.monitoring.notify.Registry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 
 /**
@@ -48,8 +51,10 @@ public class QueuesRegistry {
 
     /** the available topics. */
     private static final List<String>              AVAILABLE_TOPICS = Arrays.asList("reads", "writes", "topics", "storlets", "*");
-    /***/
+    /** reference to the event handlers. */
     private final ArrayList<TopicQueueHandler>     handlers;
+    /***/
+    private final JSONParser                       parser           = new JSONParser();
     /** the list of registered queues. */
     private final ArrayList<CDMINotificationQueue> queuesList;
     /** the actual registry. */
@@ -69,15 +74,32 @@ public class QueuesRegistry {
 
 
     /**
-     * Return the JSON representation of the list. NOTE that this is a workaround, since the {@link MonitoringEvent}s have not a
-     * definite schema.
+     * Get the list of available events in the queue, ready to be consumed by a CDMI read op.
      * 
      * @param queueName
-     *            the name of queue to retrieve events from.
-     * @return the string json representation of events in the queues.
+     *            the name of queue.
+     * @return the list of events in the queue.
+     * @throws NoSuchQueueException
+     *             when no queue with specified name exists.
      */
-    public String eventsToJSONString(final String queueName) {
-        return toJSONString(getEvents(queueName));
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> getCDMIEvents(final String queueName) {
+        final List<MonitoringEvent> list = getEvents(queueName);
+        final ArrayList<Map<String, Object>> values = new ArrayList<Map<String, Object>>(list.size());
+
+        for (final MonitoringEvent e : list) {
+            final String s = e.serialize();
+
+            try {
+                final Map<String, Object> map = (Map<String, Object>) parser.parse(s);
+
+                values.add(map);
+            } catch (final ParseException e1) {
+                e1.printStackTrace();
+            }
+        }
+
+        return values;
     }
 
 
@@ -88,7 +110,7 @@ public class QueuesRegistry {
      *            the name of queue.
      * @return the list of events in the queue.
      * @throws NoSuchQueueException
-     *             when no queue with specified name exists
+     *             when no queue with specified name exists.
      */
     public List<MonitoringEvent> getEvents(final String queueName) throws NoSuchQueueException {
         for (final CDMINotificationQueue q : queuesList)
@@ -144,8 +166,8 @@ public class QueuesRegistry {
             throw new QueuesRegistrationException("queue already exists: " + queueName);
 
         final TopicQueueHandler handler = new TopicQueueHandler(q);
-        final EventHandlerTask task = registry.register(topic, handler);
 
+        registry.register(topic, handler);
         queuesList.add(q);
         handlers.add(handler);
 
@@ -190,30 +212,5 @@ public class QueuesRegistry {
     private static void requireAvailabe(final String topic) throws QueuesRegistrationException {
         if (!isAvailableTopic(topic))
             throw new QueuesRegistrationException("topic not available or invalid: " + topic);
-    }
-
-
-    /**
-     * Return the JSON representation of the list. NOTE that this is a workaround, since the {@link MonitoringEvent}s have
-     * 
-     * @param list
-     *            the list of events.
-     * @return a json array as well formated json a string.
-     */
-    private static String toJSONString(final List<MonitoringEvent> list) {
-        final StringBuilder buf = new StringBuilder();
-
-        buf.append("[");
-
-        for (int i = 0; i < list.size(); ++i) {
-            buf.append(list.get(i).serialize());
-
-            if (i < list.size() - 1)
-                buf.append(",");
-        }
-
-        buf.append("]");
-
-        return buf.toString();
     }
 }

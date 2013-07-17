@@ -3,7 +3,6 @@ package gr.ntua.vision.monitoring.queues;
 import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.APPLICATION_CDMI_QUEUE;
 import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.X_CDMI;
 import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.X_CDMI_VERSION;
-import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -120,7 +119,7 @@ public class CDMIQueuesResource {
     @GET
     public Response readQueue(@PathParam("queue") final String queueName) {
         try {
-            return cdmiReadQueueResponse(queueName, registry.getEvents(queueName));
+            return cdmiReadQueueResponse(queueName, registry.getCDMIEvents(queueName));
         } catch (final NoSuchQueueException e) {
             return Response.status(Status.BAD_REQUEST).header(X_CDMI, X_CDMI_VERSION).type(MediaType.TEXT_PLAIN_TYPE)
                     .entity(e.getMessage()).build();
@@ -140,17 +139,14 @@ public class CDMIQueuesResource {
     /**
      * @param queueName
      * @param list
+     *            the list of cdmi events.
      * @return the cdmi successfully created queue response.
      */
-    private static Response cdmiReadQueueResponse(final String queueName, final List<MonitoringEvent> list) {
+    private static Response cdmiReadQueueResponse(final String queueName, final List<Map<String, Object>> list) {
         final CDMIQueueListBean bean = new CDMIQueueListBean(queueName);
-        final ArrayList<Map<String, Object>> values = new ArrayList<Map<String, Object>>(list.size());
-
-        for (final MonitoringEvent e : list)
-            values.add(((MyEvent) e).dict);
 
         bean.setQueueValues("1-" + list.size());
-        bean.setValue(values);
+        bean.setValue(list);
 
         return Response.ok(bean).header(X_CDMI, X_CDMI_VERSION).build();
     }
