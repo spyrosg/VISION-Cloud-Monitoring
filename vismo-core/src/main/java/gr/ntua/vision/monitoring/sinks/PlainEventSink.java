@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PlainEventSink extends AbstractSink {
     /***/
+    @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(PlainEventSink.class);
 
 
@@ -32,7 +33,6 @@ public class PlainEventSink extends AbstractSink {
     public void send(final MonitoringEvent e) {
         final String s = e.serialize();
 
-        log.trace("serializing: {}", s);
         send(s);
     }
 }
