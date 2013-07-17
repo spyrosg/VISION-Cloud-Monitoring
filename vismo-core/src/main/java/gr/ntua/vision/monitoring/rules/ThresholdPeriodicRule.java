@@ -73,10 +73,8 @@ public class ThresholdPeriodicRule extends PeriodicRule {
 
         if (violations.size() > 0) {
             log.debug("have: {}", violations);
-            // log.debug(String.format("have violation of metric %s '%s', offending value %s", foldMethod, metric,
-            // aggregatedValue));
 
-            return new ThresholdEvent(id(), list.get(0).originatingService(), topic, violations);
+            return ThresholdEventFactory.newEvent(id(), topic, list.get(0), violations);
         }
 
         return null;
