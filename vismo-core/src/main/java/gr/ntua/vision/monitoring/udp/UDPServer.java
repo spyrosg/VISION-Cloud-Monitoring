@@ -81,6 +81,7 @@ public class UDPServer extends Thread {
                 log.error("while receiving", e);
             }
 
+        sock.close();
         log.debug("shutting down");
     }
 
