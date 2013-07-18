@@ -153,8 +153,8 @@ public class VisionHTTPClient {
         c.setConnectTimeout(30000);
         c.setReadTimeout(30000);
 
-        c.addFilter(new HTTPBasicAuthFilter(user + "@" + tenant, pass));
         c.addFilter(new LoggingFilter(System.err));
+        c.addFilter(new HTTPBasicAuthFilter(user + "@" + tenant, pass));
 
         return c;
     }
