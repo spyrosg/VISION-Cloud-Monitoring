@@ -24,12 +24,6 @@ public class VisionHTTPClient {
     private final Client client;
     /***/
     private final String hostURL;
-    /***/
-    private final String pass;
-    /***/
-    private final String tenant;
-    /***/
-    private final String user;
 
 
     /**
@@ -42,74 +36,68 @@ public class VisionHTTPClient {
      */
     public VisionHTTPClient(final String hostURL, final String tenant, final String user, final String pass) {
         this.hostURL = hostURL;
-        this.tenant = tenant;
-        this.user = user;
-        this.pass = pass;
-        this.client = setupClient();
+        this.client = setupClient(tenant, user, pass);
     }
 
 
     /**
-     * @param cont
-     */
-    public void createContainer(final String cont) {
-        final ClientResponse res = containers().path(tenant).path(cont).put(ClientResponse.class);
-
-        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
-    }
-
-
-    /**
-     * @param cont
-     */
-    public void deleteContainer(final String cont) {
-        final ClientResponse res = containers().path(tenant).path(cont).delete(ClientResponse.class);
-
-        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
-    }
-
-
-    /**
+     * @param tenant
      * @param container
      * @param object
      */
-    public void deleteObject(final String container, final String object) {
-        final ClientResponse res = forObject(container, object).delete(ClientResponse.class);
+    public void deleteObject(final String tenant, final String container, final String object) {
+        final ClientResponse res = forObject(tenant, container, object).delete(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
     }
 
 
     /**
+     * @param tenant
      * @param container
      * @param object
      */
-    public void getObject(final String container, final String object) {
-        final ClientResponse res = forObject(container, object).get(ClientResponse.class);
+    public void getObject(final String tenant, final String container, final String object) {
+        final ClientResponse res = forObject(tenant, container, object).get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
     }
 
 
     /**
+     * @param tenant
      * @param container
      * @param object
      * @param payload
      */
-    public void putObject(final String container, final String object, final String payload) {
-        final ClientResponse res = forObject(container, object).entity(payload).put(ClientResponse.class);
+    public void putObject(final String tenant, final String container, final String object, final String payload) {
+        final ClientResponse res = forObject(tenant, container, object).entity(payload).put(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
     }
 
 
     /**
-     * @param bean
+     * @param ruleId
      */
-    public void sumbitRule(final RuleBean bean) {
+    public void removeRule(final String ruleId) {
+        final ClientResponse res = rules().path(ruleId).delete(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
+
+    }
+
+
+    /**
+     * @param bean
+     * @return the id of the rule inserted.
+     */
+    public String sumbitRule(final RuleBean bean) {
         final ClientResponse res = rules().type(MediaType.APPLICATION_JSON).entity(bean).post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+
+        return res.getEntity(String.class);
     }
 
 
@@ -138,20 +126,24 @@ public class VisionHTTPClient {
 
 
     /**
+     * @param tenant
      * @param container
      * @param object
      * @return a {@link Builder}.
      */
-    private Builder forObject(final String container, final String object) {
+    private Builder forObject(final String tenant, final String container, final String object) {
         return obs().path(tenant).path(container).path(object).type("application/cdmi-object").accept("application/cdmi-object")
                 .header("X-CDMI-Specification-Version", "1.0");
     }
 
 
     /**
+     * @param pass
+     * @param user
+     * @param tenant
      * @return a configured jersey http client.
      */
-    private Client setupClient() {
+    private static Client setupClient(final String tenant, final String user, final String pass) {
         final DefaultClientConfig cc = new DefaultClientConfig();
 
         cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);

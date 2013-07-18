@@ -15,30 +15,32 @@ import org.junit.Test;
  */
 public class RuleApplicationTest {
     /***/
-    private static final int                     CONSUMERS_PORT     = 56430;
+    private static final int                     CONSUMERS_PORT       = 56430;
     /***/
-    private static final NoEventsCheckingHandler FOO_RULE_HANDLER   = null;
+    private static final NoEventsCheckingHandler DEFAULT_RULE_HANDLER = null;
     /** the machine's ip */
-    private static final String                  HOST_URL           = "10.0.1.101";
+    private static final String                  HOST_URL             = "10.0.1.103";
     /***/
-    private static final String                  OBJ_NAME           = "my-vismo-test-object";
+    private static final String                  OBJ_NAME             = "my-vismo-test-object";
     /***/
-    private static final String                  PASS               = "123";
+    private static final String                  PASS                 = "123";
     /***/
-    private static final String                  TENANT             = "ntua";
+    private static final String                  TENANT               = "ntua";
     /***/
-    private static final String                  TEST_CONTAINER     = "test-1";
+    private static final String                  TEST_CONTAINER       = "test-1";
     /***/
-    private static final String                  USER               = "bill";
+    private static final String                  USER                 = "bill";
     /***/
-    private final VisionHTTPClient               client             = new VisionHTTPClient(HOST_URL, TENANT, USER, PASS);
+    private final VisionHTTPClient               client               = new VisionHTTPClient(HOST_URL, TENANT, USER, PASS);
     /***/
-    private final PerOperationHandler            GET_OBJECT_HANDLER = new PerOperationHandler("GET");
+    private final PerOperationHandler            getHandler           = new PerOperationHandler("GET");
     /***/
-    private final PerOperationHandler            PUT_OBJECT_HANDLER = new PerOperationHandler("PUT");
+    private final PerOperationHandler            putHandler           = new PerOperationHandler("PUT");
     /***/
-    private final VismoEventRegistry             registry           = new VismoEventRegistry("tcp://" + HOST_URL + ":"
-                                                                            + CONSUMERS_PORT);
+    private final VismoEventRegistry             registry             = new VismoEventRegistry("tcp://" + HOST_URL + ":"
+                                                                              + CONSUMERS_PORT);
+    /***/
+    private String                               testRuleId           = null;
 
 
     /**
@@ -48,16 +50,16 @@ public class RuleApplicationTest {
      */
     @Test
     public void producersShouldReceiveDefaultObsEvents() throws InterruptedException {
-        registry.registerToAll(PUT_OBJECT_HANDLER);
-        registry.registerToAll(GET_OBJECT_HANDLER);
+        registry.registerToAll(putHandler);
+        registry.registerToAll(getHandler);
 
-        client.putObject(TEST_CONTAINER, OBJ_NAME, "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
+        putObject(OBJ_NAME);
         waitForEventsToBeReceived();
-        shouldHaveReceivedEvent(PUT_OBJECT_HANDLER, 1);
+        putHandler.shouldHaveReceivedNoEvents(1);
 
-        client.getObject(TEST_CONTAINER, OBJ_NAME);
+        readObject(OBJ_NAME);
         waitForEventsToBeReceived();
-        shouldHaveReceivedEvent(GET_OBJECT_HANDLER, 1);
+        getHandler.shouldHaveReceivedNoEvents(1);
     }
 
 
@@ -72,6 +74,7 @@ public class RuleApplicationTest {
     /***/
     @After
     public void tearDown() {
+        deleteTestRule();
         // client.deleteContainer(TEST_CONTAINER);
     }
 
@@ -90,12 +93,38 @@ public class RuleApplicationTest {
      */
     @Test
     public void verifyRuleApplicationWithEventsConsumption() throws InterruptedException {
-        registry.registerToAll(FOO_RULE_HANDLER);
+        registry.registerToAll(DEFAULT_RULE_HANDLER);
         submitRule(throughputThresholdRule(5, "my-topic", TENANT, USER));
 
-        client.putObject(TEST_CONTAINER, OBJ_NAME, "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
+        putObject(OBJ_NAME);
         waitForEventsToBeReceived();
-        shouldHaveReceivedEvent(FOO_RULE_HANDLER, 1);
+        DEFAULT_RULE_HANDLER.shouldHaveReceivedNoEvents(1);
+    }
+
+
+    /**
+     * 
+     */
+    private void deleteTestRule() {
+        if (testRuleId != null)
+            client.removeRule(testRuleId);
+    }
+
+
+    /**
+     * @param objName
+     */
+    private void putObject(final String objName) {
+        client.putObject(TENANT, TEST_CONTAINER, objName,
+                         "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
+    }
+
+
+    /**
+     * @param objName
+     */
+    private void readObject(final String objName) {
+        client.getObject(TENANT, TEST_CONTAINER, objName);
     }
 
 
@@ -114,18 +143,7 @@ public class RuleApplicationTest {
      * @param bean
      */
     private void submitRule(final ThresholdRuleBean bean) {
-        client.sumbitRule(bean);
-    }
-
-
-    /**
-     * Check that the handler has received the given number of events.
-     * 
-     * @param handler
-     * @param noExpectedEvents
-     */
-    private static void shouldHaveReceivedEvent(final NoEventsCheckingHandler handler, final int noExpectedEvents) {
-        handler.haveReceivedExpectedNoEvents(noExpectedEvents);
+        testRuleId = client.sumbitRule(bean);
     }
 
 
