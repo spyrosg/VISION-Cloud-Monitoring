@@ -64,9 +64,16 @@ public class MeasurementRule extends Rule {
                     final Matcher m = p.matcher(serialized);
 
                     if (m.find() && m.groupCount() == 1)
-                        return m.replaceAll("\"topic\":\"" + TOPIC + "\"");
+                        return m.replaceAll(String.format("\"topic\": \"%s\"", TOPIC));
 
-                    return serialized;
+                    final int idx = serialized.lastIndexOf("}");
+
+                    if (idx < 0)
+                        return serialized;
+
+                    final String orig = serialized.substring(0, idx - 1);
+
+                    return String.format("%s, \"topic\":\"%s\"}", orig, TOPIC);
                 }
 
 
