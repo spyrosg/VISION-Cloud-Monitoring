@@ -69,15 +69,6 @@ abstract class AggregationRule extends PeriodicRule {
 
 
     /**
-     * @param map
-     * @return the aggregation results as a {@link MonitoringEvent}.
-     */
-    protected MonitoringEvent newAggregationEvent(final Map<String, Object> map) {
-        return factory.createEvent(map);
-    }
-
-
-    /**
      * @param dict
      * @param e
      */
@@ -91,6 +82,15 @@ abstract class AggregationRule extends PeriodicRule {
         } catch (final UnknownHostException e1) {
             log.error("cannot get originating machine ip", e);
         }
+    }
+
+
+    /**
+     * @param map
+     * @return the aggregation results as a {@link MonitoringEvent}.
+     */
+    protected MonitoringEvent newAggregationEvent(final Map<String, Object> map) {
+        return factory.createEvent(map);
     }
 
 

@@ -24,23 +24,6 @@ public class RulesResourceTest extends JerseyResourceTest {
     private final RulesStore rulesStore = new RulesStore();
 
 
-    /**
-     * @see integration.tests.JerseyResourceTest#setUp()
-     */
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-
-        final VismoRulesEngine engine = new VismoRulesEngine(rulesStore);
-        final ClassPathRulesFactory clsPathfactory = new ClassPathRulesFactory(engine, PassThroughRule.class.getPackage());
-        final ThresholdRulesFactory factory = new ThresholdRulesFactory(clsPathfactory, engine);
-        final Application rulesApp = WebAppBuilder.buildFrom(new RulesResource(factory, rulesStore));
-
-        configureServer(rulesApp, "/*");
-        startServer();
-    }
-
-
     /***/
     public void testHttpDELETEShouldRemoveExistingRuleFromStore() {
         final ClientResponse res = resource().path("AccountingRule").path("10000").post(ClientResponse.class);
@@ -106,7 +89,24 @@ public class RulesResourceTest extends JerseyResourceTest {
      */
     @Override
     protected WebResource resource() {
-        return root().path("rules");
+        return super.resource().path("rules");
+    }
+
+
+    /**
+     * @see integration.tests.JerseyResourceTest#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        final VismoRulesEngine engine = new VismoRulesEngine(rulesStore);
+        final ClassPathRulesFactory clsPathfactory = new ClassPathRulesFactory(engine, PassThroughRule.class.getPackage());
+        final ThresholdRulesFactory factory = new ThresholdRulesFactory(clsPathfactory, engine);
+        final Application rulesApp = WebAppBuilder.buildFrom(new RulesResource(factory, rulesStore));
+
+        configureServer(rulesApp, "/*");
+        startServer();
     }
 
 

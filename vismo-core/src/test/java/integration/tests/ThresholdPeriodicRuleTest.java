@@ -55,22 +55,6 @@ public class ThresholdPeriodicRuleTest extends JerseyResourceTest {
 
 
     /**
-     * @see integration.tests.JerseyResourceTest#setUp()
-     */
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-
-        engine = new VismoRulesEngine();
-        obs = new FakeObjectService(new InMemoryEventDispatcher(engine, "fake-obs"), new Random(3331));
-        factory = new ThresholdRulesFactory(engine);
-        engine.appendSink(new InMemoryEventSink(eventSink));
-        configureServer(WebAppBuilder.buildFrom(new RulesResource(factory, new RulesStore())), "/*");
-        startServer();
-    }
-
-
-    /**
      * @throws InterruptedException
      */
     public void testSubmitRuleShouldProduceEventWithContainerAggregationUnit() throws InterruptedException {
@@ -93,7 +77,23 @@ public class ThresholdPeriodicRuleTest extends JerseyResourceTest {
      */
     @Override
     protected WebResource resource() {
-        return root().path("rules");
+        return super.resource().path("rules");
+    }
+
+
+    /**
+     * @see integration.tests.JerseyResourceTest#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        engine = new VismoRulesEngine();
+        obs = new FakeObjectService(new InMemoryEventDispatcher(engine, "fake-obs"), new Random(3331));
+        factory = new ThresholdRulesFactory(engine);
+        engine.appendSink(new InMemoryEventSink(eventSink));
+        configureServer(WebAppBuilder.buildFrom(new RulesResource(factory, new RulesStore())), "/*");
+        startServer();
     }
 
 

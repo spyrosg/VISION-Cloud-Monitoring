@@ -14,6 +14,8 @@ import org.junit.Test;
  * This is used to test the main rule update functionality. See {@link #verifyRuleApplicationWithEventsConsumption()}.
  */
 public class RuleApplicationTest {
+    // FIXME: come back to this, there are more events received than expected
+
     /***/
     private static final int                     CONSUMERS_PORT     = 56430;
     /***/

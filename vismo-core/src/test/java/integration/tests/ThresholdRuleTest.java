@@ -47,23 +47,6 @@ public class ThresholdRuleTest extends JerseyResourceTest {
 
 
     /**
-     * @see integration.tests.JerseyResourceTest#setUp()
-     */
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-
-        engine = new VismoRulesEngine();
-        obs = new FakeObjectService(new InMemoryEventDispatcher(engine, "fake-obs"));
-        factory = new ThresholdRulesFactory(engine);
-
-        engine.appendSink(new InMemoryEventSink(eventSink));
-        configureServer(WebAppBuilder.buildFrom(new RulesResource(factory, new RulesStore())), "/*");
-        startServer();
-    }
-
-
-    /**
      * 
      */
     public void testShouldProduceMultiRequirementsResult() {
@@ -155,7 +138,24 @@ public class ThresholdRuleTest extends JerseyResourceTest {
      */
     @Override
     protected WebResource resource() {
-        return root().path("rules");
+        return super.resource().path("rules");
+    }
+
+
+    /**
+     * @see integration.tests.JerseyResourceTest#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        engine = new VismoRulesEngine();
+        obs = new FakeObjectService(new InMemoryEventDispatcher(engine, "fake-obs"));
+        factory = new ThresholdRulesFactory(engine);
+
+        engine.appendSink(new InMemoryEventSink(eventSink));
+        configureServer(WebAppBuilder.buildFrom(new RulesResource(factory, new RulesStore())), "/*");
+        startServer();
     }
 
 
@@ -164,7 +164,7 @@ public class ThresholdRuleTest extends JerseyResourceTest {
      * @return the {@link ClientResponse}.
      */
     private ClientResponse submitRule(final ThresholdRuleBean bean) {
-        return root().path("rules").type(MediaType.APPLICATION_JSON).entity(bean).post(ClientResponse.class);
+        return resource().type(MediaType.APPLICATION_JSON).entity(bean).post(ClientResponse.class);
     }
 
 

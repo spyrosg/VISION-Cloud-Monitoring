@@ -28,37 +28,6 @@ public class HttpEventSourceTest extends JerseyResourceTest {
     private final ArrayList<MonitoringEvent> sink = new ArrayList<MonitoringEvent>();
 
 
-    /**
-     * @see integration.tests.JerseyResourceTest#setUp()
-     */
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-
-        final HttpEventResource eventSource = new HttpEventResource();
-
-        engine = new VismoRulesEngine();
-        new PassThroughRule(engine).submit();
-        engine.appendSink(new InMemoryEventSink(sink));
-        eventSource.add(engine);
-
-        configureServer(WebAppBuilder.buildFrom(eventSource), "/*");
-        startServer();
-    }
-
-
-    /**
-     * @see integration.tests.JerseyResourceTest#tearDown()
-     */
-    @Override
-    public void tearDown() throws Exception {
-        if (engine != null)
-            engine.halt();
-
-        super.tearDown();
-    }
-
-
     /***/
     public void testRulesEngineShouldReceivePostedEvent() {
         final String eventRepr = getEvent();
@@ -91,7 +60,38 @@ public class HttpEventSourceTest extends JerseyResourceTest {
      */
     @Override
     protected WebResource resource() {
-        return root().path("events");
+        return super.resource().path("events");
+    }
+
+
+    /**
+     * @see integration.tests.JerseyResourceTest#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        final HttpEventResource eventSource = new HttpEventResource();
+
+        engine = new VismoRulesEngine();
+        new PassThroughRule(engine).submit();
+        engine.appendSink(new InMemoryEventSink(sink));
+        eventSource.add(engine);
+
+        configureServer(WebAppBuilder.buildFrom(eventSource), "/*");
+        startServer();
+    }
+
+
+    /**
+     * @see integration.tests.JerseyResourceTest#tearDown()
+     */
+    @Override
+    protected void tearDown() throws Exception {
+        if (engine != null)
+            engine.halt();
+
+        super.tearDown();
     }
 
 
