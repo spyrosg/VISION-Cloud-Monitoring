@@ -33,6 +33,8 @@ class PerOperationHandler extends NoEventsCheckingHandler {
             return;
         if (isContainerOperationEvent(e))
             return;
+        if (e.topic() != null)
+            return;
 
         if (operation.equals(e.get("operation")))
             receivedEvent(e);

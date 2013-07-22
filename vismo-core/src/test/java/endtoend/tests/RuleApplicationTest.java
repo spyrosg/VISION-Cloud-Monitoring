@@ -15,30 +15,23 @@ import org.junit.Test;
  */
 public class RuleApplicationTest {
     /***/
-    private static final int                     CONSUMERS_PORT       = 56430;
-    /***/
-    private static final NoEventsCheckingHandler DEFAULT_RULE_HANDLER = null;
+    private static final int         CONSUMERS_PORT = 56430;
     /** the machine's ip */
-    private static final String                  HOST_URL             = "10.0.1.103";
+    private static final String      HOST_URL       = "10.0.1.101";
     /***/
-    private static final String                  PASS                 = "foobar";
+    private static final String      PASS           = "1234";
     /***/
-    private static final String                  TENANT               = "ntua";
+    private static final String      TENANT         = "ntua";
     /***/
-    private static final String                  TEST_CONTAINER       = "t2";
+    private static final String      TEST_CONTAINER = "foo5";
     /***/
-    private static final String                  USER                 = "bill1";
+    private static final String      USER           = "vassilis";
     /***/
-    private final VisionHTTPClient               client               = new VisionHTTPClient(HOST_URL, TENANT, USER, PASS);
+    private final VisionHTTPClient   client         = new VisionHTTPClient(HOST_URL, TENANT, USER, PASS);
     /***/
-    private final PerOperationHandler            getHandler           = new PerOperationHandler("GET");
+    private final VismoEventRegistry registry       = new VismoEventRegistry("tcp://" + HOST_URL + ":" + CONSUMERS_PORT);
     /***/
-    private final PerOperationHandler            putHandler           = new PerOperationHandler("PUT");
-    /***/
-    private final VismoEventRegistry             registry             = new VismoEventRegistry("tcp://" + HOST_URL + ":"
-                                                                              + CONSUMERS_PORT);
-    /***/
-    private String                               testRuleId           = null;
+    private String                   testRuleId     = null;
 
 
     /**
@@ -49,6 +42,8 @@ public class RuleApplicationTest {
     @Test
     public void producersShouldReceiveDefaultObsEvents() throws InterruptedException {
         final String testObject = "vismo-test-object";
+        final PerOperationHandler getHandler = new PerOperationHandler("GET");
+        final PerOperationHandler putHandler = new PerOperationHandler("PUT");
 
         registry.registerToAll(putHandler);
         registry.registerToAll(getHandler);
@@ -95,13 +90,14 @@ public class RuleApplicationTest {
     public void verifyRuleApplicationWithEventsConsumption() throws InterruptedException {
         final String testObject = "vismo-test-object";
         final String topic = "my-topic";
+        final PerRuleTopicEventHandler handler = new PerRuleTopicEventHandler(topic);
 
-        registry.register(topic, DEFAULT_RULE_HANDLER);
+        registry.register(topic, handler);
         submitRule(throughputThresholdRule(5, topic, TENANT, USER));
 
         putObject(testObject);
         waitForEventsToBeReceived();
-        DEFAULT_RULE_HANDLER.shouldHaveReceivedNoEvents(1);
+        handler.shouldHaveReceivedNoEvents(1);
     }
 
 
