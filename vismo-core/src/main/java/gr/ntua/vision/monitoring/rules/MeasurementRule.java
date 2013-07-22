@@ -71,9 +71,9 @@ public class MeasurementRule extends Rule {
                     if (idx < 0)
                         return serialized;
 
-                    final String orig = serialized.substring(0, idx - 1);
+                    final String orig = serialized.substring(0, idx);
 
-                    return String.format("%s, \"topic\":\"%s\"}", orig, TOPIC);
+                    return String.format("%s,\"topic\":\"%s\"}", orig, TOPIC);
                 }
 
 
