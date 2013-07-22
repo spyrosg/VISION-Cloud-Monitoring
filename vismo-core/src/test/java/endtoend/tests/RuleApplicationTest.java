@@ -21,15 +21,13 @@ public class RuleApplicationTest {
     /** the machine's ip */
     private static final String                  HOST_URL             = "10.0.1.103";
     /***/
-    private static final String                  OBJ_NAME             = "my-vismo-test-object";
-    /***/
-    private static final String                  PASS                 = "123";
+    private static final String                  PASS                 = "foobar";
     /***/
     private static final String                  TENANT               = "ntua";
     /***/
-    private static final String                  TEST_CONTAINER       = "test-1";
+    private static final String                  TEST_CONTAINER       = "t2";
     /***/
-    private static final String                  USER                 = "bill";
+    private static final String                  USER                 = "bill1";
     /***/
     private final VisionHTTPClient               client               = new VisionHTTPClient(HOST_URL, TENANT, USER, PASS);
     /***/
@@ -50,14 +48,16 @@ public class RuleApplicationTest {
      */
     @Test
     public void producersShouldReceiveDefaultObsEvents() throws InterruptedException {
+        final String testObject = "vismo-test-object";
+
         registry.registerToAll(putHandler);
         registry.registerToAll(getHandler);
 
-        putObject(OBJ_NAME);
+        putObject(testObject);
         waitForEventsToBeReceived();
         putHandler.shouldHaveReceivedNoEvents(1);
 
-        readObject(OBJ_NAME);
+        readObject(testObject);
         waitForEventsToBeReceived();
         getHandler.shouldHaveReceivedNoEvents(1);
     }
@@ -93,10 +93,13 @@ public class RuleApplicationTest {
      */
     @Test
     public void verifyRuleApplicationWithEventsConsumption() throws InterruptedException {
-        registry.registerToAll(DEFAULT_RULE_HANDLER);
-        submitRule(throughputThresholdRule(5, "my-topic", TENANT, USER));
+        final String testObject = "vismo-test-object";
+        final String topic = "my-topic";
 
-        putObject(OBJ_NAME);
+        registry.register(topic, DEFAULT_RULE_HANDLER);
+        submitRule(throughputThresholdRule(5, topic, TENANT, USER));
+
+        putObject(testObject);
         waitForEventsToBeReceived();
         DEFAULT_RULE_HANDLER.shouldHaveReceivedNoEvents(1);
     }
