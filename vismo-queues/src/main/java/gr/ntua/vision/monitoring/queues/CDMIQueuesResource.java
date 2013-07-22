@@ -145,7 +145,6 @@ public class CDMIQueuesResource {
     private static Response cdmiReadQueueResponse(final String queueName, final List<Map<String, Object>> list) {
         final CDMIQueueListBean bean = new CDMIQueueListBean(queueName);
 
-        bean.setQueueValues("1-" + list.size());
         bean.setValue(list);
 
         return Response.ok(bean).header(X_CDMI, X_CDMI_VERSION).build();

@@ -44,10 +44,15 @@ public class CDMIQueueListBean extends CDMIQueueBean {
 
 
     /**
-     * @param value
+     * @param list
      *            the value to set
      */
-    public void setValue(final List<Map<String, Object>> value) {
-        this.value = value;
+    public void setValue(final List<Map<String, Object>> list) {
+        if (list.size() == 0)
+            this.setQueueValues("");
+        else
+            this.setQueueValues("1-" + list.size());
+
+        this.value = list;
     }
 }
