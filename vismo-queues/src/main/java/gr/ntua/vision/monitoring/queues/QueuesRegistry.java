@@ -10,6 +10,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -21,6 +23,8 @@ public class QueuesRegistry {
 
     /** the available topics. */
     private static final String[]                  AVAILABLE_TOPICS = { "reads", "writes", "storlets", "*" };
+    /***/
+    private static final Logger                    log              = LoggerFactory.getLogger(QueuesRegistry.class);
     /** reference to the event handlers. */
     private final ArrayList<CDMIQueueEventHandler> handlers;
     /***/
@@ -137,13 +141,15 @@ public class QueuesRegistry {
 
         final CDMIQueueEventHandler handler;
 
+        log.debug("registering '" + topic + "' queue");
+
         if (topic.equals("reads")) {
             handler = new ObsGETEventHandler(q);
-            registry.register(topic, handler);
+            registry.registerToAll(handler);
         } else if (topic.equals("writes")) {
             handler = new ObsPUTEventHandler(q);
-            registry.register(topic, handler);
-        } else if (topic.equals("stortles")) {
+            registry.registerToAll(handler);
+        } else if (topic.equals("storlets")) {
             handler = new StortletsEventHandler(q);
             registry.register(topic, handler);
         } else {
