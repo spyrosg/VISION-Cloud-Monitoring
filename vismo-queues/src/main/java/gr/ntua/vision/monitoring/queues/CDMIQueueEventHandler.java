@@ -23,11 +23,11 @@ abstract class CDMIQueueEventHandler implements EventHandler {
 
 
     /**
-     * Collect a notification.
+     * Collect an event.
      * 
-     * @param notification
+     * @param event
      */
-    protected void collect(final MonitoringEvent notification) {
-        q.add(notification);
+    protected void collect(final MonitoringEvent event) {
+        q.add(event);
     }
 }

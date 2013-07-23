@@ -143,7 +143,7 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
     /**
      * @throws Exception
      */
-    public void testShouldReadCDMINotificationsOffTheQueue() throws Exception {
+    public void testShouldReadCDMIEventsOffTheQueue() throws Exception {
         final int NO_EVENTS = 10;
 
         createCDMIQueue(MY_QUEUE, MY_TOPIC);
@@ -252,7 +252,7 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
      * Read a queue, with a CDMI compliant call.
      * 
      * @param queueName
-     * @return the client's response. It should contain the list of available notifications (events) stored in the queue.
+     * @return the client's response. It should contain the list of available events stored in the queue.
      */
     private ClientResponse readCDMIQueue(final String queueName) {
         final ClientResponse res = resource().path(queueName).accept(APPLICATION_CDMI_QUEUE_TYPE).header(X_CDMI, X_CDMI_VERSION)

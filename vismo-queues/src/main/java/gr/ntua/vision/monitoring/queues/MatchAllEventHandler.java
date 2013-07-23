@@ -21,7 +21,7 @@ class MatchAllEventHandler extends CDMIQueueEventHandler {
      * @see gr.ntua.vision.monitoring.notify.EventHandler#handle(gr.ntua.vision.monitoring.events.MonitoringEvent)
      */
     @Override
-    public void handle(final MonitoringEvent notification) {
-        collect(notification);
+    public void handle(final MonitoringEvent event) {
+        collect(event);
     }
 }

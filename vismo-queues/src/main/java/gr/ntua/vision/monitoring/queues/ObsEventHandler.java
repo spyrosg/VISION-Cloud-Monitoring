@@ -31,14 +31,14 @@ class ObsEventHandler extends CDMIQueueEventHandler {
      * @see gr.ntua.vision.monitoring.notify.EventHandler#handle(gr.ntua.vision.monitoring.events.MonitoringEvent)
      */
     @Override
-    public void handle(final MonitoringEvent notification) {
-        if (!OBS_SERVICE.equals(notification.originatingService()))
+    public void handle(final MonitoringEvent event) {
+        if (!OBS_SERVICE.equals(event.originatingService()))
             return;
-        if (!op.equals(notification.get(key)))
+        if (!op.equals(event.get(key)))
             return;
-        if (notification.topic() != null)
+        if (event.topic() != null)
             return;
 
-        collect(notification);
+        collect(event);
     }
 }

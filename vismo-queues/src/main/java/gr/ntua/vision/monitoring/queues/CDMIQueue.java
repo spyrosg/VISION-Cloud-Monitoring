@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * This is used to collect all events for a specified topic. The queue can set a cap on the number of notifications to hold.
+ * This is used to collect all events for a specified topic. The queue can set a cap on the number of events to hold in memory.
  */
 public class CDMIQueue {
     /***/
@@ -42,18 +42,18 @@ public class CDMIQueue {
     /**
      * Add another event in the queue. If there's no more room, first remove and discard the oldest inserted element.
      * 
-     * @param notification
+     * @param event
      *            the event.
      * @see java.util.AbstractQueue#add(java.lang.Object)
      */
-    public void add(final MonitoringEvent notification) {
-        log.trace("enqueing {}", notification.serialize());
+    public void add(final MonitoringEvent event) {
+        log.trace("enqueing {}", event.serialize());
 
-        if (queue.offer(notification))
+        if (queue.offer(event))
             return;
 
         queue.remove();
-        queue.add(notification);
+        queue.add(event);
     }
 
 
@@ -101,7 +101,7 @@ public class CDMIQueue {
      * 
      * @return a list of available elements in the queue.
      */
-    public List<MonitoringEvent> removeNotifications() {
+    public List<MonitoringEvent> removeEvents() {
         final CopyOnWriteArrayList<MonitoringEvent> copy = new CopyOnWriteArrayList<MonitoringEvent>();
 
         queue.drainTo(copy);

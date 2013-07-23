@@ -25,8 +25,8 @@ class StortletsEventHandler extends CDMIQueueEventHandler {
      * @see gr.ntua.vision.monitoring.notify.EventHandler#handle(gr.ntua.vision.monitoring.events.MonitoringEvent)
      */
     @Override
-    public void handle(final MonitoringEvent notification) {
-        if (SRE_SERVICE.equals(notification.originatingService()))
-            collect(notification);
+    public void handle(final MonitoringEvent event) {
+        if (SRE_SERVICE.equals(event.originatingService()))
+            collect(event);
     }
 }

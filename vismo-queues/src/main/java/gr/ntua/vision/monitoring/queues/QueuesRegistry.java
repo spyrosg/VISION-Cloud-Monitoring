@@ -15,8 +15,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * This is used to handle the registration/read/deregistration of a CDMI notification queue. This is wrapper over a
- * {@link Registry}.
+ * This is used to handle the registration/read/deregistration of a CDMI queue. This is wrapper over a {@link Registry}.
  */
 public class QueuesRegistry {
     // TODO: handle more than one queue for the same topic.
@@ -89,7 +88,7 @@ public class QueuesRegistry {
     public List<MonitoringEvent> getEvents(final String queueName) throws CDMIQueueException {
         for (final CDMIQueue q : queuesList)
             if (q.name.equals(queueName))
-                return q.removeNotifications();
+                return q.removeEvents();
 
         throw new CDMIQueueException("no such queue available: " + queueName);
     }

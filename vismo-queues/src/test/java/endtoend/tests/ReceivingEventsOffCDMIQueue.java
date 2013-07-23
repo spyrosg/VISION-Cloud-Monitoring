@@ -27,7 +27,7 @@ import com.sun.jersey.api.client.config.ClientConfig;
 /**
  *
  */
-public class ReceivingNotificationsOffCDMIQueue extends JerseyResourceTest {
+public class ReceivingEventsOffCDMIQueue extends JerseyResourceTest {
     // TODO: should also test storlets
     /**
      *
@@ -84,7 +84,7 @@ public class ReceivingNotificationsOffCDMIQueue extends JerseyResourceTest {
     }
 
     /***/
-    static final Logger            log            = LoggerFactory.getLogger(ReceivingNotificationsOffCDMIQueue.class);
+    static final Logger            log            = LoggerFactory.getLogger(ReceivingEventsOffCDMIQueue.class);
     /***/
     private static final String    HOST_URL       = "10.0.1.101";
     /***/
