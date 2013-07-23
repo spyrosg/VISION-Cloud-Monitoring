@@ -10,7 +10,7 @@ import java.util.Map;
  * 
  * @see CDMIQueueListBean
  */
-public class CDMIQueueListBean extends CDMIQueueBean {
+public class CDMIQueueListBean extends CDMINotificationQueueBean {
     /** mandatory. */
     private List<Map<String, Object>> value;
 

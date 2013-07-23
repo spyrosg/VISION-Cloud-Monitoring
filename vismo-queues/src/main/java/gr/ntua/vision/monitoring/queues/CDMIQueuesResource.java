@@ -53,7 +53,8 @@ public class CDMIQueuesResource {
         try {
             final CDMINotificationQueue q = registry.register(queueName, topic);
 
-            return cdmiCreateQueueResponse(CDMINotificationQueue.toBean(q));
+            return Response.created(URI.create("/")).header(X_CDMI, X_CDMI_VERSION).entity(CDMINotificationQueue.toBean(q))
+                    .build();
         } catch (final QueuesRegistrationException e) {
             return Response.status(Status.BAD_REQUEST).header(X_CDMI, X_CDMI_VERSION).type(MediaType.TEXT_PLAIN_TYPE)
                     .entity(e.getMessage()).build();
@@ -98,8 +99,8 @@ public class CDMIQueuesResource {
      * @see gr.ntua.vision.monitoring.queues.QueuesRegistry#list()
      */
     @GET
-    public List<CDMIQueueBean> listQueues() {
-        final ArrayList<CDMIQueueBean> beans = new ArrayList<CDMIQueueBean>();
+    public List<CDMINotificationQueueBean> listQueues() {
+        final ArrayList<CDMINotificationQueueBean> beans = new ArrayList<CDMINotificationQueueBean>();
 
         for (final CDMINotificationQueue q : registry.list())
             beans.add(CDMINotificationQueue.toBean(q));
@@ -124,15 +125,6 @@ public class CDMIQueuesResource {
             return Response.status(Status.BAD_REQUEST).header(X_CDMI, X_CDMI_VERSION).type(MediaType.TEXT_PLAIN_TYPE)
                     .entity(e.getMessage()).build();
         }
-    }
-
-
-    /**
-     * @param bean
-     * @return the cdmi successfully created queue response.
-     */
-    private static Response cdmiCreateQueueResponse(final CDMIQueueBean bean) {
-        return Response.created(URI.create("/")).header(X_CDMI, X_CDMI_VERSION).entity(bean).build();
     }
 
 

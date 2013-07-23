@@ -112,10 +112,10 @@ public class CDMINotificationQueue {
 
     /**
      * @param q
-     * @return the corresponding {@link CDMIQueueBean}.
+     * @return the corresponding {@link CDMINotificationQueueBean}.
      */
-    public static CDMIQueueBean toBean(final CDMINotificationQueue q) {
-        final CDMIQueueBean bean = new CDMIQueueBean(q.name);
+    public static CDMINotificationQueueBean toBean(final CDMINotificationQueue q) {
+        final CDMINotificationQueueBean bean = new CDMINotificationQueueBean(q.name);
 
         bean.setTopic(q.topic);
 

@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  * A bean which is delivered to the user by jersey when creating a CDMI queue.
  */
-public class CDMIQueueBean {
+public class CDMINotificationQueueBean {
     /***/
     private static final String              CAPABILITIES_URI     = "/cdmi_capabilities/queue/";
     /***/
@@ -53,7 +53,7 @@ public class CDMIQueueBean {
     /**
      * Constructor.
      */
-    public CDMIQueueBean() {
+    public CDMINotificationQueueBean() {
         this.objectType = OBJECT_TYPE;
         this.objectID = UUID.randomUUID().toString();
         this.parentID = PARENT_ROOT_ID;
@@ -70,7 +70,7 @@ public class CDMIQueueBean {
      * 
      * @param objectName
      */
-    public CDMIQueueBean(final String objectName) {
+    public CDMINotificationQueueBean(final String objectName) {
         this();
         this.objectName = objectName;
     }
