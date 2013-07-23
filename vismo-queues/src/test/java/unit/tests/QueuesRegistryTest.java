@@ -3,7 +3,7 @@ package unit.tests;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.queues.QueuesRegistry;
 
-import java.util.List;
+import java.util.Collection;
 
 import junit.framework.TestCase;
 
@@ -27,7 +27,7 @@ public class QueuesRegistryTest extends TestCase {
         registry.register("my-queue", "*");
         eventGenerator.pushEvents(NO_EVENTS);
 
-        final List<MonitoringEvent> events = registry.getEvents("my-queue");
+        final Collection<MonitoringEvent> events = registry.getEvents("my-queue");
 
         assertEquals(NO_EVENTS, events.size());
     }

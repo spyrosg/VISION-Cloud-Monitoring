@@ -2,8 +2,8 @@ package gr.ntua.vision.monitoring.queues;
 
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
@@ -84,6 +84,14 @@ public class CDMIQueue {
 
 
     /**
+     * @return the elements available in the queue.
+     */
+    public Collection<MonitoringEvent> getEvents() {
+        return Collections.unmodifiableCollection(queue);
+    }
+
+
+    /**
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -93,20 +101,6 @@ public class CDMIQueue {
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + ((topic == null) ? 0 : topic.hashCode());
         return result;
-    }
-
-
-    /**
-     * This is used to remove the available elements of the queue and pass them back to the caller.
-     * 
-     * @return a list of available elements in the queue.
-     */
-    public List<MonitoringEvent> removeEvents() {
-        final CopyOnWriteArrayList<MonitoringEvent> copy = new CopyOnWriteArrayList<MonitoringEvent>();
-
-        queue.drainTo(copy);
-
-        return copy;
     }
 
 

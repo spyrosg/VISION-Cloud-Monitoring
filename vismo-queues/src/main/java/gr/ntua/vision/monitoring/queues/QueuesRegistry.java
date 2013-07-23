@@ -4,6 +4,7 @@ import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.notify.Registry;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -57,7 +58,7 @@ public class QueuesRegistry {
      */
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getCDMIEvents(final String queueName) throws CDMIQueueException {
-        final List<MonitoringEvent> list = getEvents(queueName);
+        final Collection<MonitoringEvent> list = getEvents(queueName);
         final ArrayList<Map<String, Object>> values = new ArrayList<Map<String, Object>>(list.size());
 
         for (final MonitoringEvent e : list) {
@@ -85,10 +86,10 @@ public class QueuesRegistry {
      * @throws CDMIQueueException
      *             when no queue with specified name exists.
      */
-    public List<MonitoringEvent> getEvents(final String queueName) throws CDMIQueueException {
+    public Collection<MonitoringEvent> getEvents(final String queueName) throws CDMIQueueException {
         for (final CDMIQueue q : queuesList)
             if (q.name.equals(queueName))
-                return q.removeEvents();
+                return q.getEvents();
 
         throw new CDMIQueueException("no such queue available: " + queueName);
     }

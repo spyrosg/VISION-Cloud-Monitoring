@@ -91,10 +91,11 @@ public class InMemoryEventRegistry implements Registry {
         final HashMap<String, Object> m = new HashMap<String, Object>();
 
         m.put("timestamp", System.currentTimeMillis());
-        m.put("topic", topic);
+        // m.put("topic", topic);
         m.put("originating-machine", "localhost");
         m.put("originating-service", "object_service");
         m.put("operation", "GET");
+        m.put("status", "SUCCESS");
 
         return factory.createEvent(m);
     }
