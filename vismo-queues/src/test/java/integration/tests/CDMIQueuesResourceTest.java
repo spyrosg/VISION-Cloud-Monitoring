@@ -65,9 +65,6 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
     public void testShouldCreateCDMIQueue() throws Exception {
         final String QUEUE_NAME = "q1";
         final ClientResponse res = createCDMIQueue(QUEUE_NAME, "*");
-
-        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
-
         final MultivaluedMap<String, String> headers = res.getHeaders();
 
         assertEquals(APPLICATION_CDMI_QUEUE, headers.getFirst(HttpHeaders.CONTENT_TYPE));
@@ -82,13 +79,33 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
     public void testShouldDeleteCDMIQueue() throws Exception {
         final String QUEUE_NAME = "q1";
 
-        assertEquals(ClientResponse.Status.CREATED, createCDMIQueue(QUEUE_NAME, "*").getClientResponseStatus());
+        createCDMIQueue(QUEUE_NAME, "*");
 
         final ClientResponse res = deleteCDMIQueue(QUEUE_NAME);
         final MultivaluedMap<String, String> headers = res.getHeaders();
 
-        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
         assertEquals(X_CDMI_VERSION, headers.getFirst(X_CDMI));
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    public void testShouldDeleteValuesOffCDMIQueue() throws Exception {
+        final String QUEUE_NAME = "q2";
+        final int NO_EVENTS = 1;
+
+        assertEquals(ClientResponse.Status.CREATED, createCDMIQueue(QUEUE_NAME, "*").getClientResponseStatus());
+        eventGenerator.pushEvents(NO_EVENTS);
+
+        final CDMIQueueListBean cdmiValueBeforeDelete = readCDMIQueue(MY_QUEUE).getEntity(CDMIQueueListBean.class);
+
+        assertEquals("0-" + NO_EVENTS, cdmiValueBeforeDelete.getQueueValues());
+
+        deleteCDMIQueuValues(QUEUE_NAME, NO_EVENTS);
+
+        final CDMIQueueListBean cdmiValueAfterDelete = readCDMIQueue(MY_QUEUE).getEntity(CDMIQueueListBean.class);
+        assertEquals("", cdmiValueAfterDelete.getQueueValues());
     }
 
 
@@ -111,7 +128,7 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
      * @throws Exception
      */
     public void testShouldListUserQueues() throws Exception {
-        assertEquals(ClientResponse.Status.CREATED, createCDMIQueue(MY_QUEUE, "writes").getClientResponseStatus());
+        createCDMIQueue(MY_QUEUE, "writes");
 
         final ClientResponse res = resource().accept(APPLICATION_CDMI_QUEUE_TYPE).type(APPLICATION_CDMI_QUEUE_TYPE)
                 .header(X_CDMI, X_CDMI_VERSION).get(ClientResponse.class);
@@ -129,16 +146,21 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
     public void testShouldReadCDMINotificationsOffTheQueue() throws Exception {
         final int NO_EVENTS = 10;
 
-        assertEquals(ClientResponse.Status.CREATED, createCDMIQueue(MY_QUEUE, MY_TOPIC).getClientResponseStatus());
+        createCDMIQueue(MY_QUEUE, MY_TOPIC);
         eventGenerator.pushEvents(NO_EVENTS);
 
         final ClientResponse res = readCDMIQueue(MY_QUEUE);
         final MultivaluedMap<String, String> headers = res.getHeaders();
 
-        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
         assertEquals(APPLICATION_CDMI_QUEUE, headers.getFirst(HttpHeaders.CONTENT_TYPE));
         assertEquals(X_CDMI_VERSION, headers.getFirst(X_CDMI));
         assertIsCDMICompliantResponse(MY_QUEUE, MY_TOPIC, res.getEntity(CDMIQueueListBean.class), NO_EVENTS);
+
+        // TODO: should not delete values off the queue, if not requested
+
+        final ClientResponse res1 = readCDMIQueue(MY_QUEUE);
+
+        assertEquals("1-" + NO_EVENTS, res1.getEntity(CDMIQueueListBean.class).getQueueValues());
     }
 
 
@@ -146,10 +168,7 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
      * @throws Exception
      */
     public void testShouldRejectInvalidTopicRequests() throws Exception {
-        final String TOPIC = "my-topic";
-        final ClientResponse res = createCDMIQueue(MY_QUEUE, TOPIC);
-
-        assertEquals(ClientResponse.Status.BAD_REQUEST, res.getClientResponseStatus());
+        createCDMIQueue(MY_QUEUE, "foo-topic", ClientResponse.Status.BAD_REQUEST);
     }
 
 
@@ -173,15 +192,35 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
 
 
     /**
-     * Create a queue, with a CDMI compliant call.
-     * 
      * @param queueName
      * @param topic
      * @return the client's response.
      */
     private ClientResponse createCDMIQueue(final String queueName, final String topic) {
-        return resource().path(queueName).path(topic).accept(APPLICATION_CDMI_QUEUE_TYPE).type(APPLICATION_CDMI_QUEUE_TYPE)
-                .header(X_CDMI, X_CDMI_VERSION).put(ClientResponse.class);
+        final ClientResponse res = resource().path(queueName).path(topic).accept(APPLICATION_CDMI_QUEUE_TYPE)
+                .type(APPLICATION_CDMI_QUEUE_TYPE).header(X_CDMI, X_CDMI_VERSION).put(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+
+        return res;
+    }
+
+
+    /**
+     * Create a queue, with a CDMI compliant call.
+     * 
+     * @param queueName
+     * @param topic
+     * @param expectedStatus
+     * @return the client's response.
+     */
+    private ClientResponse createCDMIQueue(final String queueName, final String topic, final ClientResponse.Status expectedStatus) {
+        final ClientResponse res = resource().path(queueName).path(topic).accept(APPLICATION_CDMI_QUEUE_TYPE)
+                .type(APPLICATION_CDMI_QUEUE_TYPE).header(X_CDMI, X_CDMI_VERSION).put(ClientResponse.class);
+
+        assertEquals(expectedStatus, res.getClientResponseStatus());
+
+        return res;
     }
 
 
@@ -192,7 +231,20 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
      * @return the {@link ClientResponse} object.
      */
     private ClientResponse deleteCDMIQueue(final String queueName) {
-        return resource().path(queueName).header(X_CDMI, X_CDMI_VERSION).delete(ClientResponse.class);
+        final ClientResponse res = resource().path(queueName).header(X_CDMI, X_CDMI_VERSION).delete(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
+
+        return res;
+    }
+
+
+    /**
+     * @param queueName
+     * @param noEvents
+     */
+    private void deleteCDMIQueuValues(final String queueName, final int noEvents) {
+        // TODO Auto-generated method stub
     }
 
 
@@ -203,8 +255,12 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
      * @return the client's response. It should contain the list of available notifications (events) stored in the queue.
      */
     private ClientResponse readCDMIQueue(final String queueName) {
-        return resource().path(queueName).accept(APPLICATION_CDMI_QUEUE_TYPE).header(X_CDMI, X_CDMI_VERSION)
+        final ClientResponse res = resource().path(queueName).accept(APPLICATION_CDMI_QUEUE_TYPE).header(X_CDMI, X_CDMI_VERSION)
                 .get(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
+
+        return res;
     }
 
 
