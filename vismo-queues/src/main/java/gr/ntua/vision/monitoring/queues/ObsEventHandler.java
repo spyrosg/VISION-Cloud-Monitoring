@@ -32,11 +32,11 @@ class ObsEventHandler extends CDMIQueueEventHandler {
      */
     @Override
     public void handle(final MonitoringEvent notification) {
-        System.out.println(getClass() + " received: " + notification);
-
         if (!OBS_SERVICE.equals(notification.originatingService()))
             return;
         if (!op.equals(notification.get(key)))
+            return;
+        if (notification.topic() != null)
             return;
 
         collect(notification);

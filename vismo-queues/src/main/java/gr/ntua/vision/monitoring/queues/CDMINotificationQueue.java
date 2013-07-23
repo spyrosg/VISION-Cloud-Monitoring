@@ -6,11 +6,16 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * This is used to collect all events for a specified topic. The queue can set a cap on the number of notifications to hold.
  */
 public class CDMINotificationQueue {
+    /***/
+    private static final Logger                        log = LoggerFactory.getLogger(CDMINotificationQueue.class);
     /** the name of the queue. */
     public final String                                name;
     /** the topic of the queue. */
@@ -42,6 +47,8 @@ public class CDMINotificationQueue {
      * @see java.util.AbstractQueue#add(java.lang.Object)
      */
     public void add(final MonitoringEvent notification) {
+        log.trace("enqueing {}", notification.serialize());
+
         if (queue.offer(notification))
             return;
 

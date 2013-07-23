@@ -16,6 +16,9 @@ import integration.tests.JerseyResourceTest;
 
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
@@ -56,7 +59,7 @@ public class ReceivingNotificationsOffCDMIQueue extends JerseyResourceTest {
          */
         @Override
         public void handle(final MonitoringEvent e) {
-            System.out.println("received: " + e.serialize());
+            log.debug("received: {}", e.serialize());
 
             if (e.topic() != null)
                 return;
@@ -67,7 +70,7 @@ public class ReceivingNotificationsOffCDMIQueue extends JerseyResourceTest {
             if (!SUCCESS.equals(e.get("status")))
                 return;
 
-            System.out.println("match! " + e.serialize());
+            log.debug("match! {}", e.serialize());
             events.add(e);
         }
 
@@ -80,6 +83,8 @@ public class ReceivingNotificationsOffCDMIQueue extends JerseyResourceTest {
         }
     }
 
+    /***/
+    static final Logger            log            = LoggerFactory.getLogger(ReceivingNotificationsOffCDMIQueue.class);
     /***/
     private static final String    HOST_URL       = "10.0.1.101";
     /***/
@@ -148,6 +153,7 @@ public class ReceivingNotificationsOffCDMIQueue extends JerseyResourceTest {
         final CDMIQueueListBean list = readCDMIQueue(QUEUE);
 
         assertEquals("0-1", list.getQueueValues());
+        assertEquals(TOPIC, list.getTopic());
         assertEquals(getHandler.events.get(0), list.getValue());
     }
 
