@@ -281,7 +281,7 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
         assertEquals(0, bean.getMetadata().size());
 
         if (noExpectedEvents > 0)
-            assertEquals("1-" + noExpectedEvents, bean.getQueueValues());
+            assertEquals("0-" + noExpectedEvents, bean.getQueueValues());
         else
             assertEquals("", bean.getQueueValues());
     }

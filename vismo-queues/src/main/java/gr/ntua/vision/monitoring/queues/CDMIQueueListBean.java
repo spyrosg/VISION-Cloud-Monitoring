@@ -51,7 +51,7 @@ public class CDMIQueueListBean extends CDMIQueueBean {
         if (list.size() == 0)
             this.setQueueValues("");
         else
-            this.setQueueValues("1-" + list.size());
+            this.setQueueValues("0-" + list.size());
 
         this.value = list;
     }
