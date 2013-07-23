@@ -81,8 +81,7 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
 
         createCDMIQueue(QUEUE_NAME, "*");
 
-        final ClientResponse res = deleteCDMIQueue(QUEUE_NAME);
-        final MultivaluedMap<String, String> headers = res.getHeaders();
+        final MultivaluedMap<String, String> headers = deleteCDMIQueue(QUEUE_NAME).getHeaders();
 
         assertEquals(X_CDMI_VERSION, headers.getFirst(X_CDMI));
     }
@@ -98,14 +97,14 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
         assertEquals(ClientResponse.Status.CREATED, createCDMIQueue(QUEUE_NAME, "*").getClientResponseStatus());
         eventGenerator.pushEvents(NO_EVENTS);
 
-        final CDMIQueueListBean cdmiValueBeforeDelete = readCDMIQueue(MY_QUEUE).getEntity(CDMIQueueListBean.class);
+        final CDMIQueueListBean cdmiValueBeforeDelete = readCDMIQueue(QUEUE_NAME).getEntity(CDMIQueueListBean.class);
 
-        assertEquals("0-" + NO_EVENTS, cdmiValueBeforeDelete.getQueueValues());
-
+        assertHaveExpectedQueueValues(cdmiValueBeforeDelete, NO_EVENTS);
         deleteCDMIQueuValues(QUEUE_NAME, NO_EVENTS);
 
-        final CDMIQueueListBean cdmiValueAfterDelete = readCDMIQueue(MY_QUEUE).getEntity(CDMIQueueListBean.class);
-        assertEquals("", cdmiValueAfterDelete.getQueueValues());
+        final CDMIQueueListBean cdmiValueAfterDelete = readCDMIQueue(QUEUE_NAME).getEntity(CDMIQueueListBean.class);
+
+        assertHaveExpectedQueueValues(cdmiValueAfterDelete, 0);
     }
 
 
