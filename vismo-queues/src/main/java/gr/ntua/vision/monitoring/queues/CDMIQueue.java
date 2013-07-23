@@ -13,9 +13,9 @@ import org.slf4j.LoggerFactory;
 /**
  * This is used to collect all events for a specified topic. The queue can set a cap on the number of notifications to hold.
  */
-public class CDMINotificationQueue {
+public class CDMIQueue {
     /***/
-    private static final Logger                        log = LoggerFactory.getLogger(CDMINotificationQueue.class);
+    private static final Logger                        log = LoggerFactory.getLogger(CDMIQueue.class);
     /** the name of the queue. */
     public final String                                name;
     /** the topic of the queue. */
@@ -32,7 +32,7 @@ public class CDMINotificationQueue {
      * @param topic
      *            the topic of the queue.
      */
-    public CDMINotificationQueue(final String name, final String topic) {
+    public CDMIQueue(final String name, final String topic) {
         this.name = name;
         this.topic = topic;
         this.queue = new LinkedBlockingQueue<MonitoringEvent>(100); // FIXME: size
@@ -68,7 +68,7 @@ public class CDMINotificationQueue {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final CDMINotificationQueue other = (CDMINotificationQueue) obj;
+        final CDMIQueue other = (CDMIQueue) obj;
         if (name == null) {
             if (other.name != null)
                 return false;
@@ -112,10 +112,10 @@ public class CDMINotificationQueue {
 
     /**
      * @param q
-     * @return the corresponding {@link CDMINotificationQueueBean}.
+     * @return the corresponding {@link CDMIQueueBean}.
      */
-    public static CDMINotificationQueueBean toBean(final CDMINotificationQueue q) {
-        final CDMINotificationQueueBean bean = new CDMINotificationQueueBean(q.name);
+    public static CDMIQueueBean toBean(final CDMIQueue q) {
+        final CDMIQueueBean bean = new CDMIQueueBean(q.name);
 
         bean.setTopic(q.topic);
 

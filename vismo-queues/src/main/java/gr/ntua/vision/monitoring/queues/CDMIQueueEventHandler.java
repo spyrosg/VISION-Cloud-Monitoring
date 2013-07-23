@@ -9,7 +9,7 @@ import gr.ntua.vision.monitoring.notify.EventHandler;
  */
 abstract class CDMIQueueEventHandler implements EventHandler {
     /***/
-    private final CDMINotificationQueue q;
+    private final CDMIQueue q;
 
 
     /**
@@ -17,7 +17,7 @@ abstract class CDMIQueueEventHandler implements EventHandler {
      * 
      * @param q
      */
-    public CDMIQueueEventHandler(final CDMINotificationQueue q) {
+    public CDMIQueueEventHandler(final CDMIQueue q) {
         this.q = q;
     }
 

@@ -30,7 +30,7 @@ public class QueuesRegistry {
     /***/
     private final JSONParser                       parser           = new JSONParser();
     /** the list of registered queues. */
-    private final ArrayList<CDMINotificationQueue> queuesList;
+    private final ArrayList<CDMIQueue>             queuesList;
     /** the actual registry. */
     private final Registry                         registry;
 
@@ -42,7 +42,7 @@ public class QueuesRegistry {
      */
     public QueuesRegistry(final Registry registry) {
         this.registry = registry;
-        this.queuesList = new ArrayList<CDMINotificationQueue>();
+        this.queuesList = new ArrayList<CDMIQueue>();
         this.handlers = new ArrayList<CDMIQueueEventHandler>();
     }
 
@@ -53,11 +53,11 @@ public class QueuesRegistry {
      * @param queueName
      *            the name of queue.
      * @return the list of events in the queue.
-     * @throws NoSuchQueueException
+     * @throws CDMIQueueException
      *             when no queue with specified name exists.
      */
     @SuppressWarnings("unchecked")
-    public List<Map<String, Object>> getCDMIEvents(final String queueName) {
+    public List<Map<String, Object>> getCDMIEvents(final String queueName) throws CDMIQueueException {
         final List<MonitoringEvent> list = getEvents(queueName);
         final ArrayList<Map<String, Object>> values = new ArrayList<Map<String, Object>>(list.size());
 
@@ -83,15 +83,15 @@ public class QueuesRegistry {
      * @param queueName
      *            the name of queue.
      * @return the list of events in the queue.
-     * @throws NoSuchQueueException
+     * @throws CDMIQueueException
      *             when no queue with specified name exists.
      */
-    public List<MonitoringEvent> getEvents(final String queueName) throws NoSuchQueueException {
-        for (final CDMINotificationQueue q : queuesList)
+    public List<MonitoringEvent> getEvents(final String queueName) throws CDMIQueueException {
+        for (final CDMIQueue q : queuesList)
             if (q.name.equals(queueName))
                 return q.removeNotifications();
 
-        throw new NoSuchQueueException("no such queue available: " + queueName);
+        throw new CDMIQueueException("no such queue available: " + queueName);
     }
 
 
@@ -106,8 +106,8 @@ public class QueuesRegistry {
     /**
      * @return a list of queues.
      */
-    public List<CDMINotificationQueue> list() {
-        return new CopyOnWriteArrayList<CDMINotificationQueue>(queuesList);
+    public List<CDMIQueue> list() {
+        return new CopyOnWriteArrayList<CDMIQueue>(queuesList);
     }
 
 
@@ -128,16 +128,16 @@ public class QueuesRegistry {
      * @param topic
      *            the topic to subscribe to.
      * @return the queue object that will be receiving events for given topic.
-     * @throws QueuesRegistrationException
+     * @throws CDMIQueueException
      *             when the topic is not available or a queue with the same name already exists.
      */
-    public CDMINotificationQueue register(final String queueName, final String topic) throws QueuesRegistrationException {
+    public CDMIQueue register(final String queueName, final String topic) throws CDMIQueueException {
         requireAvailabe(topic);
 
-        final CDMINotificationQueue q = new CDMINotificationQueue(queueName, topic);
+        final CDMIQueue q = new CDMIQueue(queueName, topic);
 
         if (queuesList.contains(q))
-            throw new QueuesRegistrationException("queue already exists: " + queueName);
+            throw new CDMIQueueException("queue already exists: " + queueName);
 
         final CDMIQueueEventHandler handler;
 
@@ -166,13 +166,14 @@ public class QueuesRegistry {
 
     /**
      * @param queueName
+     * @throws CDMIQueueException
      */
-    public void unregister(final String queueName) {
-        final CDMINotificationQueue q = new CDMINotificationQueue(queueName, "*");
+    public void unregister(final String queueName) throws CDMIQueueException {
+        final CDMIQueue q = new CDMIQueue(queueName, "*");
         final int idx = queuesList.indexOf(q);
 
         if (idx == -1)
-            throw new NoSuchQueueException("no such queue available: " + queueName);
+            throw new CDMIQueueException("no such queue available: " + queueName);
 
         queuesList.remove(idx);
         registry.unregister(handlers.remove(idx));
@@ -196,10 +197,10 @@ public class QueuesRegistry {
 
     /**
      * @param topic
-     * @throws QueuesRegistrationException
+     * @throws CDMIQueueException
      */
-    private static void requireAvailabe(final String topic) throws QueuesRegistrationException {
+    private static void requireAvailabe(final String topic) throws CDMIQueueException {
         if (!isAvailableTopic(topic))
-            throw new QueuesRegistrationException("topic not available or invalid: " + topic);
+            throw new CDMIQueueException("topic not available or invalid: " + topic);
     }
 }

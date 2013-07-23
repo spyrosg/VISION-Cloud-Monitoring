@@ -6,13 +6,13 @@ import gr.ntua.vision.monitoring.events.MonitoringEvent;
 /**
  *
  */
-public class MatchAllEventHandler extends CDMIQueueEventHandler {
+class MatchAllEventHandler extends CDMIQueueEventHandler {
     /**
      * Constructor.
      * 
      * @param q
      */
-    public MatchAllEventHandler(final CDMINotificationQueue q) {
+    public MatchAllEventHandler(final CDMIQueue q) {
         super(q);
     }
 

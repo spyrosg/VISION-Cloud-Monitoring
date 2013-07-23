@@ -4,7 +4,7 @@ import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.APPLICATION_C
 import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.APPLICATION_CDMI_QUEUE_TYPE;
 import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.X_CDMI;
 import static gr.ntua.vision.monitoring.queues.CDMIQueueMediaTypes.X_CDMI_VERSION;
-import gr.ntua.vision.monitoring.queues.CDMINotificationQueueBean;
+import gr.ntua.vision.monitoring.queues.CDMIQueueBean;
 import gr.ntua.vision.monitoring.queues.CDMIQueueListBean;
 import gr.ntua.vision.monitoring.queues.CDMIQueueProdiver;
 import gr.ntua.vision.monitoring.queues.CDMIQueuesResource;
@@ -69,7 +69,7 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
 
         assertEquals(APPLICATION_CDMI_QUEUE, headers.getFirst(HttpHeaders.CONTENT_TYPE));
         assertEquals(X_CDMI_VERSION, headers.getFirst(X_CDMI));
-        assertIsCDMICompliantResponse(QUEUE_NAME, res.getEntity(CDMINotificationQueueBean.class), 0);
+        assertIsCDMICompliantResponse(QUEUE_NAME, res.getEntity(CDMIQueueBean.class), 0);
     }
 
 
@@ -133,7 +133,7 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
         final ClientResponse res = resource().accept(APPLICATION_CDMI_QUEUE_TYPE).type(APPLICATION_CDMI_QUEUE_TYPE)
                 .header(X_CDMI, X_CDMI_VERSION).get(ClientResponse.class);
         @SuppressWarnings("unchecked")
-        final List<CDMINotificationQueueBean> queues = res.getEntity(List.class);
+        final List<CDMIQueueBean> queues = res.getEntity(List.class);
 
         assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
         assertEquals(1, queues.size());
@@ -269,8 +269,7 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
      * @param bean
      * @param noExpectedEvents
      */
-    private static void assertIsCDMICompliantResponse(final String queueName, final CDMINotificationQueueBean bean,
-            final int noExpectedEvents) {
+    private static void assertIsCDMICompliantResponse(final String queueName, final CDMIQueueBean bean, final int noExpectedEvents) {
         assertEquals(APPLICATION_CDMI_QUEUE, bean.getObjectType());
         assertNotNull(bean.getObjectID());
         assertEquals(queueName, bean.getObjectName());

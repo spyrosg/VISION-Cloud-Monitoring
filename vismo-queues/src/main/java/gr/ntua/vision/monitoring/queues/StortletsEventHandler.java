@@ -6,7 +6,7 @@ import gr.ntua.vision.monitoring.events.MonitoringEvent;
 /**
  *
  */
-public class StortletsEventHandler extends CDMIQueueEventHandler {
+class StortletsEventHandler extends CDMIQueueEventHandler {
     /***/
     private static final String SRE_SERVICE = "SRE";
 
@@ -16,7 +16,7 @@ public class StortletsEventHandler extends CDMIQueueEventHandler {
      * 
      * @param q
      */
-    public StortletsEventHandler(final CDMINotificationQueue q) {
+    public StortletsEventHandler(final CDMIQueue q) {
         super(q);
     }
 

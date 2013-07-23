@@ -21,7 +21,7 @@ class ObsEventHandler extends CDMIQueueEventHandler {
      * @param q
      * @param op
      */
-    public ObsEventHandler(final CDMINotificationQueue q, final String op) {
+    public ObsEventHandler(final CDMIQueue q, final String op) {
         super(q);
         this.op = op;
     }

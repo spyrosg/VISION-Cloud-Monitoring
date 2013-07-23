@@ -51,11 +51,10 @@ public class CDMIQueuesResource {
     @PUT
     public Response createQueue(@PathParam("queue") final String queueName, @PathParam("topic") final String topic) {
         try {
-            final CDMINotificationQueue q = registry.register(queueName, topic);
+            final CDMIQueue q = registry.register(queueName, topic);
 
-            return Response.created(URI.create("/")).header(X_CDMI, X_CDMI_VERSION).entity(CDMINotificationQueue.toBean(q))
-                    .build();
-        } catch (final QueuesRegistrationException e) {
+            return Response.created(URI.create("/")).header(X_CDMI, X_CDMI_VERSION).entity(CDMIQueue.toBean(q)).build();
+        } catch (final CDMIQueueException e) {
             return Response.status(Status.BAD_REQUEST).header(X_CDMI, X_CDMI_VERSION).type(MediaType.TEXT_PLAIN_TYPE)
                     .entity(e.getMessage()).build();
         }
@@ -73,7 +72,7 @@ public class CDMIQueuesResource {
             registry.unregister(queueName);
 
             return Response.noContent().header(X_CDMI, X_CDMI_VERSION).build();
-        } catch (final NoSuchQueueException e) {
+        } catch (final CDMIQueueException e) {
             return Response.status(Status.BAD_REQUEST).header(X_CDMI, X_CDMI_VERSION).type(MediaType.TEXT_PLAIN_TYPE)
                     .entity(e.getMessage()).build();
         }
@@ -99,11 +98,11 @@ public class CDMIQueuesResource {
      * @see gr.ntua.vision.monitoring.queues.QueuesRegistry#list()
      */
     @GET
-    public List<CDMINotificationQueueBean> listQueues() {
-        final ArrayList<CDMINotificationQueueBean> beans = new ArrayList<CDMINotificationQueueBean>();
+    public List<CDMIQueueBean> listQueues() {
+        final ArrayList<CDMIQueueBean> beans = new ArrayList<CDMIQueueBean>();
 
-        for (final CDMINotificationQueue q : registry.list())
-            beans.add(CDMINotificationQueue.toBean(q));
+        for (final CDMIQueue q : registry.list())
+            beans.add(CDMIQueue.toBean(q));
 
         return beans;
     }
@@ -121,7 +120,7 @@ public class CDMIQueuesResource {
     public Response readQueue(@PathParam("queue") final String queueName) {
         try {
             return cdmiReadQueueResponse(queueName, registry.getCDMIEvents(queueName));
-        } catch (final NoSuchQueueException e) {
+        } catch (final CDMIQueueException e) {
             return Response.status(Status.BAD_REQUEST).header(X_CDMI, X_CDMI_VERSION).type(MediaType.TEXT_PLAIN_TYPE)
                     .entity(e.getMessage()).build();
         }
