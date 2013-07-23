@@ -46,8 +46,6 @@ public class CDMIQueueBean {
     private String                           parentURI;
     /** mandatory. */
     private String                           queueValues;
-    /** extension. */
-    private String                           topic;
 
 
     /**
@@ -157,14 +155,6 @@ public class CDMIQueueBean {
 
 
     /**
-     * @return the topic
-     */
-    public String getTopic() {
-        return topic;
-    }
-
-
-    /**
      * @param capabilitiesURI
      *            the capabilitiesURI to set
      */
@@ -251,14 +241,5 @@ public class CDMIQueueBean {
      */
     public void setQueueValues(final String queueValues) {
         this.queueValues = queueValues;
-    }
-
-
-    /**
-     * @param topic
-     *            the topic to set
-     */
-    public void setTopic(final String topic) {
-        this.topic = topic;
     }
 }

@@ -134,7 +134,7 @@ public class QueuesRegistry {
     public CDMIQueue register(final String queueName, final String topic) throws CDMIQueueException {
         requireAvailabe(topic);
 
-        final CDMIQueue q = new CDMIQueue(queueName, topic);
+        final CDMIQueue q = new CDMIQueue(queueName);
 
         if (queuesList.contains(q))
             throw new CDMIQueueException("queue already exists: " + queueName);
@@ -169,7 +169,7 @@ public class QueuesRegistry {
      * @throws CDMIQueueException
      */
     public void unregister(final String queueName) throws CDMIQueueException {
-        final CDMIQueue q = new CDMIQueue(queueName, "*");
+        final CDMIQueue q = new CDMIQueue(queueName);
         final int idx = queuesList.indexOf(q);
 
         if (idx == -1)

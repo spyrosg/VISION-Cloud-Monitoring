@@ -18,8 +18,6 @@ public class CDMIQueue {
     private static final Logger                        log = LoggerFactory.getLogger(CDMIQueue.class);
     /** the name of the queue. */
     public final String                                name;
-    /** the topic of the queue. */
-    public final String                                topic;
     /** the list of available events. */
     private final LinkedBlockingQueue<MonitoringEvent> queue;
 
@@ -29,12 +27,9 @@ public class CDMIQueue {
      * 
      * @param name
      *            the name of the queue.
-     * @param topic
-     *            the topic of the queue.
      */
-    public CDMIQueue(final String name, final String topic) {
+    public CDMIQueue(final String name) {
         this.name = name;
-        this.topic = topic;
         this.queue = new LinkedBlockingQueue<MonitoringEvent>(100); // FIXME: size
     }
 
@@ -74,11 +69,6 @@ public class CDMIQueue {
                 return false;
         } else if (!name.equals(other.name))
             return false;
-        if (topic == null) {
-            if (other.topic != null)
-                return false;
-        } else if (!topic.equals(other.topic))
-            return false;
         return true;
     }
 
@@ -99,7 +89,6 @@ public class CDMIQueue {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((topic == null) ? 0 : topic.hashCode());
         return result;
     }
 
@@ -109,10 +98,6 @@ public class CDMIQueue {
      * @return the corresponding {@link CDMIQueueBean}.
      */
     public static CDMIQueueBean toBean(final CDMIQueue q) {
-        final CDMIQueueBean bean = new CDMIQueueBean(q.name);
-
-        bean.setTopic(q.topic);
-
-        return bean;
+        return new CDMIQueueBean(q.name);
     }
 }

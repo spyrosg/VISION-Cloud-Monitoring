@@ -153,7 +153,6 @@ public class ReceivingEventsOffCDMIQueue extends JerseyResourceTest {
         final CDMIQueueListBean list = readCDMIQueue(QUEUE);
 
         assertEquals("0-1", list.getQueueValues());
-        assertEquals(TOPIC, list.getTopic());
         assertEquals(getHandler.events.get(0), list.getValue());
     }
 

@@ -156,11 +156,9 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
         assertEquals(X_CDMI_VERSION, headers.getFirst(X_CDMI));
         assertIsCDMICompliantResponse(MY_QUEUE, MY_TOPIC, res.getEntity(CDMIQueueListBean.class), NO_EVENTS);
 
-        // TODO: should not delete values off the queue, if not requested
-
         final ClientResponse res1 = readCDMIQueue(MY_QUEUE);
 
-        assertEquals("1-" + NO_EVENTS, res1.getEntity(CDMIQueueListBean.class).getQueueValues());
+        assertHaveExpectedQueueValues(res1.getEntity(CDMIQueueListBean.class), NO_EVENTS);
     }
 
 
@@ -265,6 +263,18 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
 
 
     /**
+     * @param bean
+     * @param noExpectedEvents
+     */
+    private static void assertHaveExpectedQueueValues(final CDMIQueueBean bean, final int noExpectedEvents) {
+        if (noExpectedEvents > 0)
+            assertEquals("0-" + noExpectedEvents, bean.getQueueValues());
+        else
+            assertEquals("", bean.getQueueValues());
+    }
+
+
+    /**
      * @param queueName
      * @param bean
      * @param noExpectedEvents
@@ -279,11 +289,7 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
         assertEquals("/cdmi_capabilities/queue/", bean.getCapabilitiesURI());
         assertEquals("Complete", bean.getCompletionStatus());
         assertEquals(0, bean.getMetadata().size());
-
-        if (noExpectedEvents > 0)
-            assertEquals("0-" + noExpectedEvents, bean.getQueueValues());
-        else
-            assertEquals("", bean.getQueueValues());
+        assertHaveExpectedQueueValues(bean, noExpectedEvents);
     }
 
 
@@ -298,9 +304,7 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
         assertIsCDMICompliantResponse(queueName, bean, noExpectedEvents);
         assertEquals(noExpectedEvents, bean.getValue().size());
 
-        for (final Map<String, Object> event : bean.getValue()) {
-            assertEquals(topic, event.get("topic"));
+        for (final Map<String, Object> event : bean.getValue())
             assertNotNull(event.get("originating-service"));
-        }
     }
 }
