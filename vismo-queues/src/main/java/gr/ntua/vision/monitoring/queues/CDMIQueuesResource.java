@@ -69,7 +69,14 @@ public class CDMIQueuesResource {
     @DELETE
     public Response deleteQueue(@PathParam("queue") final String queueName) {
         try {
-            registry.unregister(queueName);
+            if (queueName.endsWith("?value") || queueName.contains("?values:")) {
+                final String[] fs = queueName.split("\\?");
+                final String qName = fs[0];
+                final int count = Integer.valueOf(fs[1].replaceFirst("value[s][:]", ""));
+
+                registry.removeEvents(qName, count);
+            } else
+                registry.unregister(queueName);
 
             return Response.noContent().header(X_CDMI, X_CDMI_VERSION).build();
         } catch (final CDMIQueueException e) {

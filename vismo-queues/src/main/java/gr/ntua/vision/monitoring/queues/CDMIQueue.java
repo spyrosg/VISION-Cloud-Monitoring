@@ -94,6 +94,21 @@ public class CDMIQueue {
 
 
     /**
+     * Remove the first <code>count</code> elements of the queue.
+     * 
+     * @param count
+     *            the number of elements to remove.
+     */
+    public void removeEvents(final int count) {
+        if (count == Integer.MAX_VALUE)
+            queue.clear();
+        else
+            for (int i = 0; i < count && !queue.isEmpty(); ++i)
+                queue.poll();
+    }
+
+
+    /**
      * @param q
      * @return the corresponding {@link CDMIQueueBean}.
      */

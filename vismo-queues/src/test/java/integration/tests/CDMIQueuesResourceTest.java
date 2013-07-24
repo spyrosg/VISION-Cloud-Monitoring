@@ -100,7 +100,8 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
         final CDMIQueueListBean cdmiValueBeforeDelete = readCDMIQueue(QUEUE_NAME).getEntity(CDMIQueueListBean.class);
 
         assertHaveExpectedQueueValues(cdmiValueBeforeDelete, NO_EVENTS);
-        deleteCDMIQueuValues(QUEUE_NAME, NO_EVENTS);
+
+        deleteCDMIQueueValues(QUEUE_NAME, NO_EVENTS);
 
         final CDMIQueueListBean cdmiValueAfterDelete = readCDMIQueue(QUEUE_NAME).getEntity(CDMIQueueListBean.class);
 
@@ -239,9 +240,15 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
     /**
      * @param queueName
      * @param noEvents
+     * @return the client's response.
      */
-    private void deleteCDMIQueuValues(final String queueName, final int noEvents) {
-        // TODO Auto-generated method stub
+    private ClientResponse deleteCDMIQueueValues(final String queueName, final int noEvents) {
+        final ClientResponse res = resource().path(queueName + "?values:" + noEvents).accept(APPLICATION_CDMI_QUEUE_TYPE)
+                .header(X_CDMI, X_CDMI_VERSION).delete(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
+
+        return res;
     }
 
 

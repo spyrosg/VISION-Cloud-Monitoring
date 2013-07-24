@@ -5,9 +5,9 @@ import gr.ntua.vision.monitoring.notify.Registry;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -87,6 +87,8 @@ public class QueuesRegistry {
      *             when no queue with specified name exists.
      */
     public Collection<MonitoringEvent> getEvents(final String queueName) throws CDMIQueueException {
+        log.debug("getting elements off: {}", queueName);
+
         for (final CDMIQueue q : queuesList)
             if (q.name.equals(queueName))
                 return q.getEvents();
@@ -107,7 +109,7 @@ public class QueuesRegistry {
      * @return a list of queues.
      */
     public List<CDMIQueue> list() {
-        return new CopyOnWriteArrayList<CDMIQueue>(queuesList);
+        return Collections.unmodifiableList(queuesList);
     }
 
 
@@ -141,7 +143,7 @@ public class QueuesRegistry {
 
         final CDMIQueueEventHandler handler;
 
-        log.debug("registering '" + topic + "' queue");
+        log.debug("registering queue {} on topic {}", queueName, topic);
 
         if (topic.equals("reads")) {
             handler = new ObsGETEventHandler(q);
@@ -161,6 +163,24 @@ public class QueuesRegistry {
         handlers.add(handler);
 
         return q;
+    }
+
+
+    /**
+     * @param queueName
+     * @param count
+     * @throws CDMIQueueException
+     */
+    public void removeEvents(final String queueName, final int count) throws CDMIQueueException {
+        log.debug("removing {} element(s) off: {}", count, queueName);
+
+        for (final CDMIQueue q : queuesList)
+            if (q.name.equals(queueName)) {
+                q.removeEvents(count);
+                return;
+            }
+
+        throw new CDMIQueueException("no such queue available: " + queueName);
     }
 
 
