@@ -15,6 +15,7 @@ import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import integration.tests.JerseyResourceTest;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,6 @@ import com.sun.jersey.api.client.config.ClientConfig;
  *
  */
 public class ReceivingEventsOffCDMIQueue extends JerseyResourceTest {
-    // TODO: should also test storlets
     /**
      *
      */
@@ -153,7 +153,7 @@ public class ReceivingEventsOffCDMIQueue extends JerseyResourceTest {
         final CDMIQueueListBean list = readCDMIQueue(QUEUE);
 
         assertEquals("0-1", list.getQueueValues());
-        assertEquals(getHandler.events.get(0), list.getValue());
+        assertHaveSameEvent(getHandler.events.get(0), list.getValue().get(0));
     }
 
 
@@ -220,5 +220,16 @@ public class ReceivingEventsOffCDMIQueue extends JerseyResourceTest {
      */
     private void readObject(final String objName) {
         client.getObject(TENANT, TEST_CONTAINER, objName);
+    }
+
+
+    /**
+     * @param expected
+     * @param value
+     */
+    private static void assertHaveSameEvent(final MonitoringEvent expected, final Map<String, Object> value) {
+        assertEquals(expected.topic(), value.get("topic"));
+        assertEquals(expected.get("id"), value.get("id"));
+        assertEquals(expected.originatingService(), value.get("originating-service"));
     }
 }
