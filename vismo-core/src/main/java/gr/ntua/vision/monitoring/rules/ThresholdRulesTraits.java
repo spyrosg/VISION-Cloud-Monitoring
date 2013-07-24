@@ -21,7 +21,7 @@ class ThresholdRulesTraits {
     /***/
     private static final Logger   log               = LoggerFactory.getLogger(ThresholdRulesTraits.class);
     /***/
-    private static final String[] requirementFields = { "metric", "predicate", "threshold" };
+    private static final String[] requirementFields = { "predicate", "threshold" };
     /***/
     private static final String[] UNITS             = { "tenant", "user", "container", "object" };
 
@@ -88,7 +88,7 @@ class ThresholdRulesTraits {
             if (o == null)
                 continue;
 
-            log.trace(String.format("unit %s => %s matching %s", unit, o, val));
+            // log.trace(String.format("unit %s => %s matching %s", unit, o, val));
 
             if (!o.equals(val))
                 return false;

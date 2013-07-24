@@ -11,12 +11,10 @@ import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import helpers.InMemoryEventDispatcher;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 import javax.ws.rs.core.MediaType;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -29,11 +27,7 @@ public class ThresholdPeriodicRuleTest extends JerseyResourceTest {
     /***/
     private static final String              AVERAGE_THROUGHPUT_TOPIC = "average-throughput-topic";
     /***/
-    private static final String              AVG_AGGREGATION_METHOD   = "avg";
-    /***/
     private static final String              CONTAINER                = "test-container";
-    /***/
-    private static final Logger              log                      = LoggerFactory.getLogger(ThresholdPeriodicRuleTest.class);
     /***/
     private static final int                 NO_EVENTS                = 10;
     /***/
@@ -52,6 +46,30 @@ public class ThresholdPeriodicRuleTest extends JerseyResourceTest {
     private ThresholdRulesFactory            factory;
     /***/
     private FakeObjectService                obs;
+
+
+    /**
+     * @throws Exception
+     */
+    public void testCountNoOperationsPeriodicRule() throws Exception {
+        assertEquals(0, engine.noRules());
+
+        final ClientResponse res = submitRule(countNoWriteOperationsRule(TENANT, USER, CONTAINER));
+
+        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+        assertEquals(1, engine.noRules());
+
+        triggerRule();
+        Thread.sleep(6 * RULE_PERIOD / 5);
+        assertEquals(1, eventSink.size());
+        // assertIsExpectedEvent(eventSink.get(0));
+
+        @SuppressWarnings("unchecked")
+        final ArrayList<HashMap<String, Object>> violations = (ArrayList<HashMap<String, Object>>) eventSink.get(0)
+                .get("violations");
+
+        assertEquals(NO_EVENTS, (Double) violations.get(0).get("value"), 0.005);
+    }
 
 
     /**
@@ -116,10 +134,8 @@ public class ThresholdPeriodicRuleTest extends JerseyResourceTest {
     /**
      * @param e
      */
-    @SuppressWarnings("null")
     private static void assertIsExpectedEvent(final MonitoringEvent e) {
-        log.debug("asserting event: {}", e);
-        assertTrue("event cannot be null", e != null);
+        assertNotNull(e);
         assertEquals(AVERAGE_THROUGHPUT_TOPIC, e.topic());
         assertTrue("originating-machine key should be a String", e.get("originating-machine") instanceof String);
     }
@@ -139,7 +155,26 @@ public class ThresholdPeriodicRuleTest extends JerseyResourceTest {
         bean.setOperation("PUT");
         bean.setFilterUnit(tenant + "," + user + "," + containerName);
         bean.setTopic(AVERAGE_THROUGHPUT_TOPIC);
-        bean.addRequirement("transaction-throughput", AVG_AGGREGATION_METHOD, ">=", THRESHOLD);
+        bean.addRequirement("transaction-throughput", "avg", ">=", THRESHOLD);
+
+        return bean;
+    }
+
+
+    /**
+     * @param tenant
+     * @param user
+     * @param containerName
+     * @return a {@link ThresholdRuleBean}.
+     */
+    private static ThresholdRuleBean countNoWriteOperationsRule(final String tenant, final String user, final String containerName) {
+        final ThresholdRuleBean bean = new ThresholdRuleBean();
+
+        bean.setPeriod(RULE_PERIOD);
+        bean.setOperation("PUT");
+        bean.setFilterUnit(tenant + "," + user + "," + containerName);
+        bean.setTopic("count-writes");
+        bean.addRequirement(null, "count", ">=", -1);
 
         return bean;
     }

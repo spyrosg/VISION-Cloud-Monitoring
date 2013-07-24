@@ -26,6 +26,13 @@ public class ThresholdRequirement {
             }
         },
         /***/
+        COUNT("count") {
+            @Override
+            public double perform(final double[] arr) {
+                return arr.length;
+            }
+        },
+        /***/
         MAX("max") {
             @Override
             public double perform(final double[] arr) {
@@ -207,7 +214,7 @@ public class ThresholdRequirement {
      * @return <code>true</code> iff the event is about the specified metric, <code>false</code> otherwise.
      */
     public boolean isApplicable(final MonitoringEvent e) {
-        return e.get(metric) != null;
+        return metric == null || e.get(metric) != null;
     }
 
 
@@ -244,8 +251,9 @@ public class ThresholdRequirement {
     private double performFold(final List<MonitoringEvent> eventsList) {
         final double arr[] = new double[eventsList.size()];
 
-        for (int i = 0; i < arr.length; ++i)
-            arr[i] = (Double) eventsList.get(i).get(metric);
+        if (metric != null)
+            for (int i = 0; i < arr.length; ++i)
+                arr[i] = (Double) eventsList.get(i).get(metric);
 
         return foldMethod.perform(arr);
     }
