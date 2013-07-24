@@ -27,10 +27,11 @@ public class CDMIQueue {
      * 
      * @param name
      *            the name of the queue.
+     * @param size
      */
-    public CDMIQueue(final String name) {
+    public CDMIQueue(final String name, final int size) {
         this.name = name;
-        this.queue = new LinkedBlockingQueue<MonitoringEvent>(100); // FIXME: size
+        this.queue = new LinkedBlockingQueue<MonitoringEvent>(size);
     }
 
 

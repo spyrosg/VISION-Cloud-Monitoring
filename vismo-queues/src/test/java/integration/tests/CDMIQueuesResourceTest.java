@@ -47,7 +47,7 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
         super.setUp();
 
         eventGenerator = new InMemoryEventRegistry(MY_TOPIC);
-        registry = new QueuesRegistry(eventGenerator);
+        registry = new QueuesRegistry(eventGenerator, 100);
 
         final WebAppBuilder builder = new WebAppBuilder();
 

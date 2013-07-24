@@ -118,7 +118,7 @@ public class ReceivingEventsOffCDMIQueue extends JerseyResourceTest {
         registry = new VismoEventRegistry("tcp://" + HOST_URL + ":" + PORT);
         registry.registerToAll(getHandler = new ObsEventHandler("GET"));
 
-        final QueuesRegistry queuesRegistry = new QueuesRegistry(registry);
+        final QueuesRegistry queuesRegistry = new QueuesRegistry(registry, 100);
         final WebAppBuilder builder = new WebAppBuilder();
 
         builder.addProvider(CDMIQueueProdiver.class);

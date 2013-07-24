@@ -33,15 +33,19 @@ public class QueuesRegistry {
     private final ArrayList<CDMIQueue>             queuesList;
     /** the actual registry. */
     private final Registry                         registry;
+    /***/
+    private final int                              size;
 
 
     /**
      * Constructor.
      * 
      * @param registry
+     * @param size
      */
-    public QueuesRegistry(final Registry registry) {
+    public QueuesRegistry(final Registry registry, final int size) {
         this.registry = registry;
+        this.size = size;
         this.queuesList = new ArrayList<CDMIQueue>();
         this.handlers = new ArrayList<CDMIQueueEventHandler>();
     }
@@ -136,7 +140,7 @@ public class QueuesRegistry {
     public CDMIQueue register(final String queueName, final String topic) throws CDMIQueueException {
         requireAvailabe(topic);
 
-        final CDMIQueue q = new CDMIQueue(queueName);
+        final CDMIQueue q = new CDMIQueue(queueName, size);
 
         if (queuesList.contains(q))
             throw new CDMIQueueException("queue already exists: " + queueName);
@@ -189,7 +193,7 @@ public class QueuesRegistry {
      * @throws CDMIQueueException
      */
     public void unregister(final String queueName) throws CDMIQueueException {
-        final CDMIQueue q = new CDMIQueue(queueName);
+        final CDMIQueue q = new CDMIQueue(queueName, size);
         final int idx = queuesList.indexOf(q);
 
         if (idx == -1)
