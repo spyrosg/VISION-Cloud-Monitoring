@@ -90,10 +90,13 @@ public class HttpEventResource implements EventSource {
     public Response putEvent(final @Context HttpServletRequest req, final String body) {
         final Map<String, Object> json;
 
+        if (body == null || body.length() == 0)
+            return badRequest("empty event body not allowed");
+
         try {
             json = (Map<String, Object>) parser.parse(body);
         } catch (final ParseException e) {
-            return badRequest(e.getMessage());
+            return badRequest("invalid json: " + (e.getMessage() != null ? e.getMessage() : e.toString()));
         }
 
         try {

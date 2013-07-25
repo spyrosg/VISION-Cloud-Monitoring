@@ -53,11 +53,36 @@ public class HttpEventSourceTest extends JerseyResourceTest {
     }
 
 
-    /***/
-    public void testShouldRejectInvalidEvents() {
-        final ClientResponse res = resource().entity("{ \"foo\" : 3 }").put(ClientResponse.class);
+    /**
+     * @throws Exception
+     */
+    public void testShouldRejectEmptyBodyRequest() throws Exception {
+        final ClientResponse res = resource().type(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN).put(ClientResponse.class);
 
         assertEquals("server should reject invalid events", ClientResponse.Status.BAD_REQUEST, res.getClientResponseStatus());
+        assertEquals("empty event body not allowed", res.getEntity(String.class));
+    }
+
+
+    /***/
+    public void testShouldRejectInvalidEvents() {
+        final ClientResponse res = resource().entity("{ \"foo\" : 3 }").type(MediaType.APPLICATION_JSON)
+                .put(ClientResponse.class);
+
+        assertEquals("server should reject invalid events", ClientResponse.Status.BAD_REQUEST, res.getClientResponseStatus());
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    public void testShouldRejectInvalidJSONRequest() throws Exception {
+        final ClientResponse res = resource().entity("{ \"foo\": \"bar\", \"topic\":  }").type(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN).put(ClientResponse.class);
+
+        assertEquals("server should reject invalid events", ClientResponse.Status.BAD_REQUEST, res.getClientResponseStatus());
+        assertTrue(res.getEntity(String.class).startsWith("invalid json: "));
     }
 
 
