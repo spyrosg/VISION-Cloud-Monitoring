@@ -138,8 +138,6 @@ public class QueuesRegistry {
      *             when the topic is not available or a queue with the same name already exists.
      */
     public CDMIQueue register(final String queueName, final String topic) throws CDMIQueueException {
-        requireAvailabe(topic);
-
         final CDMIQueue q = new CDMIQueue(queueName, size);
 
         if (queuesList.contains(q))
@@ -216,15 +214,5 @@ public class QueuesRegistry {
                 return true;
 
         return false;
-    }
-
-
-    /**
-     * @param topic
-     * @throws CDMIQueueException
-     */
-    private static void requireAvailabe(final String topic) throws CDMIQueueException {
-        if (!isAvailableTopic(topic))
-            throw new CDMIQueueException("topic not available or invalid: " + topic);
     }
 }

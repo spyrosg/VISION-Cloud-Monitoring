@@ -163,14 +163,6 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
 
 
     /**
-     * @throws Exception
-     */
-    public void testShouldRejectInvalidTopicRequests() throws Exception {
-        createCDMIQueue(MY_QUEUE, "foo-topic", ClientResponse.Status.BAD_REQUEST);
-    }
-
-
-    /**
      * @see integration.tests.JerseyResourceTest#configureClient(com.sun.jersey.api.client.config.ClientConfig)
      */
     @Override
