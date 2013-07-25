@@ -84,7 +84,6 @@ public class VismoService implements Service, UDPListener {
             httpServer.stop();
         } catch (final Exception e) {
             log.warn("stopping http server", e);
-            // NOP
         }
     }
 

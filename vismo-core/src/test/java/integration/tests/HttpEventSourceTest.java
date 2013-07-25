@@ -7,6 +7,7 @@ import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -28,13 +29,18 @@ public class HttpEventSourceTest extends JerseyResourceTest {
     private final ArrayList<MonitoringEvent> sink = new ArrayList<MonitoringEvent>();
 
 
-    /***/
-    public void testRulesEngineShouldReceivePostedEvent() {
+    /**
+     * @throws UnknownHostException
+     */
+    public void testRulesEngineShouldReceivePostedEvent() throws UnknownHostException {
         final String eventRepr = getEvent();
         final ClientResponse res = resource().accept(MediaType.APPLICATION_JSON).entity(eventRepr).put(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
         assertEquals("engine should have received at least one event", 1, sink.size());
+        assertEquals("should accept proper event", "new event", sink.get(0).topic());
+        assertEquals("should accept proper event", "127.0.0.1", sink.get(0).originatingIP().getHostAddress());
+        assertEquals("should accept proper event", "ohai", sink.get(0).get("bar"));
     }
 
 
@@ -103,6 +109,9 @@ public class HttpEventSourceTest extends JerseyResourceTest {
 
         map.put("originating-service", "service");
         map.put("topic", "new event");
+
+        map.put("foo", 1);
+        map.put("bar", "ohai");
 
         return JSONObject.toJSONString(map);
     }

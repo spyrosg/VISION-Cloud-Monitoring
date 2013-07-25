@@ -40,6 +40,7 @@ public class HttpEventResource implements EventSource {
             super(message);
         }
     }
+
     /***/
     private static final Logger                  log       = LoggerFactory.getLogger(HttpEventResource.class);
     /***/
