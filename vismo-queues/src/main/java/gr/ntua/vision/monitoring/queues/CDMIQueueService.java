@@ -10,7 +10,7 @@ import gr.ntua.vision.monitoring.web.WebServer;
  */
 public class CDMIQueueService {
     /***/
-    private static final String PROG = "CDMIQueueService";
+    private static final String PROG = "vismo-queues";
     /***/
     private final String[]      args;
 
@@ -55,7 +55,7 @@ public class CDMIQueueService {
         final int queueSize = Integer.valueOf(getOptArg("-s"));
         final WebServer server = new WebServer(port);
         final WebAppBuilder builder = new WebAppBuilder();
-        final VismoEventRegistry registry = new VismoEventRegistry("tcp://10.0.1.101:56430");
+        final VismoEventRegistry registry = new VismoEventRegistry();
         final QueuesRegistry queuesRegistry = new QueuesRegistry(registry, queueSize);
 
         builder.addProvider(CDMIQueueProdiver.class);
