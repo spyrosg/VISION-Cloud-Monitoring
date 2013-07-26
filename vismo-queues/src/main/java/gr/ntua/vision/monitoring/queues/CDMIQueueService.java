@@ -10,9 +10,9 @@ import gr.ntua.vision.monitoring.web.WebServer;
  */
 public class CDMIQueueService {
     /***/
-    private final String[]      args;
-    /***/
     private static final String PROG = "CDMIQueueService";
+    /***/
+    private final String[]      args;
 
 
     /**
@@ -27,7 +27,7 @@ public class CDMIQueueService {
 
     /**
      * @param opt
-     * @return
+     * @return the argument that corresponds to the option.
      */
     private String getOptArg(final String opt) {
         for (int i = 0; i < args.length; ++i)
@@ -67,18 +67,18 @@ public class CDMIQueueService {
 
 
     /**
-     * 
-     */
-    private static void showHelp() {
-        System.err.println(PROG + ": usage: java -jar " + PROG + ".jar -p port -s queue-size");
-    }
-
-
-    /**
      * @param args
      * @throws Exception
      */
     public static void main(final String... args) throws Exception {
         new CDMIQueueService(args).run();
+    }
+
+
+    /**
+     * 
+     */
+    private static void showHelp() {
+        System.err.println(PROG + ": usage: java -jar " + PROG + ".jar -p port -s queue-size");
     }
 }

@@ -197,24 +197,6 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
 
 
     /**
-     * Create a queue, with a CDMI compliant call.
-     * 
-     * @param queueName
-     * @param topic
-     * @param expectedStatus
-     * @return the client's response.
-     */
-    private ClientResponse createCDMIQueue(final String queueName, final String topic, final ClientResponse.Status expectedStatus) {
-        final ClientResponse res = resource().path(queueName).path(topic).accept(APPLICATION_CDMI_QUEUE_TYPE)
-                .type(APPLICATION_CDMI_QUEUE_TYPE).header(X_CDMI, X_CDMI_VERSION).put(ClientResponse.class);
-
-        assertEquals(expectedStatus, res.getClientResponseStatus());
-
-        return res;
-    }
-
-
-    /**
      * Delete a queue, with a CDMI compliant call.
      * 
      * @param queueName

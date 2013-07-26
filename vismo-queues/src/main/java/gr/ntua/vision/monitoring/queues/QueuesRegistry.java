@@ -145,7 +145,7 @@ public class QueuesRegistry {
 
         final CDMIQueueEventHandler handler;
 
-        log.debug("registering queue {} on topic {}", queueName, topic);
+        log.debug("registering '{}'  queue on topic '{}'", queueName, topic);
 
         if (topic.equals("reads")) {
             handler = new ObsGETEventHandler(q);
@@ -156,9 +156,12 @@ public class QueuesRegistry {
         } else if (topic.equals("storlets")) {
             handler = new StortletsEventHandler(q);
             registry.register(topic, handler);
-        } else {
+        } else if (topic.equals("*")) {
             handler = new MatchAllEventHandler(q);
             registry.registerToAll(handler);
+        } else {
+            handler = new TopicEventHandler(q);
+            registry.register(topic, handler);
         }
 
         queuesList.add(q);
@@ -199,20 +202,5 @@ public class QueuesRegistry {
 
         queuesList.remove(idx);
         registry.unregister(handlers.remove(idx));
-    }
-
-
-    /**
-     * Check that given string is one of the available topics.
-     * 
-     * @param s
-     * @return <code>true</code> iff it is an available topic, <code>false</code> otherwise.
-     */
-    private static boolean isAvailableTopic(final String s) {
-        for (final String t : AVAILABLE_TOPICS)
-            if (t.equalsIgnoreCase(s))
-                return true;
-
-        return false;
     }
 }
