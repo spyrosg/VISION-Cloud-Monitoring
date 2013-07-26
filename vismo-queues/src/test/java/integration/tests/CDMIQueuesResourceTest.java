@@ -11,6 +11,7 @@ import gr.ntua.vision.monitoring.queues.CDMIQueuesResource;
 import gr.ntua.vision.monitoring.queues.QueuesRegistry;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -159,6 +160,25 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
         final ClientResponse res1 = readCDMIQueue(MY_QUEUE);
 
         assertHaveExpectedQueueValues(res1.getEntity(CDMIQueueListBean.class), NO_EVENTS);
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    public void testShouldReceiveEventsOffCustomTopic() throws Exception {
+        final String QUEUE = "custom";
+        final String TOPIC = "other?";
+        final HashMap<String, Object> map = new HashMap<String, Object>();
+
+        createCDMIQueue(QUEUE, TOPIC);
+        map.put("topic", TOPIC);
+        map.put("originating-service", CDMIQueuesResourceTest.class.getSimpleName());
+        map.put("foo", "bar");
+        eventGenerator.pushEvent(map);
+
+        final ClientResponse res = readCDMIQueue(QUEUE);
+        assertHaveExpectedQueueValues(res.getEntity(CDMIQueueListBean.class), 1);
     }
 
 

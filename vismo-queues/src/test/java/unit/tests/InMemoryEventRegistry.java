@@ -8,6 +8,7 @@ import gr.ntua.vision.monitoring.notify.Registry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -39,6 +40,20 @@ public class InMemoryEventRegistry implements Registry {
     @Override
     public void halt() {
         // Nothing to do
+    }
+
+
+    /**
+     * Push the event to the handlers.
+     * 
+     * @param map
+     */
+    public void pushEvent(final Map<String, Object> map) {
+        for (final EventHandler handler : handlers) {
+            map.put("timestamp", System.currentTimeMillis());
+            map.put("originating-machine", "localhost");
+            handler.handle(factory.createEvent(map));
+        }
     }
 
 
