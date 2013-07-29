@@ -48,7 +48,7 @@ public class RulesResource {
 
     /**
      * @param id
-     * @return if the rule was succesfully removed from the store, a respone of status 204, else, a response of status 404.
+     * @return if the rule was successfully removed from the store, a response of status 204, else, a response of status 404.
      */
     @Path("{rule-id}")
     @DELETE

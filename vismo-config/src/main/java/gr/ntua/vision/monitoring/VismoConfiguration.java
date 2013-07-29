@@ -37,6 +37,8 @@ public class VismoConfiguration extends PropertiesConfiguration {
     private static final String STARTUP_RULES_PROPERY      = "startup.rules";
     /***/
     private static final String UDP_PORT_PROPERTY          = "udp.port";
+    /***/
+    private static final String WEB_PORT                   = "web.port";
 
 
     /**
@@ -163,6 +165,14 @@ public class VismoConfiguration extends PropertiesConfiguration {
      */
     public int getUDPPort() {
         return getAsInt(UDP_PORT_PROPERTY);
+    }
+
+
+    /**
+     * @return the web server's port.
+     */
+    public int getWebPort() {
+        return getAsInt(WEB_PORT);
     }
 
 

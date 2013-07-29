@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 public class RulesStore {
     /***/
     private static final Logger          log = LoggerFactory.getLogger(RulesStore.class);
-
     /** the rule-set (mapping rule ids to rules). */
     private final Map<String, VismoRule> map;
 

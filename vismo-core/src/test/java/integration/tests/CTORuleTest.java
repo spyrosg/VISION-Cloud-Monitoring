@@ -54,6 +54,7 @@ public class CTORuleTest {
                                                         setProperty("mon.group.port", "12345");
                                                         setProperty("mon.ping.period", "60000");
                                                         setProperty("startup.rules", "");
+                                                        setProperty("web.port", "9996");
                                                     }
                                                 };
     /***/

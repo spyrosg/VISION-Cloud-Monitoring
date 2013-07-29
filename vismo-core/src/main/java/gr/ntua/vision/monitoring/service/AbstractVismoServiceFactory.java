@@ -37,8 +37,6 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
     /***/
     private static final Logger        log                   = LoggerFactory.getLogger(AbstractVismoServiceFactory.class);
     /***/
-    private static final int           PORT                  = 9996;
-    /***/
     protected final VismoConfiguration conf;
     /***/
     protected final ZMQFactory         socketFactory;
@@ -74,7 +72,7 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
         log.info("subscribing sources to rules engine");
         sources.subscribeAll(engine);
 
-        final WebServer server = buildWebServer(PORT, vminfo, store, engine);
+        final WebServer server = buildWebServer(vminfo, store, engine);
         final VismoService service = new VismoService(vminfo, sources, engine, server);
 
         addDefaultServiceTasks(vminfo, service);
@@ -134,24 +132,13 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
 
 
     /**
-     * @param service
-     * @param info
-     */
-    protected static void addDefaultServiceTasks(final VMInfo info, final VismoService service) {
-        log.debug("adding default tasks");
-    }
-
-
-    /**
-     * @param port
      * @param vminfo
      * @param store
      * @param engine
      * @return a configured {@link WebServer}.
      */
-    private static WebServer buildWebServer(final int port, final VMInfo vminfo, final RulesStore store,
-            final VismoRulesEngine engine) {
-        final WebServer server = new WebServer(port);
+    private WebServer buildWebServer(final VMInfo vminfo, final RulesStore store, final VismoRulesEngine engine) {
+        final WebServer server = new WebServer(conf.getWebPort());
         final RulesResource rulesResource = new RulesResource(new ThresholdRulesFactory(new ClassPathRulesFactory(engine,
                 DEFAULT_RULES_PACKAGE), engine), store);
         final HttpEventResource eventSource = new HttpEventResource();
@@ -161,5 +148,14 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
         eventSource.add(engine);
 
         return server.withWebAppAt(app, "/*");
+    }
+
+
+    /**
+     * @param service
+     * @param info
+     */
+    protected static void addDefaultServiceTasks(final VMInfo info, final VismoService service) {
+        log.debug("adding default tasks");
     }
 }
