@@ -8,7 +8,6 @@ import gr.ntua.vision.monitoring.rules.VismoRule;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -64,17 +63,19 @@ public class RulesResource {
      */
     @GET
     @Produces("application/json; qs=0.9")
-    public List<RuleIdBean> listRulesAsJSON() {
-        final ArrayList<RuleIdBean> ids = new ArrayList<RuleIdBean>();
+    public RuleListBean listRulesAsJSON() {
+        final ArrayList<RuleBean> ids = new ArrayList<RuleBean>();
 
         store.forEach(new RuleOperation() {
             @Override
             public void run(final VismoRule rule) {
-                ids.add(new RuleIdBean(rule.id()));
+                ids.add(new RuleBean(rule.id(), rule.getClass().getSimpleName()));
             }
         });
 
-        return ids;
+        // FIXME return ids;
+
+        return new RuleListBean();
     }
 
 
