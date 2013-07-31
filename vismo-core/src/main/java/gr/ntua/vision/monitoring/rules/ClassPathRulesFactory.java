@@ -51,11 +51,10 @@ public class ClassPathRulesFactory extends AbstractRulesFactory {
      */
     @Override
     public VismoRule buildFrom(final RuleBean bean) {
-        if (!(bean instanceof DefaultRuleBean)) {
-            log.debug("bean {} not applicable; trying next", bean);
-
+        if (!(bean instanceof DefaultRuleBean))
             return next().buildFrom(bean);
-        }
+
+        log.debug("applicable bean {}", bean);
 
         final DefaultRuleBean b = (DefaultRuleBean) bean;
 

@@ -22,8 +22,6 @@ import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 import java.io.IOException;
 import java.util.List;
 
-import javax.ws.rs.core.Application;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,12 +140,14 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
         final RulesResource rulesResource = new RulesResource(new ThresholdRulesFactory(new ClassPathRulesFactory(engine,
                 DEFAULT_RULES_PACKAGE), engine), store);
         final HttpEventResource eventSource = new HttpEventResource();
-        final Application app = WebAppBuilder.buildFrom(rulesResource, new InternalMetricsResource(),
-                                                        new VersionResource(vminfo), eventSource);
+        final WebAppBuilder builder = new WebAppBuilder();
 
+        // builder.addProvider(RuleListBeanContextResolver.class);
+        builder.addResource(rulesResource).addResource(new InternalMetricsResource()).addResource(new VersionResource(vminfo))
+                .addResource(eventSource);
         eventSource.add(engine);
 
-        return server.withWebAppAt(app, "/*");
+        return server.withWebAppAt(builder.build(), "/*");
     }
 
 

@@ -1,11 +1,13 @@
 package gr.ntua.vision.monitoring.resources;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
 
 /**
  * 
  */
+@XmlRootElement
 public class RuleBean {
     /***/
     @XmlAttribute(name = "class")

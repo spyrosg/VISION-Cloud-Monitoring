@@ -136,7 +136,7 @@ class ThresholdRulesTraits {
 
             try {
                 if (m.invoke(o) == null) // no value provided
-                    throw new ThresholdRuleValidationError("'" + field + "' field is required");
+                    throw new ThresholdRuleValidationError("invalid rule specification: '" + field + "' field is required");
             } catch (final IllegalAccessException e) {
                 log.warn("validating field " + field + " failed; ignoring", e);
             } catch (final IllegalArgumentException e) {

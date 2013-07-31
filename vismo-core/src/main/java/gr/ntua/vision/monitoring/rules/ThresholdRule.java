@@ -63,7 +63,10 @@ public class ThresholdRule extends Rule {
      */
     @Override
     public String toString() {
-        return "#<ThresholdRule: " + topic + ", on " + filterUnit + " with " + requirements.size() + " requirements>";
+        if (filterUnit != null)
+            return "#<ThresholdRule: " + topic + ", on " + filterUnit + " with " + requirements.size() + " requirement(s)>";
+
+        return "#<ThresholdRule: " + topic + ", no filters, with " + requirements.size() + " requirement(s)>";
     }
 
 

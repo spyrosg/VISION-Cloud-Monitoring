@@ -8,6 +8,7 @@ import gr.ntua.vision.monitoring.rules.VismoRule;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -63,19 +64,17 @@ public class RulesResource {
      */
     @GET
     @Produces("application/json; qs=0.9")
-    public RuleListBean listRulesAsJSON() {
-        final ArrayList<RuleBean> ids = new ArrayList<RuleBean>();
+    public List<RuleBean> listRulesAsJSON() {
+        final ArrayList<RuleBean> rules = new ArrayList<RuleBean>();
 
         store.forEach(new RuleOperation() {
             @Override
             public void run(final VismoRule rule) {
-                ids.add(new RuleBean(rule.id(), rule.getClass().getSimpleName()));
+                rules.add(new RuleBean(rule.id(), rule.getClass().getSimpleName()));
             }
         });
 
-        // FIXME return ids;
-
-        return new RuleListBean();
+        return rules;
     }
 
 
@@ -117,7 +116,7 @@ public class RulesResource {
 
         rule.submit();
 
-        return Response.created(URI.create("/" + rule.id())).entity(rule.id()).build();
+        return submittedSuccessfully(rule);
     }
 
 
@@ -138,10 +137,27 @@ public class RulesResource {
 
             rule.submit();
 
-            return Response.created(URI.create("/" + rule.id())).entity(rule.id()).build();
+            return submittedSuccessfully(rule);
         } catch (final ThresholdRuleValidationError e) {
-            throw new WebApplicationException(Response.status(Status.BAD_REQUEST)
-                    .entity("invalid rule specification: " + e.getMessage()).build());
+            return badSpecification(e.getMessage());
         }
+    }
+
+
+    /**
+     * @param msg
+     * @return the {@link Response} object.
+     */
+    private static Response badSpecification(final String msg) {
+        return Response.status(Status.BAD_REQUEST).entity(msg).build();
+    }
+
+
+    /**
+     * @param rule
+     * @return the {@link Response} object.
+     */
+    private static Response submittedSuccessfully(final VismoRule rule) {
+        return Response.created(URI.create("/" + rule.id())).entity(rule.id()).build();
     }
 }

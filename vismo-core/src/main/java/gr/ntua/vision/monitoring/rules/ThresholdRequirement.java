@@ -112,7 +112,7 @@ public class ThresholdRequirement {
                 if (p.name.equals(method))
                     return p;
 
-            throw new ThresholdRuleValidationError("unsupported aggregation method: " + method);
+            throw new ThresholdRuleValidationError("invalid rule specification: unsupported aggregation method: " + method);
         }
     }
 
@@ -180,7 +180,7 @@ public class ThresholdRequirement {
                 if (p.name.equals(predicate))
                     return p;
 
-            throw new ThresholdRuleValidationError("unsupported predicate: " + predicate);
+            throw new ThresholdRuleValidationError("invalid rule specification: unsupported predicate: " + predicate);
         }
     }
 
