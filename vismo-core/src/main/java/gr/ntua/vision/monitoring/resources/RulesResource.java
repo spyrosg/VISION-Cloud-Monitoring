@@ -1,6 +1,7 @@
 package gr.ntua.vision.monitoring.resources;
 
 import gr.ntua.vision.monitoring.rules.DefaultRuleBean;
+import gr.ntua.vision.monitoring.rules.RuleBean;
 import gr.ntua.vision.monitoring.rules.RuleOperation;
 import gr.ntua.vision.monitoring.rules.RulesFactory;
 import gr.ntua.vision.monitoring.rules.RulesStore;
@@ -22,6 +23,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * 
@@ -29,9 +33,12 @@ import javax.ws.rs.core.Response.Status;
 @Path("rules")
 public class RulesResource {
     /***/
-    private final RulesFactory factory;
+    private static final Logger log = LoggerFactory.getLogger(RulesResource.class);
     /***/
-    private final RulesStore   store;
+    private final RulesFactory  factory;
+
+    /***/
+    private final RulesStore    store;
 
 
     /**
@@ -64,13 +71,13 @@ public class RulesResource {
      */
     @GET
     @Produces("application/json; qs=0.9")
-    public List<RuleBean> listRulesAsJSON() {
-        final ArrayList<RuleBean> rules = new ArrayList<RuleBean>();
+    public List<RuleIdBean> listRulesAsJSON() {
+        final ArrayList<RuleIdBean> rules = new ArrayList<RuleIdBean>();
 
         store.forEach(new RuleOperation() {
             @Override
             public void run(final VismoRule rule) {
-                rules.add(new RuleBean(rule.id(), rule.getClass().getSimpleName()));
+                rules.add(new RuleIdBean(rule.id(), rule.getClass().getSimpleName()));
             }
         });
 
@@ -109,12 +116,14 @@ public class RulesResource {
     @POST
     @Produces(MediaType.TEXT_PLAIN)
     public Response submitDefaultRule(@PathParam("name") final String name, @PathParam("period") final long period) {
-        final VismoRule rule = factory.buildFrom(new DefaultRuleBean(name, period));
+        final DefaultRuleBean bean = new DefaultRuleBean(name, period);
+        final VismoRule rule = factory.buildFrom(bean);
 
         if (rule == null)
-            return Response.status(Status.NOT_FOUND).entity("unknown rule: " + rule).build();
+            return badSpecification("unknown rule name: " + name);
 
         rule.submit();
+        pushRule(bean);
 
         return submittedSuccessfully(rule);
     }
@@ -136,11 +145,20 @@ public class RulesResource {
             final VismoRule rule = factory.buildFrom(bean);
 
             rule.submit();
+            pushRule(bean);
 
             return submittedSuccessfully(rule);
         } catch (final ThresholdRuleValidationError e) {
             return badSpecification(e.getMessage());
         }
+    }
+
+
+    /**
+     * @param bean
+     */
+    private void pushRule(final RuleBean bean) {
+        // TODO Auto-generated method stub
     }
 
 

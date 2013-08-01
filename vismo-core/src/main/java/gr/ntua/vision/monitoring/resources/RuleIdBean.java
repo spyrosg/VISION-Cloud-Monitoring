@@ -1,14 +1,17 @@
 package gr.ntua.vision.monitoring.resources;
 
+import gr.ntua.vision.monitoring.rules.RuleBean;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
 /**
- * 
+ * This bean is used to serialize rules to json. There's also the {@link RuleBean} hierarchy for deserializing rules from json.
+ * NOTE: we don't use the same objects for ser/deser 'cause we're forced to accept different rule representations.
  */
 @XmlRootElement
-public class RuleBean {
+public class RuleIdBean {
     /***/
     @XmlAttribute(name = "class")
     private String clz;
@@ -19,7 +22,7 @@ public class RuleBean {
     /**
      * Constructor.
      */
-    public RuleBean() {
+    public RuleIdBean() {
     }
 
 
@@ -29,7 +32,7 @@ public class RuleBean {
      * @param id
      * @param clz
      */
-    public RuleBean(final String id, final String clz) {
+    public RuleIdBean(final String id, final String clz) {
         this.id = id;
         this.clz = clz;
     }
