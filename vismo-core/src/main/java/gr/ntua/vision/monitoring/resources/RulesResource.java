@@ -1,7 +1,5 @@
 package gr.ntua.vision.monitoring.resources;
 
-import gr.ntua.vision.monitoring.rules.DefaultRuleBean;
-import gr.ntua.vision.monitoring.rules.RuleBean;
 import gr.ntua.vision.monitoring.rules.RuleOperation;
 import gr.ntua.vision.monitoring.rules.RulesFactory;
 import gr.ntua.vision.monitoring.rules.RulesStore;
@@ -23,9 +21,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 /**
  * 
@@ -33,12 +28,10 @@ import org.slf4j.LoggerFactory;
 @Path("rules")
 public class RulesResource {
     /***/
-    private static final Logger log = LoggerFactory.getLogger(RulesResource.class);
-    /***/
-    private final RulesFactory  factory;
+    private final RulesFactory factory;
 
     /***/
-    private final RulesStore    store;
+    private final RulesStore   store;
 
 
     /**
@@ -155,10 +148,15 @@ public class RulesResource {
 
 
     /**
+     * Push the new rule to all other known nodes. We do this here, in the controller layer, since there isn't a good or general
+     * enough rules representation in the domain. VismoRulesEngine knows only of VismoRule instances.
+     * 
      * @param bean
      */
     private void pushRule(final RuleBean bean) {
-        // TODO Auto-generated method stub
+        final RulesUpdate update = new RulesUpdate();
+
+        update.push(bean);
     }
 
 

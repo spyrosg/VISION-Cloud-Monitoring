@@ -1,7 +1,5 @@
 package gr.ntua.vision.monitoring.resources;
 
-import gr.ntua.vision.monitoring.rules.RuleBean;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 

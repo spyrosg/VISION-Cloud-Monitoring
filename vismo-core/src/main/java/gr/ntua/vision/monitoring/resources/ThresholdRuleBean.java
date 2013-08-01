@@ -1,16 +1,18 @@
 package gr.ntua.vision.monitoring.resources;
 
-import gr.ntua.vision.monitoring.rules.RuleBean;
 import gr.ntua.vision.monitoring.rules.ThresholdPeriodicRule;
 import gr.ntua.vision.monitoring.rules.ThresholdRule;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 
 /**
  * This is just a data holder, the exchange media format for {@link ThresholdRule}s or {@link ThresholdPeriodicRule}s.
  */
+@XmlRootElement
 public class ThresholdRuleBean implements RuleBean {
     /***/
     private String                         filterUnit;

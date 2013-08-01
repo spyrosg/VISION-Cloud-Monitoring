@@ -2,13 +2,13 @@ package gr.ntua.vision.monitoring.service;
 
 import gr.ntua.vision.monitoring.VMInfo;
 import gr.ntua.vision.monitoring.VismoConfiguration;
+import gr.ntua.vision.monitoring.resources.DefaultRuleBean;
 import gr.ntua.vision.monitoring.resources.HttpEventResource;
 import gr.ntua.vision.monitoring.resources.InternalMetricsResource;
+import gr.ntua.vision.monitoring.resources.RuleBean;
 import gr.ntua.vision.monitoring.resources.RulesResource;
 import gr.ntua.vision.monitoring.resources.VersionResource;
 import gr.ntua.vision.monitoring.rules.ClassPathRulesFactory;
-import gr.ntua.vision.monitoring.rules.DefaultRuleBean;
-import gr.ntua.vision.monitoring.rules.RuleBean;
 import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.ThresholdRulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRule;

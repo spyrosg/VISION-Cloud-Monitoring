@@ -1,7 +1,7 @@
 package endtoend.tests;
 
 import static org.junit.Assert.assertEquals;
-import gr.ntua.vision.monitoring.rules.RuleBean;
+import gr.ntua.vision.monitoring.resources.RuleBean;
 
 import javax.ws.rs.core.MediaType;
 

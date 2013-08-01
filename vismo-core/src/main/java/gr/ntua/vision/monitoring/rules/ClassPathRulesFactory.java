@@ -1,5 +1,8 @@
 package gr.ntua.vision.monitoring.rules;
 
+import gr.ntua.vision.monitoring.resources.DefaultRuleBean;
+import gr.ntua.vision.monitoring.resources.RuleBean;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -47,7 +50,7 @@ public class ClassPathRulesFactory extends AbstractRulesFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.rules.RulesFactory#buildFrom(gr.ntua.vision.monitoring.rules.RuleBean)
+     * @see gr.ntua.vision.monitoring.rules.RulesFactory#buildFrom(gr.ntua.vision.monitoring.resources.RuleBean)
      */
     @Override
     public VismoRule buildFrom(final RuleBean bean) {

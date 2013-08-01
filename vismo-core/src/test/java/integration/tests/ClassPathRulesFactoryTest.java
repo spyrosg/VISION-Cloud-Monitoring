@@ -2,9 +2,9 @@ package integration.tests;
 
 import static org.junit.Assert.assertTrue;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
+import gr.ntua.vision.monitoring.resources.DefaultRuleBean;
 import gr.ntua.vision.monitoring.rules.AccountingRule;
 import gr.ntua.vision.monitoring.rules.ClassPathRulesFactory;
-import gr.ntua.vision.monitoring.rules.DefaultRuleBean;
 import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.Rule;
 import gr.ntua.vision.monitoring.rules.VismoRule;
