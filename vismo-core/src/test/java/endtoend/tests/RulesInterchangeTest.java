@@ -182,9 +182,9 @@ public class RulesInterchangeTest extends TestCase {
      */
     @Override
     protected void tearDown() throws Exception {
-        // s1.halt();
-        // s2.halt();
-        // s3.halt();
+        s1.halt();
+        s2.halt();
+        s3.halt();
 
         super.tearDown();
     }
