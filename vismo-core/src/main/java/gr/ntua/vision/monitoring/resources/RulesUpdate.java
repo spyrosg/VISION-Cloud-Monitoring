@@ -6,7 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 
@@ -35,13 +37,16 @@ public class RulesUpdate {
      * @param bean
      */
     public void push(final RuleBean bean) {
-        for (final String host : knownHosts) {
-            final ClientResponse res = client.resource("http://" + host + "/rules")
-                    .header(RulesResource.X_INTERCHANGE_HEADER, "true").type(MediaType.APPLICATION_JSON).entity(bean)
-                    .post(ClientResponse.class);
+        for (final String host : knownHosts)
+            try {
+                final ClientResponse res = client.resource("http://" + host + "/rules")
+                        .header(RulesResource.X_INTERCHANGE_HEADER, "true").type(MediaType.APPLICATION_JSON).entity(bean)
+                        .post(ClientResponse.class);
 
-            log.debug("posting to {} => {}", host, res.getClientResponseStatus());
-        }
+                log.debug("posting to {} => {}", host, res.getClientResponseStatus());
+            } catch (final ClientHandlerException e) {
+                log.debug("posting to {} failed, reason: {}", host, e.getCause());
+            }
     }
 
 
@@ -67,6 +72,8 @@ public class RulesUpdate {
         final DefaultClientConfig cc = new DefaultClientConfig();
 
         cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
+        cc.getProperties().put(ClientConfig.PROPERTY_CONNECT_TIMEOUT, 1000);
+        cc.getProperties().put(ClientConfig.PROPERTY_READ_TIMEOUT, 1000);
 
         return Client.create(cc);
     }
