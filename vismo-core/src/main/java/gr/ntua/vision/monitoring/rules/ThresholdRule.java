@@ -31,7 +31,7 @@ public class ThresholdRule extends Rule {
      * @param bean
      */
     public ThresholdRule(final VismoRulesEngine engine, final ThresholdRuleBean bean) {
-        super(engine);
+        super(engine, bean.getId());
         this.topic = bean.getTopic();
         this.operation = bean.getOperation();
         this.filterUnit = bean.getFilterUnit();

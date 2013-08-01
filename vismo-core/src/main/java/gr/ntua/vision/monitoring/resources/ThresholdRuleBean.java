@@ -17,6 +17,8 @@ public class ThresholdRuleBean implements RuleBean {
     /***/
     private String                         filterUnit;
     /***/
+    private String                         id;
+    /***/
     private String                         operation;
     /***/
     private long                           period       = -1;
@@ -85,6 +87,14 @@ public class ThresholdRuleBean implements RuleBean {
 
 
     /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+
+    /**
      * @return the operation
      */
     public String getOperation() {
@@ -122,6 +132,15 @@ public class ThresholdRuleBean implements RuleBean {
      */
     public void setFilterUnit(final String filterUnit) {
         this.filterUnit = filterUnit;
+    }
+
+
+    /**
+     * @param id
+     *            the id to set
+     */
+    public void setId(final String id) {
+        this.id = id;
     }
 
 

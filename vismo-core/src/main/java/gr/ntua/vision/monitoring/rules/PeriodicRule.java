@@ -35,12 +35,26 @@ public abstract class PeriodicRule extends TimerTask implements VismoRule {
      *            the rule's period, in milliseconds.
      */
     public PeriodicRule(final VismoRulesEngine engine, final long period) {
+        this(engine, period, getId());
+    }
+
+
+    /**
+     * Constructor.
+     * 
+     * @param engine
+     * @param period
+     *            the rule's period, in milliseconds.
+     * @param id
+     *            the rule's id.
+     */
+    public PeriodicRule(final VismoRulesEngine engine, final long period, final String id) {
         if (period <= 0)
             throw new IllegalArgumentException("rule period should be > 0");
 
         this.engine = engine;
         this.period = period;
-        this.id = UUID.randomUUID().toString();
+        this.id = id != null ? id : getId();
     }
 
 
@@ -130,5 +144,13 @@ public abstract class PeriodicRule extends TimerTask implements VismoRule {
      */
     protected void send(final MonitoringEvent e) {
         engine.send(e);
+    }
+
+
+    /**
+     * @return a uuid for this rule.
+     */
+    private static String getId() {
+        return UUID.randomUUID().toString();
     }
 }

@@ -36,7 +36,8 @@ public class RulesUpdate {
      */
     public void push(final RuleBean bean) {
         for (final String host : knownHosts) {
-            final ClientResponse res = client.resource("http://" + host + "/rules").type(MediaType.APPLICATION_JSON).entity(bean)
+            final ClientResponse res = client.resource("http://" + host + "/rules")
+                    .header(RulesResource.X_INTERCHANGE_HEADER, "true").type(MediaType.APPLICATION_JSON).entity(bean)
                     .post(ClientResponse.class);
 
             log.debug("posting to {} => {}", host, res.getClientResponseStatus());

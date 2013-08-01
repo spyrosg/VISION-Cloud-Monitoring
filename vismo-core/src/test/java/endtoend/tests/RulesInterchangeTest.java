@@ -182,9 +182,9 @@ public class RulesInterchangeTest extends TestCase {
      */
     @Override
     protected void tearDown() throws Exception {
-        s1.halt();
-        s2.halt();
-        s3.halt();
+        // s1.halt();
+        // s2.halt();
+        // s3.halt();
 
         super.tearDown();
     }
@@ -229,6 +229,8 @@ public class RulesInterchangeTest extends TestCase {
         final ThresholdRuleBean bean = getBean();
         final ClientResponse res = client.resource("http://localhost:" + port + "/rules").type(MediaType.APPLICATION_JSON)
                 .entity(bean).post(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
 
         return res.getEntity(String.class);
     }

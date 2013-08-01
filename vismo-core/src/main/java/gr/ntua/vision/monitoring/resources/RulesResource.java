@@ -12,6 +12,7 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -27,11 +28,14 @@ import javax.ws.rs.core.Response.Status;
  */
 @Path("rules")
 public class RulesResource {
+    /** this header is used to signify that the rule was passed to us by another instance and not by the user. */
+    static final String        X_INTERCHANGE_HEADER = "x-interchange";
     /***/
     private final RulesFactory factory;
-
     /***/
     private final RulesStore   store;
+    /***/
+    private final RulesUpdate  update;
 
 
     /**
@@ -43,6 +47,7 @@ public class RulesResource {
     public RulesResource(final RulesFactory factory, final RulesStore store) {
         this.factory = factory;
         this.store = store;
+        this.update = new RulesUpdate();
     }
 
 
@@ -101,6 +106,7 @@ public class RulesResource {
 
 
     /**
+     * @param isInterchange
      * @param name
      * @param period
      * @return on success, return the id of the newly added rule
@@ -108,7 +114,8 @@ public class RulesResource {
     @Path("{name}/{period}")
     @POST
     @Produces(MediaType.TEXT_PLAIN)
-    public Response submitDefaultRule(@PathParam("name") final String name, @PathParam("period") final long period) {
+    public Response submitDefaultRule(@HeaderParam(X_INTERCHANGE_HEADER) final boolean isInterchange,
+            @PathParam("name") final String name, @PathParam("period") final long period) {
         final DefaultRuleBean bean = new DefaultRuleBean(name, period);
         final VismoRule rule = factory.buildFrom(bean);
 
@@ -116,7 +123,7 @@ public class RulesResource {
             return badSpecification("unknown rule name: " + name);
 
         rule.submit();
-        pushRule(bean);
+        pushRule(isInterchange, rule.id(), bean);
 
         return submittedSuccessfully(rule);
     }
@@ -125,6 +132,7 @@ public class RulesResource {
     /**
      * Construct and submit a new rule to the engine.
      * 
+     * @param isInterchange
      * @param bean
      * @return on success, return the id of the newly added rule
      * @throws WebApplicationException
@@ -133,12 +141,13 @@ public class RulesResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    public Response submitThresholdRule(final ThresholdRuleBean bean) {
+    public Response submitThresholdRule(@HeaderParam(X_INTERCHANGE_HEADER) final boolean isInterchange,
+            final ThresholdRuleBean bean) {
         try {
             final VismoRule rule = factory.buildFrom(bean);
 
             rule.submit();
-            pushRule(bean);
+            pushRule(isInterchange, rule.id(), bean);
 
             return submittedSuccessfully(rule);
         } catch (final ThresholdRuleValidationError e) {
@@ -151,12 +160,17 @@ public class RulesResource {
      * Push the new rule to all other known nodes. We do this here, in the controller layer, since there isn't a good or general
      * enough rules representation in the domain. VismoRulesEngine knows only of VismoRule instances.
      * 
+     * @param isInterchange
+     * @param string
      * @param bean
      */
-    private void pushRule(final RuleBean bean) {
-        final RulesUpdate update = new RulesUpdate();
+    private void pushRule(final boolean isInterchange, final String string, final RuleBean bean) {
+        if (!isInterchange) {
+            if (bean instanceof ThresholdRuleBean)
+                ((ThresholdRuleBean) bean).setId(string);
 
-        update.push(bean);
+            update.push(bean);
+        }
     }
 
 

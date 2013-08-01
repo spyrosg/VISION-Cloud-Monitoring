@@ -22,8 +22,19 @@ public abstract class Rule implements VismoRule {
      * @param engine
      */
     public Rule(final VismoRulesEngine engine) {
+        this(engine, getId());
+    }
+
+
+    /**
+     * Constructor.
+     * 
+     * @param engine
+     * @param id
+     */
+    public Rule(final VismoRulesEngine engine, final String id) {
         this.engine = engine;
-        this.id = UUID.randomUUID().toString();
+        this.id = id != null ? id : getId();
     }
 
 
@@ -59,5 +70,13 @@ public abstract class Rule implements VismoRule {
      */
     protected void send(final MonitoringEvent e) {
         engine.send(e);
+    }
+
+
+    /**
+     * @return a uuid for this rule.
+     */
+    private static String getId() {
+        return UUID.randomUUID().toString();
     }
 }
