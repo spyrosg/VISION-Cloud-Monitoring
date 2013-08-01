@@ -59,7 +59,11 @@ public class ThresholdPeriodicRule extends PeriodicRule {
      */
     @Override
     public String toString() {
-        return "#<ThresholdPeriodicRule: " + topic + ", period=" + (period() / 1000.0) + "s, " + ", on " + filterUnit + " with "
+        if (filterUnit != null)
+            return "#<ThresholdPeriodicRule: " + topic + ", period=" + (period() / 1000.0) + "s, on " + filterUnit + " with "
+                    + requirements.size() + " requirements>";
+
+        return "#<ThresholdPeriodicRule: " + topic + ", period=" + (period() / 1000.0) + "s, no filters with "
                 + requirements.size() + " requirements>";
     }
 

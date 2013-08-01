@@ -18,7 +18,7 @@ import com.sun.jersey.api.json.JSONConfiguration;
  */
 public abstract class JerseyResourceTest extends TestCase {
     /***/
-    private static final int    PORT     = 9998;
+    private static final int    PORT     = 19998;
     /***/
     private static final String ROOT_URL = "http://localhost:" + PORT;
     /***/
