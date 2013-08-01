@@ -34,9 +34,18 @@ public class RulesUpdate {
 
 
     /**
+     * @param isInterchange
+     * @param id
      * @param bean
      */
-    public void push(final RuleBean bean) {
+    public void push(final boolean isInterchange, final String id, final RuleBean bean) {
+        if (isInterchange)
+            return;
+        if (!(bean instanceof ThresholdRuleBean))
+            return;
+
+        ((ThresholdRuleBean) bean).setId(id);
+
         for (final String host : knownHosts)
             try {
                 final ClientResponse res = client.resource("http://" + host + "/rules")
@@ -45,7 +54,7 @@ public class RulesUpdate {
 
                 log.debug("posting to {} => {}", host, res.getClientResponseStatus());
             } catch (final ClientHandlerException e) {
-                log.debug("posting to {} failed, reason: {}", host, e.getCause());
+                log.error("posting to {} failed, reason: {}", host, e.getCause());
             }
     }
 

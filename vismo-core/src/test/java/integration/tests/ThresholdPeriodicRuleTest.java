@@ -62,7 +62,6 @@ public class ThresholdPeriodicRuleTest extends JerseyResourceTest {
         triggerRule();
         Thread.sleep(6 * RULE_PERIOD / 5);
         assertEquals(1, eventSink.size());
-        // assertIsExpectedEvent(eventSink.get(0));
 
         @SuppressWarnings("unchecked")
         final ArrayList<HashMap<String, Object>> violations = (ArrayList<HashMap<String, Object>>) eventSink.get(0)

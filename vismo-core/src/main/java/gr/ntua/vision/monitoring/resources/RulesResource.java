@@ -161,16 +161,11 @@ public class RulesResource {
      * enough rules representation in the domain. VismoRulesEngine knows only of VismoRule instances.
      * 
      * @param isInterchange
-     * @param string
+     * @param id
      * @param bean
      */
-    private void pushRule(final boolean isInterchange, final String string, final RuleBean bean) {
-        if (!isInterchange) {
-            if (bean instanceof ThresholdRuleBean)
-                ((ThresholdRuleBean) bean).setId(string);
-
-            update.push(bean);
-        }
+    private void pushRule(final boolean isInterchange, final String id, final RuleBean bean) {
+        update.push(isInterchange, id, bean);
     }
 
 
