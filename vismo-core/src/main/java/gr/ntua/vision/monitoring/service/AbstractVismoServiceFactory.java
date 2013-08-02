@@ -137,8 +137,8 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
      */
     private WebServer buildWebServer(final VMInfo vminfo, final RulesStore store, final VismoRulesEngine engine) {
         final WebServer server = new WebServer(conf.getWebPort());
-        final RulesResource rulesResource = new RulesResource(new ThresholdRulesFactory(new ClassPathRulesFactory(engine,
-                DEFAULT_RULES_PACKAGE), engine), store);
+        final RulesResource rulesResource = new RulesResource(conf.getWebPort(), new ThresholdRulesFactory(
+                new ClassPathRulesFactory(engine, DEFAULT_RULES_PACKAGE), engine), store);
         final HttpEventResource eventSource = new HttpEventResource();
         final WebAppBuilder builder = new WebAppBuilder();
 

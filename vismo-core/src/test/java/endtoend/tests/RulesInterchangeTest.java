@@ -145,8 +145,12 @@ public class RulesInterchangeTest extends TestCase {
     /** the socket factory. */
     private final ZMQFactory    socketFactory = new ZMQFactory(new ZContext());
 
-
     // TODO: testShouldAlsoPropagateRuleDeletions
+
+    static {
+        System.setProperty("vismo.hosts", "localhost:9997,localhost:9998");
+    }
+
 
     /**
      * @throws Exception
@@ -282,8 +286,6 @@ public class RulesInterchangeTest extends TestCase {
     private static void assertHaveSameRuleSet(final HashSet<UniqueRule> s1, final HashSet<UniqueRule> s2) {
         s1.removeAll(getRulesUniqueToEachInstance(s1));
         s2.removeAll(getRulesUniqueToEachInstance(s2));
-
-        System.out.println("comparing: " + s1 + " against: " + s2);
         assertEquals(s1, s2);
     }
 
@@ -321,8 +323,6 @@ public class RulesInterchangeTest extends TestCase {
         for (final UniqueRule r : s)
             if ("PassThroughRule".equals(r.className))
                 dontCare.add(r);
-
-        System.out.println("init: " + s + ", don't care: " + dontCare);
 
         return dontCare;
     }

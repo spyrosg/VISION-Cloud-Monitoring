@@ -154,7 +154,7 @@ public class ThresholdRuleTest extends JerseyResourceTest {
         factory = new ThresholdRulesFactory(engine);
 
         engine.appendSink(new InMemoryEventSink(eventSink));
-        configureServer(WebAppBuilder.buildFrom(new RulesResource(factory, new RulesStore())), "/*");
+        configureServer(WebAppBuilder.buildFrom(new RulesResource(PORT, factory, new RulesStore())), "/*");
         startServer();
     }
 

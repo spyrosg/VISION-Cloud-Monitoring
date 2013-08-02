@@ -109,7 +109,7 @@ public class ThresholdPeriodicRuleTest extends JerseyResourceTest {
         obs = new FakeObjectService(new InMemoryEventDispatcher(engine, "fake-obs"), new Random(3331));
         factory = new ThresholdRulesFactory(engine);
         engine.appendSink(new InMemoryEventSink(eventSink));
-        configureServer(WebAppBuilder.buildFrom(new RulesResource(factory, new RulesStore())), "/*");
+        configureServer(WebAppBuilder.buildFrom(new RulesResource(PORT, factory, new RulesStore())), "/*");
         startServer();
     }
 

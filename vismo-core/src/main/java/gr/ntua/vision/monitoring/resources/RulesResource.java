@@ -29,7 +29,7 @@ import javax.ws.rs.core.Response.Status;
 @Path("rules")
 public class RulesResource {
     /** this header is used to signify that the rule was passed to us by another instance and not by the user. */
-    static final String        X_INTERCHANGE_HEADER = "x-interchange";
+    static final String        X_VISION_INTERCHANGE_HEADER = "x-vision-interchange";
     /***/
     private final RulesFactory factory;
     /***/
@@ -41,13 +41,14 @@ public class RulesResource {
     /**
      * Constructor.
      * 
+     * @param defaultPort
      * @param factory
      * @param store
      */
-    public RulesResource(final RulesFactory factory, final RulesStore store) {
+    public RulesResource(final int defaultPort, final RulesFactory factory, final RulesStore store) {
         this.factory = factory;
         this.store = store;
-        this.update = new RulesUpdate();
+        this.update = new RulesUpdate(defaultPort);
     }
 
 
@@ -114,7 +115,7 @@ public class RulesResource {
     @Path("{name}/{period}")
     @POST
     @Produces(MediaType.TEXT_PLAIN)
-    public Response submitDefaultRule(@HeaderParam(X_INTERCHANGE_HEADER) final boolean isInterchange,
+    public Response submitDefaultRule(@HeaderParam(X_VISION_INTERCHANGE_HEADER) final boolean isInterchange,
             @PathParam("name") final String name, @PathParam("period") final long period) {
         final DefaultRuleBean bean = new DefaultRuleBean(name, period);
         final VismoRule rule = factory.buildFrom(bean);
@@ -141,7 +142,7 @@ public class RulesResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    public Response submitThresholdRule(@HeaderParam(X_INTERCHANGE_HEADER) final boolean isInterchange,
+    public Response submitThresholdRule(@HeaderParam(X_VISION_INTERCHANGE_HEADER) final boolean isInterchange,
             final ThresholdRuleBean bean) {
         try {
             final VismoRule rule = factory.buildFrom(bean);

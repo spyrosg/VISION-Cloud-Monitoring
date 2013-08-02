@@ -103,7 +103,7 @@ public class RulesResourceTest extends JerseyResourceTest {
         final VismoRulesEngine engine = new VismoRulesEngine(rulesStore);
         final ClassPathRulesFactory clsPathfactory = new ClassPathRulesFactory(engine, PassThroughRule.class.getPackage());
         final ThresholdRulesFactory factory = new ThresholdRulesFactory(clsPathfactory, engine);
-        final Application rulesApp = WebAppBuilder.buildFrom(new RulesResource(factory, rulesStore));
+        final Application rulesApp = WebAppBuilder.buildFrom(new RulesResource(PORT, factory, rulesStore));
 
         configureServer(rulesApp, "/*");
         startServer();
