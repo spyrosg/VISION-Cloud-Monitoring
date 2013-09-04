@@ -151,7 +151,8 @@ public class RulesResource {
      * @param id
      * @param fieldName
      * @param value
-     * @return
+     * @return 201 when the update was successful, 404, when no rule corresponds to given id or 400 when the update cannot be
+     *         performed.
      */
     @PUT
     @Path("{rule-id}/{field}/{value}")
@@ -161,8 +162,8 @@ public class RulesResource {
             store.update(id, fieldName, value);
         } catch (final NoSuchElementException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
-        } catch (final Error e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        } catch (final IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
 
         return Response.noContent().build();

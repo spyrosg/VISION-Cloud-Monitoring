@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.rules;
 
 /**
- * 
+ * TODO: should provide specific filterUnit
  */
 public class Violation {
     /***/

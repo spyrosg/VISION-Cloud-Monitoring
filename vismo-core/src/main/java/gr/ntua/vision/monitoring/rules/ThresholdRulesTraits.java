@@ -69,10 +69,36 @@ class ThresholdRulesTraits {
      * applies to all units.
      * 
      * @param e
+     * @param filterUnits
+     * @return <code>true</code> if the event comes from a matching unit.
+     */
+    private static boolean isApplicableFilterUnit(final MonitoringEvent e, final List<String> filterUnits) {
+        if (filterUnits.size() == 0)
+            return true;
+
+        final String tenant = (String) e.get("tenant");
+        final String user = (String) e.get("user");
+        final String container = (String) e.get("container");
+        // final String object = (String) e.get("object"); FIXME: come back to this
+        final String concat = join(tenant, user, container);
+
+        for (final String filterUnit : filterUnits)
+            if (concat.equals(filterUnit))
+                return true;
+
+        return false;
+    }
+
+
+    /**
+     * When <code>filterUnit</code> is unspecified by the user, this method returns <code>true</code>, since it means that it
+     * applies to all units.
+     * 
+     * @param e
      * @param filterUnit
      * @return <code>true</code> if the event comes from a matching unit.
      */
-    private static boolean isApplicableFilterUnit(final MonitoringEvent e, final List<String> filterUnit) {
+    private static boolean isApplicableFilterUnit(final MonitoringEvent e, final String filterUnit) {
         if (filterUnit == null || filterUnit.isEmpty())
             return true;
 
@@ -112,6 +138,29 @@ class ThresholdRulesTraits {
             return true;
 
         return operation.equals(e.get("operation"));
+    }
+
+
+    /**
+     * @param fs
+     * @return
+     */
+    private static String join(final String... fs) {
+        final StringBuilder buf = new StringBuilder();
+
+        for (int i = 0; i < fs.length; ++i) {
+            final String s = fs[i];
+
+            if (s == null)
+                return buf.toString();
+
+            buf.append(s);
+
+            if (i < fs.length - 1)
+                buf.append(",");
+        }
+
+        return buf.toString();
     }
 
 
