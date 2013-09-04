@@ -7,7 +7,7 @@ define(['q'], function(Q) {
     // Determine if an XMLHttpRequest was successful
     // Some versions of WebKit return 0 for successful file:// URLs
     function xhrSuccess(req) {
-        return (req.status === 200 || (req.status === 0 && req.responseText));
+        return (req.status <= 307 || (req.status === 0 && req.responseText));
     }
 
     // Due to crazy variabile availability of new and old XHR APIs across
@@ -46,8 +46,6 @@ define(['q'], function(Q) {
                 request.setRequestHeader(name, headers[name]);
             });
 
-            request.setRequestHeader("Referer", "http://www.google.com");
-
             if (request.overrideMimeType) {
                 request.overrideMimeType('application/json');
             }
@@ -62,7 +60,11 @@ define(['q'], function(Q) {
             response.reject(exception.message, exception);
         }
 
-        request.send(data || null);
+        if (data) {
+            request.send(data);
+        } else {
+            request.send();
+        }
 
         return response.promise;
     };

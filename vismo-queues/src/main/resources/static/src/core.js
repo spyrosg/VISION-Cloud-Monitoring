@@ -6,6 +6,17 @@
 define(['dom', 'ajax'], function(dom, ajax) {
     'use strict';
 
+    var cdmi_queues = {
+        root_server: '/api/queues',
+
+        create: function(name, topic) {
+            return ajax(this.root_server + '/' + name + '/' + topic, 'PUT', {
+                'Accept': 'application/cdmi-queue',
+                'Content-Type': 'application/cdmi-queue',
+                'X-CDMI-Specification-Version': '1.0.2'
+            }).then(JSON.parse);
+        },
+    };
 
     var eventList = {
         parent: null,
@@ -14,7 +25,7 @@ define(['dom', 'ajax'], function(dom, ajax) {
         setup: function(parent) {
             this.parent = parent;
             this.el = dom.creat('ul');
-            this.parent.appendChild(el);
+            this.parent.appendChild(this.el);
         },
 
         append: function(evt) {
@@ -31,10 +42,14 @@ define(['dom', 'ajax'], function(dom, ajax) {
 
     return {
         main: function() {
-            var container = dom.id('main');
-
-            eventList.setup(container);
             console.debug('app started');
+
+            cdmi_queues.create('foo', '*').then(function(data) {
+                var container = dom.id('main');
+
+                console.debug('queue "foo" created');
+                eventList.setup(container);
+            }).done();
         }
     };
 });
