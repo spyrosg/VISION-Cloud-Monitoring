@@ -24,7 +24,7 @@ public abstract class PeriodicRule extends TimerTask implements VismoRule {
     /***/
     private final String                       id;
     /** the rule's period, in milliseconds. */
-    private final long                         period;
+    private long                               period;
 
 
     /**
@@ -92,6 +92,16 @@ public abstract class PeriodicRule extends TimerTask implements VismoRule {
     @Override
     public void submit() {
         engine.submitRule(this);
+    }
+
+
+    /**
+     * @param newPeriod
+     */
+    public void updatePeriod(final long newPeriod) {
+        log.debug("updating rule's period {} -> {}", period, newPeriod);
+        this.period = newPeriod;
+        engine.resubmit(this);
     }
 
 
