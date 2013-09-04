@@ -1,11 +1,10 @@
 package gr.ntua.vision.monitoring.rules;
 
 import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.isApplicable;
-
-import java.util.List;
-
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
+
+import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +15,11 @@ import org.slf4j.LoggerFactory;
  */
 public class ThresholdRule extends Rule {
     /** the log target. */
-    private static final Logger            log = LoggerFactory.getLogger(Rule.class);
+    private static final Logger            log         = LoggerFactory.getLogger(Rule.class);
     /***/
     // TODO: change filter unit to accept a list of containers.
-    // TODO: update period. 
-    // TODO: change #toString to show period.
-    private final List<String>                   filterUnits;
+    // TODO: update period.
+    private final ArrayList<String>        filterUnits = new ArrayList<String>();
     /***/
     private final String                   operation;
     /***/
@@ -40,7 +38,7 @@ public class ThresholdRule extends Rule {
         super(engine);
         this.topic = bean.getTopic();
         this.operation = bean.getOperation();
-        this.filterUnits = bean.getFilterUnits();
+        this.filterUnits.add(bean.getFilterUnit());
         this.requirements = ThresholdRequirementList.from(bean.getRequirements());
     }
 
@@ -74,8 +72,16 @@ public class ThresholdRule extends Rule {
 
 
     /**
+     * @param filterUnit
+     */
+    public void updateFilterUnits(final String filterUnit) {
+        filterUnits.add(filterUnit);
+    }
+
+
+    /**
      * @param e
-     * @return the violiations list.
+     * @return the violations list.
      */
     private ViolationsList thresholdExceededBy(final MonitoringEvent e) {
         return requirements.haveViolations(e);

@@ -79,8 +79,28 @@ public class RulesResourceTest extends JerseyResourceTest {
 
 
     /***/
-    public void testHttpPUTShouldUpdateRule() {
-        // TODO
+    public void testHttpPUTShouldUpdateRulesFilterUnit() {
+        final long period = 5000;
+        final String insertedRuleId = postRule(getBean(period)).getEntity(String.class);
+
+        final ClientResponse res = resource().path(insertedRuleId).path("filterUnit").path(String.valueOf("ntua,vassilis,bar"))
+                .put(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
+    }
+
+
+    /***/
+    public void testHttpPUTShouldUpdateRulesPeriod() {
+        final long oldPeriod = 5000;
+        final long newPeriod = 10000;
+
+        final String insertedRuleId = postRule(getBean(oldPeriod)).getEntity(String.class);
+
+        final ClientResponse res = resource().path(insertedRuleId).path("period").path(String.valueOf(newPeriod))
+                .put(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
     }
 
 
@@ -168,6 +188,7 @@ public class RulesResourceTest extends JerseyResourceTest {
 
         bean.setTopic("my-topic");
         bean.setPeriod(period);
+        bean.setFilterUnit("ntua,vassilis,foo");
         bean.addRequirement("latency", "sum", ">", 1.3);
 
         return bean;

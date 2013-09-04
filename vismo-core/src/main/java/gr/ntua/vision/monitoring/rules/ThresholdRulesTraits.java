@@ -7,6 +7,7 @@ import gr.ntua.vision.monitoring.resources.ThresholdRuleValidationError;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,7 @@ class ThresholdRulesTraits {
      * @param list
      * @return <code>true</code> iff the monitoring event matches all of the requirements, <code>false</code> otherwise.
      */
-    static boolean isApplicable(final MonitoringEvent e, final String filterUnit, final String operation,
+    static boolean isApplicable(final MonitoringEvent e, final List<String> filterUnit, final String operation,
             final ThresholdRequirementList list) {
         return isApplicableFilterUnit(e, filterUnit) && isApplicableOperation(e, operation) && list.isApplicable(e);
     }
@@ -71,7 +72,7 @@ class ThresholdRulesTraits {
      * @param filterUnit
      * @return <code>true</code> if the event comes from a matching unit.
      */
-    private static boolean isApplicableFilterUnit(final MonitoringEvent e, final String filterUnit) {
+    private static boolean isApplicableFilterUnit(final MonitoringEvent e, final List<String> filterUnit) {
         if (filterUnit == null || filterUnit.isEmpty())
             return true;
 

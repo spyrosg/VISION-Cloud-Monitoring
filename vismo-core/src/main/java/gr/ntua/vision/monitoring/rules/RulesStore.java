@@ -3,6 +3,7 @@ package gr.ntua.vision.monitoring.rules;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,5 +124,75 @@ public class RulesStore {
      */
     public int size() {
         return map.size();
+    }
+
+
+    /**
+     * @param id
+     * @param fieldName
+     * @param value
+     * @throws NoSuchElementException
+     *             when no the id does not match any existing rule.
+     * @throws IllegalArgumentException
+     *             when there's no applicable update.
+     */
+    public void update(final String id, final String fieldName, final String value) throws NoSuchElementException,
+            IllegalArgumentException {
+        log.debug("about to update rule id {} field: '{}'", id, fieldName);
+
+        final VismoRule r = map.get(id);
+
+        if (r == null)
+            throw new NoSuchElementException("no such rule");
+
+        if (r instanceof ThresholdRule) {
+            update((ThresholdRule) r, fieldName, value);
+            return;
+        } else if (r instanceof ThresholdPeriodicRule) {
+            update((ThresholdPeriodicRule) r, fieldName, value);
+            return;
+        }
+
+        throw new IllegalArgumentException("inapplicable update");
+    }
+
+
+    /**
+     * @param tr
+     * @param fieldName
+     * @param value
+     * @throws IllegalArgumentException
+     *             when there's no applicable update.
+     */
+    private static void update(final ThresholdPeriodicRule tr, final String fieldName, final String value)
+            throws IllegalArgumentException {
+        if ("period".equals(fieldName)) {
+            tr.updatePeriod(Long.valueOf(value));
+            return;
+        }
+        if ("filterUnit".equals(fieldName)) {
+            tr.updateFilterUnits(value);
+            return;
+        }
+
+        throw new IllegalArgumentException("inapplicable update: " + fieldName);
+    }
+
+
+    /**
+     * @param tr
+     * @param value
+     * @param fieldName
+     * @throws IllegalArgumentException
+     *             when there's no applicable update.
+     */
+    private static void update(final ThresholdRule tr, final String fieldName, final String value)
+            throws IllegalArgumentException {
+        if ("filterUnit".equals(fieldName)) {
+            tr.updateFilterUnits(value);
+            return;
+        }
+
+        throw new IllegalArgumentException("inapplicable update: " + fieldName);
     }
 }
