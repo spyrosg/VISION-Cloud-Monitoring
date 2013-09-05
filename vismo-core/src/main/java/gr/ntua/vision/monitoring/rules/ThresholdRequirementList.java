@@ -27,13 +27,14 @@ public class ThresholdRequirementList {
 
     /**
      * @param events
-     * @return the possibly empty list of violations.
+     * @param filterUnits
+     * @return the possbily empty list of violations.
      */
-    public ViolationsList haveViolations(final List<MonitoringEvent> events) {
+    public ViolationsList haveViolations(final List<MonitoringEvent> events, final List<String> filterUnits) {
         final ViolationsList violList = new ViolationsList();
 
         for (final ThresholdRequirement req : list) {
-            final Violation v = req.isViolated(events);
+            final Violation v = req.isViolated(events, filterUnits);
 
             if (v != null)
                 violList.add(v);
@@ -44,14 +45,15 @@ public class ThresholdRequirementList {
 
 
     /**
-     * @param e
-     * @return the possbily empty list of violations.
+     * @param event
+     * @param filterUnits
+     * @return the possibly empty list of violations.
      */
-    public ViolationsList haveViolations(final MonitoringEvent e) {
+    public ViolationsList haveViolations(final MonitoringEvent event, final List<String> filterUnits) {
         final ViolationsList violList = new ViolationsList();
 
         for (final ThresholdRequirement req : list) {
-            final Violation v = req.isViolated(e);
+            final Violation v = req.isViolated(event, filterUnits);
 
             if (v != null)
                 violList.add(v);

@@ -58,7 +58,7 @@ class ThresholdRulesTraits {
      */
     static boolean isApplicable(final MonitoringEvent e, final List<String> filterUnit, final String operation,
             final ThresholdRequirementList list) {
-        return isApplicableFilterUnit(e, filterUnit) && isApplicableOperation(e, operation) && list.isApplicable(e);
+        return isApplicableOperation(e, operation) && isApplicableFilterUnit(e, filterUnit) && list.isApplicable(e);
     }
 
 
@@ -70,23 +70,36 @@ class ThresholdRulesTraits {
      * @param filterUnits
      * @return <code>true</code> if the event comes from a matching unit.
      */
-    private static boolean isApplicableFilterUnit(final MonitoringEvent e, final List<String> filterUnits) {
+    static boolean isApplicableFilterUnit(final MonitoringEvent e, final List<String> filterUnits) {
         if (filterUnits.size() == 0)
             return true;
 
-        final String tenant = (String) e.get("tenant");
-        final String user = (String) e.get("user");
-        final String container = (String) e.get("container");
-        final String object = (String) e.get("object");
-        final String concat = join(tenant, user, container, object);
+        final String concat = join(e);
 
         log.debug("matching /{}/ against filter: {}", concat, filterUnits);
+
+        if (concat.length() == 0)
+            return true;
 
         for (final String filterUnit : filterUnits)
             if (concat.startsWith(filterUnit))
                 return true;
 
         return false;
+    }
+
+
+    /**
+     * @param e
+     * @return @see {@link #join(String...)}
+     */
+    static String join(final MonitoringEvent e) {
+        final String tenant = (String) e.get("tenant");
+        final String user = (String) e.get("user");
+        final String container = (String) e.get("container");
+        final String object = (String) e.get("object");
+
+        return join(tenant, user, container, object);
     }
 
 

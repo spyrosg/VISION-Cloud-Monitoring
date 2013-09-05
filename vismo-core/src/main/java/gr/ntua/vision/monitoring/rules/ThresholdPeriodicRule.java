@@ -95,6 +95,6 @@ public class ThresholdPeriodicRule extends PeriodicRule {
      * @return the violations list.
      */
     private ViolationsList thresholdExceededBy(final List<MonitoringEvent> events) {
-        return requirements.haveViolations(events);
+        return requirements.haveViolations(events, filterUnits);
     }
 }

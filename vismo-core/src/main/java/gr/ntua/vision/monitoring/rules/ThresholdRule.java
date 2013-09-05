@@ -84,6 +84,6 @@ public class ThresholdRule extends Rule {
      * @return the violations list.
      */
     private ViolationsList thresholdExceededBy(final MonitoringEvent e) {
-        return requirements.haveViolations(e);
+        return requirements.haveViolations(e, filterUnits);
     }
 }

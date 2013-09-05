@@ -42,6 +42,7 @@ class ThresholdEventFactory {
             o1.put("value", v.eventValue);
             o1.put("metric", v.metric);
             o1.put("threshold", v.threshold);
+            o1.put("filterUnits", v.filterUnits);
             arr.add(o1);
         }
 
