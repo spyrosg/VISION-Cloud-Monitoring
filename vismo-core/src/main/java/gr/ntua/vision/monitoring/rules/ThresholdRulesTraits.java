@@ -23,8 +23,6 @@ class ThresholdRulesTraits {
     private static final Logger   log               = LoggerFactory.getLogger(ThresholdRulesTraits.class);
     /***/
     private static final String[] requirementFields = { "predicate", "threshold" };
-    /***/
-    private static final String[] UNITS             = { "tenant", "user", "container", "object" };
 
 
     /**
@@ -79,49 +77,16 @@ class ThresholdRulesTraits {
         final String tenant = (String) e.get("tenant");
         final String user = (String) e.get("user");
         final String container = (String) e.get("container");
-        // final String object = (String) e.get("object"); FIXME: come back to this
-        final String concat = join(tenant, user, container);
+        final String object = (String) e.get("object");
+        final String concat = join(tenant, user, container, object);
+
+        log.debug("matching /{}/ against filter: {}", concat, filterUnits);
 
         for (final String filterUnit : filterUnits)
-            if (concat.equals(filterUnit))
+            if (concat.startsWith(filterUnit))
                 return true;
 
         return false;
-    }
-
-
-    /**
-     * When <code>filterUnit</code> is unspecified by the user, this method returns <code>true</code>, since it means that it
-     * applies to all units.
-     * 
-     * @param e
-     * @param filterUnit
-     * @return <code>true</code> if the event comes from a matching unit.
-     */
-    private static boolean isApplicableFilterUnit(final MonitoringEvent e, final String filterUnit) {
-        if (filterUnit == null || filterUnit.isEmpty())
-            return true;
-
-        final String[] fs = filterUnit.split(",");
-
-        for (int i = 0; i < UNITS.length; ++i) {
-            if (i >= fs.length)
-                continue;
-
-            final String val = fs[i];
-            final String unit = UNITS[i];
-            final Object o = e.get(unit);
-
-            if (o == null)
-                continue;
-
-            // log.trace(String.format("unit %s => %s matching %s", unit, o, val));
-
-            if (!o.equals(val))
-                return false;
-        }
-
-        return true;
     }
 
 
@@ -143,7 +108,7 @@ class ThresholdRulesTraits {
 
     /**
      * @param fs
-     * @return
+     * @return the comma separated string concatenation of the strings.
      */
     private static String join(final String... fs) {
         final StringBuilder buf = new StringBuilder();

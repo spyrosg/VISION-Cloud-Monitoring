@@ -31,8 +31,6 @@ public class VismoRulesEngine implements EventSourceListener {
     private final Timer                timer = new Timer();
 
 
-    // FIXME: addition/deletion of rules
-
     /**
      * Constructor.
      */
