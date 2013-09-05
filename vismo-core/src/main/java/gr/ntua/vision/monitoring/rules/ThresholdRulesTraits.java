@@ -7,6 +7,7 @@ import gr.ntua.vision.monitoring.resources.ThresholdRuleValidationError;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +23,6 @@ class ThresholdRulesTraits {
     private static final Logger   log               = LoggerFactory.getLogger(ThresholdRulesTraits.class);
     /***/
     private static final String[] requirementFields = { "predicate", "threshold" };
-    /***/
-    private static final String[] UNITS             = { "tenant", "user", "container", "object" };
 
 
     /**
@@ -57,9 +56,9 @@ class ThresholdRulesTraits {
      * @param list
      * @return <code>true</code> iff the monitoring event matches all of the requirements, <code>false</code> otherwise.
      */
-    static boolean isApplicable(final MonitoringEvent e, final String filterUnit, final String operation,
+    static boolean isApplicable(final MonitoringEvent e, final List<String> filterUnit, final String operation,
             final ThresholdRequirementList list) {
-        return isApplicableFilterUnit(e, filterUnit) && isApplicableOperation(e, operation) && list.isApplicable(e);
+        return isApplicableOperation(e, operation) && isApplicableFilterUnit(e, filterUnit) && list.isApplicable(e);
     }
 
 
@@ -68,33 +67,39 @@ class ThresholdRulesTraits {
      * applies to all units.
      * 
      * @param e
-     * @param filterUnit
+     * @param filterUnits
      * @return <code>true</code> if the event comes from a matching unit.
      */
-    private static boolean isApplicableFilterUnit(final MonitoringEvent e, final String filterUnit) {
-        if (filterUnit == null || filterUnit.isEmpty())
+    static boolean isApplicableFilterUnit(final MonitoringEvent e, final List<String> filterUnits) {
+        if (filterUnits.size() == 0)
             return true;
 
-        final String[] fs = filterUnit.split(",");
+        final String concat = join(e);
 
-        for (int i = 0; i < UNITS.length; ++i) {
-            if (i >= fs.length)
-                continue;
+        log.debug("matching /{}/ against filter: {}", concat, filterUnits);
 
-            final String val = fs[i];
-            final String unit = UNITS[i];
-            final Object o = e.get(unit);
+        if (concat.length() == 0)
+            return true;
 
-            if (o == null)
-                continue;
+        for (final String filterUnit : filterUnits)
+            if (concat.startsWith(filterUnit))
+                return true;
 
-            // log.trace(String.format("unit %s => %s matching %s", unit, o, val));
+        return false;
+    }
 
-            if (!o.equals(val))
-                return false;
-        }
 
-        return true;
+    /**
+     * @param e
+     * @return @see {@link #join(String...)}
+     */
+    static String join(final MonitoringEvent e) {
+        final String tenant = (String) e.get("tenant");
+        final String user = (String) e.get("user");
+        final String container = (String) e.get("container");
+        final String object = (String) e.get("object");
+
+        return join(tenant, user, container, object);
     }
 
 
@@ -111,6 +116,29 @@ class ThresholdRulesTraits {
             return true;
 
         return operation.equals(e.get("operation"));
+    }
+
+
+    /**
+     * @param fs
+     * @return the comma separated string concatenation of the strings.
+     */
+    private static String join(final String... fs) {
+        final StringBuilder buf = new StringBuilder();
+
+        for (int i = 0; i < fs.length; ++i) {
+            final String s = fs[i];
+
+            if (s == null)
+                return buf.toString();
+
+            buf.append(s);
+
+            if (i < fs.length - 1)
+                buf.append(",");
+        }
+
+        return buf.toString();
     }
 
 

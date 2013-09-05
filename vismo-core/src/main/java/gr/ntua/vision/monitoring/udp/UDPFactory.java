@@ -37,7 +37,6 @@ public class UDPFactory {
      * @return a udp server.
      * @throws SocketException
      */
-    @SuppressWarnings("resource")
     public UDPServer buildServer() throws SocketException {
         return new UDPServer(new DatagramSocket(port));
     }

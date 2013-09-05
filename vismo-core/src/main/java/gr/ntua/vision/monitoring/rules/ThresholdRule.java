@@ -4,6 +4,8 @@ import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.isApplicable;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
 
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,9 +15,11 @@ import org.slf4j.LoggerFactory;
  */
 public class ThresholdRule extends Rule {
     /** the log target. */
-    private static final Logger            log = LoggerFactory.getLogger(Rule.class);
+    private static final Logger            log         = LoggerFactory.getLogger(Rule.class);
     /***/
-    private final String                   filterUnit;
+    // TODO: change filter unit to accept a list of containers.
+    // TODO: update period.
+    private final ArrayList<String>        filterUnits = new ArrayList<String>();
     /***/
     private final String                   operation;
     /***/
@@ -34,7 +38,7 @@ public class ThresholdRule extends Rule {
         super(engine, bean.getId());
         this.topic = bean.getTopic();
         this.operation = bean.getOperation();
-        this.filterUnit = bean.getFilterUnit();
+        this.filterUnits.add(bean.getFilterUnit());
         this.requirements = ThresholdRequirementList.from(bean.getRequirements());
     }
 
@@ -44,7 +48,7 @@ public class ThresholdRule extends Rule {
      */
     @Override
     public void performWith(final MonitoringEvent e) {
-        if (!isApplicable(e, filterUnit, operation, requirements))
+        if (!isApplicable(e, filterUnits, operation, requirements))
             return;
 
         log.debug("got applicable: {}", e);
@@ -63,18 +67,23 @@ public class ThresholdRule extends Rule {
      */
     @Override
     public String toString() {
-        if (filterUnit != null)
-            return "#<ThresholdRule: " + topic + ", on " + filterUnit + " with " + requirements.size() + " requirement(s)>";
+        return "#<ThresholdRule: " + topic + ", on " + filterUnits + " with " + requirements.size() + " requirements>";
+    }
 
-        return "#<ThresholdRule: " + topic + ", no filters, with " + requirements.size() + " requirement(s)>";
+
+    /**
+     * @param filterUnit
+     */
+    public void updateFilterUnits(final String filterUnit) {
+        filterUnits.add(filterUnit);
     }
 
 
     /**
      * @param e
-     * @return the violiations list.
+     * @return the violations list.
      */
     private ViolationsList thresholdExceededBy(final MonitoringEvent e) {
-        return requirements.haveViolations(e);
+        return requirements.haveViolations(e, filterUnits);
     }
 }

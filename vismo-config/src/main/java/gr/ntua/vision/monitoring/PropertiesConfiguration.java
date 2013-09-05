@@ -141,7 +141,6 @@ public abstract class PropertiesConfiguration {
      *            the file to load.
      * @throws IOException
      */
-    @SuppressWarnings("resource")
     private static void loadFromFile(final Properties props, final String filename) throws IOException {
         loadFromStream(props, new BufferedInputStream(new FileInputStream(filename)));
     }

@@ -4,6 +4,7 @@ import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.ThresholdRequirementBean;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleValidationError;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -213,7 +214,7 @@ public class ThresholdRequirement {
      * @param e
      * @return <code>true</code> iff the event is about the specified metric, <code>false</code> otherwise.
      */
-    public boolean isApplicable(final MonitoringEvent e) {
+    boolean isApplicable(final MonitoringEvent e) {
         return metric == null || e.get(metric) != null;
     }
 
@@ -221,26 +222,48 @@ public class ThresholdRequirement {
     /**
      * @param events
      *            the list of events to check for violation metrics.
+     * @param filterUnits
      * @return the particular monitored metric violation or <code>null</code>, or <code>null</code>.
      */
-    public Violation isViolated(final List<MonitoringEvent> events) {
+    Violation isViolated(final List<MonitoringEvent> events, final List<String> filterUnits) {
+        // FIXME: should check specific filterUnit
         final double observedValue = performFold(events);
         final boolean res = pred.perform(observedValue, thresholdValue);
 
-        return res ? new Violation(metric, thresholdValue, observedValue) : null;
+        if (!res)
+            return null;
+
+        final ArrayList<String> applicable = new ArrayList<String>(filterUnits.size());
+
+        for (final String filterUnit : filterUnits)
+            for (final MonitoringEvent e : events)
+                if (ThresholdRulesTraits.join(e).startsWith(filterUnit))
+                    applicable.add(filterUnit);
+
+        return new Violation(metric, thresholdValue, observedValue, null);
     }
 
 
     /**
      * @param e
      *            the event to check for violation metrics.
+     * @param filterUnits
      * @return the particular monitored metric violation or <code>null</code>, or <code>null</code>.
      */
-    public Violation isViolated(final MonitoringEvent e) {
+    Violation isViolated(final MonitoringEvent e, final List<String> filterUnits) {
         final double observedValue = (Double) e.get(metric);
         final boolean res = pred.perform(observedValue, thresholdValue);
 
-        return res ? new Violation(metric, thresholdValue, observedValue) : null;
+        if (!res)
+            return null;
+
+        final ArrayList<String> applicable = new ArrayList<String>(filterUnits.size());
+
+        for (final String filterUnit : filterUnits)
+            if (ThresholdRulesTraits.join(e).startsWith(filterUnit))
+                applicable.add(filterUnit);
+
+        return new Violation(metric, thresholdValue, observedValue, applicable);
     }
 
 
@@ -263,7 +286,7 @@ public class ThresholdRequirement {
      * @param bean
      * @return the {@link ThresholdRequirement}.
      */
-    public static ThresholdRequirement from(final ThresholdRequirementBean bean) {
+    static ThresholdRequirement from(final ThresholdRequirementBean bean) {
         return new ThresholdRequirement(bean);
     }
 }

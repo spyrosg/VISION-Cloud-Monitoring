@@ -299,8 +299,8 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
      * @param bean
      * @param noExpectedEvents
      */
-    private static void assertIsCDMICompliantResponse(final String queueName, final String topic, final CDMIQueueListBean bean,
-            final int noExpectedEvents) {
+    private static void assertIsCDMICompliantResponse(final String queueName, @SuppressWarnings("unused") final String topic,
+            final CDMIQueueListBean bean, final int noExpectedEvents) {
         assertIsCDMICompliantResponse(queueName, bean, noExpectedEvents);
         assertEquals(noExpectedEvents, bean.getValue().size());
 

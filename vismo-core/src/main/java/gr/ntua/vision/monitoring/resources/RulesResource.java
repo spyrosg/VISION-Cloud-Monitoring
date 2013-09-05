@@ -8,12 +8,14 @@ import gr.ntua.vision.monitoring.rules.VismoRule;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -154,6 +156,29 @@ public class RulesResource {
         } catch (final ThresholdRuleValidationError e) {
             return badSpecification(e.getMessage());
         }
+    }
+
+
+    /**
+     * @param id
+     * @param fieldName
+     * @param value
+     * @return 201 when the update was successful, 404, when no rule corresponds to given id or 400 when the update cannot be
+     *         performed.
+     */
+    @PUT
+    @Path("{rule-id}/{field}/{value}")
+    public Response updateRule(@PathParam("rule-id") final String id, @PathParam("field") final String fieldName,
+            @PathParam("value") final String value) {
+        try {
+            store.update(id, fieldName, value);
+        } catch (final NoSuchElementException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        } catch (final IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+
+        return Response.noContent().build();
     }
 
 
