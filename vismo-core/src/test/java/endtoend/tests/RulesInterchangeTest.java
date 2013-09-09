@@ -146,7 +146,7 @@ public class RulesInterchangeTest extends TestCase {
     private final ZMQFactory    socketFactory = new ZMQFactory(new ZContext());
 
     static {
-        System.setProperty("vismo.hosts", "localhost:9996,localhost:9997,localhost:9998");
+        System.setProperty("vismo.hosts", "192.168.1.4:9996,192.168.1.4:9997,192.168.1.4:9998");
     }
 
 
@@ -156,7 +156,7 @@ public class RulesInterchangeTest extends TestCase {
     public void testVismoInstancesShouldPropagateRuleDeletions() throws Exception {
         final String id = postRuleTo(p1);
         log.debug("posted on p1 rule[id] = {}", id);
-        final UniqueRule u = new UniqueRule("ThresholdRule", id);
+        final UniqueRule u = new UniqueRule("ThresholdPeriodicRule", id);
 
         assertSetContainsRule(getRules(p1), u);
 
@@ -171,7 +171,7 @@ public class RulesInterchangeTest extends TestCase {
     public void testVismoInstancesShouldPropagateRuleInsertions() throws Exception {
         final String id = postRuleTo(p1);
         log.debug("posted on p1 rule[id] = {}", id);
-        final UniqueRule u = new UniqueRule("ThresholdRule", id);
+        final UniqueRule u = new UniqueRule("ThresholdPeriodicRule", id);
 
         assertSetContainsRule(getRules(p1), u);
         assertThatAllNodesContainSameRuleSet();
@@ -184,7 +184,7 @@ public class RulesInterchangeTest extends TestCase {
     public void testVismoInstancesShouldPropagateRuleUpdates() throws Exception {
         final String id = postRuleTo(p1);
         log.debug("posted on p1 rule[id] = {}", id);
-        final UniqueRule u = new UniqueRule("ThresholdRule", id);
+        final UniqueRule u = new UniqueRule("ThresholdPeriodicRule", id);
 
         assertSetContainsRule(getRules(p1), u);
 

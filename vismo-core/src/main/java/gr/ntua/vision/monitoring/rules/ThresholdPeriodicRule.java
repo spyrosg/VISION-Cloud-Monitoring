@@ -34,7 +34,7 @@ public class ThresholdPeriodicRule extends PeriodicRule {
      * @param bean
      */
     public ThresholdPeriodicRule(final VismoRulesEngine engine, final ThresholdRuleBean bean) {
-        super(engine, bean.getPeriod());
+        super(engine, bean.getPeriod(), bean.getId());
         this.topic = bean.getTopic();
         this.operation = bean.getOperation();
         this.filterUnits.add(bean.getFilterUnit());
