@@ -86,7 +86,7 @@ public class RulesResourceTest extends JerseyResourceTest {
         final ClientResponse res = resource().path(insertedRuleId).path("filterUnit").path(String.valueOf("ntua,vassilis,bar"))
                 .put(ClientResponse.class);
 
-        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
+        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
     }
 
 
@@ -100,7 +100,7 @@ public class RulesResourceTest extends JerseyResourceTest {
         final ClientResponse res = resource().path(insertedRuleId).path("period").path(String.valueOf(newPeriod))
                 .put(ClientResponse.class);
 
-        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
+        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
     }
 
 
