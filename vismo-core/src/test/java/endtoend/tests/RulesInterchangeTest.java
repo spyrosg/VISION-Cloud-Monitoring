@@ -146,7 +146,7 @@ public class RulesInterchangeTest extends TestCase {
     private final ZMQFactory    socketFactory = new ZMQFactory(new ZContext());
 
     static {
-        System.setProperty("vismo.hosts", "192.168.1.4:9996,192.168.1.4:9997,192.168.1.4:9998");
+        System.setProperty("vismo.hosts", "localhost:9996,localhost:9997,localhost:9998");
     }
 
 
