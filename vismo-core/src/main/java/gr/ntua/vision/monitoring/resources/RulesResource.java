@@ -167,6 +167,7 @@ public class RulesResource {
 
 
     /**
+     * @param isInterchange
      * @param id
      * @param fieldName
      * @param value
@@ -175,18 +176,19 @@ public class RulesResource {
      */
     @PUT
     @Path("{rule-id}/{field}/{value}")
-    public Response updateRule(@PathParam("rule-id") final String id, @PathParam("field") final String fieldName,
+    public Response updateRule(@HeaderParam(X_VISION_INTERCHANGE_HEADER) final boolean isInterchange,
+            @PathParam("rule-id") final String id, @PathParam("field") final String fieldName,
             @PathParam("value") final String value) {
-        // TODO: push delete rule
         try {
             store.update(id, fieldName, value);
+            update.notifyUpdate(isInterchange, id, fieldName, value);
         } catch (final NoSuchElementException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         } catch (final IllegalArgumentException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        return Response.noContent().build();
+        return Response.ok().build();
     }
 
 

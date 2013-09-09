@@ -182,7 +182,15 @@ public class RulesInterchangeTest extends TestCase {
      * @throws Exception
      */
     public void testVismoInstancesShouldPropagateRuleUpdates() throws Exception {
-        // TODO
+        final String id = postRuleTo(p1);
+        log.debug("posted on p1 rule[id] = {}", id);
+        final UniqueRule u = new UniqueRule("ThresholdRule", id);
+
+        assertSetContainsRule(getRules(p1), u);
+
+        updateRuleOnWith(p3, id, "period", 10000);
+
+        assertThatAllNodesContainSameRuleSet();
     }
 
 
@@ -205,9 +213,9 @@ public class RulesInterchangeTest extends TestCase {
      */
     @Override
     protected void tearDown() throws Exception {
-        /*s1.halt();
+        s1.halt();
         s2.halt();
-        s3.halt();*/
+        s3.halt();
 
         super.tearDown();
     }
@@ -322,6 +330,22 @@ public class RulesInterchangeTest extends TestCase {
 
 
     /**
+     * @param props
+     * @param id
+     * @param field
+     * @param period
+     */
+    private void updateRuleOnWith(final Properties props, final String id, final String field, final long period) {
+        final int port = Integer.valueOf(props.getProperty("web.port"));
+
+        final ClientResponse res = client.resource("http://localhost:" + port).path("rules").path(id).path(field)
+                .path(String.valueOf(period)).put(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
+    }
+
+
+    /**
      * @param s1
      * @param s2
      */
@@ -349,6 +373,7 @@ public class RulesInterchangeTest extends TestCase {
 
         bean.setTopic("my-topic");
         bean.addRequirement("latency", ">", 1.3);
+        bean.setPeriod(5000);
 
         return bean;
     }

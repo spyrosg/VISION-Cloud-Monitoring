@@ -96,6 +96,28 @@ public class RulesUpdate {
 
 
     /**
+     * @param isInterchange
+     * @param id
+     * @param fieldName
+     * @param value
+     */
+    public void notifyUpdate(final boolean isInterchange, final String id, final String fieldName, final String value) {
+        if (isInterchange)
+            return;
+
+        for (final String host : knownHosts)
+            try {
+                final ClientResponse res = client.resource("http://" + host).path("rules").path(id).path(fieldName).path(value)
+                        .header(RulesResource.X_VISION_INTERCHANGE_HEADER, "true").put(ClientResponse.class);
+
+                log.debug("posting to {} => {}", host, res.getClientResponseStatus());
+            } catch (final ClientHandlerException e) {
+                log.error("posting to {} failed, reason: {}", host, e.getCause());
+            }
+    }
+
+
+    /**
      * @return the list of known vismo hosts.
      */
     private String[] getKnownVismoHosts() {
