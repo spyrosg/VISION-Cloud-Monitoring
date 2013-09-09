@@ -1,5 +1,9 @@
 package gr.ntua.vision.monitoring.resources;
 
+import gr.ntua.vision.monitoring.VismoVMInfo;
+
+import java.util.ArrayList;
+
 import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
@@ -118,24 +122,31 @@ public class RulesUpdate {
 
 
     /**
-     * @return the list of known vismo hosts.
+     * @return the list of known vismo hosts as specified in the jvm's environment.
      */
     private String[] getKnownVismoHosts() {
-        final String var = getFromEnv();
+        final String env = getFromEnv();
 
-        if (var == null || var.isEmpty())
+        if (env == null || env.isEmpty())
             return new String[0];
 
-        final String[] fs = var.split(",");
-        final String[] hosts = new String[fs.length];
+        final VismoVMInfo vminfo = new VismoVMInfo();
+        final String[] fs = env.split(",");
+        final ArrayList<String> hosts = new ArrayList<String>(fs.length);
 
-        for (int i = 0; i < fs.length; ++i)
+        for (int i = 0; i < fs.length; ++i) {
+            if (fs[i].equals(vminfo.getAddress().getHostName() + ":" + defaultPort))
+                continue;
+
             if (hasPort(fs[i]))
-                hosts[i] = fs[i];
+                hosts.add(fs[i]);
             else
-                hosts[i] = fs[i] + ":" + defaultPort;
+                hosts.add(fs[i] + ":" + defaultPort);
+        }
 
-        return hosts;
+        log.trace("known hosts: {}", hosts);
+
+        return hosts.toArray(new String[] {});
     }
 
 
