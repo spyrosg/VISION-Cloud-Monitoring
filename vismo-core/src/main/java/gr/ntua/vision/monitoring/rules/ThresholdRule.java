@@ -17,8 +17,6 @@ public class ThresholdRule extends Rule {
     /** the log target. */
     private static final Logger            log         = LoggerFactory.getLogger(Rule.class);
     /***/
-    // TODO: change filter unit to accept a list of containers.
-    // TODO: update period.
     private final ArrayList<String>        filterUnits = new ArrayList<String>();
     /***/
     private final String                   operation;

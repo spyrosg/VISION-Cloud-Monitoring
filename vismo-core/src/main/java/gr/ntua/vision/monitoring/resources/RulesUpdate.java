@@ -49,9 +49,32 @@ public class RulesUpdate {
     /**
      * @param isInterchange
      * @param id
+     */
+    public void notifyDeletion(final boolean isInterchange, final String id) {
+        if (isInterchange)
+            return;
+
+        for (final String host : knownHosts)
+            try {
+                final ClientResponse res = client.resource("http://" + host).path("rules").path(id)
+                        .header(RulesResource.X_VISION_INTERCHANGE_HEADER, "true").delete(ClientResponse.class);
+
+                log.debug("posting to {} => {}", host, res.getClientResponseStatus());
+            } catch (final ClientHandlerException e) {
+                log.error("posting to {} failed, reason: {}", host, e.getCause());
+            }
+    }
+
+
+    /**
+     * Push the new rule to all other known nodes. We do this here, in the controller layer, since there isn't a good or general
+     * enough rules representation in the domain. VismoRulesEngine knows only of VismoRule instances.
+     * 
+     * @param isInterchange
+     * @param id
      * @param bean
      */
-    public void push(final boolean isInterchange, final String id, final RuleBean bean) {
+    public void notifyInsertion(final boolean isInterchange, final String id, final RuleBean bean) {
         if (isInterchange)
             return;
         if (!(bean instanceof ThresholdRuleBean))
@@ -61,7 +84,7 @@ public class RulesUpdate {
 
         for (final String host : knownHosts)
             try {
-                final ClientResponse res = client.resource("http://" + host + "/rules")
+                final ClientResponse res = client.resource("http://" + host).path("rules")
                         .header(RulesResource.X_VISION_INTERCHANGE_HEADER, "true").type(MediaType.APPLICATION_JSON).entity(bean)
                         .post(ClientResponse.class);
 

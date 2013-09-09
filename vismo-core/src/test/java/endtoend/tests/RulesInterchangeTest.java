@@ -145,27 +145,44 @@ public class RulesInterchangeTest extends TestCase {
     /** the socket factory. */
     private final ZMQFactory    socketFactory = new ZMQFactory(new ZContext());
 
-    // TODO: testShouldAlsoPropagateRuleDeletions
-
     static {
-        System.setProperty("vismo.hosts", "localhost:9997,localhost:9998");
+        System.setProperty("vismo.hosts", "localhost:9996,localhost:9997,localhost:9998");
     }
 
 
     /**
      * @throws Exception
      */
-    public void testVismoInstancesShouldExchangeRules() throws Exception {
-        assertHaveSameRuleSet(getRules(p1), getRules(p2));
-        assertHaveSameRuleSet(getRules(p2), getRules(p3));
-
-        final String id = postNewRule(p1);
+    public void testVismoInstancesShouldPropagateRuleDeletions() throws Exception {
+        final String id = postRuleTo(p1);
         log.debug("posted on p1 rule[id] = {}", id);
         final UniqueRule u = new UniqueRule("ThresholdRule", id);
 
         assertSetContainsRule(getRules(p1), u);
-        assertHaveSameRuleSet(getRules(p1), getRules(p2));
-        assertHaveSameRuleSet(getRules(p2), getRules(p3));
+
+        deleteRuleOn(p2, id);
+        assertThatAllNodesContainSameRuleSet();
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    public void testVismoInstancesShouldPropagateRuleInsertions() throws Exception {
+        final String id = postRuleTo(p1);
+        log.debug("posted on p1 rule[id] = {}", id);
+        final UniqueRule u = new UniqueRule("ThresholdRule", id);
+
+        assertSetContainsRule(getRules(p1), u);
+        assertThatAllNodesContainSameRuleSet();
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    public void testVismoInstancesShouldPropagateRuleUpdates() throws Exception {
+        // TODO
     }
 
 
@@ -178,6 +195,8 @@ public class RulesInterchangeTest extends TestCase {
         setupConfig();
         setupClient();
         setupVismoServices();
+
+        assertThatAllNodesContainSameRuleSet();
     }
 
 
@@ -186,11 +205,34 @@ public class RulesInterchangeTest extends TestCase {
      */
     @Override
     protected void tearDown() throws Exception {
-        s1.halt();
+        /*s1.halt();
         s2.halt();
-        s3.halt();
+        s3.halt();*/
 
         super.tearDown();
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    private void assertThatAllNodesContainSameRuleSet() throws Exception {
+        assertHaveSameRuleSet(getRules(p1), getRules(p2));
+        assertHaveSameRuleSet(getRules(p2), getRules(p3));
+    }
+
+
+    /**
+     * @param props
+     * @param id
+     */
+    private void deleteRuleOn(final Properties props, final String id) {
+        final int port = Integer.valueOf(props.getProperty("web.port"));
+
+        final ClientResponse res = client.resource("http://localhost:" + port).path("rules").path(id)
+                .delete(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
     }
 
 
@@ -201,7 +243,7 @@ public class RulesInterchangeTest extends TestCase {
     private HashSet<UniqueRule> getRules(final Properties props) {
         final int port = Integer.valueOf(props.getProperty("web.port"));
         @SuppressWarnings("unchecked")
-        final List<Map<String, Object>> rules = client.resource("http://localhost:" + port + "/rules")
+        final List<Map<String, Object>> rules = client.resource("http://localhost:" + port).path("rules")
                 .accept(MediaType.APPLICATION_JSON).get(List.class);
         final HashSet<UniqueRule> nameSet = new HashSet<UniqueRule>();
 
@@ -228,10 +270,10 @@ public class RulesInterchangeTest extends TestCase {
      * @param props
      * @return the id of the rule posted.
      */
-    private String postNewRule(final Properties props) {
+    private String postRuleTo(final Properties props) {
         final int port = Integer.valueOf(props.getProperty("web.port"));
         final ThresholdRuleBean bean = getBean();
-        final ClientResponse res = client.resource("http://localhost:" + port + "/rules").type(MediaType.APPLICATION_JSON)
+        final ClientResponse res = client.resource("http://localhost:" + port).path("rules").type(MediaType.APPLICATION_JSON)
                 .entity(bean).post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());

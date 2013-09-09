@@ -55,15 +55,22 @@ public class RulesResource {
 
 
     /**
+     * @param isInterchange
      * @param id
      * @return if the rule was successfully removed from the store, a response of status 204, else, a response of status 404.
      */
     @Path("{rule-id}")
     @DELETE
-    @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_PLAIN)
-    public Response deleteRule(@PathParam("rule-id") final String id) {
-        return (store.remove(id) ? Response.noContent() : Response.status(Status.NOT_FOUND)).build();
+    public Response deleteRule(@HeaderParam(X_VISION_INTERCHANGE_HEADER) final boolean isInterchange,
+            @PathParam("rule-id") final String id) {
+
+        if (store.remove(id)) {
+            update.notifyDeletion(isInterchange, id);
+            return Response.noContent().build();
+        }
+
+        return Response.status(Status.NOT_FOUND).build();
     }
 
 
@@ -126,7 +133,7 @@ public class RulesResource {
             return badSpecification("unknown rule name: " + name);
 
         rule.submit();
-        pushRule(isInterchange, rule.id(), bean);
+        update.notifyInsertion(isInterchange, rule.id(), bean);
 
         return submittedSuccessfully(rule);
     }
@@ -150,7 +157,7 @@ public class RulesResource {
             final VismoRule rule = factory.buildFrom(bean);
 
             rule.submit();
-            pushRule(isInterchange, rule.id(), bean);
+            update.notifyInsertion(isInterchange, rule.id(), bean);
 
             return submittedSuccessfully(rule);
         } catch (final ThresholdRuleValidationError e) {
@@ -170,6 +177,7 @@ public class RulesResource {
     @Path("{rule-id}/{field}/{value}")
     public Response updateRule(@PathParam("rule-id") final String id, @PathParam("field") final String fieldName,
             @PathParam("value") final String value) {
+        // TODO: push delete rule
         try {
             store.update(id, fieldName, value);
         } catch (final NoSuchElementException e) {
@@ -179,19 +187,6 @@ public class RulesResource {
         }
 
         return Response.noContent().build();
-    }
-
-
-    /**
-     * Push the new rule to all other known nodes. We do this here, in the controller layer, since there isn't a good or general
-     * enough rules representation in the domain. VismoRulesEngine knows only of VismoRule instances.
-     * 
-     * @param isInterchange
-     * @param id
-     * @param bean
-     */
-    private void pushRule(final boolean isInterchange, final String id, final RuleBean bean) {
-        update.push(isInterchange, id, bean);
     }
 
 
