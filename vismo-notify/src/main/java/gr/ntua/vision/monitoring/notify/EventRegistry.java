@@ -1,20 +1,13 @@
 package gr.ntua.vision.monitoring.notify;
 
+import gr.ntua.vision.monitoring.VisionFormatter;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.TimeZone;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.Formatter;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 
@@ -25,46 +18,6 @@ import java.util.logging.Logger;
  * notified asynchronously to the main client program loop.
  */
 class EventRegistry implements Registry {
-    /**
-     * A custom log formatter. The format should match the following logback notation:
-     * <code>%-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m\n%ex</code>.
-     */
-    private static class VisionFormatter extends Formatter {
-        // INFO [2012-06-11 10:05:42,525] gr.ntua.vision.monitoring.MonitoringInstance: Starting up, pid=28206, ip=vis0/10.0.0.10
-        /***/
-        private final DateFormat fmt;
-
-
-        /**
-         * Constructor.
-         */
-        public VisionFormatter() {
-            this.fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-            this.fmt.setTimeZone(TimeZone.getTimeZone("GMT"));
-        }
-
-
-        /**
-         * @see java.util.logging.Formatter#format(java.util.logging.LogRecord)
-         */
-        @Override
-        public String format(final LogRecord r) {
-            final String s = String.format("%-6s [%s] %s: %s\n", r.getLevel(), fmt.format(new Date(r.getMillis())),
-                                           r.getSourceClassName(), r.getMessage());
-
-            if (r.getThrown() != null) {
-                final StringWriter sw = new StringWriter();
-                final PrintWriter pw = new PrintWriter(sw);
-
-                r.getThrown().printStackTrace(pw);
-
-                return s + sw.toString();
-            }
-
-            return s;
-        }
-    }
-
     /***/
     private static final Logger               log               = Logger.getLogger(EventRegistry.class.getName());
     /** the property name to set when activating logging output. */
