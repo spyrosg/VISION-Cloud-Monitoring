@@ -3,6 +3,60 @@ header {
     font-family: Didot;
 }
 
-#main {
-    width: 100%;
+body {
+    padding: 1em 0 0em 3em;
+}
+
+form div + div {
+    margin-top: 1em;
+}
+
+label {
+    display: inline-block;
+    width: 180px;
+    text-align: right;
+}
+
+button {
+    margin-left: .5em;
+}
+
+input {
+    font: 1em sans-serif;
+
+    width: 300px;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    border: 1px solid #999;
+}
+
+input:focus {
+    /* To give a little highlight on active elements */
+    border-color: #000;
+}
+
+ul {
+    margin: 0.5em;
+    width: 300px;
+    list-style-type: none;
+}
+
+li {
+    padding-top: 11px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid black;
+}
+
+#events {
+    padding-left: 120px; /* same size as the label elements */
+}
+
+.button {
+    padding-left: 180px; /* same size as the label elements */
+}
+
+span .e {
+    padding: 5px;
+    display: inline-block;
 }

@@ -36,7 +36,7 @@ define(['q'], function(Q) {
         }
 
         function onerror() {
-            response.reject("Can't XHR " + JSON.stringify(url));
+            response.reject(request);
         }
 
         try {
