@@ -174,28 +174,4 @@ public class VismoConfiguration extends PropertiesConfiguration {
     public int getWebPort() {
         return getAsInt(WEB_PORT);
     }
-
-
-    /**
-     * Check that given ip one of the cloud heads.
-     * 
-     * @param ip
-     *            the ip.
-     * @return <code>true</code> iff the given ip is one of the cloud head ips.
-     */
-    public boolean isIPCloudHead(final String ip) {
-        return getCloudHeads().contains(ip);
-    }
-
-
-    /**
-     * Check that given ip is the cluster head.
-     * 
-     * @param ip
-     *            the ip.
-     * @return <code>true</code> iff the given ip and the ip of cluster head are the same.
-     */
-    public boolean isIPClusterHead(final String ip) {
-        return getClusterHead().equals(ip);
-    }
 }

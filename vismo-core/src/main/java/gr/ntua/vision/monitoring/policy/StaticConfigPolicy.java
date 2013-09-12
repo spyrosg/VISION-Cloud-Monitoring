@@ -63,7 +63,11 @@ public class StaticConfigPolicy implements NodePolicy {
      * @return <code>true</code> when local-host is a cloud head, <code>false</code> otherwise.
      */
     private boolean hostIsCloudHead(final VMInfo vminfo) {
-        return conf.isIPCloudHead(vminfo.getAddress().getHostAddress());
+        for (final String ip : conf.getCloudHeads())
+            if (vminfo.isHostAddress(ip))
+                return true;
+
+        return false;
     }
 
 
@@ -74,7 +78,7 @@ public class StaticConfigPolicy implements NodePolicy {
      * @return <code>true</code> when local-host is a cluster head, <code>false</code> otherwise.
      */
     private boolean hostIsClusterHead(final VMInfo vminfo) {
-        return conf.isIPClusterHead(vminfo.getAddress().getHostAddress());
+        return vminfo.isHostAddress(conf.getClusterHead());
     }
 
 
