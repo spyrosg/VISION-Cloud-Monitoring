@@ -3,7 +3,7 @@
 
 
 // the views used in the app
-define(['dom', 'util'], function(dom, util) {
+define(['dom', 'util', 'd3'], function(dom, util, d3) {
     'use strict';
 
     var extend = util.extend,
@@ -12,8 +12,8 @@ define(['dom', 'util'], function(dom, util) {
     var queuesView = {
         el: dom.$('#queues'),
 
-        setup: function(domain) {
-            this.domain = domain;
+        setup: function(model) {
+            this.model = model;
         },
 
         update: function(/*args*/) {
@@ -44,8 +44,8 @@ define(['dom', 'util'], function(dom, util) {
 
         known_events: {},
 
-        setup: function(domain) {
-            this.domain = domain;
+        setup: function(model) {
+            this.model = model;
             this.insert_into_list.el = this.el;
             this.insert_into_list.method = this.insert_into_list.append;
         },
@@ -84,7 +84,6 @@ define(['dom', 'util'], function(dom, util) {
                 time = dom.creat('span'),
                 from = dom.creat('span'),
                 pre = dom.creat('pre');
-
 
             time.textContent = this.calc_human_time(e.timestamp);
             time.classList.add('e');
@@ -135,8 +134,20 @@ define(['dom', 'util'], function(dom, util) {
 
     extend(eventsView).with(Observable);
 
+    var graphView = {
+        el: dom.id('graph'),
+
+        setup: function(model) {
+            // create an SVG element inside the #graph div that fills 100% of the div
+            var graph = d3.select(this.el).append("svg:svg").attr("width", "100%").attr("height", "100%");
+        }
+    };
+
+    extend(graphView).with(Observable);
+
     return {
         queuesView: queuesView,
-        eventsView: eventsView
+        eventsView: eventsView,
+        graphView: graphView
     };
 });

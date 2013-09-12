@@ -8,8 +8,8 @@ define(['dom'], function(dom) {
     var updateButtonController = {
         el: dom.id('queue-entry'),
 
-        setup: function(domain) {
-            this.domain = domain;
+        setup: function(model) {
+            this.model = model;
             this.register_on_click();
         },
 
@@ -22,7 +22,7 @@ define(['dom'], function(dom) {
 
             dom.on('submit', this.el, function(evt) {
                 evt.preventDefault();
-                self.domain.create_queue(self.get_value(), '*');
+                self.model.create_queue(self.get_value(), '*');
             });
         }
     };

@@ -6,16 +6,22 @@ requirejs.config({
     baseUrl: '.',
     paths: {
         // external libraries used
-        'q': 'lib/q.min',
+        q: 'lib/q.min',
+        d3: 'lib/d3.v3.min.js',
 
         // internal app libraries
-        'ajax': 'src/ajax',
-        'dom': 'src/dom',
-        'util': 'src/util',
-        'views': 'src/views',
-        'ctrls': 'src/ctrls',
+        ajax: 'src/ajax',
+        dom: 'src/dom',
+        util: 'src/util',
+        views: 'src/views',
+        ctrls: 'src/ctrls',
 
-        'core': 'src/core'
+        core: 'src/core'
+    },
+    shim: {
+        d3: {
+            exports: 'd3'
+        }
     }
 });
 
