@@ -25,9 +25,11 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
             },
 
             create: function(name, topic) {
-                return ajax(this.root_server + '/' + name + '/' + topic, 'PUT',
-                        extend(this.headers, { 'Content-Type': 'application/cdmi-queue' }))
-                    .then(JSON.parse);
+                return ajax(this.root_server + '/' + name + '/' + topic, 'PUT', {
+                        'Content-Type': 'application/cdmi-queue',
+                        'Accept': 'application/cdmi-queue',
+                        'X-CDMI-Specification-Version': '1.0.2'
+                    }).then(JSON.parse);
             },
 
             read: function(name) {
