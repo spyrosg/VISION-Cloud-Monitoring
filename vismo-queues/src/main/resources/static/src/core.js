@@ -11,13 +11,12 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
     var extend = util.extend,
         Observer = util.Observer;
 
-    var domain = {
-        setup: function() { // NOTE: required by Observer
-            this.observables = [];
+    var cdmiQueuesModel = {
+        setup: function() {
+            this.observables = []; // NOTE: required by Observer
         },
 
-        // this is the service object
-        cdmi_queues: {
+        service: {
             root_server: '/api/queues',
 
             headers: {
@@ -47,7 +46,7 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
             var self = this;
 
             this
-                .cdmi_queues.create(name, topic)
+                .service.create(name, topic)
                 .then(
                     function() {
                         self.notify('queue', name);
@@ -78,7 +77,7 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
             var self = this;
 
             this
-                .cdmi_queues.read(name)
+                .service.read(name)
                 .then(function(eventList) {
                     self.notify('events', eventList);
                 })
@@ -88,7 +87,7 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
         render_queues: function() {
             var self = this;
 
-            this.cdmi_queues.list()
+            this.service.list()
                 .then(function(list) {
                     list.forEach(function(q) {
                         self.notify('queue', q.objectName);
@@ -100,7 +99,7 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
         render_events: function() {
             var self = this;
 
-            this.cdmi_queues.list()
+            this.service.list()
                 .then(function(list) {
                     if (list.length > 0) {
                         var q = list[list.length - 1];
@@ -112,20 +111,20 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
         }
     };
 
-    extend(domain).with(Observer);
+    extend(cdmiQueuesModel).with(Observer);
 
     return {
         setup: function() {
-            ctrls.updateButtonController.setup(domain);
-            views.eventsView.setup(domain);
-            views.queuesView.setup(domain);
+            ctrls.updateButtonController.setup(cdmiQueuesModel);
+            views.eventsView.setup(cdmiQueuesModel);
+            views.queuesView.setup(cdmiQueuesModel);
 
-            domain.setup();
-            domain.add(views.queuesView);
-            domain.add(views.eventsView);
+            cdmiQueuesModel.setup();
+            cdmiQueuesModel.add(views.queuesView);
+            cdmiQueuesModel.add(views.eventsView);
 
-            domain.render_queues();
-            domain.render_events();
+            cdmiQueuesModel.render_queues();
+            cdmiQueuesModel.render_events();
             console.info('app started');
         }
     };
