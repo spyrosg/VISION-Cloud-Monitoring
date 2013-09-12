@@ -127,6 +127,8 @@ public class RulesUpdate {
     private String[] getKnownVismoHosts() {
         final String env = getFromEnv();
 
+        log.trace("known hosts string => {}", env);
+
         if (env == null || env.isEmpty())
             return new String[0];
 
@@ -144,7 +146,7 @@ public class RulesUpdate {
                 hosts.add(fs[i] + ":" + defaultPort);
         }
 
-        log.trace("known hosts: {}", hosts);
+        log.debug("known hosts: {}", hosts);
 
         return hosts.toArray(new String[] {});
     }
