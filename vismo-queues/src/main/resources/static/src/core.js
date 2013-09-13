@@ -117,13 +117,16 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
 
     return {
         setup: function() {
-            ctrls.updateButtonController.setup(cdmiQueuesModel);
-            views.eventsView.setup(cdmiQueuesModel);
-            views.queuesView.setup(cdmiQueuesModel);
-
             cdmiQueuesModel.setup();
-            cdmiQueuesModel.add(views.queuesView);
-            cdmiQueuesModel.add(views.eventsView);
+
+            Object.getOwnPropertyNames(views).forEach(function(name) {
+                var view = views[name];
+
+                view.setup(cdmiQueuesModel);
+                cdmiQueuesModel.add(view);
+            });
+
+            ctrls.updateButtonController.setup(cdmiQueuesModel);
 
             cdmiQueuesModel.render_queues();
             cdmiQueuesModel.render_events();

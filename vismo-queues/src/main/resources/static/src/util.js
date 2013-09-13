@@ -14,7 +14,7 @@ define([], function() {
         },
 
         notify: function(/*args*/) {
-            var args = Array.slice(arguments);
+            var args = Array.prototype.slice.call(arguments);
 
             console.debug('notifying', args);
 

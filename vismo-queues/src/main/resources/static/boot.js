@@ -7,7 +7,7 @@ requirejs.config({
     paths: {
         // external libraries used
         q: 'lib/q.min',
-        d3: 'lib/d3.v3.min.js',
+        d3: 'lib/d3.v3.min',
 
         // internal app libraries
         ajax: 'src/ajax',
