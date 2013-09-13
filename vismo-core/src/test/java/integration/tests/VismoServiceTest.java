@@ -93,7 +93,7 @@ public class VismoServiceTest {
                                                            setProperty("mon.group.addr", "228.5.6.7");
                                                            setProperty("mon.group.port", "12345");
                                                            setProperty("mon.ping.period", "60000");
-                                                           setProperty("startup.rules", "");
+                                                           setProperty("startup.rules", "PassThroughRule");
                                                            setProperty("web.port", "9996");
                                                        }
                                                    };
