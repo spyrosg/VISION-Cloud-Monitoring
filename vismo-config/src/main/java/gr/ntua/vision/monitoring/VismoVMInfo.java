@@ -88,7 +88,7 @@ public class VismoVMInfo implements VMInfo {
         final ConsoleHandler h = new ConsoleHandler();
         final String pkg = VismoVMInfo.class.getPackage().getName();
 
-        h.setFormatter(new VisionFormatter());
+        h.setFormatter(new VismoFormatter());
         h.setLevel(Level.ALL);
         Logger.getLogger(pkg).addHandler(h);
         Logger.getLogger(pkg).setLevel(Level.ALL);

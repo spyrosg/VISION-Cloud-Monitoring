@@ -1,7 +1,7 @@
 package gr.ntua.vision.monitoring.dispatch;
 
-import gr.ntua.vision.monitoring.VisionFormatter;
 import gr.ntua.vision.monitoring.VismoConfiguration;
+import gr.ntua.vision.monitoring.VismoFormatter;
 import gr.ntua.vision.monitoring.VismoVMInfo;
 import gr.ntua.vision.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
@@ -163,7 +163,7 @@ public class VismoEventDispatcher implements EventDispatcher {
         final ConsoleHandler h = new ConsoleHandler();
         final String pkg = EventDispatcher.class.getPackage().getName();
 
-        h.setFormatter(new VisionFormatter());
+        h.setFormatter(new VismoFormatter());
         h.setLevel(Level.ALL);
         Logger.getLogger(pkg).addHandler(h);
         Logger.getLogger(pkg).setLevel(Level.ALL);

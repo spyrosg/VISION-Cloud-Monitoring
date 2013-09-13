@@ -1,6 +1,6 @@
 package gr.ntua.vision.monitoring.notify;
 
-import gr.ntua.vision.monitoring.VisionFormatter;
+import gr.ntua.vision.monitoring.VismoFormatter;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
@@ -134,7 +134,7 @@ class EventRegistry implements Registry {
         final ConsoleHandler h = new ConsoleHandler();
         final String pkg = EventRegistry.class.getPackage().getName();
 
-        h.setFormatter(new VisionFormatter());
+        h.setFormatter(new VismoFormatter());
         h.setLevel(Level.ALL);
         Logger.getLogger(pkg).addHandler(h);
         Logger.getLogger(pkg).setLevel(Level.ALL);
