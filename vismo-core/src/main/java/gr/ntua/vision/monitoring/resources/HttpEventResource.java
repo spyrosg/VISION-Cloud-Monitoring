@@ -104,6 +104,7 @@ public class HttpEventResource implements EventSource {
             requireField("originating-service", json);
             json.put("timestamp", System.currentTimeMillis());
             json.put("originating-machine", req.getRemoteAddr());
+            log.trace("from {}, received {}", req.getRemoteAddr(), body);
             notifyAll(factory.createEvent(JSONObject.toJSONString(json)));
         } catch (final EventValidationError e) {
             return badRequest(e.getMessage());
