@@ -104,7 +104,9 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
      * @param engine
      *            the rules engine.
      */
-    protected abstract void submitRules(final VismoRulesEngine engine);
+    protected void submitRules(final VismoRulesEngine engine) {
+        submitRulesFromConf(engine);
+    }
 
 
     /**
