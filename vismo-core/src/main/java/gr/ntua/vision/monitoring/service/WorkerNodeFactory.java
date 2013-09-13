@@ -1,7 +1,6 @@
 package gr.ntua.vision.monitoring.service;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
-import gr.ntua.vision.monitoring.rules.PassThroughRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sinks.EventSinksFactory;
@@ -48,6 +47,6 @@ public class WorkerNodeFactory extends AbstractVismoServiceFactory {
      */
     @Override
     protected void submitRules(final VismoRulesEngine engine) {
-        new PassThroughRule(engine).submit();
+        // NOP
     }
 }
