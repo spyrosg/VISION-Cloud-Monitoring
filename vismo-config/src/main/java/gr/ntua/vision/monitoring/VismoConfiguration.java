@@ -26,12 +26,6 @@ public class VismoConfiguration extends PropertiesConfiguration {
     /***/
     private static final String CONSUMERS_PORT_PROPERTY    = "consumers.port";
     /***/
-    private static final String MON_GROUP_ADDR_PROPERTY    = "mon.group.addr";
-    /***/
-    private static final String MON_GROUP_PORT_PROPERTY    = "mon.group.port";
-    /***/
-    private static final String MON_PING_PERIOD_PROPERTY   = "mon.ping.period";
-    /***/
     private static final String PRODUCERS_POINT_PROPERTY   = "producers.point";
     /***/
     private static final String STARTUP_RULES_PROPERY      = "startup.rules";
@@ -117,30 +111,6 @@ public class VismoConfiguration extends PropertiesConfiguration {
      */
     public int getConsumersPort() {
         return getAsInt(CONSUMERS_PORT_PROPERTY);
-    }
-
-
-    /**
-     * @return the monitoring multicast group address.
-     */
-    public String getMonGroupAddr() {
-        return get(MON_GROUP_ADDR_PROPERTY);
-    }
-
-
-    /**
-     * @return the monitoring multicast group port.
-     */
-    public int getMonGroupPort() {
-        return getAsInt(MON_GROUP_PORT_PROPERTY);
-    }
-
-
-    /**
-     * @return the multicast group ping period, in millies.
-     */
-    public long getMonPingPeriod() {
-        return getAsLong(MON_PING_PERIOD_PROPERTY);
     }
 
 
