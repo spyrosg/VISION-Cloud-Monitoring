@@ -76,8 +76,6 @@ class ThresholdRulesTraits {
 
         final String concat = join(e);
 
-        log.debug("matching /{}/ against filter: {}", concat, filterUnits);
-
         if (concat.length() == 0)
             return true;
 
