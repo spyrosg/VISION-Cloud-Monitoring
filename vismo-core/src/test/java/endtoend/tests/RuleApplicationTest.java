@@ -14,31 +14,26 @@ import org.junit.Test;
  * This is used to test the main rule update functionality. See {@link #verifyRuleApplicationWithEventsConsumption()}.
  */
 public class RuleApplicationTest {
+    // FIXME: come back to this, there are more events received than expected
+
     /***/
-    private static final int                     CONSUMERS_PORT     = 56430;
-    /***/
-    private static final NoEventsCheckingHandler FOO_RULE_HANDLER   = null;
+    private static final int         CONSUMERS_PORT = 56430;
     /** the machine's ip */
-    private static final String                  HOST_URL           = "10.0.1.101";
+    private static final String      HOST_URL       = "10.0.1.101";
     /***/
-    private static final String                  OBJ_NAME           = "my-vismo-test-object";
+    private static final String      PASS           = "1234";
     /***/
-    private static final String                  PASS               = "123";
+    private static final String      TENANT         = "ntua";
     /***/
-    private static final String                  TENANT             = "ntua";
+    private static final String      TEST_CONTAINER = "foo5";
     /***/
-    private static final String                  TEST_CONTAINER     = "test-1";
+    private static final String      USER           = "vassilis";
     /***/
-    private static final String                  USER               = "bill";
+    private final VisionHTTPClient   client         = new VisionHTTPClient(HOST_URL, TENANT, USER, PASS);
     /***/
-    private final VisionHTTPClient               client             = new VisionHTTPClient(HOST_URL, TENANT, USER, PASS);
+    private final VismoEventRegistry registry       = new VismoEventRegistry("tcp://" + HOST_URL + ":" + CONSUMERS_PORT);
     /***/
-    private final PerOperationHandler            GET_OBJECT_HANDLER = new PerOperationHandler("GET");
-    /***/
-    private final PerOperationHandler            PUT_OBJECT_HANDLER = new PerOperationHandler("PUT");
-    /***/
-    private final VismoEventRegistry             registry           = new VismoEventRegistry("tcp://" + HOST_URL + ":"
-                                                                            + CONSUMERS_PORT);
+    private String                   testRuleId     = null;
 
 
     /**
@@ -48,16 +43,20 @@ public class RuleApplicationTest {
      */
     @Test
     public void producersShouldReceiveDefaultObsEvents() throws InterruptedException {
-        registry.registerToAll(PUT_OBJECT_HANDLER);
-        registry.registerToAll(GET_OBJECT_HANDLER);
+        final String testObject = "vismo-test-object";
+        final PerOperationHandler getHandler = new PerOperationHandler("GET");
+        final PerOperationHandler putHandler = new PerOperationHandler("PUT");
 
-        client.putObject(TEST_CONTAINER, OBJ_NAME, "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
-        waitEventsToBeReceived();
-        shouldHaveReceivedEvent(PUT_OBJECT_HANDLER, 1);
+        registry.registerToAll(putHandler);
+        registry.registerToAll(getHandler);
 
-        client.getObject(TEST_CONTAINER, OBJ_NAME);
+        putObject(testObject);
         waitEventsToBeReceived();
-        shouldHaveReceivedEvent(GET_OBJECT_HANDLER, 1);
+        putHandler.shouldHaveReceivedNoEvents(1);
+
+        readObject(testObject);
+        waitEventsToBeReceived();
+        getHandler.shouldHaveReceivedNoEvents(1);
     }
 
 
@@ -72,6 +71,7 @@ public class RuleApplicationTest {
     /***/
     @After
     public void tearDown() {
+        deleteTestRule();
         // client.deleteContainer(TEST_CONTAINER);
     }
 
@@ -90,12 +90,42 @@ public class RuleApplicationTest {
      */
     @Test
     public void verifyRuleApplicationWithEventsConsumption() throws InterruptedException {
-        registry.registerToAll(FOO_RULE_HANDLER);
-        submitRule(throughputThresholdRule(5, "my-topic", TENANT, USER));
+        final String testObject = "vismo-test-object";
+        final String topic = "my-topic";
+        final PerRuleTopicEventHandler handler = new PerRuleTopicEventHandler(topic);
 
-        client.putObject(TEST_CONTAINER, OBJ_NAME, "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
+        registry.register(topic, handler);
+        submitRule(throughputThresholdRule(5, topic, TENANT, USER));
+
+        putObject(testObject);
         waitEventsToBeReceived();
-        shouldHaveReceivedEvent(FOO_RULE_HANDLER, 1);
+        handler.shouldHaveReceivedNoEvents(1);
+    }
+
+
+    /**
+     * 
+     */
+    private void deleteTestRule() {
+        if (testRuleId != null)
+            client.removeRule(testRuleId);
+    }
+
+
+    /**
+     * @param objName
+     */
+    private void putObject(final String objName) {
+        client.putObject(TENANT, TEST_CONTAINER, objName,
+                         "{ \"foo\": \"bar\", \"is-test\": \"true\", \"value\": \"hello-world\" }");
+    }
+
+
+    /**
+     * @param objName
+     */
+    private void readObject(final String objName) {
+        client.getObject(TENANT, TEST_CONTAINER, objName);
     }
 
 
@@ -114,18 +144,7 @@ public class RuleApplicationTest {
      * @param bean
      */
     private void submitRule(final ThresholdRuleBean bean) {
-        client.sumbitRule(bean);
-    }
-
-
-    /**
-     * Check that the handler has received the given number of events.
-     * 
-     * @param handler
-     * @param noExpectedEvents
-     */
-    private static void shouldHaveReceivedEvent(final NoEventsCheckingHandler handler, final int noExpectedEvents) {
-        handler.haveReceivedExpectedNoEvents(noExpectedEvents);
+        testRuleId = client.sumbitRule(bean);
     }
 
 

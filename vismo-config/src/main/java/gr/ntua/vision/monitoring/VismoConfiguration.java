@@ -26,17 +26,13 @@ public class VismoConfiguration extends PropertiesConfiguration {
     /***/
     private static final String CONSUMERS_PORT_PROPERTY    = "consumers.port";
     /***/
-    private static final String MON_GROUP_ADDR_PROPERTY    = "mon.group.addr";
-    /***/
-    private static final String MON_GROUP_PORT_PROPERTY    = "mon.group.port";
-    /***/
-    private static final String MON_PING_PERIOD_PROPERTY   = "mon.ping.period";
-    /***/
     private static final String PRODUCERS_POINT_PROPERTY   = "producers.point";
     /***/
     private static final String STARTUP_RULES_PROPERY      = "startup.rules";
     /***/
     private static final String UDP_PORT_PROPERTY          = "udp.port";
+    /***/
+    private static final String WEB_PORT                   = "web.port";
 
 
     /**
@@ -119,30 +115,6 @@ public class VismoConfiguration extends PropertiesConfiguration {
 
 
     /**
-     * @return the monitoring multicast group address.
-     */
-    public String getMonGroupAddr() {
-        return get(MON_GROUP_ADDR_PROPERTY);
-    }
-
-
-    /**
-     * @return the monitoring multicast group port.
-     */
-    public int getMonGroupPort() {
-        return getAsInt(MON_GROUP_PORT_PROPERTY);
-    }
-
-
-    /**
-     * @return the multicast group ping period, in millies.
-     */
-    public long getMonPingPeriod() {
-        return getAsLong(MON_PING_PERIOD_PROPERTY);
-    }
-
-
-    /**
      * @return the producers address.
      */
     public String getProducersPoint() {
@@ -167,25 +139,9 @@ public class VismoConfiguration extends PropertiesConfiguration {
 
 
     /**
-     * Check that given ip one of the cloud heads.
-     * 
-     * @param ip
-     *            the ip.
-     * @return <code>true</code> iff the given ip is one of the cloud head ips.
+     * @return the web server's port.
      */
-    public boolean isIPCloudHead(final String ip) {
-        return getCloudHeads().contains(ip);
-    }
-
-
-    /**
-     * Check that given ip is the cluster head.
-     * 
-     * @param ip
-     *            the ip.
-     * @return <code>true</code> iff the given ip and the ip of cluster head are the same.
-     */
-    public boolean isIPClusterHead(final String ip) {
-        return getClusterHead().equals(ip);
+    public int getWebPort() {
+        return getAsInt(WEB_PORT);
     }
 }

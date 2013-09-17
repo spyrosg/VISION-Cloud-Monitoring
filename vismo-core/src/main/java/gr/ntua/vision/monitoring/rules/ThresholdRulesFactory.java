@@ -1,5 +1,6 @@
 package gr.ntua.vision.monitoring.rules;
 
+import gr.ntua.vision.monitoring.resources.RuleBean;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleValidationError;
 

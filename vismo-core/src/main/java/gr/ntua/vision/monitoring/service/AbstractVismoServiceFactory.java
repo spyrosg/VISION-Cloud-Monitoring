@@ -2,13 +2,13 @@ package gr.ntua.vision.monitoring.service;
 
 import gr.ntua.vision.monitoring.VMInfo;
 import gr.ntua.vision.monitoring.VismoConfiguration;
+import gr.ntua.vision.monitoring.resources.DefaultRuleBean;
 import gr.ntua.vision.monitoring.resources.HttpEventResource;
 import gr.ntua.vision.monitoring.resources.InternalMetricsResource;
+import gr.ntua.vision.monitoring.resources.RuleBean;
 import gr.ntua.vision.monitoring.resources.RulesResource;
 import gr.ntua.vision.monitoring.resources.VersionResource;
 import gr.ntua.vision.monitoring.rules.ClassPathRulesFactory;
-import gr.ntua.vision.monitoring.rules.DefaultRuleBean;
-import gr.ntua.vision.monitoring.rules.RuleBean;
 import gr.ntua.vision.monitoring.rules.RulesStore;
 import gr.ntua.vision.monitoring.rules.ThresholdRulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRule;
@@ -22,8 +22,6 @@ import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 import java.io.IOException;
 import java.util.List;
 
-import javax.ws.rs.core.Application;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +34,6 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
     private static final Package       DEFAULT_RULES_PACKAGE = VismoRule.class.getPackage();
     /***/
     private static final Logger        log                   = LoggerFactory.getLogger(AbstractVismoServiceFactory.class);
-    /***/
-    private static final int           PORT                  = 9996;
     /***/
     protected final VismoConfiguration conf;
     /***/
@@ -74,7 +70,7 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
         log.info("subscribing sources to rules engine");
         sources.subscribeAll(engine);
 
-        final WebServer server = buildWebServer(PORT, vminfo, store, engine);
+        final WebServer server = buildWebServer(vminfo, store, engine);
         final VismoService service = new VismoService(vminfo, sources, engine, server);
 
         addDefaultServiceTasks(vminfo, service);
@@ -108,7 +104,9 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
      * @param engine
      *            the rules engine.
      */
-    protected abstract void submitRules(final VismoRulesEngine engine);
+    protected void submitRules(final VismoRulesEngine engine) {
+        submitRulesFromConf(engine);
+    }
 
 
     /**
@@ -134,32 +132,33 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
 
 
     /**
-     * @param service
-     * @param info
-     */
-    protected static void addDefaultServiceTasks(final VMInfo info, final VismoService service) {
-        log.debug("adding default tasks");
-    }
-
-
-    /**
-     * @param port
      * @param vminfo
      * @param store
      * @param engine
      * @return a configured {@link WebServer}.
      */
-    private static WebServer buildWebServer(final int port, final VMInfo vminfo, final RulesStore store,
-            final VismoRulesEngine engine) {
-        final WebServer server = new WebServer(port);
-        final RulesResource rulesResource = new RulesResource(new ThresholdRulesFactory(new ClassPathRulesFactory(engine,
-                DEFAULT_RULES_PACKAGE), engine), store);
+    private WebServer buildWebServer(final VMInfo vminfo, final RulesStore store, final VismoRulesEngine engine) {
+        final WebServer server = new WebServer(conf.getWebPort());
+        final RulesResource rulesResource = new RulesResource(conf.getWebPort(), new ThresholdRulesFactory(
+                new ClassPathRulesFactory(engine, DEFAULT_RULES_PACKAGE), engine), store);
         final HttpEventResource eventSource = new HttpEventResource();
-        final Application app = WebAppBuilder.buildFrom(rulesResource, new InternalMetricsResource(),
-                                                        new VersionResource(vminfo), eventSource);
+        final WebAppBuilder builder = new WebAppBuilder();
 
+        // builder.addProvider(RuleListBeanContextResolver.class);
+        builder.addResource(rulesResource).addResource(new InternalMetricsResource()).addResource(new VersionResource(vminfo))
+                .addResource(eventSource);
         eventSource.add(engine);
 
-        return server.withWebAppAt(app, "/*");
+        return server.withWebAppAt(builder.build(), "/*");
+    }
+
+
+    /**
+     * @param service
+     * @param info
+     */
+    protected static void addDefaultServiceTasks(@SuppressWarnings("unused") final VMInfo info,
+            @SuppressWarnings("unused") final VismoService service) {
+        log.debug("adding default tasks");
     }
 }

@@ -10,8 +10,6 @@ import gr.ntua.vision.monitoring.events.MonitoringEvent;
 class PerOperationHandler extends NoEventsCheckingHandler {
     /***/
     private static final String ORIGINATING_SERVICE = "object_service";
-    /** this is used to drop intermediate (vismo-dispatch) events. */
-    private static final String SPECIAL_FIELD       = "transaction-throughput";
     /***/
     private final String        operation;
 
@@ -33,9 +31,9 @@ class PerOperationHandler extends NoEventsCheckingHandler {
     public void handle(final MonitoringEvent e) {
         if (!isObsEvent(e))
             return;
-        if (!isfullObsEvent(e))
-            return;
         if (isContainerOperationEvent(e))
+            return;
+        if (e.topic() != null)
             return;
 
         if (operation.equals(e.get("operation")))
@@ -51,16 +49,6 @@ class PerOperationHandler extends NoEventsCheckingHandler {
         final String objectName = (String) e.get("object");
 
         return objectName == null || objectName.isEmpty();
-    }
-
-
-    /**
-     * @param e
-     * @return <code>true</code> iff the events is an obs event with calculated fields (throughput, latency, etc),
-     *         <code>false</code> otherwise.
-     */
-    private static boolean isfullObsEvent(final MonitoringEvent e) {
-        return e.get(SPECIAL_FIELD) != null;
     }
 
 

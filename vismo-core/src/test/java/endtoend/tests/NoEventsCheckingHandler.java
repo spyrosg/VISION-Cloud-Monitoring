@@ -23,7 +23,7 @@ abstract class NoEventsCheckingHandler implements EventHandler {
     /**
      * @param noExpectedEvents
      */
-    public void haveReceivedExpectedNoEvents(final int noExpectedEvents) {
+    public void shouldHaveReceivedNoEvents(final int noExpectedEvents) {
         assertEquals(noExpectedEvents, noReceivedEvents);
     }
 
@@ -31,7 +31,7 @@ abstract class NoEventsCheckingHandler implements EventHandler {
     /**
      * @param e
      */
-    protected void receivedEvent(final MonitoringEvent e) {
+    protected void receivedEvent(@SuppressWarnings("unused") final MonitoringEvent e) {
         ++noReceivedEvents;
     }
 }

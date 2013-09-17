@@ -1,4 +1,4 @@
-package gr.ntua.vision.monitoring.rules;
+package gr.ntua.vision.monitoring.resources;
 
 /**
  * 

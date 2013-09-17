@@ -62,7 +62,7 @@ public class VismoEventDispatcherTest {
      * @throws InterruptedException
      */
     @Test
-    public void vismoReceivesEventsThroughDispatcher() throws InterruptedException {
+    public void vismoShouldReceivesEventsSendByDispatcher() throws InterruptedException {
         producer.sendEvents();
         waitEventsDelivery();
     }

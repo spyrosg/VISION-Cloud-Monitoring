@@ -1,8 +1,12 @@
 package gr.ntua.vision.monitoring.resources;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+
 /**
  * 
  */
+@XmlRootElement
 public class ThresholdRequirementBean {
     /***/
     private String aggregationMethod;

@@ -4,6 +4,7 @@ import gr.ntua.vision.monitoring.events.MonitoringEvent;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,11 +14,13 @@ import java.util.regex.Pattern;
  */
 public class MeasurementRule extends Rule {
     /***/
-    static final Pattern        p     = Pattern.compile("\"topic\"\\s*:\\s*\"([^\"]+)\"");
+    static final Pattern        ID_PATTERN    = Pattern.compile("\"id\":\"[^\"]+\"");
     /***/
-    private static final String OBS   = "object_service";
+    static final Pattern        TOPIC_PATTERN = Pattern.compile("\"topic\"\\s*:\\s*\"([^\"]+)\"");
     /***/
-    private static final String TOPIC = "measurement";
+    private static final String OBS           = "object_service";
+    /***/
+    private static final String TOPIC         = "measurement";
 
 
     /**
@@ -35,12 +38,16 @@ public class MeasurementRule extends Rule {
      */
     @Override
     public void performWith(final MonitoringEvent e) {
+        final String id = UUID.randomUUID().toString();
+
         if (OBS.equals(e.originatingService()))
             send(new MonitoringEvent() {
                 @Override
                 public Object get(final String key) {
                     if ("topic".equals(key))
                         return TOPIC;
+                    if ("id".equals("id"))
+                        return id;
 
                     return e.get(key);
                 }
@@ -61,12 +68,28 @@ public class MeasurementRule extends Rule {
                 @Override
                 public String serialize() {
                     final String serialized = e.serialize();
-                    final Matcher m = p.matcher(serialized);
+                    final Matcher m = TOPIC_PATTERN.matcher(serialized);
+                    final Matcher m1 = ID_PATTERN.matcher(serialized);
+                    final String tmp;
+
+                    if (m1.find())
+                        tmp = m1.replaceFirst("\"id\":\"" + id + "\"");
+                    else
+                        tmp = serialized;
+
+                    m.replaceFirst("\"id\":\"");
 
                     if (m.find() && m.groupCount() == 1)
-                        return m.replaceAll("\"topic\":\"" + TOPIC + "\"");
+                        return m.replaceAll(String.format("\"topic\": \"%s\"", TOPIC));
 
-                    return serialized;
+                    final int idx = tmp.lastIndexOf("}");
+
+                    if (idx < 0)
+                        return tmp;
+
+                    final String orig = tmp.substring(0, idx);
+
+                    return String.format("%s,\"topic\":\"%s\"}", orig, TOPIC);
                 }
 
 

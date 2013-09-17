@@ -7,6 +7,7 @@ import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.InMemoryEventSink;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -15,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import org.json.simple.JSONObject;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 
 
 /**
@@ -28,10 +30,76 @@ public class HttpEventSourceTest extends JerseyResourceTest {
 
 
     /**
+     * @throws UnknownHostException
+     */
+    public void testRulesEngineShouldReceivePostedEvent() throws UnknownHostException {
+        final String eventRepr = getEvent();
+        final ClientResponse res = resource().accept(MediaType.APPLICATION_JSON).entity(eventRepr).put(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
+        assertEquals("engine should have received at least one event", 1, sink.size());
+        assertEquals("should accept proper event", "new event", sink.get(0).topic());
+        assertEquals("should accept proper event", "127.0.0.1", sink.get(0).originatingIP().getHostAddress());
+        assertEquals("should accept proper event", "ohai", sink.get(0).get("bar"));
+    }
+
+
+    /***/
+    public void testShouldAcceptEventsThroughPut() {
+        final String eventRepr = getEvent();
+        final ClientResponse res = resource().accept(MediaType.APPLICATION_JSON).entity(eventRepr).put(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    public void testShouldRejectEmptyBodyRequest() throws Exception {
+        final ClientResponse res = resource().type(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN).put(ClientResponse.class);
+
+        assertEquals("server should reject invalid events", ClientResponse.Status.BAD_REQUEST, res.getClientResponseStatus());
+        assertEquals("empty event body not allowed", res.getEntity(String.class));
+    }
+
+
+    /***/
+    public void testShouldRejectInvalidEvents() {
+        final ClientResponse res = resource().entity("{ \"foo\" : 3 }").type(MediaType.APPLICATION_JSON)
+                .put(ClientResponse.class);
+
+        assertEquals("server should reject invalid events", ClientResponse.Status.BAD_REQUEST, res.getClientResponseStatus());
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    public void testShouldRejectInvalidJSONRequest() throws Exception {
+        final ClientResponse res = resource().entity("{ \"foo\": \"bar\", \"topic\":  }").type(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN).put(ClientResponse.class);
+
+        assertEquals("server should reject invalid events", ClientResponse.Status.BAD_REQUEST, res.getClientResponseStatus());
+        assertTrue(res.getEntity(String.class).startsWith("invalid json: "));
+    }
+
+
+    /**
+     * @see integration.tests.JerseyResourceTest#resource()
+     */
+    @Override
+    protected WebResource resource() {
+        return super.resource().path("events");
+    }
+
+
+    /**
      * @see integration.tests.JerseyResourceTest#setUp()
      */
     @Override
-    public void setUp() throws Exception {
+    protected void setUp() throws Exception {
         super.setUp();
 
         final HttpEventResource eventSource = new HttpEventResource();
@@ -50,40 +118,11 @@ public class HttpEventSourceTest extends JerseyResourceTest {
      * @see integration.tests.JerseyResourceTest#tearDown()
      */
     @Override
-    public void tearDown() throws Exception {
+    protected void tearDown() throws Exception {
         if (engine != null)
             engine.halt();
 
         super.tearDown();
-    }
-
-
-    /***/
-    public void testRulesEngineShouldReceivePostedEvent() {
-        final String eventRepr = getEvent();
-        final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(eventRepr)
-                .put(ClientResponse.class);
-
-        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
-        assertEquals("engine should have received at least one event", 1, sink.size());
-    }
-
-
-    /***/
-    public void testShouldAcceptEventsThroughPut() {
-        final String eventRepr = getEvent();
-        final ClientResponse res = root().path("events").accept(MediaType.APPLICATION_JSON).entity(eventRepr)
-                .put(ClientResponse.class);
-
-        assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
-    }
-
-
-    /***/
-    public void testShouldRejectInvalidEvents() {
-        final ClientResponse res = root().path("events").entity("{ \"foo\" : 3 }").put(ClientResponse.class);
-
-        assertEquals("server should reject invalid events", ClientResponse.Status.BAD_REQUEST, res.getClientResponseStatus());
     }
 
 
@@ -95,6 +134,9 @@ public class HttpEventSourceTest extends JerseyResourceTest {
 
         map.put("originating-service", "service");
         map.put("topic", "new event");
+
+        map.put("foo", 1);
+        map.put("bar", "ohai");
 
         return JSONObject.toJSONString(map);
     }

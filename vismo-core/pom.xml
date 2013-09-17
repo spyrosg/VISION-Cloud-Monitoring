@@ -7,7 +7,7 @@
   <parent>
     <artifactId>vismo</artifactId>
     <groupId>gr.ntua.vision</groupId>
-    <version>1.1.7-SNAPSHOT</version>
+    <version>1.1.9-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
@@ -210,19 +210,22 @@
       <version>${project.version}</version>
     </dependency>
 
-
     <dependency>
       <artifactId>vismo-web</artifactId>
       <groupId>gr.ntua.vision</groupId>
       <version>${project.version}</version>
     </dependency>
 
-
-
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>${logback.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-client</artifactId>
+      <version>1.16</version>
     </dependency>
 
     <dependency>
@@ -236,13 +239,6 @@
       <artifactId>vismo-dispatch</artifactId>
       <groupId>gr.ntua.vision</groupId>
       <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-client</artifactId>
-      <version>1.16</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

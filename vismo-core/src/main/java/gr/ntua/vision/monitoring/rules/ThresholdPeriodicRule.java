@@ -4,6 +4,7 @@ import static gr.ntua.vision.monitoring.rules.ThresholdRulesTraits.isApplicable;
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.resources.ThresholdRuleBean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -15,9 +16,9 @@ import org.slf4j.LoggerFactory;
  */
 public class ThresholdPeriodicRule extends PeriodicRule {
     /***/
-    private static final Logger            log = LoggerFactory.getLogger(ThresholdPeriodicRule.class);
+    private static final Logger            log         = LoggerFactory.getLogger(ThresholdPeriodicRule.class);
     /***/
-    private final String                   filterUnit;
+    private final ArrayList<String>        filterUnits = new ArrayList<String>();
     /***/
     private final String                   operation;
     /***/
@@ -33,10 +34,10 @@ public class ThresholdPeriodicRule extends PeriodicRule {
      * @param bean
      */
     public ThresholdPeriodicRule(final VismoRulesEngine engine, final ThresholdRuleBean bean) {
-        super(engine, bean.getPeriod());
+        super(engine, bean.getPeriod(), bean.getId());
         this.topic = bean.getTopic();
         this.operation = bean.getOperation();
-        this.filterUnit = bean.getFilterUnit();
+        this.filterUnits.add(bean.getFilterUnit());
         this.requirements = ThresholdRequirementList.from(bean.getRequirements());
     }
 
@@ -46,7 +47,7 @@ public class ThresholdPeriodicRule extends PeriodicRule {
      */
     @Override
     public void performWith(final MonitoringEvent e) {
-        if (!isApplicable(e, filterUnit, operation, requirements))
+        if (!isApplicable(e, filterUnits, operation, requirements))
             return;
 
         log.debug("got applicable: {}", e);
@@ -59,8 +60,16 @@ public class ThresholdPeriodicRule extends PeriodicRule {
      */
     @Override
     public String toString() {
-        return "#<ThresholdPeriodicRule: " + topic + ", period=" + (period() / 1000.0) + "s, " + ", on " + filterUnit + " with "
+        return "#<ThresholdPeriodicRule: " + topic + ", period=" + (period() / 1000.0) + "s, on " + filterUnits + " with "
                 + requirements.size() + " requirements>";
+    }
+
+
+    /**
+     * @param filterUnit
+     */
+    public void updateFilterUnits(final String filterUnit) {
+        filterUnits.add(filterUnit);
     }
 
 
@@ -73,10 +82,8 @@ public class ThresholdPeriodicRule extends PeriodicRule {
 
         if (violations.size() > 0) {
             log.debug("have: {}", violations);
-            // log.debug(String.format("have violation of metric %s '%s', offending value %s", foldMethod, metric,
-            // aggregatedValue));
 
-            return new ThresholdEvent(id(), list.get(0).originatingService(), topic, violations);
+            return ThresholdEventFactory.newEvent(id(), topic, list.get(0), violations);
         }
 
         return null;
@@ -85,9 +92,9 @@ public class ThresholdPeriodicRule extends PeriodicRule {
 
     /**
      * @param events
-     * @return the violiations list.
+     * @return the violations list.
      */
     private ViolationsList thresholdExceededBy(final List<MonitoringEvent> events) {
-        return requirements.haveViolations(events);
+        return requirements.haveViolations(events, filterUnits);
     }
 }

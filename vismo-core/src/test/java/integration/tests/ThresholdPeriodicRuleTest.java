@@ -11,14 +11,13 @@ import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import helpers.InMemoryEventDispatcher;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 import javax.ws.rs.core.MediaType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 
 
 /**
@@ -28,11 +27,7 @@ public class ThresholdPeriodicRuleTest extends JerseyResourceTest {
     /***/
     private static final String              AVERAGE_THROUGHPUT_TOPIC = "average-throughput-topic";
     /***/
-    private static final String              AVG_AGGREGATION_METHOD   = "avg";
-    /***/
     private static final String              CONTAINER                = "test-container";
-    /***/
-    private static final Logger              log                      = LoggerFactory.getLogger(ThresholdPeriodicRuleTest.class);
     /***/
     private static final int                 NO_EVENTS                = 10;
     /***/
@@ -54,18 +49,25 @@ public class ThresholdPeriodicRuleTest extends JerseyResourceTest {
 
 
     /**
-     * @see integration.tests.JerseyResourceTest#setUp()
+     * @throws Exception
      */
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
+    public void testCountNoOperationsPeriodicRule() throws Exception {
+        assertEquals(0, engine.noRules());
 
-        engine = new VismoRulesEngine();
-        obs = new FakeObjectService(new InMemoryEventDispatcher(engine, "fake-obs"), new Random(3331));
-        factory = new ThresholdRulesFactory(engine);
-        engine.appendSink(new InMemoryEventSink(eventSink));
-        configureServer(WebAppBuilder.buildFrom(new RulesResource(factory, new RulesStore())), "/*");
-        startServer();
+        final ClientResponse res = submitRule(countNoWriteOperationsRule(TENANT, USER, CONTAINER));
+
+        assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
+        assertEquals(1, engine.noRules());
+
+        triggerRule();
+        Thread.sleep(6 * RULE_PERIOD / 5);
+        assertEquals(1, eventSink.size());
+
+        @SuppressWarnings("unchecked")
+        final ArrayList<HashMap<String, Object>> violations = (ArrayList<HashMap<String, Object>>) eventSink.get(0)
+                .get("violations");
+
+        assertEquals(NO_EVENTS, (Double) violations.get(0).get("value"), 0.005);
     }
 
 
@@ -88,11 +90,36 @@ public class ThresholdPeriodicRuleTest extends JerseyResourceTest {
 
 
     /**
+     * @see integration.tests.JerseyResourceTest#resource()
+     */
+    @Override
+    protected WebResource resource() {
+        return super.resource().path("rules");
+    }
+
+
+    /**
+     * @see integration.tests.JerseyResourceTest#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        engine = new VismoRulesEngine();
+        obs = new FakeObjectService(new InMemoryEventDispatcher(engine, "fake-obs"), new Random(3331));
+        factory = new ThresholdRulesFactory(engine);
+        engine.appendSink(new InMemoryEventSink(eventSink));
+        configureServer(WebAppBuilder.buildFrom(new RulesResource(PORT, factory, new RulesStore())), "/*");
+        startServer();
+    }
+
+
+    /**
      * @param bean
      * @return the {@link ClientResponse}.
      */
     private ClientResponse submitRule(final ThresholdRuleBean bean) {
-        return root().path("rules").type(MediaType.APPLICATION_JSON).entity(bean).post(ClientResponse.class);
+        return resource().type(MediaType.APPLICATION_JSON).entity(bean).post(ClientResponse.class);
     }
 
 
@@ -106,10 +133,8 @@ public class ThresholdPeriodicRuleTest extends JerseyResourceTest {
     /**
      * @param e
      */
-    @SuppressWarnings("null")
     private static void assertIsExpectedEvent(final MonitoringEvent e) {
-        log.debug("asserting event: {}", e);
-        assertTrue("event cannot be null", e != null);
+        assertNotNull(e);
         assertEquals(AVERAGE_THROUGHPUT_TOPIC, e.topic());
         assertTrue("originating-machine key should be a String", e.get("originating-machine") instanceof String);
     }
@@ -129,7 +154,26 @@ public class ThresholdPeriodicRuleTest extends JerseyResourceTest {
         bean.setOperation("PUT");
         bean.setFilterUnit(tenant + "," + user + "," + containerName);
         bean.setTopic(AVERAGE_THROUGHPUT_TOPIC);
-        bean.addRequirement("transaction-throughput", AVG_AGGREGATION_METHOD, ">=", THRESHOLD);
+        bean.addRequirement("transaction-throughput", "avg", ">=", THRESHOLD);
+
+        return bean;
+    }
+
+
+    /**
+     * @param tenant
+     * @param user
+     * @param containerName
+     * @return a {@link ThresholdRuleBean}.
+     */
+    private static ThresholdRuleBean countNoWriteOperationsRule(final String tenant, final String user, final String containerName) {
+        final ThresholdRuleBean bean = new ThresholdRuleBean();
+
+        bean.setPeriod(RULE_PERIOD);
+        bean.setOperation("PUT");
+        bean.setFilterUnit(tenant + "," + user + "," + containerName);
+        bean.setTopic("count-writes");
+        bean.addRequirement(null, "count", ">=", -1);
 
         return bean;
     }

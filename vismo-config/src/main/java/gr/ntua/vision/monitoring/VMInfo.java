@@ -27,4 +27,14 @@ public interface VMInfo {
      * @return a version string for the program.
      */
     String getVersion();
+
+
+    /**
+     * Check that given address is no of the addresses assigned on any of the interfaces of the host machine.
+     * 
+     * @param ip
+     *            the ip address to check.
+     * @return <code>true</code> when the given address is assigned to the host machine, <code>false</code> otherwise.
+     */
+    boolean isHostAddress(String ip);
 }

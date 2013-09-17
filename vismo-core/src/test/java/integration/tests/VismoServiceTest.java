@@ -53,7 +53,6 @@ public class VismoServiceTest {
          * @param expectedNoEvents
          */
         public void hasSeenExpectedNoEvents(final int expectedNoEvents) {
-            System.err.println("rule got in total: " + counter + " events");
             assertEquals(expectedNoEvents, counter);
         }
 
@@ -94,7 +93,8 @@ public class VismoServiceTest {
                                                            setProperty("mon.group.addr", "228.5.6.7");
                                                            setProperty("mon.group.port", "12345");
                                                            setProperty("mon.ping.period", "60000");
-                                                           setProperty("startup.rules", "");
+                                                           setProperty("startup.rules", "PassThroughRule");
+                                                           setProperty("web.port", "9996");
                                                        }
                                                    };
     /***/
@@ -115,11 +115,7 @@ public class VismoServiceTest {
     @Before
     public void setUp() throws IOException {
         obs = new FakeObjectService(new VismoEventDispatcher(socketFactory, conf, "fake-obs"));
-
         service = new ClusterHeadNodeFactory(conf, socketFactory) {
-            /**
-             * @see gr.ntua.vision.monitoring.service.ClusterHeadNodeFactory#submitRules(gr.ntua.vision.monitoring.rules.VismoRulesEngine)
-             */
             @Override
             protected void submitRules(final VismoRulesEngine engine) {
                 countRule = new EventCountRule(engine);

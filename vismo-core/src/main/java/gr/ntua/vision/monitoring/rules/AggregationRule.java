@@ -1,11 +1,13 @@
 package gr.ntua.vision.monitoring.rules;
 
 import gr.ntua.vision.monitoring.events.MonitoringEvent;
+import gr.ntua.vision.monitoring.events.VismoEventFactory;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,29 +18,31 @@ import org.slf4j.LoggerFactory;
  */
 abstract class AggregationRule extends PeriodicRule {
     /***/
-    protected static final String OBS_FIELD               = "transaction-duration";
+    protected static final String   OBS_FIELD               = "transaction-duration";
     /***/
-    private static final String   DELETE_OPERATION        = "DELETE";
+    private static final String     DELETE_OPERATION        = "DELETE";
     /***/
-    private static final String   GET_FEDERATED_OPERATION = "GET_F";
+    private static final String     GET_FEDERATED_OPERATION = "GET_F";
     /***/
-    private static final String   GET_OPERATION           = "GET";
+    private static final String     GET_OPERATION           = "GET";
     /***/
-    private static final Logger   log                     = LoggerFactory.getLogger(AggregationRule.class);
+    private static final Logger     log                     = LoggerFactory.getLogger(AggregationRule.class);
     /***/
-    private static final String   OPERATION_FIELD         = "operation";
+    private static final String     OPERATION_FIELD         = "operation";
     /***/
-    private static final String   PUT_FEDERATED_OPERATION = "PUT_F";
+    private static final String     PUT_FEDERATED_OPERATION = "PUT_F";
     /***/
-    private static final String   PUT_MULTI_OPERATION     = "PUT_MULTI";
+    private static final String     PUT_MULTI_OPERATION     = "PUT_MULTI";
     /***/
-    private static final String   PUT_OPERATION           = "PUT";
+    private static final String     PUT_OPERATION           = "PUT";
     /***/
-    private static final String   SRE_SERVICE             = "SRE";
+    private static final String     SRE_SERVICE             = "SRE";
     /***/
-    private static final String   STORLET_KEY             = "storletType";
+    private static final String     STORLET_KEY             = "storletType";
     /***/
-    protected final String        topic;
+    protected final String          topic;
+    /***/
+    private final VismoEventFactory factory;
 
 
     /**
@@ -51,6 +55,7 @@ abstract class AggregationRule extends PeriodicRule {
     public AggregationRule(final VismoRulesEngine engine, final long period, final String topic) {
         super(engine, period);
         this.topic = topic;
+        this.factory = new VismoEventFactory();
     }
 
 
@@ -67,15 +72,25 @@ abstract class AggregationRule extends PeriodicRule {
      * @param dict
      * @param e
      */
-    protected static void addRequiredFields(final HashMap<String, Object> dict, final MonitoringEvent e) {
+    protected void addRequiredFields(final HashMap<String, Object> dict, final MonitoringEvent e) {
         dict.put("timestamp", System.currentTimeMillis());
         dict.put("originating-service", e.originatingService());
+        dict.put("topic", topic);
 
         try {
             dict.put("originating-machine", e.originatingIP().getHostAddress());
         } catch (final UnknownHostException e1) {
             log.error("cannot get originating machine ip", e);
         }
+    }
+
+
+    /**
+     * @param map
+     * @return the aggregation results as a {@link MonitoringEvent}.
+     */
+    protected MonitoringEvent newAggregationEvent(final Map<String, Object> map) {
+        return factory.createEvent(map);
     }
 
 

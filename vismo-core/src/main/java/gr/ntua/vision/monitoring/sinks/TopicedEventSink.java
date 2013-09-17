@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TopicedEventSink extends AbstractSink {
     /***/
+    @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(TopicedEventSink.class);
 
 
@@ -32,7 +33,6 @@ public class TopicedEventSink extends AbstractSink {
     public void send(final MonitoringEvent e) {
         final String s = e.topic() + " " + e.serialize();
 
-        log.trace("serializing: {}", s);
         send(s);
     }
 

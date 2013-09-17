@@ -18,13 +18,13 @@ import com.sun.jersey.api.json.JSONConfiguration;
  */
 public abstract class JerseyResourceTest extends TestCase {
     /***/
-    private static final int    PORT     = 9998;
+    protected static final int  PORT     = 19998;
     /***/
     private static final String ROOT_URL = "http://localhost:" + PORT;
     /***/
     private final Client        client;
     /***/
-    private WebServer           server;
+    private final WebServer     server   = new WebServer(PORT);
 
     {
         final ClientConfig cc = new DefaultClientConfig();
@@ -35,39 +35,28 @@ public abstract class JerseyResourceTest extends TestCase {
 
 
     /**
-     * @see junit.framework.TestCase#setUp()
-     */
-    @Override
-    public void setUp() throws Exception {
-        server = new WebServer(PORT);
-    }
-
-
-    /**
-     * @see junit.framework.TestCase#tearDown()
-     */
-    @Override
-    public void tearDown() throws Exception {
-        if (server != null)
-            server.stop();
-    }
-
-
-    /**
      * @param app
      * @param pathSpec
      */
     protected void configureServer(final Application app, final String pathSpec) {
-        if (server != null)
-            server.withWebAppAt(app, pathSpec);
+        server.withWebAppAt(app, pathSpec);
     }
 
 
     /**
      * @return a web resource pointing to the server's root.
      */
-    protected WebResource root() {
+    protected WebResource resource() {
         return client.resource(ROOT_URL);
+    }
+
+
+    /**
+     * @see junit.framework.TestCase#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
     }
 
 
@@ -80,9 +69,11 @@ public abstract class JerseyResourceTest extends TestCase {
 
 
     /**
-     * @throws Exception
+     * @see junit.framework.TestCase#tearDown()
      */
-    protected void stopServer() throws Exception {
+    @Override
+    protected void tearDown() throws Exception {
         server.stop();
+        super.tearDown();
     }
 }

@@ -15,10 +15,10 @@ public class EventHandlerTask implements Runnable {
     private static final Logger ilog               = Logger.getLogger(EventHandlerTask.class.getName());
     /** no of milliseconds to sleep for when receiving an event. */
     private static final int    OPT_SLEEP_DURATION = 50;
+    /** the actual handler. */
+    final EventHandler          handler;
     /** the event factory. */
     private final EventFactory  factory;
-    /** the actual handler. */
-    private final EventHandler  handler;
     /** the socket to receive messages. */
     private final Socket        sock;
     /***/

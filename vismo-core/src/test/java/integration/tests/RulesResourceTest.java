@@ -13,6 +13,7 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 
 
 /**
@@ -23,26 +24,9 @@ public class RulesResourceTest extends JerseyResourceTest {
     private final RulesStore rulesStore = new RulesStore();
 
 
-    /**
-     * @see integration.tests.JerseyResourceTest#setUp()
-     */
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-
-        final VismoRulesEngine engine = new VismoRulesEngine(rulesStore);
-        final ClassPathRulesFactory clsPathfactory = new ClassPathRulesFactory(engine, PassThroughRule.class.getPackage());
-        final ThresholdRulesFactory factory = new ThresholdRulesFactory(clsPathfactory, engine);
-        final Application rulesApp = WebAppBuilder.buildFrom(new RulesResource(factory, rulesStore));
-
-        configureServer(rulesApp, "/*");
-        startServer();
-    }
-
-
     /***/
     public void testHttpDELETEShouldRemoveExistingRuleFromStore() {
-        final ClientResponse res = root().path("rules").path("AccountingRule").path("10000").post(ClientResponse.class);
+        final ClientResponse res = resource().path("AccountingRule").path("10000").post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.CREATED, res.getClientResponseStatus());
 
@@ -95,8 +79,54 @@ public class RulesResourceTest extends JerseyResourceTest {
 
 
     /***/
-    public void testHttpPUTShouldUpdateRule() {
-        // TODO
+    public void testHttpPUTShouldUpdateRulesFilterUnit() {
+        final long period = 5000;
+        final String insertedRuleId = postRule(getBean(period)).getEntity(String.class);
+
+        final ClientResponse res = resource().path(insertedRuleId).path("filterUnit").path(String.valueOf("ntua,vassilis,bar"))
+                .put(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
+    }
+
+
+    /***/
+    public void testHttpPUTShouldUpdateRulesPeriod() {
+        final long oldPeriod = 5000;
+        final long newPeriod = 10000;
+
+        final String insertedRuleId = postRule(getBean(oldPeriod)).getEntity(String.class);
+
+        final ClientResponse res = resource().path(insertedRuleId).path("period").path(String.valueOf(newPeriod))
+                .put(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
+    }
+
+
+    /**
+     * @see integration.tests.JerseyResourceTest#resource()
+     */
+    @Override
+    protected WebResource resource() {
+        return super.resource().path("rules");
+    }
+
+
+    /**
+     * @see integration.tests.JerseyResourceTest#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        final VismoRulesEngine engine = new VismoRulesEngine(rulesStore);
+        final ClassPathRulesFactory clsPathfactory = new ClassPathRulesFactory(engine, PassThroughRule.class.getPackage());
+        final ThresholdRulesFactory factory = new ThresholdRulesFactory(clsPathfactory, engine);
+        final Application rulesApp = WebAppBuilder.buildFrom(new RulesResource(PORT, factory, rulesStore));
+
+        configureServer(rulesApp, "/*");
+        startServer();
     }
 
 
@@ -105,7 +135,7 @@ public class RulesResourceTest extends JerseyResourceTest {
      * @return the {@link ClientResponse}.
      */
     private ClientResponse deleteRule(final String ruleId) {
-        return root().path("rules").path(ruleId).accept(MediaType.TEXT_PLAIN).delete(ClientResponse.class);
+        return resource().path(ruleId).accept(MediaType.TEXT_PLAIN).delete(ClientResponse.class);
     }
 
 
@@ -113,7 +143,7 @@ public class RulesResourceTest extends JerseyResourceTest {
      * @return the {@link ClientResponse}.
      */
     private ClientResponse getRules() {
-        return root().path("rules").get(ClientResponse.class);
+        return resource().get(ClientResponse.class);
     }
 
 
@@ -123,7 +153,7 @@ public class RulesResourceTest extends JerseyResourceTest {
      * @return the {@link ClientResponse}.
      */
     private ClientResponse postRule(final String name, final long period) {
-        return root().path("rules").path(name).path(String.valueOf(period)).post(ClientResponse.class);
+        return resource().path(name).path(String.valueOf(period)).post(ClientResponse.class);
     }
 
 
@@ -132,7 +162,7 @@ public class RulesResourceTest extends JerseyResourceTest {
      * @return the {@link ClientResponse}.
      */
     private ClientResponse postRule(final ThresholdRuleBean bean) {
-        return root().path("rules").type(MediaType.APPLICATION_JSON).entity(bean).post(ClientResponse.class);
+        return resource().type(MediaType.APPLICATION_JSON).entity(bean).post(ClientResponse.class);
     }
 
 
@@ -158,6 +188,7 @@ public class RulesResourceTest extends JerseyResourceTest {
 
         bean.setTopic("my-topic");
         bean.setPeriod(period);
+        bean.setFilterUnit("ntua,vassilis,foo");
         bean.addRequirement("latency", "sum", ">", 1.3);
 
         return bean;

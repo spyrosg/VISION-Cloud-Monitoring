@@ -40,6 +40,7 @@ public class HttpEventResource implements EventSource {
             super(message);
         }
     }
+
     /***/
     private static final Logger                  log       = LoggerFactory.getLogger(HttpEventResource.class);
     /***/
@@ -89,10 +90,13 @@ public class HttpEventResource implements EventSource {
     public Response putEvent(final @Context HttpServletRequest req, final String body) {
         final Map<String, Object> json;
 
+        if (body == null || body.length() == 0)
+            return badRequest("empty event body not allowed");
+
         try {
             json = (Map<String, Object>) parser.parse(body);
         } catch (final ParseException e) {
-            return badRequest(e.getMessage());
+            return badRequest("invalid json: " + (e.getMessage() != null ? e.getMessage() : e.toString()));
         }
 
         try {
@@ -100,6 +104,7 @@ public class HttpEventResource implements EventSource {
             requireField("originating-service", json);
             json.put("timestamp", System.currentTimeMillis());
             json.put("originating-machine", req.getRemoteAddr());
+            log.trace("from {}, received {}", req.getRemoteAddr(), body);
             notifyAll(factory.createEvent(JSONObject.toJSONString(json)));
         } catch (final EventValidationError e) {
             return badRequest(e.getMessage());

@@ -92,6 +92,6 @@ public class EventSources {
      */
     @Override
     public String toString() {
-        return "#<EventSources: " + sources + ">";
+        return sources.toString();
     }
 }

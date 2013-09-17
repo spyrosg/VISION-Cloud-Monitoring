@@ -1,23 +1,16 @@
 package gr.ntua.vision.monitoring.dispatch;
 
 import gr.ntua.vision.monitoring.VismoConfiguration;
+import gr.ntua.vision.monitoring.VismoFormatter;
 import gr.ntua.vision.monitoring.VismoVMInfo;
 import gr.ntua.vision.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.UUID;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.Formatter;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.json.simple.JSONValue;
@@ -29,45 +22,6 @@ import org.zeromq.ZContext;
  * {@link VismoEventBuilder}) to provide a fluent interface to sending events.
  */
 public class VismoEventDispatcher implements EventDispatcher {
-    /**
-     * A custom log formatter. The format should match the following logback notation:
-     * <code>%-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m\n%ex</code>.
-     */
-    private static class VisionFormatter extends Formatter {
-        // INFO [2012-06-11 10:05:42,525] gr.ntua.vision.monitoring.MonitoringInstance: Starting up, pid=28206, ip=vis0/10.0.0.10
-        /***/
-        private final DateFormat fmt;
-
-
-        /**
-         * Constructor.
-         */
-        public VisionFormatter() {
-            this.fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-            this.fmt.setTimeZone(TimeZone.getTimeZone("GMT"));
-        }
-
-
-        /**
-         * @see java.util.logging.Formatter#format(java.util.logging.LogRecord)
-         */
-        @Override
-        public String format(final LogRecord r) {
-            final String s = String.format("%-6s [%s] %s: %s\n", r.getLevel(), fmt.format(new Date(r.getMillis())),
-                                           r.getSourceClassName(), r.getMessage());
-
-            if (r.getThrown() != null) {
-                final StringWriter sw = new StringWriter();
-                final PrintWriter pw = new PrintWriter(sw);
-
-                r.getThrown().printStackTrace(pw);
-
-                return s + sw.toString();
-            }
-
-            return s;
-        }
-    }
     /***/
     private static final String      dispatchLogProperty = "dispatch.log";
     /** the log target. */
@@ -209,7 +163,7 @@ public class VismoEventDispatcher implements EventDispatcher {
         final ConsoleHandler h = new ConsoleHandler();
         final String pkg = EventDispatcher.class.getPackage().getName();
 
-        h.setFormatter(new VisionFormatter());
+        h.setFormatter(new VismoFormatter());
         h.setLevel(Level.ALL);
         Logger.getLogger(pkg).addHandler(h);
         Logger.getLogger(pkg).setLevel(Level.ALL);

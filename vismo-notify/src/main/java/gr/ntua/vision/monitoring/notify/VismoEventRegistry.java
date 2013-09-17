@@ -52,7 +52,7 @@ public class VismoEventRegistry extends EventRegistry {
      * @return the default registry address.
      */
     private static String getDefaultRegistryAddress(final VismoConfiguration conf) {
-        return "tcp://" + conf.getClusterHead() + ":" + conf.getClusterHeadPort();
+        return "tcp://" + conf.getClusterHead() + ":" + conf.getConsumersPort();
     }
 
 

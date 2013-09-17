@@ -33,7 +33,7 @@ public class WebAppBuilder {
      * @param c
      * @return <code>this</code>.
      */
-    public WebAppBuilder addProvide(final Class< ? > c) {
+    public WebAppBuilder addProvider(final Class< ? > c) {
         classes.add(c);
 
         return this;

@@ -5,6 +5,7 @@ import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sources.EventSource;
 import gr.ntua.vision.monitoring.sources.EventSourceListener;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -29,8 +30,6 @@ public class VismoRulesEngine implements EventSourceListener {
     /***/
     private final Timer                timer = new Timer();
 
-
-    // FIXME: addition/deletion of rules
 
     /**
      * Constructor.
@@ -121,9 +120,40 @@ public class VismoRulesEngine implements EventSourceListener {
      *            the rule.
      */
     public void removeRule(final VismoRule rule) {
-        // FIXME: periodic rules aren't removed from the timer
         log.debug("removing {}", rule);
         store.remove(rule);
+
+        if (rule instanceof PeriodicRule)
+            ((PeriodicRule) rule).cancel();
+    }
+
+
+    /**
+     * @param rule
+     */
+    public void resubmit(final PeriodicRule rule) {
+        log.debug("resubmitting {}", rule);
+        rule.cancel();
+
+        try {
+            final Class< ? > c = rule.getClass().getSuperclass().getSuperclass();
+
+            log.debug("super <: {}", c);
+
+            final Field f = c.getDeclaredField("state");
+
+            f.setAccessible(true);
+            f.setInt(rule, 0);
+            log.trace("field set");
+        } catch (final NoSuchFieldException e) {
+            // ignored
+        } catch (final SecurityException e) {
+            // ignored
+        } catch (final IllegalAccessException e) {
+            // ignored
+        }
+
+        submitRule(rule);
     }
 
 
@@ -151,7 +181,6 @@ public class VismoRulesEngine implements EventSourceListener {
     void submitRule(final PeriodicRule rule) {
         add(rule);
         schedule(rule);
-
     }
 
 
