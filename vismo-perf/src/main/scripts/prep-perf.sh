@@ -69,9 +69,9 @@ function submit_rules {
 
 	for i in $(seq $1)
 	do
-		curl -X POST http://localhost:9996/rules \
+		curl -s -X POST http://localhost:9996/rules \
 			-H 'Content-Type: application/json' \
-			-d '{ "topic": "'$2'", { "filterUnit": null, "operation": "GET", "requirements": [ "metric": "latency", "predicate": ">", "threshold": 1.3 } ] }'
+			-d '{ "topic": "'$2'", "filterUnit": null, "operation": "GET", "requirements": [ { "metric": "latency", "predicate": ">", "threshold": 1.3 } ] }'
 	done
 }
 
