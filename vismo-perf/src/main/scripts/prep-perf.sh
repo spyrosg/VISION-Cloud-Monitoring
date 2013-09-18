@@ -64,6 +64,17 @@ function vismo_gc {
 	curl -X POST http://localhost:9996/mon/gc >/dev/null 2>&1
 }
 
+function submit_rules {
+	local i
+
+	for i in $(seq $1)
+	do
+		curl -X POST http://localhost:9996/rules \
+			-H 'Content-Type: application/json' \
+			-d '{ "topic": "'$2'", { "filterUnit": null, "operation": "GET", "requirements": [ "metric": "latency", "predicate": ">", "threshold": 1.3 } ] }'
+	done
+}
+
 function header {
 	local results="$1"
 
@@ -84,6 +95,28 @@ function record_round {
 
 	local stat=$("$STAT" "$tmp_file")
 	echo -e "$event_size\t$rate\t$no_events\t$stat\t$mem_before\t$mem_after" >>"$results"
+}
+
+function header_rules {
+	local results="$1"
+
+	echo -e "#no-rules\tevent-size\tevent-rate\tno-events\tlatency-min\tlatency-mean\tlatency-stddev\tlatench-max\tthroughput-min\tthroughput-mean\tthroughput-stddev\tthroughput-max\tmem-used-before\tmem-used-after" >"$results"
+	local mem_before=$(vismo_memory_used)
+	vismo_gc
+	local mem_after=$(vismo_memory_used)
+	echo -e "0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t$mem_before\t$mem_after" >>"$results"
+}
+
+function record_round_rules {
+	local tmp_file="$1"
+	local results="$2"
+
+	local mem_before=$(vismo_memory_used)
+	vismo_gc
+	local mem_after=$(vismo_memory_used)
+
+	local stat=$("$STAT" "$tmp_file")
+	echo -e "$no_rules\t$event_size\t$rate\t$no_events\t$stat\t$mem_before\t$mem_after" >>"$results"
 }
 
 function main {
