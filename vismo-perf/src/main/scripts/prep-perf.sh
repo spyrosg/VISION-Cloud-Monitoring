@@ -72,7 +72,7 @@ function submit_rules {
 	do
 		curl -s -X POST http://localhost:9996/rules \
 			-H 'Content-Type: application/json' \
-			-d '{ "topic": "'$2'", "filterUnit": null, "operation": "GET", "requirements": [ { "metric": "latency", "predicate": ">", "threshold": 1.3 } ] }'
+			-d '{ "topic": "'$2'", "filterUnit": "ntua,vassilis,x1", "operation": "GET", "requirements": [ { "metric": "latency", "predicate": ">", "threshold": 1.3 } ] }'
 	done
 }
 

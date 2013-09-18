@@ -55,7 +55,7 @@ public class ConstantSizeEventService implements EventService {
         @Override
         public void run() {
             for (int i = 0; i < noEvents; ++i) {
-                dispatcher.newEvent().field("topic", topic).field("operation", "GET").field("dummy", dummyValue).send();
+                dispatcher.newEvent().field("topic", topic).field("tenant", "ntua").field("user", "vassilis").field("container", "x1").field("operation", "GET").field("dummy", dummyValue).send();
                 ++noSentEvents;
             }
 
