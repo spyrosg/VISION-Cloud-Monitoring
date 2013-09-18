@@ -8,7 +8,7 @@ function run_perf {
 	local no_events="$1"
 	local event_size="$2"
 	local rate="$3"
-	local max_rules_size="$4"
+	local max_no_rules="$4"
 	local results="$5"
 	local topic="perf-var-rule-set"
 	local tmp_out=perf.$$.tmp
@@ -16,7 +16,7 @@ function run_perf {
 	rm -f "$results"
 	header_rules "$results"
 
-	for no_rules in $(seq 100 100 "$max_no_rules")
+	for no_rules in $(seq 100 50 "$max_no_rules")
 	do
 		start_vismo
 		start_producer
