@@ -15,6 +15,7 @@ function set_config {
 	local my_ip=$(/sbin/ifconfig -a | awk '/inet\ / { sub(/addr:/, ""); print $2; exit 0 }')
 
 	sed 's/cluster.head = .*$/cluster.head = '$my_ip'/' $CONF >config.properties
+	rm -fr vismo.log
 }
 
 function start_producer {
@@ -27,13 +28,13 @@ function stop_producer {
 }
 
 function start_vismo {
-	nohup java -jar "$VISMO_JAR" config.properties start >/dev/null 2>&1 &
+	nohup java -jar "$VISMO_JAR" config.properties start >>vismo.log 2>&1 &
 	sleep 3
 	java -jar "$VISMO_JAR" config.properties status || exit 1
 }
 
 function stop_vismo {
-	java -jar "$VISMO_JAR" config.properties stop
+	java -jar "$VISMO_JAR" config.properties stop >/dev/null 2>&1
 }
 
 function generate_events {
