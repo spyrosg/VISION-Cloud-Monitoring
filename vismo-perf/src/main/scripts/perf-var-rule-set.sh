@@ -16,7 +16,7 @@ function run_perf {
 	rm -f "$results"
 	header_rules "$results"
 
-	for no_rules in $(seq 100 50 "$max_no_rules")
+	for no_rules in $(seq 100 100 "$max_no_rules")
 	do
 		start_vismo
 		start_producer
