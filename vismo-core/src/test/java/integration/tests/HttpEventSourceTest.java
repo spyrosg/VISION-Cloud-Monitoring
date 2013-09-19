@@ -102,12 +102,11 @@ public class HttpEventSourceTest extends JerseyResourceTest {
     protected void setUp() throws Exception {
         super.setUp();
 
-        final HttpEventResource eventSource = new HttpEventResource();
-
         engine = new VismoRulesEngine();
+
+        final HttpEventResource eventSource = new HttpEventResource(engine);
         new PassThroughRule(engine).submit();
         engine.appendSink(new InMemoryEventSink(sink));
-        eventSource.add(engine);
 
         configureServer(WebAppBuilder.buildFrom(eventSource), "/*");
         startServer();

@@ -6,11 +6,5 @@ package gr.ntua.vision.monitoring.sources;
  * <code>blocking</code>, <code>non-blocking</code>) in the way {@link EventSourceListener}s are notified is unspecified.
  */
 public interface EventSource {
-    /**
-     * Subscribe the listener to the source.
-     * 
-     * @param listener
-     *            the listener.
-     */
-    void add(EventSourceListener listener);
+    // NOP
 }

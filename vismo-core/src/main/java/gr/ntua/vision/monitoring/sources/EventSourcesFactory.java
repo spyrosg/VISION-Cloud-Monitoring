@@ -11,9 +11,11 @@ import org.zeromq.ZContext;
  */
 public class EventSourcesFactory {
     /** the configuration object. */
-    private final VismoConfiguration conf;
+    private final VismoConfiguration  conf;
     /***/
-    private final ZMQFactory         socketFactory;
+    private final EventSourceListener listener;
+    /***/
+    private final ZMQFactory          socketFactory;
 
 
     /**
@@ -21,9 +23,10 @@ public class EventSourcesFactory {
      * 
      * @param conf
      *            the configuration object.
+     * @param listener
      */
-    public EventSourcesFactory(final VismoConfiguration conf) {
-        this(conf, new ZMQFactory(new ZContext()));
+    public EventSourcesFactory(final VismoConfiguration conf, final EventSourceListener listener) {
+        this(conf, new ZMQFactory(new ZContext()), listener);
     }
 
 
@@ -33,10 +36,12 @@ public class EventSourcesFactory {
      * @param conf
      *            the configuration object.
      * @param socketFactory
+     * @param listener
      */
-    public EventSourcesFactory(final VismoConfiguration conf, final ZMQFactory socketFactory) {
+    public EventSourcesFactory(final VismoConfiguration conf, final ZMQFactory socketFactory, final EventSourceListener listener) {
         this.conf = conf;
         this.socketFactory = socketFactory;
+        this.listener = listener;
     }
 
 
@@ -83,7 +88,8 @@ public class EventSourcesFactory {
      * @return the event source for given address
      */
     private VismoEventSource sourceforAddress(final String address) {
-        return new VismoEventSource(socketFactory.newBoundPullSocket(address), socketFactory.newConnectedPushSocket(address));
+        return new VismoEventSource(listener, socketFactory.newBoundPullSocket(address),
+                socketFactory.newConnectedPushSocket(address));
     }
 
 

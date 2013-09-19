@@ -3,6 +3,7 @@ package gr.ntua.vision.monitoring.service;
 import gr.ntua.vision.monitoring.VismoConfiguration;
 import gr.ntua.vision.monitoring.sinks.EventSink;
 import gr.ntua.vision.monitoring.sinks.EventSinksFactory;
+import gr.ntua.vision.monitoring.sources.EventSourceListener;
 import gr.ntua.vision.monitoring.sources.EventSources;
 import gr.ntua.vision.monitoring.sources.EventSourcesFactory;
 import gr.ntua.vision.monitoring.zmq.ZMQFactory;
@@ -33,10 +34,10 @@ public class WorkerNodeFactory extends AbstractVismoServiceFactory {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#getEventSources()
+     * @see gr.ntua.vision.monitoring.service.AbstractVismoServiceFactory#getEventSources(gr.ntua.vision.monitoring.sources.EventSourceListener)
      */
     @Override
-    protected EventSources getEventSources() {
-        return new EventSourcesFactory(conf, socketFactory).buildForWorker();
+    protected EventSources getEventSources(final EventSourceListener listener) {
+        return new EventSourcesFactory(conf, socketFactory, listener).buildForWorker();
     }
 }

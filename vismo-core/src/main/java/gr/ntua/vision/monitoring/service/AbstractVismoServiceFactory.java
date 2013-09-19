@@ -14,6 +14,7 @@ import gr.ntua.vision.monitoring.rules.ThresholdRulesFactory;
 import gr.ntua.vision.monitoring.rules.VismoRule;
 import gr.ntua.vision.monitoring.rules.VismoRulesEngine;
 import gr.ntua.vision.monitoring.sinks.EventSink;
+import gr.ntua.vision.monitoring.sources.EventSourceListener;
 import gr.ntua.vision.monitoring.sources.EventSources;
 import gr.ntua.vision.monitoring.web.WebAppBuilder;
 import gr.ntua.vision.monitoring.web.WebServer;
@@ -61,14 +62,11 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
 
         final RulesStore store = new RulesStore();
         final VismoRulesEngine engine = new VismoRulesEngine(store);
-        final EventSources sources = getEventSources();
+        final EventSources sources = getEventSources(engine);
 
         log.info("with {}", sources);
 
         engine.appendSinks(getEventSinks());
-
-        log.info("subscribing sources to rules engine");
-        sources.subscribeAll(engine);
 
         final WebServer server = buildWebServer(vminfo, store, engine);
         final VismoService service = new VismoService(vminfo, sources, engine, server);
@@ -93,9 +91,10 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
     /**
      * Provides the event sources for <code>this</code> service.
      * 
+     * @param listener
      * @return an {@link EventSources} object, already configured.
      */
-    protected abstract EventSources getEventSources();
+    protected abstract EventSources getEventSources(EventSourceListener listener);
 
 
     /**
@@ -141,13 +140,12 @@ abstract class AbstractVismoServiceFactory implements ServiceFactory {
         final WebServer server = new WebServer(conf.getWebPort());
         final RulesResource rulesResource = new RulesResource(conf.getWebPort(), new ThresholdRulesFactory(
                 new ClassPathRulesFactory(engine, DEFAULT_RULES_PACKAGE), engine), store);
-        final HttpEventResource eventSource = new HttpEventResource();
+        final HttpEventResource eventSource = new HttpEventResource(engine);
         final WebAppBuilder builder = new WebAppBuilder();
 
         // builder.addProvider(RuleListBeanContextResolver.class);
         builder.addResource(rulesResource).addResource(new InternalMetricsResource()).addResource(new VersionResource(vminfo))
                 .addResource(eventSource);
-        eventSource.add(engine);
 
         return server.withWebAppAt(builder.build(), "/*");
     }
