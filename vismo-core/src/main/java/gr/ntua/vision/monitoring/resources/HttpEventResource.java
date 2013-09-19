@@ -1,12 +1,10 @@
 package gr.ntua.vision.monitoring.resources;
 
 import gr.ntua.vision.monitoring.events.EventFactory;
-import gr.ntua.vision.monitoring.events.MonitoringEvent;
 import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.sources.EventSource;
 import gr.ntua.vision.monitoring.sources.EventSourceListener;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,41 +40,35 @@ public class HttpEventResource implements EventSource {
     }
 
     /***/
-    private static final Logger                  log       = LoggerFactory.getLogger(HttpEventResource.class);
+    private static final Logger       log = LoggerFactory.getLogger(HttpEventResource.class);
     /***/
-    private final EventFactory                   factory;
-    /** the listeners lists. */
-    private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
+    private final EventFactory        factory;
     /***/
-    private final JSONParser                     parser;
+    private final EventSourceListener listener;
+    /***/
+    private final JSONParser          parser;
 
 
     /**
      * Constructor.
+     * 
+     * @param listener
      */
-    public HttpEventResource() {
-        this(new VismoEventFactory());
+    public HttpEventResource(final EventSourceListener listener) {
+        this(listener, new VismoEventFactory());
     }
 
 
     /**
      * Constructor
      * 
+     * @param listener
      * @param factory
      */
-    public HttpEventResource(final EventFactory factory) {
+    public HttpEventResource(final EventSourceListener listener, final EventFactory factory) {
+        this.listener = listener;
         this.factory = factory;
         this.parser = new JSONParser();
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.sources.EventSource#add(gr.ntua.vision.monitoring.sources.EventSourceListener)
-     */
-    @Override
-    public void add(final EventSourceListener listener) {
-        log.debug("registering listener {}", listener);
-        listeners.add(listener);
     }
 
 
@@ -105,24 +97,12 @@ public class HttpEventResource implements EventSource {
             json.put("timestamp", System.currentTimeMillis());
             json.put("originating-machine", req.getRemoteAddr());
             log.trace("from {}, received {}", req.getRemoteAddr(), body);
-            notifyAll(factory.createEvent(JSONObject.toJSONString(json)));
+            listener.receive(factory.createEvent(JSONObject.toJSONString(json)));
         } catch (final EventValidationError e) {
             return badRequest(e.getMessage());
         }
 
         return Response.status(Response.Status.NO_CONTENT).build();
-    }
-
-
-    /**
-     * Notify any listeners of the incoming message.
-     * 
-     * @param e
-     *            the event received.
-     */
-    private void notifyAll(final MonitoringEvent e) {
-        for (final EventSourceListener listener : listeners)
-            listener.receive(e);
     }
 
 

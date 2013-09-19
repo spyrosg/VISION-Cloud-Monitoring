@@ -173,7 +173,7 @@ public class VismoRulesEngineTest {
     /***/
     private final RulesStore                 rulesStore  = new RulesStore();
     /***/
-    private final InMemoryEventSource        source      = new InMemoryEventSource();
+    private InMemoryEventSource              source;
 
 
     /***/
@@ -254,7 +254,7 @@ public class VismoRulesEngineTest {
     @Before
     public void setUp() {
         engine = new VismoRulesEngine(rulesStore);
-        engine.registerToSource(source);
+        source = new InMemoryEventSource(engine);
         engine.appendSink(new InMemoryEventSink(eventsStore));
     }
 

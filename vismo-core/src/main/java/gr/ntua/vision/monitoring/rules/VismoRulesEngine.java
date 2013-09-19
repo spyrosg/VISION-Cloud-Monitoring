@@ -102,18 +102,6 @@ public class VismoRulesEngine implements EventSourceListener {
 
 
     /**
-     * Register with source.
-     * 
-     * @param source
-     *            the event source.
-     */
-    public void registerToSource(final EventSource source) {
-        log.debug("registering with {}", source);
-        source.add(this);
-    }
-
-
-    /**
      * Remove a rule from the rule engine.
      * 
      * @param rule

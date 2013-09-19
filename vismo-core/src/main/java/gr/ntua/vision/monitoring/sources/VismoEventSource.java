@@ -6,7 +6,6 @@ import gr.ntua.vision.monitoring.events.VismoEventFactory;
 import gr.ntua.vision.monitoring.sockets.Socket;
 import gr.ntua.vision.monitoring.threading.StoppableTask;
 
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,43 +18,35 @@ import org.slf4j.LoggerFactory;
  */
 public class VismoEventSource extends StoppableTask implements EventSource {
     /***/
-    private static final Pattern                 patt      = Pattern.compile("\"originating-machine\": ?\"([^\"]*)\"");
+    private static final Pattern      patt     = Pattern.compile("\"originating-machine\": ?\"([^\"]*)\"");
     /***/
-    private static final String                  SHUTDOWN  = "shutdown!";
+    private static final String       SHUTDOWN = "shutdown!";
     /** the socket used to receive events from outside the system. */
-    private final Socket                         eventSock;
+    private final Socket              eventSock;
     /***/
-    private final EventFactory                   factory   = new VismoEventFactory();
-    /** the listeners lists. */
-    private final ArrayList<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
+    private final EventFactory        factory  = new VismoEventFactory();
+    /***/
+    private final EventSourceListener listener;
     /** the log target. */
-    private final Logger                         log       = LoggerFactory.getLogger(VismoEventSource.class);
+    private final Logger              log      = LoggerFactory.getLogger(VismoEventSource.class);
     /** this is used to shutdown the thread. */
-    private final Socket                         shutdownSocket;
+    private final Socket              shutdownSocket;
 
 
     /**
      * Constructor.
      * 
+     * @param listener
      * @param eventSock
      *            the socket used to receive events from outside the system.
      * @param shutdownSocket
      *            this is used to shutdown the thread.
      */
-    public VismoEventSource(final Socket eventSock, final Socket shutdownSocket) {
+    public VismoEventSource(final EventSourceListener listener, final Socket eventSock, final Socket shutdownSocket) {
         super("vismo-event-source");
+        this.listener = listener;
         this.eventSock = eventSock;
         this.shutdownSocket = shutdownSocket;
-    }
-
-
-    /**
-     * @see gr.ntua.vision.monitoring.sources.EventSource#add(gr.ntua.vision.monitoring.sources.EventSourceListener)
-     */
-    @Override
-    public void add(final EventSourceListener listener) {
-        log.debug("registering listener {}", listener);
-        listeners.add(listener);
     }
 
 
@@ -93,7 +84,7 @@ public class VismoEventSource extends StoppableTask implements EventSource {
             try {
                 final MonitoringEvent e = factory.createEvent(message);
 
-                notifyAll(e);
+                listener.receive(e);
             } catch (final Throwable x) {
                 log.error("deserialization error", x);
                 log.debug("skipping");
@@ -112,18 +103,6 @@ public class VismoEventSource extends StoppableTask implements EventSource {
     @Override
     public String toString() {
         return "#<" + getClass().getSimpleName() + " using " + eventSock + ">";
-    }
-
-
-    /**
-     * Notify any listeners of the incoming message.
-     * 
-     * @param e
-     *            the event received.
-     */
-    private void notifyAll(final MonitoringEvent e) {
-        for (final EventSourceListener listener : listeners)
-            listener.receive(e);
     }
 
 

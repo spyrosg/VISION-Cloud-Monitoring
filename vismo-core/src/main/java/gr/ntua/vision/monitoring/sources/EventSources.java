@@ -76,18 +76,6 @@ public class EventSources {
 
 
     /**
-     * Subscribe listener to all available sources.
-     * 
-     * @param listener
-     *            the listener.
-     */
-    public void subscribeAll(final EventSourceListener listener) {
-        for (final EventSource source : sources)
-            source.add(listener);
-    }
-
-
-    /**
      * @see java.lang.Object#toString()
      */
     @Override

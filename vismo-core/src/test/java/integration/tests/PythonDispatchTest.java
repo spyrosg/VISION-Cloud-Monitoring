@@ -190,9 +190,6 @@ public class PythonDispatchTest {
     @Before
     public void setUp() throws IOException {
         conf = new VismoConfiguration(VISMO_CONFIG_FILE);
-        source = new VismoEventSource(factory.newBoundPullSocket(conf.getProducersPoint()), factory.newConnectedPushSocket(conf
-                .getProducersPoint()));
-        source.start();
     }
 
 
@@ -203,7 +200,7 @@ public class PythonDispatchTest {
     @Test
     public void shouldReceiveMultiUploadEvents() throws IOException, InterruptedException {
         listener = new MultiUploadEvents(2 * NO_EVENTS_TO_SEND);
-        source.add(listener);
+        setupSource(listener);
 
         runPythonVismoDispatch(MULTI_COMMAND);
         Thread.sleep(1000);
@@ -220,7 +217,7 @@ public class PythonDispatchTest {
     @Test
     public void sourceReceivesEventsFromPyDispatch() throws IOException, InterruptedException {
         listener = new PlainEventsListener(NO_EVENTS_TO_SEND);
-        source.add(listener);
+        setupSource(listener);
 
         runPythonVismoDispatch(PLAIN_COMMAND);
         Thread.sleep(1000);
@@ -235,6 +232,16 @@ public class PythonDispatchTest {
     public void tearDown() throws InterruptedException {
         source.halt();
         Thread.sleep(50); // wait for source sockets to die off.
+    }
+
+
+    /**
+     * @param listener
+     */
+    private void setupSource(final EventSourceListener listener) {
+        source = new VismoEventSource(listener, factory.newBoundPullSocket(conf.getProducersPoint()),
+                factory.newConnectedPushSocket(conf.getProducersPoint()));
+        source.start();
     }
 
 
