@@ -72,7 +72,7 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
 
             this.interval_fn_id = setInterval(function() {
                 self.read_queue(name);
-            }, 2000);
+            }, 1000);
         },
 
         read_queue: function(name) {
@@ -82,6 +82,12 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
                 .service.read(name)
                 .then(function(eventList) {
                     self.notify('events', eventList);
+
+                    eventList.forEach(function(e) {
+                        if (e.topic === 'storletProgress') {
+                            self.notify('storlets', e.target, e.progress);
+                        }
+                    });
                 })
                 .done();
         },

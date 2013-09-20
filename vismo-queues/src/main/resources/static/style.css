@@ -1,6 +1,6 @@
 
 body {
-  background-color: #F1F2F2;
+    background-color: #F1F2F2;
 }
 
 header {
@@ -12,20 +12,11 @@ header {
     height: 80px;
 }
 
-.stripe {
-  background-color: lightgrey;
-}
-
-#main {
-    padding: 1em 0 0 3em;
-}
-
 form {
-  background-color: white;
-  width: 500px;
-  padding: 0.8em 0.8em;
-  border-radius: 10px;
-  float: left;
+    background-color: white;
+    width: 500px;
+    padding: 0.8em 0.8em;
+    border-radius: 10px;
 }
 
 form div + div {
@@ -69,15 +60,6 @@ li {
     border-bottom: 1px solid black;
 }
 
-#events {
-    padding-left: 120px; /* same size as the label elements */
-    background-color: white;
-    padding: 0.8em 0.8em;
-    margin-left: 1em;
-    width: 60%;
-    float: left;
-}
-
 .button {
     padding-left: 180px; /* same size as the label elements */
 }
@@ -85,4 +67,47 @@ li {
 span .e {
     padding: 5px;
     display: inline-block;
+}
+
+.stripe {
+  background-color: lightgrey;
+}
+
+#main {
+    padding: 1em 0 0 3em;
+    overflow: hidden;
+}
+
+#events {
+    padding-left: 120px; /* same size as the label elements */
+    background-color: white;
+    padding: 0.8em 0.8em;
+    margin-left: 1em;
+    width: 60%;
+}
+
+#storlets {
+    background-color: white;
+    width: 90px;
+    height: 120px;
+    margin: 1em 0;
+    border-radius: 10px;
+    border: 1px solid black;
+}
+
+#storlets .name {
+    background-color: red;
+    border-bottom: 1px solid black;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    padding-left: 0.1em;
+}
+
+#storlets .count {
+    background-color: white;
+    border-radius: 10px;
+    font-size: 32px;
+    font-weight: bold;
+    padding-top: 0.85em;
+    text-align: center;
 }

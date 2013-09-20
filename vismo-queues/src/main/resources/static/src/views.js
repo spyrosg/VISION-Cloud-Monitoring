@@ -135,13 +135,25 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
     extend(eventsView).with(Observable);
 
     var storletsView = {
-        el: dom.id('#storlets'),
+        name: dom.$('#storlets .name'),
+        count: dom.$('#storlets .count'),
 
         setup: function(model) {
             this.model = model;
         },
 
         update: function(/*args*/) {
+            if (arguments[0] !== 'storlets') {
+                return;
+            }
+
+            console.log('update:', arguments[0]);
+
+            var name = arguments[1],
+                count = parseInt(arguments[2], 10);
+
+            this.name.textContent = name;
+            this.count.textContent = count + '%';
         }
     };
 
