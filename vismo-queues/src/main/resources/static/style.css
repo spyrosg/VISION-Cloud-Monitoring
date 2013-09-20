@@ -1,10 +1,31 @@
 
-header {
-    font-family: Didot;
+body {
+  background-color: #F1F2F2;
 }
 
-body {
-    padding: 1em 0 0em 3em;
+header {
+    font-family: Didot;
+    background-color: #060B01;
+    color: white;
+    padding-left: 2em;
+    padding-top: 0.5em;
+    height: 80px;
+}
+
+.stripe {
+  background-color: lightgrey;
+}
+
+#main {
+    padding: 1em 0 0 3em;
+}
+
+form {
+  background-color: white;
+  width: 500px;
+  padding: 0.8em 0.8em;
+  border-radius: 10px;
+  float: left;
 }
 
 form div + div {
@@ -50,6 +71,11 @@ li {
 
 #events {
     padding-left: 120px; /* same size as the label elements */
+    background-color: white;
+    padding: 0.8em 0.8em;
+    margin-left: 1em;
+    width: 60%;
+    float: left;
 }
 
 .button {
@@ -59,9 +85,4 @@ li {
 span .e {
     padding: 5px;
     display: inline-block;
-}
-
-#graph {
-    width: 300px;
-    height: 50px;
 }

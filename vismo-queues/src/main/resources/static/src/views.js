@@ -134,20 +134,20 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
 
     extend(eventsView).with(Observable);
 
-    var graphView = {
-        el: dom.id('graph'),
+    var storletsView = {
+        el: dom.id('#storlets'),
 
         setup: function(model) {
-            // create an SVG element inside the #graph div that fills 100% of the div
-            var graph = d3.select(this.el).append("svg:svg").attr("width", "100%").attr("height", "100%");
+            this.model = model;
+        },
+
+        update: function(/*args*/) {
         }
     };
-
-    extend(graphView).with(Observable);
 
     return {
         queuesView: queuesView,
         eventsView: eventsView,
-        graphView: graphView
+        storletsView: storletsView
     };
 });
