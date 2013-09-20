@@ -2,6 +2,7 @@ package gr.ntua.vision.monitoring.perf;
 
 import gr.ntua.vision.monitoring.dispatch.EventDispatcher;
 
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
@@ -27,6 +28,8 @@ public class ConstantSizeEventService implements EventService {
         private final long            noEvents;
         /***/
         private final String          topic;
+        /***/
+        private static final Random   rng = new Random();
 
 
         /**
@@ -55,7 +58,11 @@ public class ConstantSizeEventService implements EventService {
         @Override
         public void run() {
             for (int i = 0; i < noEvents; ++i) {
-                dispatcher.newEvent().field("topic", topic).field("tenant", "ntua").field("user", "vassilis").field("container", "x1").field("operation", "GET").field("dummy", dummyValue).send();
+                double lat = 10 * rng.nextDouble(); // [0, 10) seconds
+
+                dispatcher.newEvent().field("topic", topic).field("tenant", "ntua").field("user", "vassilis")
+                        .field("container", "x1").field("operation", "GET").field("transaction-latency", lat)
+                        .field("dummy", dummyValue).send();
                 ++noSentEvents;
             }
 
