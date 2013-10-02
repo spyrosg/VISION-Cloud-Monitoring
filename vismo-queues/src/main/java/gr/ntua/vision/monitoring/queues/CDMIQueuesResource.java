@@ -12,12 +12,15 @@ import java.util.Map;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 
@@ -28,6 +31,8 @@ import javax.ws.rs.core.Response.Status;
 @Consumes(APPLICATION_CDMI_QUEUE)
 @Produces(APPLICATION_CDMI_QUEUE)
 public class CDMIQueuesResource {
+    /***/
+    private String               corsHeaders;
     /** the event registry. */
     private final QueuesRegistry registry;
 
@@ -43,6 +48,56 @@ public class CDMIQueuesResource {
 
 
     /**
+     * This OPTIONS request/response is necessary if you consumes other format than text/plain or if you use other HTTP verbs than
+     * GET and POST
+     * 
+     * @param accessControlRequestHeaders
+     * @return an 200 response.
+     */
+    @OPTIONS
+    public Response corsResource(@HeaderParam("Access-Control-Request-Headers") final String accessControlRequestHeaders) {
+        corsHeaders = accessControlRequestHeaders;
+        return toCORS(Response.ok(), accessControlRequestHeaders);
+    }
+
+
+    /**
+     * This OPTIONS request/response is necessary if you consumes other format than text/plain or if you use other HTTP verbs than
+     * GET and POST
+     * 
+     * @param accessControlRequestHeaders
+     * @param queue
+     * @return an 200 response.
+     */
+    @OPTIONS
+    @Path("{queue}")
+    public Response corsResource(@HeaderParam("Access-Control-Request-Headers") final String accessControlRequestHeaders,
+            @SuppressWarnings("unused") @PathParam("queue") final String queue) {
+        corsHeaders = accessControlRequestHeaders;
+        return toCORS(Response.ok(), accessControlRequestHeaders);
+    }
+
+
+    /**
+     * This OPTIONS request/response is necessary if you consumes other format than text/plain or if you use other HTTP verbs than
+     * GET and POST
+     * 
+     * @param accessControlRequestHeaders
+     * @param queue
+     * @param topic
+     * @return an 200 response.
+     */
+    @OPTIONS
+    @Path("{queue}/{topic}")
+    public Response corsResource(@HeaderParam("Access-Control-Request-Headers") final String accessControlRequestHeaders,
+            @SuppressWarnings("unused") @PathParam("queue") final String queue,
+            @SuppressWarnings("unused") @PathParam("topic") final String topic) {
+        corsHeaders = accessControlRequestHeaders;
+        return toCORS(Response.ok(), accessControlRequestHeaders);
+    }
+
+
+    /**
      * @param queueName
      * @param topic
      * @return the {@link Response} object.
@@ -53,10 +108,10 @@ public class CDMIQueuesResource {
         try {
             final CDMIQueue q = registry.register(queueName, topic);
 
-            return Response.created(URI.create("/")).header(X_CDMI, X_CDMI_VERSION).entity(CDMIQueue.toBean(q)).build();
+            return toCORS(Response.created(URI.create("/")).header(X_CDMI, X_CDMI_VERSION).entity(CDMIQueue.toBean(q)));
         } catch (final CDMIQueueException e) {
-            return Response.status(Status.BAD_REQUEST).header(X_CDMI, X_CDMI_VERSION).type(MediaType.TEXT_PLAIN_TYPE)
-                    .entity(e.getMessage()).build();
+            return toCORS(Response.status(Status.BAD_REQUEST).header(X_CDMI, X_CDMI_VERSION).type(MediaType.TEXT_PLAIN_TYPE)
+                    .entity(e.getMessage()));
         }
     }
 
@@ -78,10 +133,10 @@ public class CDMIQueuesResource {
             } else
                 registry.unregister(queueName);
 
-            return Response.noContent().header(X_CDMI, X_CDMI_VERSION).build();
+            return toCORS(Response.noContent().header(X_CDMI, X_CDMI_VERSION));
         } catch (final CDMIQueueException e) {
-            return Response.status(Status.BAD_REQUEST).header(X_CDMI, X_CDMI_VERSION).type(MediaType.TEXT_PLAIN_TYPE)
-                    .entity(e.getMessage()).build();
+            return toCORS(Response.status(Status.BAD_REQUEST).header(X_CDMI, X_CDMI_VERSION).type(MediaType.TEXT_PLAIN_TYPE)
+                    .entity(e.getMessage()));
         }
     }
 
@@ -93,8 +148,8 @@ public class CDMIQueuesResource {
     @GET
     @Path("topics")
     @Produces(MediaType.APPLICATION_JSON)
-    public String[] getAvailableTopics() {
-        return registry.listAvailableTopics();
+    public Response getAvailableTopics() {
+        return toCORS(Response.ok(registry.listAvailableTopics()));
     }
 
 
@@ -105,13 +160,13 @@ public class CDMIQueuesResource {
      * @see gr.ntua.vision.monitoring.queues.QueuesRegistry#list()
      */
     @GET
-    public List<CDMIQueueBean> listQueues() {
+    public Response listQueues() {
         final ArrayList<CDMIQueueBean> beans = new ArrayList<CDMIQueueBean>();
 
         for (final CDMIQueue q : registry.list())
             beans.add(CDMIQueue.toBean(q));
 
-        return beans;
+        return toCORS(Response.ok(beans));
     }
 
 
@@ -128,8 +183,8 @@ public class CDMIQueuesResource {
         try {
             return cdmiReadQueueResponse(queueName, registry.getCDMIEvents(queueName));
         } catch (final CDMIQueueException e) {
-            return Response.status(Status.BAD_REQUEST).header(X_CDMI, X_CDMI_VERSION).type(MediaType.TEXT_PLAIN_TYPE)
-                    .entity(e.getMessage()).build();
+            return toCORS(Response.status(Status.BAD_REQUEST).header(X_CDMI, X_CDMI_VERSION).type(MediaType.TEXT_PLAIN_TYPE)
+                    .entity(e.getMessage()));
         }
     }
 
@@ -140,11 +195,36 @@ public class CDMIQueuesResource {
      *            the list of cdmi events.
      * @return the cdmi successfully created queue response.
      */
-    private static Response cdmiReadQueueResponse(final String queueName, final List<Map<String, Object>> list) {
+    private Response cdmiReadQueueResponse(final String queueName, final List<Map<String, Object>> list) {
         final CDMIQueueListBean bean = new CDMIQueueListBean(queueName);
 
         bean.setValue(list);
 
-        return Response.ok(bean).header(X_CDMI, X_CDMI_VERSION).build();
+        return toCORS(Response.ok(bean).header(X_CDMI, X_CDMI_VERSION));
+    }
+
+
+    /**
+     * @param req
+     * @return CORS-ed a response object.
+     */
+    private Response toCORS(final ResponseBuilder req) {
+        return toCORS(req, corsHeaders);
+    }
+
+
+    /**
+     * @param req
+     * @param returnMethod
+     * @return a cors-ed response object.
+     */
+    private static Response toCORS(final ResponseBuilder req, final String returnMethod) {
+        final ResponseBuilder rb = req.header("Access-Control-Allow-Origin", "*").header("Access-Control-Allow-Methods",
+                                                                                         "GET, POST, PUT, DELETE, OPTIONS");
+
+        if (!returnMethod.isEmpty())
+            rb.header("Access-Control-Allow-Headers", returnMethod);
+
+        return rb.build();
     }
 }
