@@ -222,7 +222,7 @@ public class CDMIQueuesResource {
         final ResponseBuilder rb = req.header("Access-Control-Allow-Origin", "*").header("Access-Control-Allow-Methods",
                                                                                          "GET, POST, PUT, DELETE, OPTIONS");
 
-        if (!returnMethod.isEmpty())
+        if (returnMethod != null && !returnMethod.isEmpty())
             rb.header("Access-Control-Allow-Headers", returnMethod);
 
         return rb.build();
