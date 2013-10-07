@@ -85,7 +85,7 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
 
                     eventList.forEach(function(e) {
                         if (e.topic === 'storletProgress') {
-                            self.notify('storlets', e.target, e.progress);
+                            self.notify('storlets', e['originating-service'], e.progress);
                         }
                     });
                 })
