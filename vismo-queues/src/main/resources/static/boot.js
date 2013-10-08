@@ -4,6 +4,7 @@
 
 requirejs.config({
     baseUrl: '.',
+    urlArgs: "bust=" + (new Date()).getTime(),
     paths: {
         // external libraries used
         q: 'lib/q.min',
