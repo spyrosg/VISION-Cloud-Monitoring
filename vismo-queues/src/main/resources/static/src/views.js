@@ -56,26 +56,19 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
             }
 
             var self = this,
-                eventList = arguments[1];
+                e = arguments[1];
 
-            console.log('list with', eventList.length, 'events');
-
-            if (eventList.length > 0) {
-                eventList.
-                    filter(function(e) {
-                        return ('timestamp' in e) || ('id' in e);
-                    }).
-                    filter(function(e) {
-                        if ('timestamp' in e) {
-                            return !(e.timestamp in self.known_events);
-                        }
-
-                        return !(e.id in self.known_events);
-                    }).
-                    forEach(function(e) {
-                        self.render(e);
-                    });
+            if (!('timestamp' in e) && !('id' in e)) {
+                return;
             }
+            if ('timestamp' in e && e.timestamp in self.known_events) {
+                return;
+            }
+            if ('id' in e && e.id in self.known_events) {
+                return;
+            }
+
+            self.render(e);
         },
 
         render: function(e) {
@@ -150,7 +143,9 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
             console.log('update:', arguments[0]);
 
             var name = arguments[1],
-                count = parseInt(arguments[2], 10);
+                event = arguments[2],
+                count = parseInt(event.progress, 10),
+                name = event.tenantId + '.' + e.containerId + '.' + e.storlet_name;
 
             this.name.textContent = name;
             this.count.textContent = count + '%';

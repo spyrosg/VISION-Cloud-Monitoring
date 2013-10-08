@@ -49,13 +49,11 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
 
             this
                 .service.create(name, topic)
-                .then(
-                    function() {
+                .then(function() {
                         self.notify('queue', name);
                         self.notify('new:queue', name);
                         self.reset_read_events_timer(name);
-                    },
-                    function(req) {
+                    }, function(req) {
                         console.error('error creating queue:', req.statusText + ', ' + req.responseText);
                     })
                 .done();
@@ -78,14 +76,17 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
         read_queue: function(name) {
             var self = this;
 
+
             this
                 .service.read(name)
                 .then(function(eventList) {
-                    self.notify('events', eventList);
+                    console.log('got', eventList.length, 'events');
 
                     eventList.forEach(function(e) {
-                        if (e.topic === 'storletProgress') {
-                            self.notify('storlets', e.target, e.progress);
+                        if (e.topic !== 'storletProgress') {
+                            self.notify('events', e);
+                        } else {
+                            self.notify('storlets', e);
                         }
                     });
                 })
