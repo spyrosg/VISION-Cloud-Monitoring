@@ -13,8 +13,12 @@ define(['dom'], function(dom) {
             this.register_on_click();
         },
 
-        get_value: function() {
+        get_name: function() {
             return this.el['queue'].value;
+        },
+
+        get_topic: function() {
+            return this.el['topic'].value;
         },
 
         register_on_click: function() {
@@ -22,7 +26,7 @@ define(['dom'], function(dom) {
 
             dom.on('submit', this.el, function(evt) {
                 evt.preventDefault();
-                self.model.create_queue(self.get_value(), '*');
+                self.model.create_queue(self.get_name(), self.get_topic());
             });
         }
     };
