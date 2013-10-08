@@ -129,7 +129,7 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
 
             var event = arguments[1],
                 count = parseInt(event.progress, 10),
-                name = event.tenantId + '.' + event.containerId + '.' + event.storlet_name;
+                name = event.tenantID + '.' + event.containerID + '.' + event.storlet_name;
 
             this.name.textContent = name;
             this.count.setAttribute('value', count);
