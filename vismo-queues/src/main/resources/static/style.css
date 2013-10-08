@@ -9,31 +9,32 @@ header {
     color: white;
     padding-left: 2em;
     padding-top: 0.5em;
-    height: 80px;
+    height: 4rem;
 }
 
-form {
+#queue-entry {
     background-color: white;
-    width: 500px;
-    padding: 0.8em 0.8em;
+    width: 800px;
+    padding: 0.8em;
+    margin: 1em;
     border-radius: 10px;
 }
 
-form div + div {
+#queue-entry div + div {
     margin-top: 1em;
 }
 
-label {
+#queue-entry label {
     display: inline-block;
     width: 180px;
     text-align: right;
 }
 
-button {
+#queue-entry button {
     margin-left: .5em;
 }
 
-input {
+#queue-entry input {
     font: 1em sans-serif;
 
     width: 300px;
@@ -43,9 +44,13 @@ input {
     border: 1px solid #999;
 }
 
-input:focus {
+#queue-entry input:focus {
     /* To give a little highlight on active elements */
     border-color: #000;
+}
+
+#queue-entry .button {
+    padding-left: 180px; /* same size as the label elements */
 }
 
 ul {
@@ -60,54 +65,51 @@ li {
     border-bottom: 1px solid black;
 }
 
-.button {
-    padding-left: 180px; /* same size as the label elements */
-}
-
 span .e {
     padding: 5px;
     display: inline-block;
 }
 
 .stripe {
-  background-color: lightgrey;
+    height: 1rem;
+    background-color: lightgrey;
 }
 
-#main {
+#content {
     padding: 1em 0 0 3em;
-    overflow: hidden;
+    display: flex;
 }
 
 #events {
-    padding-left: 120px; /* same size as the label elements */
+    margin-top: 1em;
+    margin-left: 4em;
     background-color: white;
-    padding: 0.8em 0.8em;
-    margin-left: 1em;
-    width: 60%;
+    padding: 0.8em;
+    width: 66%;
+    border-radius: 5px;
 }
 
 #storlets {
+    margin: 1em;
     background-color: white;
-    width: 90px;
-    height: 120px;
-    margin: 1em 0;
-    border-radius: 10px;
-    border: 1px solid black;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    height: 40px;
 }
 
 #storlets .name {
+    width: 180px;
     background-color: red;
     border-bottom: 1px solid black;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
     padding-left: 0.1em;
+    text-align: center;
 }
 
 #storlets .count {
     background-color: white;
-    border-radius: 10px;
-    font-size: 32px;
-    font-weight: bold;
-    padding-top: 0.85em;
-    text-align: center;
+    width: 99%;
+    /* -webkit-transform: rotate(270deg);
+    -moz-transform: rotate(270deg); */
 }

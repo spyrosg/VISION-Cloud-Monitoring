@@ -42,8 +42,6 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
     var eventsView = {
         el: dom.$('#events ul'),
 
-        known_events: {},
-
         setup: function(model) {
             this.model = model;
             this.insert_into_list.el = this.el;
@@ -56,26 +54,9 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
             }
 
             var self = this,
-                eventList = arguments[1];
+                e = arguments[1];
 
-            console.log('list with', eventList.length, 'events');
-
-            if (eventList.length > 0) {
-                eventList.
-                    filter(function(e) {
-                        return ('timestamp' in e) || ('id' in e);
-                    }).
-                    filter(function(e) {
-                        if ('timestamp' in e) {
-                            return !(e.timestamp in self.known_events);
-                        }
-
-                        return !(e.id in self.known_events);
-                    }).
-                    forEach(function(e) {
-                        self.render(e);
-                    });
-            }
+            self.render(e);
         },
 
         render: function(e) {
@@ -90,7 +71,6 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
             from.textContent = ', from: ' + e['originating-machine'] + '/' + e['originating-service'];
             from.classList.add('e');
 
-            this.known_events[e.timestamp || e.id] = true;
             delete e['originating-machine'];
             delete e['originating-service'];
             delete e['timestamp'];
@@ -147,13 +127,13 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
                 return;
             }
 
-            console.log('update:', arguments[0]);
-
             var name = arguments[1],
-                count = parseInt(arguments[2], 10);
+                event = arguments[2],
+                count = parseInt(event.progress, 10),
+                name = event.tenantId + '.' + e.containerId + '.' + e.storlet_name;
 
             this.name.textContent = name;
-            this.count.textContent = count + '%';
+            this.count.setAttribute('value', count);
         }
     };
 
