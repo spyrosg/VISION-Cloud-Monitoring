@@ -92,12 +92,13 @@ span .e {
 #storlets {
     margin: 1em;
     background-color: white;
-    width: 180px;
-    border-radius: 5px;
-    border: 1px solid black;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    height: 40px;
 }
 
 #storlets .name {
+    width: 180px;
     background-color: red;
     border-bottom: 1px solid black;
     border-top-left-radius: 5px;
@@ -108,9 +109,7 @@ span .e {
 
 #storlets .count {
     background-color: white;
-    border-radius: 10px;
-    font-size: 32px;
-    font-weight: bold;
-    padding-top: 0.85em;
-    text-align: center;
+    width: 99%;
+    /* -webkit-transform: rotate(270deg);
+    -moz-transform: rotate(270deg); */
 }

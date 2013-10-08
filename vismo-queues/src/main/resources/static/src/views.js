@@ -42,8 +42,6 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
     var eventsView = {
         el: dom.$('#events ul'),
 
-        known_events: {},
-
         setup: function(model) {
             this.model = model;
             this.insert_into_list.el = this.el;
@@ -57,16 +55,6 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
 
             var self = this,
                 e = arguments[1];
-
-            if (!('timestamp' in e) && !('id' in e)) {
-                return;
-            }
-            if ('timestamp' in e && e.timestamp in self.known_events) {
-                return;
-            }
-            if ('id' in e && e.id in self.known_events) {
-                return;
-            }
 
             self.render(e);
         },
@@ -83,7 +71,6 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
             from.textContent = ', from: ' + e['originating-machine'] + '/' + e['originating-service'];
             from.classList.add('e');
 
-            this.known_events[e.timestamp || e.id] = true;
             delete e['originating-machine'];
             delete e['originating-service'];
             delete e['timestamp'];
@@ -140,15 +127,13 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
                 return;
             }
 
-            console.log('update:', arguments[0]);
-
             var name = arguments[1],
                 event = arguments[2],
                 count = parseInt(event.progress, 10),
                 name = event.tenantId + '.' + e.containerId + '.' + e.storlet_name;
 
             this.name.textContent = name;
-            this.count.textContent = count + '%';
+            this.count.setAttribute('value', count);
         }
     };
 

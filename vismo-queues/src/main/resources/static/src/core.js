@@ -73,22 +73,40 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
             }, 1000);
         },
 
+        known_events: {},
+
+        is_known_event: function(e) {
+            if ('timestamp' in e && e.timestamp in this.known_events) {
+                return true;
+            }
+            if ('id' in e && e.id in this.known_events) {
+                return true;
+            }
+
+            return false;
+        },
+
         read_queue: function(name) {
             var self = this;
-
 
             this
                 .service.read(name)
                 .then(function(eventList) {
                     console.log('got', eventList.length, 'events');
 
-                    eventList.forEach(function(e) {
-                        if (e.topic !== 'storletProgress') {
-                            self.notify('events', e);
-                        } else {
-                            self.notify('storlets', e);
-                        }
-                    });
+                    eventList
+                        .filter(function(e) {
+                            return !self.is_known_event(e);
+                        })
+                        .forEach(function(e) {
+                            self.known_events[e.timestamp || e.id] = true;
+
+                            if (e.topic !== 'storletProgress') {
+                                self.notify('events', e);
+                            } else {
+                                self.notify('storlets', e);
+                            }
+                        });
                 })
                 .done();
         },
