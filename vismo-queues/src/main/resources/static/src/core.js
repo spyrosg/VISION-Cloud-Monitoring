@@ -76,7 +76,6 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
         read_queue: function(name) {
             var self = this;
 
-
             this
                 .service.read(name)
                 .then(function(eventList) {

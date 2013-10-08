@@ -148,7 +148,7 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
                 name = event.tenantId + '.' + e.containerId + '.' + e.storlet_name;
 
             this.name.textContent = name;
-            this.count.textContent = count + '%';
+            this.count.setAttribute('value', count);
         }
     };
 
