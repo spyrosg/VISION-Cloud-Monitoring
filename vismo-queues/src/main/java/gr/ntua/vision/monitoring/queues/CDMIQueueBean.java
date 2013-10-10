@@ -75,6 +75,17 @@ public class CDMIQueueBean {
 
 
     /**
+     * Constructor.
+     * 
+     * @param objectName
+     */
+    public CDMIQueueBean(String objectName) {
+    	this();
+    	this.objectName = objectName;
+	}
+
+
+	/**
      * @return the capabilitiesURI
      */
     public String getCapabilitiesURI() {
