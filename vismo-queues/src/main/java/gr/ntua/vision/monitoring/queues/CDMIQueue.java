@@ -21,7 +21,7 @@ public class CDMIQueue {
     /** the list of available events. */
     private final LinkedBlockingQueue<MonitoringEvent> queue;
     /** the associated topic */
-    private final String topic;
+    public final String topic;
 
 
     /**

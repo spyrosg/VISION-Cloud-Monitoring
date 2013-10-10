@@ -196,7 +196,15 @@ public class CDMIQueuesResource {
      * @return the cdmi successfully created queue response.
      */
     private Response cdmiReadQueueResponse(final String queueName, final List<Map<String, Object>> list) {
-        final CDMIQueueListBean bean = new CDMIQueueListBean(queueName);
+    	String topic = null;
+    	
+    	for (final CDMIQueue q : registry.list())
+    		if (q.name.equals(queueName)) {
+    			topic = q.topic;
+    			break;
+    		}
+    	
+        final CDMIQueueListBean bean = new CDMIQueueListBean(queueName, topic);
 
         bean.setValue(list);
 

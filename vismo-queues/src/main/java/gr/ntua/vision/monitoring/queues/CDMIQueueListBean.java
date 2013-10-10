@@ -29,8 +29,8 @@ public class CDMIQueueListBean extends CDMIQueueBean {
      * 
      * @param objectName
      */
-    public CDMIQueueListBean(final String objectName) {
-        super(objectName);
+    public CDMIQueueListBean(final String objectName, final String topic) {
+        super(objectName, topic);
         this.value = Collections.emptyList();
     }
 

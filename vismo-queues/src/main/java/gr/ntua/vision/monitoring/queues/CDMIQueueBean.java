@@ -71,18 +71,7 @@ public class CDMIQueueBean {
         this.metadata = Collections.singletonMap("topic", (Object)topic);
     }
 
-
-    /**
-     * Constructor.
-     * 
-     * @param objectName
-     */
-    public CDMIQueueBean(String objectName) {
-    	this();
-    	this.objectName = objectName;
-	}
-
-
+    
 	/**
      * @return the capabilitiesURI
      */
