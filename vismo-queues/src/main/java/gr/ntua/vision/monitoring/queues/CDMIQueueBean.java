@@ -14,8 +14,6 @@ public class CDMIQueueBean {
     /***/
     private static final String              COMPLETE_STATUS      = "Complete";
     /***/
-    private static final Map<String, Object> DEFAULT_METADATA     = Collections.emptyMap();
-    /***/
     private static final String              DEFAULT_QUEUE_VALUES = "";
     /***/
     private static final String              DOMAIN_PREFIX        = "/cdmi_domains/";
@@ -57,7 +55,7 @@ public class CDMIQueueBean {
         this.parentURI = PARENT_ROOT;
         this.capabilitiesURI = CAPABILITIES_URI;
         this.completionStatus = COMPLETE_STATUS;
-        this.metadata = DEFAULT_METADATA;
+        this.metadata = Collections.emptyMap();
         this.queueValues = DEFAULT_QUEUE_VALUES;
     }
 
@@ -70,7 +68,7 @@ public class CDMIQueueBean {
     public CDMIQueueBean(final String objectName, final String topic) {
         this();
         this.objectName = objectName;
-        this.metadata.put("topic", topic);
+        this.metadata = Collections.singletonMap("topic", (Object)topic);
     }
 
 
