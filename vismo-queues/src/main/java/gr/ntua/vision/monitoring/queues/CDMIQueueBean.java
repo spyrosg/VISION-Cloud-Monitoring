@@ -47,7 +47,6 @@ public class CDMIQueueBean {
     /** mandatory. */
     private String                           queueValues;
 
-
     /**
      * Constructor.
      */
@@ -68,9 +67,10 @@ public class CDMIQueueBean {
      * 
      * @param objectName
      */
-    public CDMIQueueBean(final String objectName) {
+    public CDMIQueueBean(final String objectName, final String topic) {
         this();
         this.objectName = objectName;
+        this.metadata.put("topic", topic);
     }
 
 

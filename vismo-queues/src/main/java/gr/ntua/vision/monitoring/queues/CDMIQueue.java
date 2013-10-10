@@ -20,6 +20,8 @@ public class CDMIQueue {
     public final String                                name;
     /** the list of available events. */
     private final LinkedBlockingQueue<MonitoringEvent> queue;
+    /** the associated topic */
+    private final String topic;
 
 
     /**
@@ -29,8 +31,9 @@ public class CDMIQueue {
      *            the name of the queue.
      * @param size
      */
-    public CDMIQueue(final String name, final int size) {
+    public CDMIQueue(final String name, final String topic, final int size) {
         this.name = name;
+        this.topic = topic;
         this.queue = new LinkedBlockingQueue<MonitoringEvent>(size);
     }
 
@@ -114,6 +117,6 @@ public class CDMIQueue {
      * @return the corresponding {@link CDMIQueueBean}.
      */
     public static CDMIQueueBean toBean(final CDMIQueue q) {
-        return new CDMIQueueBean(q.name);
+        return new CDMIQueueBean(q.name, q.topic);
     }
 }
