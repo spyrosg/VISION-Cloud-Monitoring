@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+  <head lang="en">
+    <meta charset="utf-8">
+    <title>VISION Cloud CDMI Notification Service</title>
+    <link rel="icon" type="image/png" href="pyrforos.png"/>
+    <link href="normalize.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+  </head>
+  <style>
+    #ntua {
+      margin: 0px auto;
+    }
+
+    #content {
+      margin: 0px auto;
+    }
+  </style>
+  <body>
+    <header>
+      <h2>VISION Cloud CDMI Notification Service</h2>
+    </header>
+
+    <section id="content" data-server-ip="5.255.144.199:9997">
+      <iframe id="ntua" src="ntua.html" width="300" height="150" seamless="seamless"></iframe>
+    </section>
+
+    <script type="text/javascript">
+        window.addEventListener('load', function() {
+            console.log('main window loaded');
+
+            window.addEventListener('message', function(evt) {
+                if (evt.origin !== window.location.origin) {
+                    return;
+                }
+
+                var server_root_ip = document.getElementById('content').dataset.serverIp;
+
+                console.log('the ip in parent is', server_root_ip);
+
+                evt.source.postMessage(server_root_ip, window.location.origin);
+            }, false);
+        }, false);
+    </script>
+  </body>
+</html>
