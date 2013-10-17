@@ -138,7 +138,7 @@ public class QueuesRegistry {
      *             when the topic is not available or a queue with the same name already exists.
      */
     public CDMIQueue register(final String queueName, final String topic) throws CDMIQueueException {
-        final CDMIQueue q = new CDMIQueue(queueName, size);
+        final CDMIQueue q = new CDMIQueue(queueName, topic, size);
 
         if (queuesList.contains(q))
             throw new CDMIQueueException("queue already exists: " + queueName);
@@ -194,7 +194,7 @@ public class QueuesRegistry {
      * @throws CDMIQueueException
      */
     public void unregister(final String queueName) throws CDMIQueueException {
-        final CDMIQueue q = new CDMIQueue(queueName, size);
+        final CDMIQueue q = new CDMIQueue(queueName, null, size);
         final int idx = queuesList.indexOf(q);
 
         if (idx == -1)

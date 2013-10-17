@@ -42,8 +42,6 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
     var eventsView = {
         el: dom.$('#events ul'),
 
-        known_events: {},
-
         setup: function(model) {
             this.model = model;
             this.insert_into_list.el = this.el;
@@ -56,26 +54,9 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
             }
 
             var self = this,
-                eventList = arguments[1];
+                e = arguments[1];
 
-            console.log('list with', eventList.length, 'events');
-
-            if (eventList.length > 0) {
-                eventList.
-                    filter(function(e) {
-                        return ('timestamp' in e) || ('id' in e);
-                    }).
-                    filter(function(e) {
-                        if ('timestamp' in e) {
-                            return !(e.timestamp in self.known_events);
-                        }
-
-                        return !(e.id in self.known_events);
-                    }).
-                    forEach(function(e) {
-                        self.render(e);
-                    });
-            }
+            self.render(e);
         },
 
         render: function(e) {
@@ -90,7 +71,6 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
             from.textContent = ', from: ' + e['originating-machine'] + '/' + e['originating-service'];
             from.classList.add('e');
 
-            this.known_events[e.timestamp || e.id] = true;
             delete e['originating-machine'];
             delete e['originating-service'];
             delete e['timestamp'];
@@ -134,20 +114,31 @@ define(['dom', 'util', 'd3'], function(dom, util, d3) {
 
     extend(eventsView).with(Observable);
 
-    var graphView = {
-        el: dom.id('graph'),
+    var storletsView = {
+        name: dom.$('#storlets .name'),
+        count: dom.$('#storlets .count'),
 
         setup: function(model) {
-            // create an SVG element inside the #graph div that fills 100% of the div
-            var graph = d3.select(this.el).append("svg:svg").attr("width", "100%").attr("height", "100%");
+            this.model = model;
+        },
+
+        update: function(/*args*/) {
+            if (arguments[0] !== 'storlets') {
+                return;
+            }
+
+            var event = arguments[1],
+                count = parseInt(event.progress, 10),
+                name = event.tenantID + '.' + event.containerID + '.' + event.storlet_name;
+
+            this.name.textContent = name;
+            this.count.setAttribute('value', count);
         }
     };
-
-    extend(graphView).with(Observable);
 
     return {
         queuesView: queuesView,
         eventsView: eventsView,
-        graphView: graphView
+        storletsView: storletsView
     };
 });

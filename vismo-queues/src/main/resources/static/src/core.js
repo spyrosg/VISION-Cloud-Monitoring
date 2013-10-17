@@ -49,13 +49,11 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
 
             this
                 .service.create(name, topic)
-                .then(
-                    function() {
+                .then(function() {
                         self.notify('queue', name);
                         self.notify('new:queue', name);
                         self.reset_read_events_timer(name);
-                    },
-                    function(req) {
+                    }, function(req) {
                         console.error('error creating queue:', req.statusText + ', ' + req.responseText);
                     })
                 .done();
@@ -72,7 +70,20 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
 
             this.interval_fn_id = setInterval(function() {
                 self.read_queue(name);
-            }, 2000);
+            }, 1000);
+        },
+
+        known_events: {},
+
+        is_known_event: function(e) {
+            if ('timestamp' in e && e.timestamp in this.known_events) {
+                return true;
+            }
+            if ('id' in e && e.id in this.known_events) {
+                return true;
+            }
+
+            return false;
         },
 
         read_queue: function(name) {
@@ -81,7 +92,21 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
             this
                 .service.read(name)
                 .then(function(eventList) {
-                    self.notify('events', eventList);
+                    console.log('got', eventList.length, 'events');
+
+                    eventList
+                        .filter(function(e) {
+                            return !self.is_known_event(e);
+                        })
+                        .forEach(function(e) {
+                            self.known_events[e.timestamp || e.id] = true;
+
+                            if (e.topic !== 'storletProgress') {
+                                self.notify('events', e);
+                            } else {
+                                self.notify('storlets', e);
+                            }
+                        });
                 })
                 .done();
         },

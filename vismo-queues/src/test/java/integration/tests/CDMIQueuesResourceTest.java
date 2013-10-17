@@ -288,7 +288,7 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
         assertEquals("/cdmi_domains/" + queueName + "/", bean.getDomainURI());
         assertEquals("/cdmi_capabilities/queue/", bean.getCapabilitiesURI());
         assertEquals("Complete", bean.getCompletionStatus());
-        assertEquals(0, bean.getMetadata().size());
+        assertEquals(1, bean.getMetadata().size());
         assertHaveExpectedQueueValues(bean, noExpectedEvents);
     }
 
