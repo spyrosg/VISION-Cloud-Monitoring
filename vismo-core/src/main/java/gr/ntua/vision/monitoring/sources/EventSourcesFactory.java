@@ -98,6 +98,6 @@ public class EventSourcesFactory {
      * @return an address bound to all interfaces and the given port.
      */
     private static String withPort(final int port) {
-        return "tcp://0.0.0.0:" + port;
+        return "tcp://127.0.0.1:" + port;
     }
 }
