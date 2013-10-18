@@ -8,9 +8,6 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.Properties;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
@@ -19,11 +16,8 @@ import java.util.logging.Logger;
 public class VismoVMInfo implements VMInfo {
     /***/
     private static final InetAddress addr;
-    /***/
-    private static final Logger      log = Logger.getLogger(VismoVMInfo.class.getName());
 
     static {
-        activateLogger();
         addr = getAddress1();
     }
 
@@ -77,21 +71,8 @@ public class VismoVMInfo implements VMInfo {
         try {
             return isHostAddress1(ip);
         } catch (final SocketException e) {
-            log.warning(ip + " => " + e);
             return false;
         }
-    }
-
-
-    /***/
-    private static void activateLogger() {
-        final ConsoleHandler h = new ConsoleHandler();
-        final String pkg = VismoVMInfo.class.getPackage().getName();
-
-        h.setFormatter(new VismoFormatter());
-        h.setLevel(Level.ALL);
-        Logger.getLogger(pkg).addHandler(h);
-        Logger.getLogger(pkg).setLevel(Level.ALL);
     }
 
 
@@ -103,7 +84,6 @@ public class VismoVMInfo implements VMInfo {
 
         try {
             iface = getInterface();
-            log.config("selected " + iface + " interface");
         } catch (final SocketException e) {
             throw new RuntimeException(e);
         }
@@ -115,8 +95,6 @@ public class VismoVMInfo implements VMInfo {
 
             if (a instanceof Inet6Address)
                 continue;
-
-            log.config("selected " + a + " address");
 
             return a;
         }
