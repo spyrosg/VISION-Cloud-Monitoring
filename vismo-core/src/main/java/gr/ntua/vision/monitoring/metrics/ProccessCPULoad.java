@@ -6,25 +6,26 @@ import java.io.InputStreamReader;
 
 
 /**
- * Provides for the host cpu load. Uses the linux <code>uptime</code> command. The value reported is the system load average for
- * the last minute.
+ * This is used to provide for the cpu load of process. It uses top under the hood.
  */
-public class HostCPULoad {
+public class ProccessCPULoad {
     /***/
-    private static final String  uptime  = "uptime";
+    private static final String  top = "ps -o pid,comm,pcpu,rss -p";
     /***/
-    private final ProcessBuilder builder = new ProcessBuilder(uptime);
+    private final ProcessBuilder builder;
 
 
     /**
-     * 
+     * @param pid
+     *            the pid of the process to get the cpu load for
      */
-    public HostCPULoad() {
+    public ProccessCPULoad(final long pid) {
+        builder = new ProcessBuilder((top + String.valueOf(pid)).split(" "));
     }
 
 
     /**
-     * @return the host's cpu load.
+     * @return the process' cpu load.
      */
     public double get() {
         try {
@@ -32,7 +33,7 @@ public class HostCPULoad {
         } catch (final NumberFormatException e) {
             // NOP
         } catch (final IOException e) {
-            // NOP
+            e.printStackTrace();
         } catch (final InterruptedException e) {
             // NOP
         }
@@ -42,23 +43,31 @@ public class HostCPULoad {
 
 
     /**
-     * @return the host's cpu load.
+     * @return the process' cpu load.
      * @throws IOException
      * @throws InterruptedException
      */
     private String get1() throws IOException, InterruptedException {
+        builder.redirectErrorStream(true);
+
         final Process proc = builder.start();
 
         proc.getOutputStream().close();
 
         final BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-        final String line = reader.readLine();
-        final String[] fs = line.split(" ");
+        String line = null, prev = null;
+
+        while ((line = reader.readLine()) != null)
+            prev = line;
 
         reader.close();
         proc.waitFor();
 
-        // NOTE: the last three fields are the load averages for the last 1, 5, 15 minutes
-        return fs[fs.length - 3];
+        if (prev == null)
+            return "0";
+
+        final String[] fs = prev.split("\\s+");
+
+        return fs[fs.length - 2];
     }
 }
