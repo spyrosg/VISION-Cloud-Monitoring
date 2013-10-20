@@ -1,8 +1,10 @@
 package unit.tests;
 
+import gr.ntua.vision.monitoring.VismoVMInfo;
 import gr.ntua.vision.monitoring.metrics.HostCPULoad;
 
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 
 import junit.framework.TestCase;
 
@@ -12,16 +14,42 @@ import junit.framework.TestCase;
  */
 public class HostCPULoadTest extends TestCase {
     /***/
-    private HostCPULoad cpuLoad;
+    private HostCPULoad          cpuLoad;
+    /***/
+    private final CountDownLatch latch = new CountDownLatch(2);
+    /***/
+    private final VismoVMInfo    vm    = new VismoVMInfo();
 
 
     /**
      * @throws IOException
+     * @throws InterruptedException
      */
-    public void testShouldGetCPULoad() throws IOException {
+    public void testShouldGetCPULoad() throws IOException, InterruptedException {
         cpuLoad = new HostCPULoad();
 
-        System.err.println(cpuLoad.get());
-        assertTrue(cpuLoad.get() > 0);
+        final double load = cpuLoad.get();
+
+        latch.await();
+        System.err.println("cpu load for this host (" + vm.getAddress().getHostAddress() + ") is about " + load);
+        assertTrue("expecting cpu load for jvm to be greater than zero", load > 0);
+    }
+
+
+    /**
+     * @see junit.framework.TestCase#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        final PrimeCountingThread t1 = new PrimeCountingThread(latch);
+        t1.setDaemon(true);
+
+        final PrimeCountingThread t2 = new PrimeCountingThread(latch);
+        t2.setDaemon(true);
+
+        t1.start();
+        t2.start();
     }
 }
