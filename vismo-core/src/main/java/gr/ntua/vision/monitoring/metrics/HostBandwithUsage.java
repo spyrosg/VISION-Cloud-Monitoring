@@ -8,7 +8,8 @@ import java.util.Arrays;
 
 
 /**
- *
+ * This is used to report the total inbound/outbound bandwith usage of the host. It is using the linux <code>/proc/net/dev</code>
+ * under the hood.
  */
 public class HostBandwithUsage {
     /**
@@ -30,9 +31,9 @@ public class HostBandwithUsage {
             this.outbound = outbound;
         }
     }
+
     /***/
     private static final String  NET_FILE = "/proc/net/dev";
-
     /***/
     private final BufferedReader reader;
 
@@ -46,7 +47,7 @@ public class HostBandwithUsage {
 
 
     /**
-     * @return
+     * @return the inbound/outbound in bytes.
      */
     public Bandwidth get() {
         try {
@@ -62,7 +63,7 @@ public class HostBandwithUsage {
 
 
     /**
-     * @return
+     * @return the inbound/outbound in bytes.
      * @throws IOException
      */
     private long[] get1() throws IOException {

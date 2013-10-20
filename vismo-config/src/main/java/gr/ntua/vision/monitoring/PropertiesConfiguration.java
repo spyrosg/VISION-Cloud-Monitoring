@@ -150,7 +150,7 @@ public abstract class PropertiesConfiguration {
      * @param val
      * @param name
      */
-    
+
     private static void requireNonNullValue(final String val, final String name) {
         if (val == null)
             throw new Error("undefined configuration property: '" + name + "'");
