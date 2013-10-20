@@ -6,13 +6,16 @@ import java.io.InputStreamReader;
 
 
 /**
- * This is used to provide for the cpu load of process. It uses top under the hood.
+ * This is used to provide for the cpu load of process, averaged over all processors. It uses the linux <code>ps</code> command
+ * under the hood.
  */
 public class ProccessCPULoad {
     /***/
-    private static final String  top = "ps -o pid,comm,pcpu,rss -p";
+    private static final String  psCommand    = "ps -o pid,comm,pcpu,rss -p";
     /***/
     private final ProcessBuilder builder;
+    /***/
+    private static final int     noProcessors = Runtime.getRuntime().availableProcessors();
 
 
     /**
@@ -20,7 +23,7 @@ public class ProccessCPULoad {
      *            the pid of the process to get the cpu load for
      */
     public ProccessCPULoad(final long pid) {
-        builder = new ProcessBuilder((top + String.valueOf(pid)).split(" "));
+        builder = new ProcessBuilder((psCommand + String.valueOf(pid)).split(" "));
     }
 
 
@@ -29,7 +32,7 @@ public class ProccessCPULoad {
      */
     public double get() {
         try {
-            return Double.parseDouble(get1());
+            return Double.parseDouble(get1()) / noProcessors;
         } catch (final NumberFormatException e) {
             // NOP
         } catch (final IOException e) {
