@@ -78,7 +78,7 @@ public class HostBandwithUsage {
 
             System.err.println(Arrays.toString(fs));
             totalInbound += Long.parseLong(fs[1].split(":")[1]);
-            totalOutbound += Long.parseLong(fs[8]);
+            totalOutbound += Long.parseLong(fs[9]);
         }
 
         return new long[] { totalInbound, totalOutbound };
