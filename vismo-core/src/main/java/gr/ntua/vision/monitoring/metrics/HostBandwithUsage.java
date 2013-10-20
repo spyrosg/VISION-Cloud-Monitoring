@@ -77,7 +77,7 @@ public class HostBandwithUsage {
             final String[] fs = line.split("\\s+");
 
             System.err.println(Arrays.toString(fs));
-            totalInbound += Long.parseLong(fs[0].split(":")[1]);
+            totalInbound += Long.parseLong(fs[1].split(":")[1]);
             totalOutbound += Long.parseLong(fs[8]);
         }
 
