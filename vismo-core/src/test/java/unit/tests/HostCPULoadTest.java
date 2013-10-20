@@ -32,7 +32,7 @@ public class HostCPULoadTest extends TestCase {
 
         latch.await();
         System.err.println("cpu load for this host (" + vm.getAddress().getHostAddress() + ") is about " + load);
-        assertTrue("expecting cpu load for jvm to be greater than zero", load > 0);
+        assertTrue("expecting cpu load for this host to be greater than zero", load > 0);
     }
 
 

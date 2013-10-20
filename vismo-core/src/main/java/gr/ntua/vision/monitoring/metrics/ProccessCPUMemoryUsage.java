@@ -29,11 +29,11 @@ public class ProccessCPUMemoryUsage {
             this.memoryUsage = memoryUsage;
         }
     }
+
     /***/
     private static final int     noProcessors = Runtime.getRuntime().availableProcessors();
     /***/
     private static final String  psCommand    = "ps -o pid,comm,pcpu,rss -p";
-
     /***/
     private final ProcessBuilder builder;
 
