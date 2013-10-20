@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 
 
 /**
@@ -67,6 +68,7 @@ public class HostBandwithUsage {
     private long[] get1() throws IOException {
         reader.readLine();
         reader.readLine();
+
         long totalInbound = 0;
         long totalOutbound = 0;
         String line = null;
@@ -74,6 +76,7 @@ public class HostBandwithUsage {
         while ((line = reader.readLine()) != null) {
             final String[] fs = line.split("\\s+");
 
+            System.err.println(Arrays.toString(fs));
             totalInbound += Long.parseLong(fs[0].split(":")[1]);
             totalOutbound += Long.parseLong(fs[8]);
         }
