@@ -28,7 +28,7 @@ public class HostCPULoad {
      */
     public double get() {
         try {
-            return Double.parseDouble(get1());
+            return Double.parseDouble(get1().replace(",", ""));
         } catch (final NumberFormatException e) {
             // NOP
         } catch (final IOException e) {
