@@ -12,14 +12,14 @@ public class LinuxHostMemoryUsage implements HostMemoryUsage {
     /***/
     private static final String  memoryCommand = "free -b";
     /***/
-    private final ProcessBuilder builder       = new ProcessBuilder(memoryCommand);
+    private final ProcessBuilder builder;
 
 
     /**
      * 
      */
     public LinuxHostMemoryUsage() {
-        super();
+        builder = new ProcessBuilder(memoryCommand.split(" "));
     }
 
 
