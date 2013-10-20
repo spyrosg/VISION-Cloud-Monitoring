@@ -25,7 +25,7 @@ public class HostMemoryUsageTest extends TestCase {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void testShouldGetCPULoad() throws IOException, InterruptedException {
+    public void testShouldReportMemoryUsage() throws IOException, InterruptedException {
         memoryUsage = getHostMemoryUsage();
 
         final HostMemory mem = memoryUsage.get();

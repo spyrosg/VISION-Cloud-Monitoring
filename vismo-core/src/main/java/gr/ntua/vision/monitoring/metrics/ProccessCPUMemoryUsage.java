@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 
 
 /**
- * This is used to provide for the cpu load of process, averaged over all processors. It uses the linux <code>ps</code> command
+ * This is used to provide for the cpu load of a process, averaged over all processors. It uses the linux <code>ps</code> command
  * under the hood.
  */
 public class ProccessCPUMemoryUsage {

@@ -26,7 +26,7 @@ public class ProccessCPUMemoryUsageTest extends TestCase {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void testShouldGetCPULoad() throws IOException, InterruptedException {
+    public void testShouldReportCPUAndMemoryUsage() throws IOException, InterruptedException {
         final int pid = vm.getPID();
 
         usage = new ProccessCPUMemoryUsage(pid);
