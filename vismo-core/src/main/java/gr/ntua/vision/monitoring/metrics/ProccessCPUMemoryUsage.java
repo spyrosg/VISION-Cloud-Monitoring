@@ -9,20 +9,40 @@ import java.io.InputStreamReader;
  * This is used to provide for the cpu load of process, averaged over all processors. It uses the linux <code>ps</code> command
  * under the hood.
  */
-public class ProccessCPULoad {
-    /***/
-    private static final String  psCommand    = "ps -o pid,comm,pcpu,rss -p";
-    /***/
-    private final ProcessBuilder builder;
+public class ProccessCPUMemoryUsage {
+    /**
+     *
+     */
+    public static class CPUMemory {
+        /***/
+        public final double cpuLoad;
+        /***/
+        public final int    memoryUsage;
+
+
+        /**
+         * @param cpuLoad
+         * @param memoryUsage
+         */
+        public CPUMemory(final double cpuLoad, final int memoryUsage) {
+            this.cpuLoad = cpuLoad;
+            this.memoryUsage = memoryUsage;
+        }
+    }
     /***/
     private static final int     noProcessors = Runtime.getRuntime().availableProcessors();
+    /***/
+    private static final String  psCommand    = "ps -o pid,comm,pcpu,rss -p";
+
+    /***/
+    private final ProcessBuilder builder;
 
 
     /**
      * @param pid
      *            the pid of the process to get the cpu load for
      */
-    public ProccessCPULoad(final long pid) {
+    public ProccessCPUMemoryUsage(final long pid) {
         builder = new ProcessBuilder((psCommand + String.valueOf(pid)).split(" "));
     }
 
@@ -30,9 +50,11 @@ public class ProccessCPULoad {
     /**
      * @return the process' cpu load.
      */
-    public double get() {
+    public CPUMemory get() {
         try {
-            return Double.parseDouble(get1()) / noProcessors;
+            final String[] arr = get1();
+
+            return new CPUMemory(Double.parseDouble(arr[0]) / noProcessors, Integer.parseInt(arr[1]));
         } catch (final NumberFormatException e) {
             // NOP
         } catch (final IOException e) {
@@ -41,7 +63,7 @@ public class ProccessCPULoad {
             // NOP
         }
 
-        return 0;
+        return new CPUMemory(0, 0);
     }
 
 
@@ -50,7 +72,7 @@ public class ProccessCPULoad {
      * @throws IOException
      * @throws InterruptedException
      */
-    private String get1() throws IOException, InterruptedException {
+    private String[] get1() throws IOException, InterruptedException {
         builder.redirectErrorStream(true);
 
         final Process proc = builder.start();
@@ -67,10 +89,10 @@ public class ProccessCPULoad {
         proc.waitFor();
 
         if (prev == null)
-            return "0";
+            return new String[] { "0", "0" };
 
         final String[] fs = prev.split("\\s+");
 
-        return fs[fs.length - 2];
+        return new String[] { fs[fs.length - 2], fs[fs.length - 1] };
     }
 }
