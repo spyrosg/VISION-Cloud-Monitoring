@@ -59,7 +59,7 @@ public class LinuxHostMemoryUsage implements HostMemoryUsage {
         reader.readLine();
 
         final String total = reader.readLine().split("\\s+")[1];
-        final String used = reader.readLine().split("\\s+")[1];
+        final String used = reader.readLine().split("\\s+")[2];
 
         reader.close();
         proc.waitFor();
