@@ -6,7 +6,7 @@ import java.util.List;
 
 
 /**
- *
+ * TODO
  */
 public class CPUMemoryUsageRule extends PeriodicRule {
     /**
@@ -17,6 +17,7 @@ public class CPUMemoryUsageRule extends PeriodicRule {
         super(engine, period);
     }
 
+
     /**
      * @param engine
      * @param period
@@ -24,11 +25,9 @@ public class CPUMemoryUsageRule extends PeriodicRule {
      */
     public CPUMemoryUsageRule(final VismoRulesEngine engine, final long period, final String id) {
         super(engine, period, id);
-    
+    }
 
 
-
-    
     /**
      * @see gr.ntua.vision.monitoring.rules.RuleProc#performWith(java.lang.Object)
      */
@@ -38,6 +37,7 @@ public class CPUMemoryUsageRule extends PeriodicRule {
 
     }
 
+
     /**
      * @see gr.ntua.vision.monitoring.rules.PeriodicRule#aggregate(java.util.List, long, long)
      */
@@ -45,13 +45,5 @@ public class CPUMemoryUsageRule extends PeriodicRule {
     protected MonitoringEvent aggregate(final List<MonitoringEvent> list, final long tStart, final long tEnd) {
         // TODO Auto-generated method stub
         return null;
-    }    private static double hostCPULoad() {
-        
     }
-
-
-    private static double processCPULoad() {
-        return 0;
-    }
-
 }
