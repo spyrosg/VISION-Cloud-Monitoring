@@ -58,6 +58,9 @@ public class HostCPULoad {
         reader.close();
         proc.waitFor();
 
+        System.err.println("uptime: " + line);
+        System.err.println("last min avg load: " + fs[fs.length - 3]);
+
         // NOTE: the last three fields are the load averages for the last 1, 5, 15 minutes
         return fs[fs.length - 3];
     }
