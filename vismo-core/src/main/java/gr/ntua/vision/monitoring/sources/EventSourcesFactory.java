@@ -92,12 +92,23 @@ public class EventSourcesFactory {
                 socketFactory.newConnectedPushSocket(address));
     }
 
+    /**
+     * Check that we're running on a windows machine :(
+     *
+     * @return <code>true</code> if we're running on a windows machine.
+     */
+    private static boolean isWin() {
+        return System.getProperty("os.name").toLowerCase().contains("win");
+    }
 
     /**
      * @param port
      * @return an address bound to all interfaces and the given port.
      */
     private static String withPort(final int port) {
-        return "tcp://127.0.0.1:" + port;
+        if (isWin())
+            return "tcp://127.0.0.1:" + port;
+
+        return "tcp://*:" + port; // bind to all avail ifaces
     }
 }
