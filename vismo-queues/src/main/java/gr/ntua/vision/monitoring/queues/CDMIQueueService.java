@@ -57,7 +57,7 @@ public class CDMIQueueService {
         final WebAppBuilder builder = new WebAppBuilder();
 
         // connect to localhost, hopefully on the cloud head
-        final VismoEventRegistry registry = new VismoEventRegistry("tcp://localhost:56430"); 
+        final VismoEventRegistry registry = new VismoEventRegistry("tcp://localhost:56430");
         final QueuesRegistry queuesRegistry = new QueuesRegistry(registry, queueSize);
 
         builder.addProvider(CDMIQueueProdiver.class);

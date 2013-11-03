@@ -18,10 +18,10 @@ public class CDMIQueue {
     private static final Logger                        log = LoggerFactory.getLogger(CDMIQueue.class);
     /** the name of the queue. */
     public final String                                name;
+    /** the associated topic */
+    public final String                                topic;
     /** the list of available events. */
     private final LinkedBlockingQueue<MonitoringEvent> queue;
-    /** the associated topic */
-    public final String topic;
 
 
     /**

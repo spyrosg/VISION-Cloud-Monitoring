@@ -10,40 +10,41 @@ import java.util.UUID;
  */
 public class CDMIQueueBean {
     /***/
-    private static final String              CAPABILITIES_URI     = "/cdmi_capabilities/queue/";
+    private static final String CAPABILITIES_URI     = "/cdmi_capabilities/queue/";
     /***/
-    private static final String              COMPLETE_STATUS      = "Complete";
+    private static final String COMPLETE_STATUS      = "Complete";
     /***/
-    private static final String              DEFAULT_QUEUE_VALUES = "";
+    private static final String DEFAULT_QUEUE_VALUES = "";
     /***/
-    private static final String              DOMAIN_PREFIX        = "/cdmi_domains/";
+    private static final String DOMAIN_PREFIX        = "/cdmi_domains/";
     /***/
-    private static final String              OBJECT_TYPE          = CDMIQueueMediaTypes.APPLICATION_CDMI_QUEUE;
+    private static final String OBJECT_TYPE          = CDMIQueueMediaTypes.APPLICATION_CDMI_QUEUE;
     /***/
-    private static final String              PARENT_ROOT          = "/";
+    private static final String PARENT_ROOT          = "/";
     /***/
-    private static final String              PARENT_ROOT_ID       = UUID.randomUUID().toString();
+    private static final String PARENT_ROOT_ID       = UUID.randomUUID().toString();
 
     /** mandatory. */
-    private String                           capabilitiesURI;
+    private String              capabilitiesURI;
     /** mandatory. */
-    private String                           completionStatus;
+    private String              completionStatus;
     /** mandatory. */
-    private String                           domainURI;
+    private String              domainURI;
     /** mandatory. */
-    private Map<String, Object>              metadata;
+    private Map<String, Object> metadata;
     /** mandatory. */
-    private String                           objectID;
+    private String              objectID;
     /** mandatory. */
-    private String                           objectName;
+    private String              objectName;
     /** mandatory. */
-    private String                           objectType;
+    private String              objectType;
     /** mandatory. */
-    private String                           parentID;
+    private String              parentID;
     /** mandatory. */
-    private String                           parentURI;
+    private String              parentURI;
     /** mandatory. */
-    private String                           queueValues;
+    private String              queueValues;
+
 
     /**
      * Constructor.
@@ -68,11 +69,11 @@ public class CDMIQueueBean {
     public CDMIQueueBean(final String objectName, final String topic) {
         this();
         this.objectName = objectName;
-        this.metadata = Collections.singletonMap("topic", (Object)topic);
+        this.metadata = Collections.singletonMap("topic", (Object) topic);
     }
 
-    
-	/**
+
+    /**
      * @return the capabilitiesURI
      */
     public String getCapabilitiesURI() {
