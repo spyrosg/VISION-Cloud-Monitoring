@@ -22,7 +22,9 @@ import java.util.Map;
  */
 public class MetricsRule extends PeriodicRule {
     /***/
-    private static final int              pid = new VismoVMInfo().getPID();
+    private static final int              PID   = new VismoVMInfo().getPID();
+    /***/
+    private static final String           TOPIC = "metrics";
     /***/
     private final VismoEventFactory       factory;
     /***/
@@ -46,7 +48,7 @@ public class MetricsRule extends PeriodicRule {
         this.hostBandwith = new HostBandwithMetric();
         this.hostCPU = new HostCPULoadMetric();
         this.hostMemory = new LinuxHostMemoryMetric();
-        this.procMetric = new ProccessCPUMemoryMetric(pid);
+        this.procMetric = new ProccessCPUMemoryMetric(PID);
     }
 
 
@@ -62,7 +64,7 @@ public class MetricsRule extends PeriodicRule {
         this.hostBandwith = new HostBandwithMetric();
         this.hostCPU = new HostCPULoadMetric();
         this.hostMemory = new LinuxHostMemoryMetric();
-        this.procMetric = new ProccessCPUMemoryMetric(pid);
+        this.procMetric = new ProccessCPUMemoryMetric(PID);
     }
 
 
@@ -82,6 +84,8 @@ public class MetricsRule extends PeriodicRule {
     protected MonitoringEvent aggregate(final List<MonitoringEvent> list, final long tStart, final long tEnd) {
         final HashMap<String, Object> dict = new HashMap<String, Object>();
 
+        dict.put("topic", TOPIC);
+
         final Bandwidth b = hostBandwith.get();
 
         dict.put("inbound", b.inbound);
@@ -97,7 +101,7 @@ public class MetricsRule extends PeriodicRule {
 
         final CPUMemory cm = procMetric.get();
 
-        proc.put("pid", pid);
+        proc.put("PID", PID);
         proc.put("memory-used", cm.memoryUsage);
         proc.put("cpu-load", cm.cpuLoad);
 
