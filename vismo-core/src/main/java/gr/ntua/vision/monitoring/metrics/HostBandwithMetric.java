@@ -87,13 +87,9 @@ public class HostBandwithMetric {
 
             final String[] fs = line.substring(idx + 1).trim().split("\\s+");
 
-            try {
-                totalInbound += Long.parseLong(fs[0]);
-                totalOutbound += Long.parseLong(fs[8]);
-            } catch (Exception e) {
-                log.debug("error parsing {}: {}", NET_FILE, fs);
-                log.error("error while parsing", e);
-            }
+            log.debug("fields: {}", java.util.Arrays.toString(fs));
+            totalInbound += Long.parseLong(fs[0]);
+            totalOutbound += Long.parseLong(fs[8]);
         }
 
         return new long[] { totalInbound, totalOutbound };
