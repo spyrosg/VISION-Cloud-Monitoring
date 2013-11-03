@@ -39,16 +39,6 @@ public class HostBandwithMetric {
     private static final String  NET_FILE = "/proc/net/dev";
     /***/
     private static final Logger  log      = LoggerFactory.getLogger(HostBandwithMetric.class);
-    /***/
-    private final BufferedReader reader;
-
-
-    /**
-     * @throws FileNotFoundException
-     */
-    public HostBandwithMetric() throws FileNotFoundException {
-        this.reader = new BufferedReader(new FileReader(NET_FILE));
-    }
 
 
     /**
@@ -72,7 +62,8 @@ public class HostBandwithMetric {
      * @throws IOException
      */
     private long[] get1() throws IOException {
-        reader.mark();
+        final BufferedReader reader = new BufferedReader(new FileReader(NET_FILE));
+
         reader.readLine();
         reader.readLine();
 
@@ -93,7 +84,7 @@ public class HostBandwithMetric {
             totalOutbound += Long.parseLong(fs[8]);
         }
 
-        reader.reset();
+        reader.close();
 
         return new long[] { totalInbound, totalOutbound };
     }
