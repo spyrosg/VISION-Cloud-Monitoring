@@ -92,6 +92,8 @@ public class HostBandwithMetric {
             totalOutbound += Long.parseLong(fs[8]);
         }
 
+        reader.reset();
+
         return new long[] { totalInbound, totalOutbound };
     }
 }
