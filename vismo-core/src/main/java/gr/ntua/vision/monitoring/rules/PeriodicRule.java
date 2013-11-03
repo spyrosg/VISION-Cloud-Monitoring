@@ -80,7 +80,7 @@ public abstract class PeriodicRule extends TimerTask implements VismoRule {
         // the start of the aggregation period
         final long lastAggregationPeriodStart = lastAggregationPeriodEnd - period;
 
-        if (eventsList.isEmpty())
+        if (eventsList.isEmpty() && !shouldAlwaysRun())
             return;
 
         log.debug("{} will aggregate over {} events", getClass().getSimpleName(), eventsList.size());
@@ -155,6 +155,16 @@ public abstract class PeriodicRule extends TimerTask implements VismoRule {
     protected void send(final MonitoringEvent e) {
         engine.send(e);
     }
+
+    /**
+     * This is a hack, used to allow rules to run even if there are no events. See {@link MetricsRule}.
+     * 
+     * @return <code>true</code> if the rule should always run, <code>false</code> otherwise.
+     */
+     @SuppressWarnings("static-method")
+     protected boolean shouldAlwaysRun() {
+         return false;
+     }
 
 
     /**

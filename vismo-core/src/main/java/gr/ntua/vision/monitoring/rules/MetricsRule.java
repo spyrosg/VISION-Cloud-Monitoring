@@ -35,6 +35,8 @@ public class MetricsRule extends PeriodicRule {
     private final LinuxHostMemoryMetric   hostMemory;
     /***/
     private final ProccessCPUMemoryMetric procMetric;
+    /** this flag is used to accept events: this is hack to let this rule run */
+    private boolean acceptEvents = true;
 
 
     /**
@@ -73,7 +75,10 @@ public class MetricsRule extends PeriodicRule {
      */
     @Override
     public void performWith(final MonitoringEvent c) {
-        // NOP, nothing to do with incoming events
+        if (acceptEvents) {
+            collect(c);
+            acceptEvents = false;
+        }
     }
 
 
@@ -82,6 +87,8 @@ public class MetricsRule extends PeriodicRule {
      */
     @Override
     protected MonitoringEvent aggregate(final List<MonitoringEvent> list, final long tStart, final long tEnd) {
+        acceptEvents = true;
+
         final HashMap<String, Object> dict = new HashMap<String, Object>();
 
         dict.put("topic", TOPIC);
@@ -105,11 +112,18 @@ public class MetricsRule extends PeriodicRule {
         proc.put("memory-used", cm.memoryUsage);
         proc.put("cpu-load", cm.cpuLoad);
 
-        proc.put("jvm", proc);
+        dict.put("jvm", proc);
 
         return newAggregationEvent(dict);
     }
 
+    /**
+     * @see gr.ntua.vision.monitoring.rules.PeriodicRule#shouldAlwaysRun()
+     */
+    @Override
+    protected boolean shouldAlwaysRun() {
+        return true;
+    }
 
     /**
      * @param map
