@@ -6,6 +6,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * This is used to report the total inbound/outbound bandwith usage of the host. It is using the linux <code>/proc/net/dev</code>
@@ -34,6 +37,8 @@ public class HostBandwithMetric {
 
     /***/
     private static final String  NET_FILE = "/proc/net/dev";
+    /***/
+    private static final Logger  log      = LoggerFactory.getLogger(HostBandwithMetric.class);
     /***/
     private final BufferedReader reader;
 
@@ -77,9 +82,13 @@ public class HostBandwithMetric {
         while ((line = reader.readLine()) != null) {
             final String[] fs = line.split("\\s+");
 
-            System.err.println(Arrays.toString(fs));
-            totalInbound += Long.parseLong(fs[1].split(":")[1]);
-            totalOutbound += Long.parseLong(fs[9]);
+            try {
+                totalInbound += Long.parseLong(fs[1].split(":")[1]);
+                totalOutbound += Long.parseLong(fs[9]);
+            } catch (Exception e) {
+                log.debug("error parsing {}: {}", NET_FILE, fs);
+                log.error("error while parsing", e);
+            }
         }
 
         return new long[] { totalInbound, totalOutbound };

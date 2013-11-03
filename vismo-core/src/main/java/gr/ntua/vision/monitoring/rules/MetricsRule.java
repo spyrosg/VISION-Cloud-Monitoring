@@ -82,6 +82,8 @@ public class MetricsRule extends PeriodicRule {
      */
     @Override
     protected MonitoringEvent aggregate(final List<MonitoringEvent> list, final long tStart, final long tEnd) {
+        System.err.println("MetricsRule#aggregate called");
+
         final HashMap<String, Object> dict = new HashMap<String, Object>();
 
         dict.put("topic", TOPIC);
