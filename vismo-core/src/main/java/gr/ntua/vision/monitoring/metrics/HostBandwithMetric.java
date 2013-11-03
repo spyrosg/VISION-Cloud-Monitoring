@@ -72,6 +72,7 @@ public class HostBandwithMetric {
      * @throws IOException
      */
     private long[] get1() throws IOException {
+        reader.mark();
         reader.readLine();
         reader.readLine();
 
