@@ -80,11 +80,16 @@ public class HostBandwithMetric {
         String line = null;
 
         while ((line = reader.readLine()) != null) {
-            final String[] fs = line.split("\\s+");
+            final int idx = line.indexOf(":");
+
+            if (idx < 0)
+                continue;
+
+            final String[] fs = line.substring(idx + 1).trim().split("\\s+");
 
             try {
-                totalInbound += Long.parseLong(fs[1].split(":")[1]);
-                totalOutbound += Long.parseLong(fs[9]);
+                totalInbound += Long.parseLong(fs[0]);
+                totalOutbound += Long.parseLong(fs[8]);
             } catch (Exception e) {
                 log.debug("error parsing {}: {}", NET_FILE, fs);
                 log.error("error while parsing", e);
