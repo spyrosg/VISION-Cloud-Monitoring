@@ -22,9 +22,11 @@ import java.util.Map;
  */
 public class MetricsRule extends PeriodicRule {
     /***/
-    private static final int              PID   = new VismoVMInfo().getPID();
+    private static final VismoVMInfo      vminfo  = new VismoVMInfo();
     /***/
     private static final String           TOPIC = "metrics";
+    /***/
+    private static final String           SERVICE = "vismo";
     /***/
     private final VismoEventFactory       factory;
     /***/
@@ -48,7 +50,7 @@ public class MetricsRule extends PeriodicRule {
         this.hostBandwith = new HostBandwithMetric();
         this.hostCPU = new HostCPULoadMetric();
         this.hostMemory = new LinuxHostMemoryMetric();
-        this.procMetric = new ProccessCPUMemoryMetric(PID);
+        this.procMetric = new ProccessCPUMemoryMetric(vminfo.getPID());
     }
 
 
@@ -64,7 +66,7 @@ public class MetricsRule extends PeriodicRule {
         this.hostBandwith = new HostBandwithMetric();
         this.hostCPU = new HostCPULoadMetric();
         this.hostMemory = new LinuxHostMemoryMetric();
-        this.procMetric = new ProccessCPUMemoryMetric(PID);
+        this.procMetric = new ProccessCPUMemoryMetric(vminfo.getPID());
     }
 
 
@@ -82,11 +84,12 @@ public class MetricsRule extends PeriodicRule {
      */
     @Override
     protected MonitoringEvent aggregate(final List<MonitoringEvent> list, final long tStart, final long tEnd) {
-        System.err.println("MetricsRule#aggregate called");
-
         final HashMap<String, Object> dict = new HashMap<String, Object>();
 
         dict.put("topic", TOPIC);
+        dict.put("originating-service", SERVICE);
+        dict.put("timestamp", System.currentTimeMillis());
+        dict.put("originating-machine", vminfo.getAddress().getHostAddress());
 
         final Bandwidth b = hostBandwith.get();
 
@@ -103,7 +106,7 @@ public class MetricsRule extends PeriodicRule {
 
         final CPUMemory cm = procMetric.get();
 
-        proc.put("PID", PID);
+        proc.put("PID", vminfo.getPID());
         proc.put("memory-used", cm.memoryUsage);
         proc.put("cpu-load", cm.cpuLoad);
 
