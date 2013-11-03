@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 /**
  * This is used to report the used and total memory of the host. It uses the linux <code>free</code> command under the hood.
  */
-public class LinuxHostMemoryUsage implements HostMemoryUsage {
+public class LinuxHostMemoryMetric implements HostMemoryMetric {
     /***/
     private static final String  memoryCommand = "free -b";
     /***/
@@ -18,13 +18,13 @@ public class LinuxHostMemoryUsage implements HostMemoryUsage {
     /**
      * 
      */
-    public LinuxHostMemoryUsage() {
+    public LinuxHostMemoryMetric() {
         builder = new ProcessBuilder(memoryCommand.split(" "));
     }
 
 
     /**
-     * @see gr.ntua.vision.monitoring.metrics.HostMemoryUsage#get()
+     * @see gr.ntua.vision.monitoring.metrics.HostMemoryMetric#get()
      */
     @Override
     public HostMemory get() {

@@ -11,7 +11,7 @@ import java.util.Arrays;
  * This is used to report the total inbound/outbound bandwith usage of the host. It is using the linux <code>/proc/net/dev</code>
  * under the hood.
  */
-public class HostBandwithUsage {
+public class HostBandwithMetric {
     /**
      *
      */
@@ -41,7 +41,7 @@ public class HostBandwithUsage {
     /**
      * @throws FileNotFoundException
      */
-    public HostBandwithUsage() throws FileNotFoundException {
+    public HostBandwithMetric() throws FileNotFoundException {
         this.reader = new BufferedReader(new FileReader(NET_FILE));
     }
 

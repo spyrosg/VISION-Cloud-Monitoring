@@ -1,8 +1,8 @@
 package unit.tests;
 
 import gr.ntua.vision.monitoring.VismoVMInfo;
-import gr.ntua.vision.monitoring.metrics.ProccessCPUMemoryUsage;
-import gr.ntua.vision.monitoring.metrics.ProccessCPUMemoryUsage.CPUMemory;
+import gr.ntua.vision.monitoring.metrics.ProccessCPUMemoryMetric;
+import gr.ntua.vision.monitoring.metrics.ProccessCPUMemoryMetric.CPUMemory;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
@@ -13,13 +13,13 @@ import junit.framework.TestCase;
 /**
  *
  */
-public class ProccessCPUMemoryUsageTest extends TestCase {
+public class ProccessCPUMemoryMetricTest extends TestCase {
     /***/
-    private final CountDownLatch   latch = new CountDownLatch(1);
+    private final CountDownLatch    latch = new CountDownLatch(1);
     /***/
-    private ProccessCPUMemoryUsage usage;
+    private ProccessCPUMemoryMetric usage;
     /***/
-    private final VismoVMInfo      vm    = new VismoVMInfo();
+    private final VismoVMInfo       vm    = new VismoVMInfo();
 
 
     /**
@@ -29,7 +29,7 @@ public class ProccessCPUMemoryUsageTest extends TestCase {
     public void testShouldReportCPUAndMemoryUsage() throws IOException, InterruptedException {
         final int pid = vm.getPID();
 
-        usage = new ProccessCPUMemoryUsage(pid);
+        usage = new ProccessCPUMemoryMetric(pid);
         latch.await();
 
         final CPUMemory cm = usage.get();

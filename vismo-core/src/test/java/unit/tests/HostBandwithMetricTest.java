@@ -1,8 +1,8 @@
 package unit.tests;
 
 import gr.ntua.vision.monitoring.VismoVMInfo;
-import gr.ntua.vision.monitoring.metrics.HostBandwithUsage;
-import gr.ntua.vision.monitoring.metrics.HostBandwithUsage.Bandwidth;
+import gr.ntua.vision.monitoring.metrics.HostBandwithMetric;
+import gr.ntua.vision.monitoring.metrics.HostBandwithMetric.Bandwidth;
 
 import java.io.IOException;
 
@@ -12,11 +12,11 @@ import junit.framework.TestCase;
 /**
  *
  */
-public class HostBandwithUsageTest extends TestCase {
+public class HostBandwithMetricTest extends TestCase {
     /***/
-    private HostBandwithUsage bandwithUsage;
+    private HostBandwithMetric bandwithUsage;
     /***/
-    private final VismoVMInfo vm = new VismoVMInfo();
+    private final VismoVMInfo  vm = new VismoVMInfo();
 
 
     /**
@@ -24,7 +24,7 @@ public class HostBandwithUsageTest extends TestCase {
      * @throws InterruptedException
      */
     public void testShouldReportInboundAndOutBoundUsage() throws IOException, InterruptedException {
-        bandwithUsage = new HostBandwithUsage();
+        bandwithUsage = new HostBandwithMetric();
 
         final Bandwidth bw = bandwithUsage.get();
 

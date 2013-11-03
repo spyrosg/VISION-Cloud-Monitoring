@@ -1,7 +1,7 @@
 package unit.tests;
 
 import gr.ntua.vision.monitoring.VismoVMInfo;
-import gr.ntua.vision.monitoring.metrics.HostCPULoad;
+import gr.ntua.vision.monitoring.metrics.HostCPULoadMetric;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
@@ -12,9 +12,9 @@ import junit.framework.TestCase;
 /**
  *
  */
-public class HostCPULoadTest extends TestCase {
+public class HostCPULoadMetricTest extends TestCase {
     /***/
-    private HostCPULoad          cpuLoad;
+    private HostCPULoadMetric    cpuLoad;
     /***/
     private final CountDownLatch latch = new CountDownLatch(2);
     /***/
@@ -26,7 +26,7 @@ public class HostCPULoadTest extends TestCase {
      * @throws InterruptedException
      */
     public void testShouldGetCPULoad() throws IOException, InterruptedException {
-        cpuLoad = new HostCPULoad();
+        cpuLoad = new HostCPULoadMetric();
 
         final double load = cpuLoad.get();
 

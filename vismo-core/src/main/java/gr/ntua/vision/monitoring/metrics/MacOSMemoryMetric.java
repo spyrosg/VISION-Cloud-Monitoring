@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 /**
  * This is used to report the used and total memory of the host. It uses the mac os <code>vm_stat</code> command under the hood.
  */
-public class MacOSMemoryUsage implements HostMemoryUsage {
+public class MacOSMemoryMetric implements HostMemoryMetric {
     /***/
     private static final int     MAC_OS_PAGE_SIZE = 4096;
     /***/
@@ -18,7 +18,7 @@ public class MacOSMemoryUsage implements HostMemoryUsage {
 
 
     /**
-     * @see gr.ntua.vision.monitoring.metrics.HostMemoryUsage#get()
+     * @see gr.ntua.vision.monitoring.metrics.HostMemoryMetric#get()
      */
     @Override
     public HostMemory get() {

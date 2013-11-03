@@ -92,14 +92,16 @@ public class EventSourcesFactory {
                 socketFactory.newConnectedPushSocket(address));
     }
 
+
     /**
      * Check that we're running on a windows machine :(
-     *
+     * 
      * @return <code>true</code> if we're running on a windows machine.
      */
     private static boolean isWin() {
         return System.getProperty("os.name").toLowerCase().contains("win");
     }
+
 
     /**
      * @param port

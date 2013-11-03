@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
  * Provides for the host cpu load. Uses the linux <code>uptime</code> command. The value reported is the system load average for
  * the last minute.
  */
-public class HostCPULoad {
+public class HostCPULoadMetric {
     /***/
     private static final String  uptime  = "uptime";
     /***/
@@ -19,7 +19,7 @@ public class HostCPULoad {
     /**
      * 
      */
-    public HostCPULoad() {
+    public HostCPULoadMetric() {
     }
 
 

@@ -2,9 +2,9 @@ package unit.tests;
 
 import gr.ntua.vision.monitoring.VismoVMInfo;
 import gr.ntua.vision.monitoring.metrics.HostMemory;
-import gr.ntua.vision.monitoring.metrics.HostMemoryUsage;
-import gr.ntua.vision.monitoring.metrics.LinuxHostMemoryUsage;
-import gr.ntua.vision.monitoring.metrics.MacOSMemoryUsage;
+import gr.ntua.vision.monitoring.metrics.HostMemoryMetric;
+import gr.ntua.vision.monitoring.metrics.LinuxHostMemoryMetric;
+import gr.ntua.vision.monitoring.metrics.MacOSMemoryMetric;
 
 import java.io.IOException;
 
@@ -14,9 +14,9 @@ import junit.framework.TestCase;
 /**
  *
  */
-public class HostMemoryUsageTest extends TestCase {
+public class HostMemoryMetricTest extends TestCase {
     /***/
-    private HostMemoryUsage   memoryUsage;
+    private HostMemoryMetric  memoryUsage;
     /***/
     private final VismoVMInfo vm = new VismoVMInfo();
 
@@ -37,12 +37,12 @@ public class HostMemoryUsageTest extends TestCase {
 
 
     /**
-     * @return a HostMemoryUsage object.
+     * @return a HostMemoryMetric object.
      */
-    private static HostMemoryUsage getHostMemoryUsage() {
+    private static HostMemoryMetric getHostMemoryUsage() {
         if (System.getProperty("os.name").toLowerCase().contains("linux"))
-            return new LinuxHostMemoryUsage();
+            return new LinuxHostMemoryMetric();
 
-        return new MacOSMemoryUsage();
+        return new MacOSMemoryMetric();
     }
 }

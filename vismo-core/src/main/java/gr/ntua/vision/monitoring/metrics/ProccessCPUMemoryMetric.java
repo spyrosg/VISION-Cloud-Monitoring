@@ -6,10 +6,10 @@ import java.io.InputStreamReader;
 
 
 /**
- * This is used to provide for the cpu load of a process, averaged over all processors. It uses the linux <code>ps</code> command
- * under the hood.
+ * This is used to provide for the cpu load of a process, averaged over all processors, and the total memory used by that process.
+ * It uses the linux <code>ps</code> command under the hood.
  */
-public class ProccessCPUMemoryUsage {
+public class ProccessCPUMemoryMetric {
     /**
      *
      */
@@ -42,7 +42,7 @@ public class ProccessCPUMemoryUsage {
      * @param pid
      *            the pid of the process to get the cpu load for
      */
-    public ProccessCPUMemoryUsage(final long pid) {
+    public ProccessCPUMemoryMetric(final long pid) {
         builder = new ProcessBuilder((psCommand + String.valueOf(pid)).split(" "));
     }
 

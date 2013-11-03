@@ -3,7 +3,7 @@ package gr.ntua.vision.monitoring.metrics;
 /**
  *
  */
-public interface HostMemoryUsage {
+public interface HostMemoryMetric {
     /**
      * @return the memory usage of the host.
      */
