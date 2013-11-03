@@ -35,8 +35,6 @@ public class MetricsRule extends PeriodicRule {
     private final LinuxHostMemoryMetric   hostMemory;
     /***/
     private final ProccessCPUMemoryMetric procMetric;
-    /** this flag is used to accept events: this is hack to let this rule run */
-    private boolean acceptEvents = true;
 
 
     /**
@@ -75,10 +73,7 @@ public class MetricsRule extends PeriodicRule {
      */
     @Override
     public void performWith(final MonitoringEvent c) {
-        if (acceptEvents) {
-            collect(c);
-            acceptEvents = false;
-        }
+        // NOP, nothing to do with incoming events
     }
 
 
@@ -87,8 +82,6 @@ public class MetricsRule extends PeriodicRule {
      */
     @Override
     protected MonitoringEvent aggregate(final List<MonitoringEvent> list, final long tStart, final long tEnd) {
-        acceptEvents = true;
-
         final HashMap<String, Object> dict = new HashMap<String, Object>();
 
         dict.put("topic", TOPIC);
