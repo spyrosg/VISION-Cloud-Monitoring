@@ -106,7 +106,7 @@ public class MetricsRule extends PeriodicRule {
 
         final CPUMemory cm = procMetric.get();
 
-        proc.put("PID", vminfo.getPID());
+        proc.put("pid", vminfo.getPID());
         proc.put("memory-used", cm.memoryUsage);
         proc.put("cpu-load", cm.cpuLoad);
 
