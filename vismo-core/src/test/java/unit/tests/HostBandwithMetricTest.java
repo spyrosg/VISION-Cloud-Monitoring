@@ -28,7 +28,7 @@ public class HostBandwithMetricTest extends TestCase {
 
         final Bandwidth bw = bandwithUsage.get();
 
-        System.err.println("this host (" + vm.getAddress().getHostAddress() + ") is seeing" + bw.inbound + " bytes inbound and "
+        System.err.println("this host (" + vm.getAddress().getHostAddress() + ") is seeing " + bw.inbound + " bytes inbound and "
                 + bw.outbound + " bytes outbound");
         assertTrue("expecting memory usage of host to be greater than zero", bw.inbound > 0 && bw.outbound > 0);
     }

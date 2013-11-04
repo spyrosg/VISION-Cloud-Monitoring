@@ -14,7 +14,7 @@ public class ProccessCPUMemoryMetric {
      *
      */
     public static class CPUMemory {
-        /***/
+        /** the cpu load of the process as a percent. */
         public final double cpuLoad;
         /***/
         public final int    memoryUsage;
@@ -54,7 +54,7 @@ public class ProccessCPUMemoryMetric {
         try {
             final String[] arr = get1();
 
-            return new CPUMemory(Double.parseDouble(arr[0]) / (100 * noProcessors), Integer.parseInt(arr[1]));
+            return new CPUMemory(Double.parseDouble(arr[0]) / noProcessors, Integer.parseInt(arr[1]));
         } catch (final NumberFormatException e) {
             // NOP
         } catch (final IOException e) {
