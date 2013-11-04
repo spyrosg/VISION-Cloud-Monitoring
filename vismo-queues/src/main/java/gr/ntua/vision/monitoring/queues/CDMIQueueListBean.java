@@ -28,6 +28,7 @@ public class CDMIQueueListBean extends CDMIQueueBean {
      * Constructor.
      * 
      * @param objectName
+     * @param topic
      */
     public CDMIQueueListBean(final String objectName, final String topic) {
         super(objectName, topic);

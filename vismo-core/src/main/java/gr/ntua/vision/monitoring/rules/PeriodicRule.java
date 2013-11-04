@@ -156,15 +156,16 @@ public abstract class PeriodicRule extends TimerTask implements VismoRule {
         engine.send(e);
     }
 
+
     /**
      * This is a hack, used to allow rules to run even if there are no events. See {@link MetricsRule}.
      * 
      * @return <code>true</code> if the rule should always run, <code>false</code> otherwise.
      */
-     @SuppressWarnings("static-method")
-     protected boolean shouldAlwaysRun() {
-         return false;
-     }
+    @SuppressWarnings("static-method")
+    protected boolean shouldAlwaysRun() {
+        return false;
+    }
 
 
     /**

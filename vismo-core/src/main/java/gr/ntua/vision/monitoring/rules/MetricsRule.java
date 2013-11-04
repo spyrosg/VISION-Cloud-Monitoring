@@ -22,11 +22,11 @@ import java.util.Map;
  */
 public class MetricsRule extends PeriodicRule {
     /***/
-    private static final VismoVMInfo      vminfo  = new VismoVMInfo();
-    /***/
-    private static final String           TOPIC = "metrics";
-    /***/
     private static final String           SERVICE = "vismo";
+    /***/
+    private static final String           TOPIC   = "metrics";
+    /***/
+    private static final VismoVMInfo      vminfo  = new VismoVMInfo();
     /***/
     private final VismoEventFactory       factory;
     /***/
@@ -115,6 +115,7 @@ public class MetricsRule extends PeriodicRule {
         return newAggregationEvent(dict);
     }
 
+
     /**
      * @see gr.ntua.vision.monitoring.rules.PeriodicRule#shouldAlwaysRun()
      */
@@ -122,6 +123,7 @@ public class MetricsRule extends PeriodicRule {
     protected boolean shouldAlwaysRun() {
         return true;
     }
+
 
     /**
      * @param map

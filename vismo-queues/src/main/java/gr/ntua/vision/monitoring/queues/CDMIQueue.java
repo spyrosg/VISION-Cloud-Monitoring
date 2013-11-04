@@ -29,6 +29,7 @@ public class CDMIQueue {
      * 
      * @param name
      *            the name of the queue.
+     * @param topic
      * @param size
      */
     public CDMIQueue(final String name, final String topic, final int size) {

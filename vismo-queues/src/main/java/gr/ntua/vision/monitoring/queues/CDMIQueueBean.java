@@ -65,6 +65,7 @@ public class CDMIQueueBean {
      * Constructor.
      * 
      * @param objectName
+     * @param topic
      */
     public CDMIQueueBean(final String objectName, final String topic) {
         this();
