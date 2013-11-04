@@ -94,12 +94,12 @@ public class EventSourcesFactory {
 
 
     /**
-     * Check that we're running on a windows machine :(
+     * Check that we're running on a linux box.
      * 
-     * @return <code>true</code> if we're running on a windows machine.
+     * @return <code>true</code> if we're running on a linux box.
      */
-    private static boolean isWin() {
-        return System.getProperty("os.name").toLowerCase().contains("win");
+    private static boolean isLinux() {
+        return System.getProperty("os.name").toLowerCase().contains("linux");
     }
 
 
@@ -108,7 +108,7 @@ public class EventSourcesFactory {
      * @return an address bound to all interfaces and the given port.
      */
     private static String withPort(final int port) {
-        if (isWin())
+        if (!isLinux())
             return "tcp://127.0.0.1:" + port;
 
         return "tcp://*:" + port; // bind to all avail ifaces
