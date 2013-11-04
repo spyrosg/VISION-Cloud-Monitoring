@@ -1,10 +1,8 @@
 package gr.ntua.vision.monitoring.metrics;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.RandomAccessFile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +34,19 @@ public class HostBandwithMetric {
     }
 
     /***/
-    private static final String  NET_FILE = "/proc/net/dev";
+    private static final Logger    log      = LoggerFactory.getLogger(HostBandwithMetric.class);
     /***/
-    private static final Logger  log      = LoggerFactory.getLogger(HostBandwithMetric.class);
+    private static final String    NET_FILE = "/proc/net/dev";
+    /***/
+    private final RandomAccessFile file;
+
+
+    /**
+     * @throws FileNotFoundException
+     */
+    public HostBandwithMetric() throws FileNotFoundException {
+        this.file = new RandomAccessFile(NET_FILE, "r");
+    }
 
 
     /**
@@ -62,16 +70,14 @@ public class HostBandwithMetric {
      * @throws IOException
      */
     private long[] get1() throws IOException {
-        final BufferedReader reader = new BufferedReader(new FileReader(NET_FILE));
-
-        reader.readLine();
-        reader.readLine();
+        file.readLine();
+        file.readLine();
 
         long totalInbound = 0;
         long totalOutbound = 0;
         String line = null;
 
-        while ((line = reader.readLine()) != null) {
+        while ((line = file.readLine()) != null) {
             final int idx = line.indexOf(":");
 
             if (idx < 0)
@@ -84,7 +90,7 @@ public class HostBandwithMetric {
             totalOutbound += Long.parseLong(fs[8]);
         }
 
-        reader.close();
+        file.seek(0);
 
         return new long[] { totalInbound, totalOutbound };
     }
