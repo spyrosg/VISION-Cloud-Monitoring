@@ -38,14 +38,16 @@ define([], function() {
         extend: function(dest) {
             return {
                 'with': function(src) {
-                    Object
-                        .getOwnPropertyNames(src)
-                        .filter(function(name) {
-                            return !(name in dest);
-                        }).
-                        forEach(function(name) {
-                            dest[name] = src[name];
-                        });
+                    if (src) {
+                        Object
+                            .getOwnPropertyNames(src)
+                            .filter(function(name) {
+                                return !(name in dest);
+                            }).
+                            forEach(function(name) {
+                                dest[name] = src[name];
+                            });
+                    }
 
                     return dest;
                 }

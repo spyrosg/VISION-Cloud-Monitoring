@@ -10,6 +10,7 @@ define([], function() {
         on: function(type, el, fn) { el.addEventListener(type, fn, false); },
         off: function(type, el, fn) { el.removeEventListener(type, fn, false); },
         creat: function(el) { return document.createElement(el); },
+        text: function(str) { return document.createTextNode(str); },
         frag: function() { return document.createDocumentFragment(); },
         empty: function(el) { el.innerHTML = ''; }
     };

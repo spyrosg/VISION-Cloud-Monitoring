@@ -14,6 +14,7 @@ requirejs.config({
         ajax: 'src/ajax',
         dom: 'src/dom',
         util: 'src/util',
+        service: 'src/service',
         views: 'src/views',
         ctrls: 'src/ctrls',
 

@@ -27,13 +27,18 @@ define(['dom', 'util'], function(dom, util) {
         add: function(name) {
             var span = dom.creat('span');
 
-            if (this.el.children.length === 0) {
-                span.textContent = name;
-            } else {
-                span.textContent = ', ' + name;
-            }
-
+            span.appendChild(this.to_link(name));
             this.el.appendChild(span);
+            this.el.appendChild(dom.text(', '));
+        },
+
+        to_link: function(name) {
+            var link = dom.creat('a');
+
+            link.setAttribute('href', '#' + name);
+            link.textContent = name;
+
+            return link;
         }
     };
 

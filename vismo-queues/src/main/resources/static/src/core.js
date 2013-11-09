@@ -5,7 +5,7 @@
 // this is were the application is assembled,
 // configured and started.
 // Search for the ``setup`` method.
-define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
+define(['service', 'util', 'views', 'ctrls'], function(service, util, views, ctrls) {
     'use strict';
 
     var extend = util.extend,
@@ -16,121 +16,36 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
             this.observables = []; // NOTE: required by Observer
         },
 
-        service: {
-            root_server: '/api/queues',
+        available_queues: [],
 
-            headers: {
-                'Accept': 'application/cdmi-queue',
-                'X-CDMI-Specification-Version': '1.0.2'
-            },
-
-            create: function(name, topic) {
-                return ajax(this.root_server + '/' + name + '/' + topic, 'PUT', {
-                        'Content-Type': 'application/cdmi-queue',
-                        'Accept': 'application/cdmi-queue',
-                        'X-CDMI-Specification-Version': '1.0.2'
-                    }).then(JSON.parse);
-            },
-
-            read: function(name) {
-                return ajax(this.root_server + '/' + name, 'GET', this.headers)
-                    .then(JSON.parse)
-                    .then(function(cdmi) { return cdmi.value; });
-            },
-
-            list: function() {
-                return ajax(this.root_server, 'GET', this.headers)
-                    .then(JSON.parse);
-            }
-        },
+        current_queue: null,
 
         create_queue: function(name, topic) {
             var self = this;
 
-            this
-                .service.create(name, topic)
-                .then(function() {
-                        self.notify('queue', name);
-                        self.notify('new:queue', name);
-                        self.reset_read_events_timer(name);
-                    }, function(req) {
-                        console.error('error creating queue:', req.statusText + ', ' + req.responseText);
-                    });
-        },
-
-        interval_fn_id: null,
-
-        reset_read_events_timer: function(name) {
-            var self = this;
-
-            if (this.interval_fn_id !== null) {
-                clearInterval(this.interval_fn_id);
-            }
-
-            this.interval_fn_id = setInterval(function() {
-                self.read_queue(name);
-            }, 1000);
-        },
-
-        known_events: {},
-
-        is_known_event: function(e) {
-            if ('timestamp' in e && e.timestamp in this.known_events) {
-                return true;
-            }
-            if ('id' in e && e.id in this.known_events) {
-                return true;
-            }
-
-            return false;
+            service.create(name, topic).then(function() {
+                self.render_queues();
+            }, function(req) {
+                console.error('could not create queue:', req.statusText + ', ' + req.responseText);
+            });
         },
 
         read_queue: function(name) {
             var self = this;
 
-            this
-                .service.read(name)
-                .then(function(eventList) {
-                    console.log('got', eventList.length, 'events');
-
-                    eventList
-                        .filter(function(e) {
-                            return !self.is_known_event(e);
-                        })
-                        .forEach(function(e) {
-                            self.known_events[e.timestamp || e.id] = true;
-
-                            if (e.topic !== 'storletProgress') {
-                                self.notify('events', e);
-                            } else {
-                                self.notify('storlets', e);
-                            }
-                        });
-                });
+            service.read(name).then(function(eventList) {
+                eventList.forEach(function(e) { self.notify(e.topic, e); });
+            });
         },
 
         render_queues: function() {
             var self = this;
 
-            this.service.list()
-                .then(function(list) {
-                    list.forEach(function(q) {
-                        self.notify('queue', q.objectName);
-                    });
+            service.list().then(function(list) {
+                list.forEach(function(q) {
+                    self.notify('queue', q.objectName);
                 });
-        },
-
-        render_events: function() {
-            var self = this;
-
-            this.service.list()
-                .then(function(list) {
-                    if (list.length > 0) {
-                        var q = list[list.length - 1];
-
-                        self.reset_read_events_timer(q.objectName);
-                    }
-                });
+            });
         }
     };
 
@@ -150,7 +65,6 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
             ctrls.updateButtonController.setup(cdmiQueuesModel);
 
             cdmiQueuesModel.render_queues();
-            cdmiQueuesModel.render_events();
             console.info('app started');
         }
     };
