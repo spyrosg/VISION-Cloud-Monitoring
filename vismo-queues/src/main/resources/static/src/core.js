@@ -55,8 +55,7 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
                         self.reset_read_events_timer(name);
                     }, function(req) {
                         console.error('error creating queue:', req.statusText + ', ' + req.responseText);
-                    })
-                .done();
+                    });
         },
 
         interval_fn_id: null,
@@ -107,8 +106,7 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
                                 self.notify('storlets', e);
                             }
                         });
-                })
-                .done();
+                });
         },
 
         render_queues: function() {
@@ -119,8 +117,7 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
                     list.forEach(function(q) {
                         self.notify('queue', q.objectName);
                     });
-                })
-                .done();
+                });
         },
 
         render_events: function() {
@@ -133,8 +130,7 @@ define(['ajax', 'util', 'views', 'ctrls'], function(ajax, util, views, ctrls) {
 
                         self.reset_read_events_timer(q.objectName);
                     }
-                })
-                .done();
+                });
         }
     };
 

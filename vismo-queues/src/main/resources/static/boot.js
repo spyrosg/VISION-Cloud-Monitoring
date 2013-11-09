@@ -7,8 +7,8 @@ requirejs.config({
     urlArgs: "bust=" + (new Date()).getTime(),
     paths: {
         // external libraries used
-        q: 'lib/q.min',
-        d3: 'lib/d3.v3.min',
+        when: 'lib/when',
+        // d3: 'lib/d3.v3.min',
 
         // internal app libraries
         ajax: 'src/ajax',
@@ -19,11 +19,11 @@ requirejs.config({
 
         core: 'src/core'
     },
-    shim: {
+    /*shim: {
         d3: {
             exports: 'd3'
         }
-    }
+    }*/
 });
 
 

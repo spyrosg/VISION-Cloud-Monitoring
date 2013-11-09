@@ -1,7 +1,7 @@
 /* global define */
 
 // An promises based ajax request.
-define(['q'], function(Q) {
+define(['when'], function(when) {
     'use strict';
 
     // Determine if an XMLHttpRequest was successful
@@ -25,7 +25,7 @@ define(['q'], function(Q) {
         }
 
         var request = new XMLHttpRequest();
-        var response = Q.defer();
+        var response = when.defer();
 
         function onload() {
             if (xhrSuccess(request)) {

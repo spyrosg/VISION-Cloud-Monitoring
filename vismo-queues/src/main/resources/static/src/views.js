@@ -3,7 +3,7 @@
 
 
 // the views used in the app
-define(['dom', 'util', 'd3'], function(dom, util, d3) {
+define(['dom', 'util'], function(dom, util) {
     'use strict';
 
     var extend = util.extend,
