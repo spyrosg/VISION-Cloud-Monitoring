@@ -20,37 +20,18 @@
 
       <div id="content">
 
-        <form id="queue-entry" action="">
+        <form id="update-period" action="">
           <div>
-            <label for="queue">Queue name:</label>
-            <input id="queue" type="text">
-          </div>
-
-          <div>
-            <label for="topic">Topic:</label>
-            <input id="topic" type="text">
-          </div>
-
-          <div class="button">
-            <button type="submit">Create</button>
-          </div>
-
-          <div id="queues">
-            Existing queues:
+            <label for="period">Metrics rule period:</label>
+            <input id="period" type="text" value="5ms">
           </div>
         </form>
 
-        <div id="storlets">
+      </div>
 
-          <div class="name">
-            no storlet running
-          </div>
-
-          <progress class="count" value="0" max="100">
-          </progress>
-
-        </div>
-
+      <div id="graph-container">
+        <canvas id="cpu-graph" width="400" height="200">
+        </canvas>
       </div>
 
       <div id="events">

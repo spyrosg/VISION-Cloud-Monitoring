@@ -3,46 +3,11 @@
 
 
 // the views used in the app
-define(['dom', 'util'], function(dom, util) {
+define(['dom', 'util', 'ctrls'], function(dom, util, ctrls) {
     'use strict';
 
     var extend = util.extend,
         Observable = util.Observable;
-
-    var queuesView = {
-        el: dom.$('#queues'),
-
-        setup: function(model) {
-            this.model = model;
-        },
-
-        update: function(/*args*/) {
-            if (arguments[0] !== 'queue') {
-                return;
-            }
-
-            this.add(arguments[1]);
-        },
-
-        add: function(name) {
-            var span = dom.creat('span');
-
-            span.appendChild(this.to_link(name));
-            this.el.appendChild(span);
-            this.el.appendChild(dom.text(', '));
-        },
-
-        to_link: function(name) {
-            var link = dom.creat('a');
-
-            link.setAttribute('href', '#' + name);
-            link.textContent = name;
-
-            return link;
-        }
-    };
-
-    extend(queuesView).with(Observable);
 
     var eventsView = {
         el: dom.$('#events ul'),
@@ -119,31 +84,7 @@ define(['dom', 'util'], function(dom, util) {
 
     extend(eventsView).with(Observable);
 
-    var storletsView = {
-        name: dom.$('#storlets .name'),
-        count: dom.$('#storlets .count'),
-
-        setup: function(model) {
-            this.model = model;
-        },
-
-        update: function(/*args*/) {
-            if (arguments[0] !== 'storlets') {
-                return;
-            }
-
-            var event = arguments[1],
-                count = parseInt(event.progress, 10),
-                name = event.tenantID + '.' + event.containerID + '.' + event.storlet_name;
-
-            this.name.textContent = name;
-            this.count.setAttribute('value', count);
-        }
-    };
-
     return {
-        queuesView: queuesView,
         eventsView: eventsView,
-        storletsView: storletsView
     };
 });
