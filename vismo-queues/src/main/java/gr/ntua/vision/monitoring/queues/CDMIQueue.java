@@ -105,7 +105,7 @@ public class CDMIQueue {
      *            the number of elements to remove.
      */
     public void removeEvents(final int count) {
-        if (count == Integer.MAX_VALUE)
+        if (count >= queue.size())
             queue.clear();
         else
             for (int i = 0; i < count && !queue.isEmpty(); ++i)

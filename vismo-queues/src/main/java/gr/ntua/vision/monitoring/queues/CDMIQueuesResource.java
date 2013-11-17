@@ -18,10 +18,12 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 
 /**
@@ -118,20 +120,25 @@ public class CDMIQueuesResource {
 
     /**
      * @param queueName
+     * @param uriInfo
      * @return the {@link Response} object.
      */
     @Path("{queue}")
     @DELETE
-    public Response deleteQueue(@PathParam("queue") final String queueName) {
-        try {
-            if (queueName.endsWith("?value") || queueName.contains("?values:")) {
-                final String[] fs = queueName.split("\\?");
-                final String qName = fs[0];
-                final int count = Integer.valueOf(fs[1].replaceFirst("value[s][:]", ""));
+    public Response deleteQueue(@PathParam("queue") final String queueName, @Context UriInfo uriInfo) {
+        final String query = uriInfo.getRequestUri().getQuery();
 
-                registry.removeEvents(qName, count);
-            } else
+        try {
+            if (query != null && query.length() > 0) {
+                if (!query.contains("value"))
+                    throw new CDMIQueueException("query not supported: " + query);
+
+                final int count = Integer.valueOf(query.replaceFirst("value(s:)?", ""));
+
+                registry.removeEvents(queueName, count);
+            } else {
                 registry.unregister(queueName);
+            }
 
             return toCORS(Response.noContent().header(X_CDMI, X_CDMI_VERSION));
         } catch (final CDMIQueueException e) {
@@ -203,6 +210,9 @@ public class CDMIQueuesResource {
                 topic = q.topic;
                 break;
             }
+
+        if (topic == null)
+            throw new CDMIQueueException("no such queue available: " + queueName);
 
         final CDMIQueueListBean bean = new CDMIQueueListBean(queueName, topic);
 
