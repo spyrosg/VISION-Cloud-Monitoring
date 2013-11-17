@@ -138,7 +138,7 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
 
             var e = arguments[1];
             var dt = (e.timestamp - Date.now()) / 1000;
-            vat val = e['cpu-load'];
+            var val = e['cpu-load'];
 
             console.log('x: ' + dt + ', y: ' + val);
 
