@@ -237,7 +237,7 @@ public class CDMIQueuesResourceTest extends JerseyResourceTest {
      * @return the client's response.
      */
     private ClientResponse deleteCDMIQueueValues(final String queueName, final int noEvents) {
-        final ClientResponse res = resource().path(queueName + "?values:" + noEvents).accept(APPLICATION_CDMI_QUEUE_TYPE)
+        final ClientResponse res = resource().path(queueName).queryParam("values:" + noEvents, "").accept(APPLICATION_CDMI_QUEUE_TYPE)
                 .header(X_CDMI, X_CDMI_VERSION).delete(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.NO_CONTENT, res.getClientResponseStatus());
