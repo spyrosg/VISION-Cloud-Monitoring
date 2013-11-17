@@ -43,7 +43,7 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
 
             delete e['originating-machine'];
             delete e['originating-service'];
-            delete e['timestamp'];
+            // delete e['timestamp'];
             pre.textContent = JSON.stringify(e);
 
             div.appendChild(pre);
@@ -98,7 +98,7 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
         mk_chart: function(elem_id) {
             return new CanvasJS.Chart("cpu-graph", {
                 title: { text: this.title },
-                axisX: { title: "time (sec)", interval: 2, },
+                axisX: { title: "time (sec)", interval: 5, },
                 axisY: { title: "%", interval: 20, minimum: 0, maximum: 100 },
                 data: [{
                     type: "line",
@@ -122,6 +122,7 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
         },
 
         add_point: function(p) {
+            // this.chart.options.title.text = this.title + '(' + e['originating-machine'] + ')';
             this.data_queue.push(p);
 
             if (this.data_queue.length >= this.max_data_size) {
@@ -130,14 +131,13 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
         },
 
         update: function(/*args*/) {
-            if (arguments[0] !== 'events') {
+            if (arguments[0] !== 'metrics') {
                 return;
             }
 
             var e = arguments[1];
 
-            console.debug('event:', e);
-            this.add_point(e);
+            this.add_point({ x: (e.timestamp - Date.now()) / 1000, y: e.jvm['cpu-load'], 'originating-machine': e['originating-machine'] });
         }
     };
 

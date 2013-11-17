@@ -28,7 +28,7 @@ define(['ajax', 'util'], function(ajax, util) {
         },
 
         delete: function(path, headers) {
-            return this.request(path, 'DELETE', headers);
+            return this.request('/' + path, 'DELETE', headers);
         },
 
         create: function(name, topic) {
