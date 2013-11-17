@@ -133,7 +133,7 @@ public class CDMIQueuesResource {
                 if (!query.contains("value"))
                     throw new CDMIQueueException("query not supported: " + query);
 
-                final int count = Integer.valueOf(query.replaceFirst("value(s:)?", ""));
+                final int count = Integer.valueOf(query.replace("=", "").replaceFirst("value(s:)?", ""));
 
                 registry.removeEvents(queueName, count);
             } else {
