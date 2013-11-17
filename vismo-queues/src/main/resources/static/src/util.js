@@ -16,8 +16,6 @@ define([], function() {
         notify: function(/*args*/) {
             var args = Array.prototype.slice.call(arguments);
 
-            console.debug('notifying', args);
-
             this.observables.forEach(function(obs) {
                 obs.update.apply(obs, args);
             });

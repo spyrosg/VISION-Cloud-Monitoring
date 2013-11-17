@@ -98,8 +98,8 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
         mk_chart: function(elem_id) {
             return new CanvasJS.Chart("cpu-graph", {
                 title: { text: this.title },
-                axisX: { title: "time (sec)", interval: 5, },
-                axisY: { interval: 1, minimum: 0, maximum: 10 },
+                axisX: { title: "time (sec)", interval: 5, valueFormatString: "HH:mm:ss"},
+                axisY: { interval: 1, minimum: 0, maximum: 4 },
                 data: [{
                     type: "line",
                     dataPoints: this.data_queue
@@ -122,10 +122,10 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
         },
 
         add_point: function(p) {
-            this.chart.options.title.text = this.title + ' @ ' + e['originating-machine'];
+            this.chart.options.title.text = this.title + ' @ ' + p['originating-machine'];
             this.data_queue.push(p);
 
-            if (this.data_queue.length >= this.max_data_size) {
+            if (this.data_queue.length >= this.max_data_size + 1) {
                 this.data_queue.shift();
             }
         },
@@ -142,7 +142,7 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
 
             console.log('x: ' + dt + ', y: ' + val);
 
-            this.add_point({ x: (e.timestamp - Date.now()) / 1000, y: e['cpu-load'], 'originating-machine': e['originating-machine'] });
+            this.add_point({ x: new Date(e.timestamp), y: val, 'originating-machine': e['originating-machine'] });
         }
     };
 

@@ -31,14 +31,13 @@ define(['service', 'util', 'views', 'ctrls', 'dom'], function(service, util, vie
 
             return service.read(name).then(function(eventList) {
                 eventList.forEach(function(e) { self.notify(e.topic, e); });
-
-                return [];
+                return eventList;
             });
         },
 
         delete_values_off: function(name) {
             service.delete(name + '?values:10000');
-        },
+        }
     };
 
     extend(cdmiQueuesModel).with(Observer);
@@ -57,10 +56,10 @@ define(['service', 'util', 'views', 'ctrls', 'dom'], function(service, util, vie
             console.info('app started');
 
             setInterval(function() {
-                cdmiQueuesModel.read_queue('m1').then(function() {
-                    console.debug('before deleting');
-                    cdmiQueuesModel.delete_values_off('m1');
-                    console.debug('after deleting');
+                var queue_name = 'm1';
+
+                cdmiQueuesModel.read_queue(queue_name).then(function() {
+                    cdmiQueuesModel.delete_values_off(queue_name);
                 });
             }, 1000);
         }
