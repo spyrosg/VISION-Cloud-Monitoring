@@ -58,7 +58,9 @@ define(['service', 'util', 'views', 'ctrls', 'dom'], function(service, util, vie
 
             setInterval(function() {
                 cdmiQueuesModel.read_queue('m1').then(function() {
+                    console.debug('before deleting');
                     cdmiQueuesModel.delete_values_off('m1');
+                    console.debug('after deleting');
                 });
             }, 1000);
         }
