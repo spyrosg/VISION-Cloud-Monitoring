@@ -37,26 +37,6 @@ define(['service', 'util', 'views', 'ctrls', 'dom'], function(service, util, vie
 
     extend(cdmiQueuesModel).with(Observer);
 
-    function draw_canvas_background_on(canvas) {
-        var ctx = canvas.getContext('2d');
-
-        ctx.rect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#fff';
-        ctx.fill();
-        ctx.strokeStyle = '#eee';
-
-        for (var x = 0.5; x < canvas.width; x += 10) {
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, canvas.height);
-        }
-
-        for (var y = 0.5; y < canvas.height; y += 10) {
-            ctx.moveTo(0, y);
-            ctx.lineTo(canvas.width, y);
-            ctx.stroke();
-        }
-    }
-
     return {
         setup: function() {
             cdmiQueuesModel.setup();
@@ -68,7 +48,6 @@ define(['service', 'util', 'views', 'ctrls', 'dom'], function(service, util, vie
                 cdmiQueuesModel.add(view);
             });
 
-            draw_canvas_background_on(dom.id('cpu-graph'));
             console.info('app started');
         }
     };

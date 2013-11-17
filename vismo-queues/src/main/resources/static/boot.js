@@ -8,7 +8,7 @@ requirejs.config({
     paths: {
         // external libraries used
         when: 'lib/when',
-        // d3: 'lib/d3.v3.min',
+        canvasjs: 'lib/canvasjs.min',
 
         // internal app libraries
         ajax: 'src/ajax',
@@ -20,11 +20,11 @@ requirejs.config({
 
         core: 'src/core'
     },
-    /*shim: {
-        d3: {
-            exports: 'd3'
+    shim: {
+        canvasjs: {
+            exports: 'CanvasJS'
         }
-    }*/
+    }
 });
 
 

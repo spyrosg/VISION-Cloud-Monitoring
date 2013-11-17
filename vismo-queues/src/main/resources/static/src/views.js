@@ -3,7 +3,7 @@
 
 
 // the views used in the app
-define(['dom', 'util', 'ctrls'], function(dom, util, ctrls) {
+define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS) {
     'use strict';
 
     var extend = util.extend,
@@ -84,7 +84,68 @@ define(['dom', 'util', 'ctrls'], function(dom, util, ctrls) {
 
     extend(eventsView).with(Observable);
 
+    var graphView = {
+        el: dom.id('cpu-graph'),
+
+        update_interval: 500, // 1000ms = 1sec
+
+        title: "cpu load",
+
+        data_queue: [],
+
+        max_data_size: 20,
+
+        mk_chart: function(elem_id) {
+            return new CanvasJS.Chart("cpu-graph", {
+                title: { text: this.title },
+                axisX: { title: "time (sec)", interval: 2, },
+                axisY: { title: "%", interval: 20, minimum: 0, maximum: 100 },
+                data: [{
+                    type: "line",
+                    dataPoints: this.data_queue
+                }]
+            });
+        },
+
+        setup: function(model) {
+            this.model = model;
+            this.chart = this.mk_chart('cpu-graph');
+            this.chart.render();
+
+            var self = this;
+
+            setInterval(function() { self.redraw(); }, this.update_interval);
+        },
+
+        redraw: function() {
+            this.chart.render();
+        },
+
+        add_point: function(p) {
+            this.data_queue.push(p);
+
+            if (this.data_queue.length >= this.max_data_size) {
+                this.data_queue.shift();
+            }
+        },
+
+        update: function(/*args*/) {
+            if (arguments[0] !== 'events') {
+                return;
+            }
+
+            var e = arguments[1];
+
+            console.debug('event:', e);
+            this.add_point(e);
+        }
+    };
+
+    extend(graphView).with(Observable);
+
     return {
         eventsView: eventsView,
+
+        graphView: graphView
     };
 });
