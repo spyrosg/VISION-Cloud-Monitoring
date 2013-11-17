@@ -99,7 +99,7 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
             return new CanvasJS.Chart("cpu-graph", {
                 title: { text: this.title },
                 axisX: { title: "time (sec)", interval: 5, },
-                axisY: { title: "%", interval: 20, minimum: 0, maximum: 100 },
+                axisY: { interval: 1, minimum: 0, maximum: 10 },
                 data: [{
                     type: "line",
                     dataPoints: this.data_queue
@@ -122,7 +122,7 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
         },
 
         add_point: function(p) {
-            // this.chart.options.title.text = this.title + '(' + e['originating-machine'] + ')';
+            this.chart.options.title.text = this.title + ' @ ' + e['originating-machine'];
             this.data_queue.push(p);
 
             if (this.data_queue.length >= this.max_data_size) {
@@ -130,6 +130,7 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
             }
         },
 
+        // NOTE: there should be another object that dispatches events to the various graph views
         update: function(/*args*/) {
             if (arguments[0] !== 'metrics') {
                 return;
@@ -137,7 +138,7 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
 
             var e = arguments[1];
 
-            this.add_point({ x: (e.timestamp - Date.now()) / 1000, y: e.jvm['cpu-load'], 'originating-machine': e['originating-machine'] });
+            this.add_point({ x: (e.timestamp - Date.now()) / 1000, y: e['cpu-load'], 'originating-machine': e['originating-machine'] });
         }
     };
 
