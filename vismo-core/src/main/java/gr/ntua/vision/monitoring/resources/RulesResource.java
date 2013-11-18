@@ -264,7 +264,7 @@ public class RulesResource {
      */
     private static Response toCORS(final ResponseBuilder req, final String returnMethod) {
         final ResponseBuilder rb = req.header("Access-Control-Allow-Origin", "*").header("Access-Control-Allow-Methods",
-                                                                                         "GET, POST, OPTIONS");
+                                                                                         "GET, PUT, OPTIONS");
 
         if (returnMethod != null && !returnMethod.isEmpty())
             rb.header("Access-Control-Allow-Headers", returnMethod);
