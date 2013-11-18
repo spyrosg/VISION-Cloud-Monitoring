@@ -150,9 +150,28 @@ public class RulesStore {
         } else if (r instanceof ThresholdPeriodicRule) {
             update((ThresholdPeriodicRule) r, fieldName, value);
             return;
+        } else if (r instanceof MetricsRule) {
+            update((MetricsRule) r, fieldName, value);
+            return;
         }
 
         throw new IllegalArgumentException("inapplicable update");
+    }
+
+
+    /**
+     * @param mr
+     * @param r
+     * @param fieldName
+     * @param value
+     */
+    private static void update(final MetricsRule mr, final String fieldName, final String value) {
+        if ("period".equals(fieldName)) {
+            mr.updatePeriod(Long.valueOf(value));
+            return;
+        }
+
+        throw new IllegalArgumentException("inapplicable update: " + fieldName);
     }
 
 

@@ -79,6 +79,20 @@ public class RulesResourceTest extends JerseyResourceTest {
 
 
     /***/
+    public void testHttpPUTShouldUpdateMetricsRulePeriod() {
+        final long oldPeriod = 5000;
+        final long newPeriod = 10000;
+
+        final String insertedRuleId = postMetricsRule(oldPeriod).getEntity(String.class);
+
+        final ClientResponse res = resource().path(insertedRuleId).path("period").path(String.valueOf(newPeriod))
+                .put(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.OK, res.getClientResponseStatus());
+    }
+
+
+    /***/
     public void testHttpPUTShouldUpdateRulesFilterUnit() {
         final long period = 5000;
         final String insertedRuleId = postRule(getBean(period)).getEntity(String.class);
@@ -144,6 +158,15 @@ public class RulesResourceTest extends JerseyResourceTest {
      */
     private ClientResponse getRules() {
         return resource().get(ClientResponse.class);
+    }
+
+
+    /**
+     * @param period
+     * @return
+     */
+    private ClientResponse postMetricsRule(final long period) {
+        return postRule("MetricsRule", period);
     }
 
 
