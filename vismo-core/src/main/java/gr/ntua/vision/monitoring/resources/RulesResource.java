@@ -7,13 +7,13 @@ import gr.ntua.vision.monitoring.rules.VismoRule;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -22,6 +22,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 
@@ -32,6 +33,8 @@ import javax.ws.rs.core.Response.Status;
 public class RulesResource {
     /** this header is used to signify that the rule was passed to us by another instance and not by the user. */
     static final String        X_VISION_INTERCHANGE_HEADER = "x-vision-interchange";
+    /***/
+    private String             corsHeaders;
     /***/
     private final RulesFactory factory;
     /***/
@@ -51,6 +54,41 @@ public class RulesResource {
         this.factory = factory;
         this.store = store;
         this.update = new RulesUpdate(defaultPort);
+    }
+
+
+    /**
+     * This OPTIONS request/response is necessary if you consumes other format than text/plain or if you use other HTTP verbs than
+     * GET and POST
+     * 
+     * @param accessControlRequestHeaders
+     * @return an 200 response.
+     */
+    @OPTIONS
+    public Response corsResource(@HeaderParam("Access-Control-Request-Headers") final String accessControlRequestHeaders) {
+        corsHeaders = accessControlRequestHeaders;
+        return toCORS(Response.ok(), accessControlRequestHeaders);
+    }
+
+
+    /**
+     * This OPTIONS request/response is necessary if you consumes other format than text/plain or if you use other HTTP verbs than
+     * GET and POST
+     * 
+     * @param accessControlRequestHeaders
+     * @param ruleId
+     * @param fieldName
+     * @param value
+     * @return an 200 response.
+     */
+    @OPTIONS
+    @Path("{rule-id}/{field}/{value}")
+    public Response corsResource(@HeaderParam("Access-Control-Request-Headers") final String accessControlRequestHeaders,
+            @SuppressWarnings("unused") @PathParam("rule-id") final String ruleId,
+            @SuppressWarnings("unused") @PathParam("field") final String fieldName,
+            @SuppressWarnings("unused") @PathParam("value") final String value) {
+        corsHeaders = accessControlRequestHeaders;
+        return toCORS(Response.ok(), accessControlRequestHeaders);
     }
 
 
@@ -79,7 +117,7 @@ public class RulesResource {
      */
     @GET
     @Produces("application/json; qs=0.9")
-    public List<RuleIdBean> listRulesAsJSON() {
+    public Response listRulesAsJSON() {
         final ArrayList<RuleIdBean> rules = new ArrayList<RuleIdBean>();
 
         store.forEach(new RuleOperation() {
@@ -89,7 +127,7 @@ public class RulesResource {
             }
         });
 
-        return rules;
+        return toCORS(Response.ok().entity(rules));
     }
 
 
@@ -188,7 +226,16 @@ public class RulesResource {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        return Response.ok().build();
+        return toCORS(Response.ok());
+    }
+
+
+    /**
+     * @param req
+     * @return CORS-ed a response object.
+     */
+    private Response toCORS(final ResponseBuilder req) {
+        return toCORS(req, corsHeaders);
     }
 
 
@@ -207,5 +254,21 @@ public class RulesResource {
      */
     private static Response submittedSuccessfully(final VismoRule rule) {
         return Response.created(URI.create("/" + rule.id())).entity(rule.id()).build();
+    }
+
+
+    /**
+     * @param req
+     * @param returnMethod
+     * @return a cors-ed response object.
+     */
+    private static Response toCORS(final ResponseBuilder req, final String returnMethod) {
+        final ResponseBuilder rb = req.header("Access-Control-Allow-Origin", "*").header("Access-Control-Allow-Methods",
+                                                                                         "GET, POST, OPTIONS");
+
+        if (returnMethod != null && !returnMethod.isEmpty())
+            rb.header("Access-Control-Allow-Headers", returnMethod);
+
+        return rb.build();
     }
 }
