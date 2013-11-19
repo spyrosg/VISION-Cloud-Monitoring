@@ -140,8 +140,6 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
             var dt = (e.timestamp - Date.now()) / 1000;
             var val = e['cpu-load'];
 
-            console.log('x: ' + dt + ', y: ' + val);
-
             this.add_point({ x: new Date(e.timestamp), y: val, 'originating-machine': e['originating-machine'] });
         }
     };
