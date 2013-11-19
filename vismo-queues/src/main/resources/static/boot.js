@@ -14,9 +14,11 @@ requirejs.config({
         ajax: 'src/ajax',
         dom: 'src/dom',
         util: 'src/util',
+        http: 'src/http',
         service: 'src/service',
         views: 'src/views',
         ctrls: 'src/ctrls',
+        queues: 'src/queues',
 
         core: 'src/core'
     },

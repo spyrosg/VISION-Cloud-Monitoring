@@ -2,33 +2,23 @@
 /* jshint devel: true */
 
 
-define(['ajax', 'util'], function(ajax, util) {
+define(['util', 'http'], function(util, http) {
     'use strict';
 
     var extend = util.extend;
 
-    return {
-        root_server: '/api/queues',
-
-        headers: {
+    var queues_service = {
+        cdmi_headers: {
             'Accept': 'application/cdmi-queue',
             'X-CDMI-Specification-Version': '1.0.2'
         },
 
-        request: function(path, name, headers) {
-            return ajax(this.root_server + path, name, extend(this.headers).with(headers)).then(JSON.parse);
+        server_root: function() {
+            return '/api/queues';
         },
 
-        put: function(path, headers) {
-            return this.request(path, 'PUT', headers);
-        },
-
-        get: function(path, headers) {
-            return this.request(path, 'GET', headers);
-        },
-
-        delete: function(path, headers) {
-            return this.request('/' + path, 'DELETE', headers);
+        headers: function() {
+            return this.cdmi_headers;
         },
 
         create: function(name, topic) {
@@ -39,8 +29,46 @@ define(['ajax', 'util'], function(ajax, util) {
             return this.get('/' + name).then(function(cdmi) { return cdmi.value; });
         },
 
-        list: function() {
-            return this.get('/');
+        delete_queue: function(path) {
+            return this.delete('/' + path);
         }
+    };
+
+    extend(queues_service).with(http);
+
+    var rules_service = {
+        json_content: {
+            'Accept': 'application/json',
+        },
+
+        server_root: function() {
+            // return 'http://10.0.1.101:9996';
+            return window.location.protocol + '//' + window.location.hostname + ':9996';
+        },
+
+        headers: function() {
+            return this.json_content;
+        },
+
+        update_rule_period: function(rule_id, period) {
+            console.log('rule id', rule_id);
+            return this.put('/rules/' + rule_id + '/period/' + period);
+        },
+
+        get_metrics_rule_id: function() {
+            return this.get('/rules').then(function(rules) {
+                return rules.filter(function(rule) {
+                    return rule['class'] === "MetricsRule";
+                })[0].id;
+            });
+        },
+    };
+
+    extend(rules_service).with(http);
+
+    return {
+        queues_service: queues_service,
+
+        rules_service: rules_service
     };
 });
