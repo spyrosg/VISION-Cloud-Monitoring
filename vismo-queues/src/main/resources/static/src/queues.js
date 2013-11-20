@@ -32,7 +32,10 @@ define(['services', 'util'], function(services, util) {
             var self = this;
 
             return queues_service.read(name).then(function(eventList) {
-                eventList.forEach(function(e) { self.notify(e.topic, e); });
+                eventList
+                    .filter(function(e) { return 'topic' in e; })
+                    .forEach(function(e) { self.notify(e.topic, e); });
+
                 return eventList;
             });
         },

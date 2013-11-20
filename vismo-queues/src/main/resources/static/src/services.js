@@ -41,8 +41,15 @@ define(['util', 'http'], function(util, http) {
             'Accept': 'application/json',
         },
 
+        is_dev_env: function() {
+            return /8767/.test(window.location.host);
+        },
+
         server_root: function() {
-            // return 'http://10.0.1.101:9996';
+            if (this.is_dev_env()) {
+                return 'http://10.0.1.101:9996';
+            }
+
             return window.location.protocol + '//' + window.location.hostname + ':9996';
         },
 

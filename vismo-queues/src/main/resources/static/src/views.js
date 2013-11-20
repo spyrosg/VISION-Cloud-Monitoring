@@ -9,24 +9,17 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
     var extend = util.extend,
         Observable = util.Observable;
 
-    var eventsView = {
+    var defaultView = {
         el: dom.$('#events ul'),
 
-        setup: function(model) {
-            this.model = model;
+        setup: function() {
             this.insert_into_list.el = this.el;
             this.insert_into_list.method = this.insert_into_list.append;
         },
 
-        update: function(/*args*/) {
-            if (arguments[0] !== 'events') {
-                return;
-            }
-
-            var self = this,
-                e = arguments[1];
-
-            self.render(e);
+        update: function(e) {
+            console.log('defaultView#update');
+            this.render(e);
         },
 
         render: function(e) {
@@ -82,33 +75,27 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
         }
     };
 
-    extend(eventsView).with(Observable);
-
-    var graphView = {
+    var metricsView = {
         el: dom.id('cpu-graph'),
 
         update_interval: 500, // 1000ms = 1sec
 
-        title: "cpu load",
+        title: 'cpu load',
 
         data_queue: [],
 
         max_data_size: 20,
 
         mk_chart: function(elem_id) {
-            return new CanvasJS.Chart("cpu-graph", {
+            return new CanvasJS.Chart('cpu-graph', {
                 title: { text: this.title },
-                axisX: { title: "time (sec)", interval: 5, valueFormatString: "HH:mm:ss"},
+                axisX: { title: 'time (sec)', interval: 5, valueFormatString: 'HH:mm:ss'},
                 axisY: { interval: 1, minimum: 0, maximum: 4 },
-                data: [{
-                    type: "line",
-                    dataPoints: this.data_queue
-                }]
+                data: [{ type: 'line', dataPoints: this.data_queue }]
             });
         },
 
-        setup: function(model) {
-            this.model = model;
+        setup: function() {
             this.chart = this.mk_chart('cpu-graph');
             this.chart.render();
 
@@ -130,13 +117,7 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
             }
         },
 
-        // NOTE: there should be another object that dispatches events to the various graph views
-        update: function(/*args*/) {
-            if (arguments[0] !== 'metrics') {
-                return;
-            }
-
-            var e = arguments[1];
+        update: function(e) {
             var dt = (e.timestamp - Date.now()) / 1000;
             var val = e['cpu-load'];
 
@@ -144,11 +125,38 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
         }
     };
 
-    extend(graphView).with(Observable);
+    // this object decides which view gets to show which events
+    var selectView = {
+        setup: function(model) {
+            this.model = model;
+            metricsView.setup();
+            defaultView.setup();
+        },
+
+        update: function(/*args*/) {
+            var topic = arguments[0],
+                event = arguments[1];
+
+            if ('select_' + topic in this) {
+                this['select_' + topic](event);
+            } else {
+                console.log('selectView#update');
+                this.default_view(event);
+            }
+        },
+
+        select_metrics: function(e) {
+            metricsView.update(e);
+        },
+
+        default_view: function(e) {
+            defaultView.update(e);
+        }
+    };
+
+    extend(selectView).with(Observable);
 
     return {
-        eventsView: eventsView,
-
-        graphView: graphView
+        selectView: selectView
     };
 });
