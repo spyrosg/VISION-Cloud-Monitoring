@@ -5,13 +5,13 @@
 // this is were the application is assembled,
 // configured and started.
 // Search for the ``setup`` method.
-define(['service', 'util'], function(service, util) {
+define(['services', 'util'], function(services, util) {
     'use strict';
 
     var extend = util.extend,
         Observer = util.Observer,
-        queues_service = service.queues_service,
-        rules_service = service.rules_service;
+        queues_service = services.queues_service,
+        rules_service = services.rules_service;
 
     var cdmiQueuesModel = {
         metrics_rule_id: null,
