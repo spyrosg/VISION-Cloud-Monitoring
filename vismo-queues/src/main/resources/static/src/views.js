@@ -115,7 +115,7 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
         mk_chart: function(elem_id) {
             return new CanvasJS.Chart('cpu-graph', {
                 title: { text: this.title },
-                axisX: { title: 'time (sec)', interval: 5, valueFormatString: 'HH:mm:ss'},
+                axisX: { title: 'time (sec)', valueFormatString: 'HH:mm:ss'},
                 axisY: { interval: 1, minimum: 0, maximum: 4 },
                 data: [{ type: 'line', dataPoints: this.data_queue }]
             });
