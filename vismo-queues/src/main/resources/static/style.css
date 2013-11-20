@@ -93,3 +93,15 @@ span .e {
     border-left: 1px solid black;
     border-bottom: 1px solid black;
 }
+
+footer {
+    font-family: Didot;
+    /*padding-top: 0.5em; */
+    height: 3rem;
+    position: absolute;
+    bottom: 0;
+    text-align: right;
+    background-color: lightgrey;
+    color: black;
+    width: 100%;
+}

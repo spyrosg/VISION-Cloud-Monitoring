@@ -8,7 +8,8 @@ define(['services', 'util'], function(services, util) {
     var extend = util.extend,
         Observer = util.Observer,
         queues_service = services.queues_service,
-        rules_service = services.rules_service;
+        rules_service = services.rules_service,
+        versionService = services.versionService;
 
     var cdmiQueuesModel = {
         metrics_rule_id: null,
@@ -16,6 +17,13 @@ define(['services', 'util'], function(services, util) {
         setup: function() {
             this.observables = []; // NOTE: required by Observer
             this.get_metrics_rule_id();
+            this.set_version();
+        },
+
+        set_version: function() {
+            var self = this;
+
+            versionService.get_version().then(function(s) { self.notify(s); });
         },
 
         create_queue: function(name, topic) {

@@ -36,17 +36,17 @@ define(['util', 'http'], function(util, http) {
 
     extend(queues_service).with(http);
 
+    function is_dev_env() {
+        return /8767/.test(window.location.host);
+    }
+
     var rules_service = {
         json_content: {
             'Accept': 'application/json',
         },
 
-        is_dev_env: function() {
-            return /8767/.test(window.location.host);
-        },
-
         server_root: function() {
-            if (this.is_dev_env()) {
+            if (is_dev_env()) {
                 return 'http://10.0.1.101:9996';
             }
 
@@ -72,9 +72,35 @@ define(['util', 'http'], function(util, http) {
 
     extend(rules_service).with(http);
 
+    var versionService = {
+        text_content: {
+            'Accept': 'text/plain'
+        },
+
+        server_root: function() {
+            if (is_dev_env()) {
+                return 'http://10.0.1.101:9996';
+            }
+
+            return window.location.protocol + '//' + window.location.hostname + ':9996';
+        },
+
+        headers: function() {
+            return this.text_content;
+        },
+
+        get_version: function() {
+            return this.ajax(this.server_root() + '/version', 'GET', this.headers());
+        }
+    };
+
+    extend(versionService).with(http);
+
     return {
         queues_service: queues_service,
 
-        rules_service: rules_service
+        rules_service: rules_service,
+
+        versionService: versionService
     };
 });

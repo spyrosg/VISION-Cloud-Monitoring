@@ -9,6 +9,32 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
     var extend = util.extend,
         Observable = util.Observable;
 
+    var versionView = {
+        el: dom.$('#info .version'),
+
+        is_set: false,
+
+        setup: function(model) {
+            this.model = model;
+        },
+
+        update: function(version) {
+            if (!this.is_set) {
+                this.is_set = true;
+
+                try {
+                    console.log('versionView#update');
+                    this.el.textContent = version;
+                } catch (e1) {
+                } finally {
+                    // this.model.remove(this);
+                }
+            }
+        }
+    };
+
+    extend(versionView).with(Observable);
+
     var defaultView = {
         el: dom.$('#events ul'),
 
@@ -157,6 +183,8 @@ define(['dom', 'util', 'ctrls', 'canvasjs'], function(dom, util, ctrls, CanvasJS
     extend(selectView).with(Observable);
 
     return {
+        versionView: versionView,
+
         selectView: selectView
     };
 });

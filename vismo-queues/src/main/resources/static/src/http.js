@@ -8,6 +8,8 @@ define(['ajax', 'util'], function(ajax, util) {
     var extend = util.extend;
 
     return {
+        ajax: ajax,
+
         request: function(path, name, headers) {
             return ajax(this.server_root() + path, name, extend(this.headers()).with(headers)).then(JSON.parse);
         },
