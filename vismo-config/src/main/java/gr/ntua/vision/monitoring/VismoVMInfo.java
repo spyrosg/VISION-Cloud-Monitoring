@@ -59,7 +59,7 @@ public class VismoVMInfo implements VMInfo {
             throw new Error("cannot get system version");
         }
 
-        return p.getProperty("git.commit.id.abbrev") + " built on " + p.getProperty("git.build.time");
+        return p.getProperty("git.commit.id.describe") + " built on " + p.getProperty("git.build.time");
     }
 
 
