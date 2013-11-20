@@ -2,9 +2,6 @@
 /* jshint devel: true */
 
 
-// this is were the application is assembled,
-// configured and started.
-// Search for the ``setup`` method.
 define(['services', 'util'], function(services, util) {
     'use strict';
 
@@ -66,6 +63,7 @@ define(['services', 'util'], function(services, util) {
             var self = this;
 
             rules_service.get_metrics_rule_id().then(function(id) {
+                console.log('metrics rule id =>', id);
                 self.metrics_rule_id = id;
             });
         },
@@ -81,7 +79,7 @@ define(['services', 'util'], function(services, util) {
             period = Number(period) * 1000;
 
             return this.update_vismo_rule(period).then(function() {
-                console.log("rule updated succeded");
+                console.info("rule updated succeded");
             }, function(req) {
                 console.error('rule update failed:', req.statusText + ', ' + req.responseText);
             });

@@ -51,7 +51,6 @@ define(['util', 'http'], function(util, http) {
         },
 
         update_rule_period: function(rule_id, period) {
-            console.log('rule id', rule_id);
             return this.put('/rules/' + rule_id + '/period/' + period);
         },
 
