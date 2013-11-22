@@ -94,12 +94,15 @@ span .e {
 
 footer {
     font-family: Didot;
-    /*padding-top: 0.5em; */
     height: 3rem;
-    position: absolute;
+    position: fixed;
     bottom: 0;
     text-align: right;
     background-color: lightgrey;
     color: black;
     width: 100%;
+}
+
+footer p {
+    padding-right: 5px;
 }
