@@ -110,11 +110,22 @@ define(['dom', 'util', 'ctrls', 'canvasjs', 'bqueue'], function(dom, util, ctrls
         });
     }
 
+    function mk_chart2(elem_name, title, data) {
+        return new CanvasJS.Chart(elem_name, {
+            title: { text: title },
+            axisX: { title: 'time (sec)', valueFormatString: 'HH:mm:ss'},
+            axisY: { title: '%', interval: 20, minimum: 0, maximum: 100 },
+            data: [{ type: 'area', color: "rgba(255,12,32,.8)", dataPoints: data }]
+        });
+    }
+
     var baseChart = {
         update_interval: 500, // in ms
 
+        default_max_data_size: 20,
+
         setup: function(mk_chart) {
-            this.data_queue = bqueue.new();
+            this.data_queue = bqueue.new(this.default_max_data_size);
             this.chart = mk_chart(this.elem_name, this.title, this.data_queue.data);
             this.chart.render();
 
@@ -147,11 +158,30 @@ define(['dom', 'util', 'ctrls', 'canvasjs', 'bqueue'], function(dom, util, ctrls
 
     extend(cpuLoadChart).with(baseChart);
 
+    var memoryUsageChart = {
+        update_interval: 520, // in ms
+
+        elem_name: 'memory-graph',
+
+        title: 'memory usage',
+
+        update: function(e) {
+            var dt = (e.timestamp - Date.now()) / 1000;
+            var val = 100 * Number(e['memory-used']) / Number(e['memory-total']);
+
+            this.add_point({ x: new Date(e.timestamp), y: val, 'originating-machine': e['originating-machine'] });
+        }
+    };
+
+    extend(memoryUsageChart).with(baseChart);
+
+    extend(cpuLoadChart).with(baseChart);
     // this object decides which view gets to show which events
     var selectView = {
         setup: function(model) {
             this.model = model;
             cpuLoadChart.setup(mk_chart1);
+            memoryUsageChart.setup(mk_chart2);
             defaultView.setup();
         },
 
@@ -169,6 +199,7 @@ define(['dom', 'util', 'ctrls', 'canvasjs', 'bqueue'], function(dom, util, ctrls
 
         select_metrics: function(e) {
             cpuLoadChart.update(e);
+            memoryUsageChart.update(e);
         },
 
         default_view: function(e) {
