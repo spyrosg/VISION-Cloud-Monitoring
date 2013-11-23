@@ -115,7 +115,16 @@ define(['dom', 'util', 'ctrls', 'canvasjs', 'bqueue'], function(dom, util, ctrls
             title: { text: title },
             axisX: { title: 'time (sec)', valueFormatString: 'HH:mm:ss'},
             axisY: { title: '%', interval: 20, minimum: 0, maximum: 100 },
-            data: [{ type: 'area', color: "rgba(255,12,32,.8)", dataPoints: data }]
+            data: [{ type: 'area', color: "rgba(255, 244, 32, 0.95)", dataPoints: data }]
+        });
+    }
+
+    function mk_chart3(elem_name, title, data_in, data_out) {
+        return new CanvasJS.Chart(elem_name, {
+            title: { text: title },
+            axisX: { title: 'time (sec)', valueFormatString: 'HH:mm:ss'},
+            axisY: { title: 'KB' },
+            data: [{ type: 'line', color: "rgb(12, 255, 32)", dataPoints: data_in }, { type: 'line', color: "rgb(255, 33, 45)", dataPoints: data_out }]
         });
     }
 
@@ -149,7 +158,6 @@ define(['dom', 'util', 'ctrls', 'canvasjs', 'bqueue'], function(dom, util, ctrls
         title: 'cpu load',
 
         update: function(e) {
-            var dt = (e.timestamp - Date.now()) / 1000;
             var val = e['cpu-load'];
 
             this.add_point({ x: new Date(e.timestamp), y: val, 'originating-machine': e['originating-machine'] });
@@ -159,15 +167,14 @@ define(['dom', 'util', 'ctrls', 'canvasjs', 'bqueue'], function(dom, util, ctrls
     extend(cpuLoadChart).with(baseChart);
 
     var memoryUsageChart = {
-        update_interval: 520, // in ms
+        update_interval: 620, // in ms
 
         elem_name: 'memory-graph',
 
         title: 'memory usage',
 
         update: function(e) {
-            var dt = (e.timestamp - Date.now()) / 1000;
-            var val = 100 * Number(e['memory-used']) / Number(e['memory-total']);
+            var val = parseFloat((100 * e['memory-used'] / e['memory-total']).toFixed(2));
 
             this.add_point({ x: new Date(e.timestamp), y: val, 'originating-machine': e['originating-machine'] });
         }
@@ -175,13 +182,65 @@ define(['dom', 'util', 'ctrls', 'canvasjs', 'bqueue'], function(dom, util, ctrls
 
     extend(memoryUsageChart).with(baseChart);
 
-    extend(cpuLoadChart).with(baseChart);
+    var bandwidthUsageChart = {
+        update_interval: 380, // in ms
+
+        elem_name: 'bandwidth-graph',
+
+        title: 'bandwidth',
+
+        prev_inb: -1,
+        prev_outb: -1,
+
+        toKB: function(x, y) {
+            return (y - x) / 1024;
+        },
+
+        add_inb: function(x) {
+            this.data_queue_in.push(x);
+        },
+
+        add_outb: function(x) {
+            this.data_queue_out.push(x);
+        },
+
+        update: function(e) {
+            var inbound = e.inbound;
+            var outbound = e.outbound;
+
+            if (this.prev_inb !== -1) {
+                this.add_inb({ x: new Date(e.timestamp), y: this.toKB(this.prev_inb, inbound) });
+                this.add_outb({ x: new Date(e.timestamp), y: this.toKB(this.prev_outb, outbound) });
+            } else {
+                this.add_inb({ x: new Date(e.timestamp), y: 0 });
+                this.add_outb({ x: new Date(e.timestamp), y: 0 });
+            }
+
+            this.prev_inb = inbound;
+            this.prev_outb = outbound;
+        }
+    };
+
+    extend(bandwidthUsageChart).with(baseChart);
+
+    bandwidthUsageChart.setup = function(mk_chart) {
+        this.data_queue_in = bqueue.new(this.default_max_data_size);
+        this.data_queue_out = bqueue.new(this.default_max_data_size);
+        this.chart = mk_chart(this.elem_name, this.title, this.data_queue_in.data, this.data_queue_out.data);
+        this.chart.render();
+
+        var self = this;
+
+        setInterval(function() { self.redraw(); }, this.update_interval);
+    };
+
     // this object decides which view gets to show which events
     var selectView = {
         setup: function(model) {
             this.model = model;
             cpuLoadChart.setup(mk_chart1);
             memoryUsageChart.setup(mk_chart2);
+            bandwidthUsageChart.setup(mk_chart3);
             defaultView.setup();
         },
 
@@ -200,6 +259,7 @@ define(['dom', 'util', 'ctrls', 'canvasjs', 'bqueue'], function(dom, util, ctrls
         select_metrics: function(e) {
             cpuLoadChart.update(e);
             memoryUsageChart.update(e);
+            bandwidthUsageChart.update(e);
         },
 
         default_view: function(e) {
