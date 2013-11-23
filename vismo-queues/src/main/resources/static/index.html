@@ -10,32 +10,37 @@
   </head>
   <body>
     <header>
-      <h2>VISION Cloud CDMI Notification Service</h2>
+      <div>
+        <h2>VISION Cloud CDMI Notification Service</h2>
+      </div>
     </header>
 
-    <main role="main">
+    <div class="stripe">
+    </div>
 
-      <div class="stripe">
-      </div>
+    <main role="main" class="content">
 
-      <div id="content">
-
-        <form id="update-period" action="">
-          <div>
-            <label for="period">Metrics rule period:</label>
-            <input id="period" type="text" value="5">
-            <span>sec</span>
-          </div>
-        </form>
-
-      </div>
+      <form id="update-period" action="">
+        <div>
+          <label for="period">Metrics rule period:</label>
+          <input id="period" type="text" value="5">
+          <span>sec</span>
+        </div>
+      </form>
 
       <div id="graph-container">
         <div id="cpu-graph">
         </div>
+
+        <div id="memory-graph">
+        </div>
+
+        <div id="bandwidth-graph">
+        </div>
       </div>
 
       <div id="events">
+        <h3>other events</h3>
         <ul>
         </ul>
       </div>

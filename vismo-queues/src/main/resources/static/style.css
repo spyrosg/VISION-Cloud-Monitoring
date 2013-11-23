@@ -7,100 +7,85 @@ header {
     font-family: Didot;
     background-color: #060B01;
     color: white;
+    display: flex;
+    width: 100% !important;
+}
+
+header h2 {
     padding-left: 2em;
     padding-top: 0.5em;
-    height: 4rem;
-}
-
-#update-period {
-    background-color: white;
-    width: 290px;
-    padding: 0.8em;
-    margin: 1em;
-    border-radius: 10px;
-}
-
-#update-period div + div {
-    margin-top: 1em;
-}
-
-#update-period label {
-    display: inline-block;
-    width: 150px;
-    text-align: right;
-}
-
-#update-period input {
-    font: 1em sans-serif;
-
-    width: 100px;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    text-align: right;
-    padding-right: 3px;
-
-    border: 1px solid #999;
-}
-
-#update-period input:focus {
-    /* To give a little highlight on active elements */
-    border-color: #000;
-}
-
-ul {
-    margin: 0.5em;
-    width: 300px;
-    list-style-type: none;
-}
-
-li {
-    padding-top: 11px;
-    padding-bottom: 3px;
-    border-bottom: 1px solid black;
-}
-
-span .e {
-    padding: 5px;
-    display: inline-block;
 }
 
 .stripe {
+    flex: 1;
+    width: 100% !important;
     height: 1rem;
     background-color: lightgrey;
 }
 
-#content {
-    padding: 1em 0 0 3em;
-    display: flex;
+.content {
+    flex: 1;
+    margin: 10px 3px;
 }
 
-#events {
+#update-period {
+    display: flex;
     margin-top: 1em;
-    margin-left: 4em;
-    background-color: white;
-    padding: 0.8em;
-    width: 80%;
-    border-radius: 5px;
+    margin-left: 1em;
+    margin-bottom: 1em;
+}
+
+#update-period #period {
+    text-align: right;
 }
 
 #graph-container {
-    margin-left: 4em;
+    display: flex;
 }
 
 #cpu-graph {
     width: 582px;
     height: 360px;
+    -moz-box-flex: 1;
+    flex: 1;
+    margin-left: 1em;
+}
+
+#memory-graph {
+    width: 582px;
+    height: 360px;
+    -moz-box-flex: 1;
+    flex: 1;
+    margin-left: 1em;
+}
+
+#bandwidth-graph {
+    width: 582px;
+    height: 360px;
+    -moz-box-flex: 1;
+    flex: 1;
+    margin-left: 1em;
+}
+
+#events {
+    margin-left: 1em;
+    background-color: white;
+    width: 90%;
+}
+
+#events ul {
+    list-style-type: none;
 }
 
 footer {
     font-family: Didot;
     height: 3rem;
-    position: fixed;
-    bottom: 0;
     text-align: right;
     background-color: lightgrey;
     color: black;
     width: 100%;
+    bottom: 0;
+    position: fixed;
 }
 
 footer p {
