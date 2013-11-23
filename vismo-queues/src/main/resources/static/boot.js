@@ -19,6 +19,7 @@ requirejs.config({
         views: 'src/views',
         ctrls: 'src/ctrls',
         queues: 'src/queues',
+        bqueue: 'src/bqueue',
     },
     shim: {
         canvasjs: {
