@@ -101,29 +101,21 @@ define(['dom', 'util', 'ctrls', 'canvasjs', 'bqueue'], function(dom, util, ctrls
         }
     };
 
-    var metricsView = {
-        el_name: 'cpu-graph',
+    function mk_chart1(elem_name, title, data) {
+        return new CanvasJS.Chart(elem_name, {
+            title: { text: title },
+            axisX: { title: 'time (sec)', valueFormatString: 'HH:mm:ss'},
+            axisY: { interval: 1, minimum: 0, maximum: 4 },
+            data: [{ type: 'line', dataPoints: data }]
+        });
+    }
 
+    var baseChart = {
         update_interval: 500, // in ms
 
-        title: 'cpu load',
-
-        data_queue: [],
-
-        max_data_size: 20,
-
-        mk_chart: function(elem_id, title, data_queue) {
-            return new CanvasJS.Chart(elem_id, {
-                title: { text: title },
-                axisX: { title: 'time (sec)', valueFormatString: 'HH:mm:ss'},
-                axisY: { interval: 1, minimum: 0, maximum: 4 },
-                data: [{ type: 'line', dataPoints: data_queue }]
-            });
-        },
-
-        setup: function() {
+        setup: function(mk_chart) {
             this.data_queue = bqueue.new();
-            this.chart = this.mk_chart(this.el_name, this.title, this.data_queue.data);
+            this.chart = mk_chart(this.elem_name, this.title, this.data_queue.data);
             this.chart.render();
 
             var self = this;
@@ -137,7 +129,13 @@ define(['dom', 'util', 'ctrls', 'canvasjs', 'bqueue'], function(dom, util, ctrls
 
         add_point: function(p) {
             this.data_queue.push(p);
-        },
+        }
+    };
+
+    var cpuLoadChart = {
+        elem_name: 'cpu-graph',
+
+        title: 'cpu load',
 
         update: function(e) {
             var dt = (e.timestamp - Date.now()) / 1000;
@@ -147,11 +145,13 @@ define(['dom', 'util', 'ctrls', 'canvasjs', 'bqueue'], function(dom, util, ctrls
         }
     };
 
+    extend(cpuLoadChart).with(baseChart);
+
     // this object decides which view gets to show which events
     var selectView = {
         setup: function(model) {
             this.model = model;
-            metricsView.setup();
+            cpuLoadChart.setup(mk_chart1);
             defaultView.setup();
         },
 
@@ -168,7 +168,7 @@ define(['dom', 'util', 'ctrls', 'canvasjs', 'bqueue'], function(dom, util, ctrls
         },
 
         select_metrics: function(e) {
-            metricsView.update(e);
+            cpuLoadChart.update(e);
         },
 
         default_view: function(e) {
