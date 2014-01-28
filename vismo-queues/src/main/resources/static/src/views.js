@@ -251,9 +251,9 @@ define(['dom', 'util', 'ctrls', 'canvasjs', 'bqueue'], function(dom, util, ctrls
                 event = arguments[1];
 
             if (this.originating_machine === null) {
-                this.originating_machine = e['originating-machine'];
+                this.originating_machine = event['originating-machine'];
             }
-            if (this.originating_machine !== e['originating-machine']) {
+            if (this.originating_machine !== event['originating-machine']) {
                 return; // ignore this event
             }
 
