@@ -236,6 +236,8 @@ define(['dom', 'util', 'ctrls', 'canvasjs', 'bqueue'], function(dom, util, ctrls
 
     // this object decides which view gets to show which events
     var selectView = {
+        originating_machine: null,
+
         setup: function(model) {
             this.model = model;
             cpuLoadChart.setup(mk_chart1);
@@ -247,6 +249,13 @@ define(['dom', 'util', 'ctrls', 'canvasjs', 'bqueue'], function(dom, util, ctrls
         update: function(/*args*/) {
             var topic = arguments[0],
                 event = arguments[1];
+
+            if (this.originating_machine === null) {
+                this.originating_machine = e['originating-machine'];
+            }
+            if (this.originating !== e['originating-machine']) {
+                return; // ignore this event
+            }
 
             if ('select_' + topic in this) {
                 this['select_' + topic](event);

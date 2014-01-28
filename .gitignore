@@ -5,6 +5,7 @@ target/
 *.pyc
 .project
 git.properties
+.git
 
 .DS_Store
 /bin
